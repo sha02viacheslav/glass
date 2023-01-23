@@ -1,0 +1,14 @@
+[
+    {
+        "category": "Description", 
+        "values": [" ", " ", " ", " "]
+    },
+    {
+        "category": "Claim new wipers", 
+        "values": [0, 0, 0, 0]
+    },
+    {
+        "category": "Price", 
+        "values": [{"original":0, "discount":0}, {"original":0, "discount":0}, {"original":0, "discount":0}, {"original":0, "discount":0}]
+    }
+]

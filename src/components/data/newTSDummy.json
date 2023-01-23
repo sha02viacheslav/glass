@@ -1,0 +1,16 @@
+[
+    ["Jan", "9", "Full", "Empty", "Half", "Empty", "Full", "Empty", "Empty"],
+    ["Jan", "10", "Half", "Half", "Half", "Empty", "Half", "Empty", "Empty"],
+    ["Jan", "11", "Full", "Half", "Half", "Half", "Half", "Half", "Empty"],
+    ["Jan", "12", "Half", "Half", "Empty", "Full", "Half", "Empty", "Empty"],
+    ["Jan", "13", "Half", "Half", "Half", "Empty", "Half", "Empty", "Empty"],
+    ["Jan", "14", "Half", "Half", "Half", "Half", "Half", "Empty", "Empty"],
+    ["Jan", "15", "Full", "Half", "Half", "Empty", "Half", "Empty", "Empty"],
+    ["Jan", "16", "Full", "Empty", "Half", "Empty", "Full", "Empty", "Empty"],
+    ["Jan", "17", "Half", "Half", "Half", "Empty", "Half", "Empty", "Empty"],
+    ["Jan", "18", "Full", "Full", "Half", "Half", "Empty", "Half", "Empty"],
+    ["Jan", "19", "Half", "Half", "Empty", "Full", "Half", "Empty", "Empty"],
+    ["Jan", "20", "Half", "Half", "Half", "Empty", "Half", "Full", "Empty"],
+    ["Jan", "21", "Half", "Half", "Full", "Half", "Half", "Empty", "Empty"],
+    ["Jan", "22", "Full", "Half", "Half", "Empty", "Half", "Empty", "Empty"]
+]

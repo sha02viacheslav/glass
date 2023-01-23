@@ -1,0 +1,88 @@
+
+.license-plate {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.09);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+    padding: 20px;
+}
+
+.left-container {
+    display: relative;
+    justify-content: left;
+    align-items: left;
+    margin-right: 10px;
+}
+
+.yellow-box {
+    display: flex;
+    overflow: hidden;
+    background-color: #fdd835;
+    width: 270px;
+    height: 50px;
+    border-radius: 10px;   
+    text-align: center;
+    vertical-align: middle;
+    margin-bottom: 6px;
+}
+
+.license-number {
+    padding: 6px;
+}
+
+.blue-box {
+    background-color: #1062af;
+    width: 60px;
+    margin-right: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 7px;
+}
+
+.flag {
+    width: 22px;
+    margin-top: 19px;
+}
+
+.gb {
+    display: inline-block;
+    margin-top: 10px;
+    height: 17px;
+    font-size: 16px;
+    margin-bottom: 30px;
+    color: white;
+    line-height: 0;
+}
+
+.license-input {
+    background: none;
+    border: none;
+    width: 100%;
+}
+
+.right-container {
+    display: relative;
+    width: 150px;
+    text-align: right;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: #9a73dd;
+    font-size: 18px;
+    font-weight: 600;
+    width: 55px;
+    border-radius: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #9a73dd1c;
+}
