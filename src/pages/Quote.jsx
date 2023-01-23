@@ -12,6 +12,7 @@ import expand from '../components/icons/expand.png';
 import up from '../components/icons/up.png';
 import timeData from '../components/data/newTSDummy.json';
 import { trackPromise } from 'react-promise-tracker';
+
 const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
 const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
 
@@ -24,7 +25,7 @@ function Quote() {
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
     const [backBtn, setBackBtn] = useState('Back'); // can change to Back
     const [timeSlot, setTimeSlot] = useState("");
-    const [quoteInfoOpen, setInfoOpen] = useState(false);
+    const [quoteInfoOpen, setInfoOpen] = useState(true);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
     const [quoteDetails, setQuoteDetails] = useState([]);
@@ -35,6 +36,7 @@ function Quote() {
     const [paymentOption, setPaymentOption] = useState([]);
     const [dateToPayment, setDateToPayment] = useState('');
     const [timeToPayment, setTimeToPayment] = useState('');
+    const [slotSelected, setSlotSelected] = useState(false);
     let scrolling = false;
 
     // navigate back to customer page
@@ -133,18 +135,30 @@ function Quote() {
 
     function handleSnapChange(option) {
         // naviagate scroll snap
-        if (snapValue === 1 && option === 'next') {
+        if (snapValue === 1 && option === 'next' && timeSlot === '') {
             setSnapValue(2);
+            document.getElementById('2').scrollIntoView({behavior: 'smooth'});
+        } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
+            setSnapValue(3);
+            document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
             setSnapValue(3);
+            document.getElementById('3').scrollIntoView({behavior: 'smooth'});
+        } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
+            // setSnapValue(2);
+            // scroll snap to time select if no slot selected
+            document.getElementById('2').scrollIntoView({behavior: 'smooth'});
+            setSlotSelected(true);
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
             // change tab
             handleTabChange(1);
             updateQuoteData();
-        } else if (snapValue === 3 && option === 'next' && timeSlot === '') {
+        } else if (option === 'prev' && snapValue === 3) {
             setSnapValue(2);
-        } else if (option === 'prev' && snapValue > 1) {
-            setSnapValue(snapValue - 1);
+            document.getElementById('2').scrollIntoView({behavior: 'smooth'});
+        } else if (option === 'prev' && snapValue === 2) {
+            setSnapValue(1);
+            document.getElementById('1').scrollIntoView({behavior: 'smooth'});
         } else {
             return;
         }
@@ -161,6 +175,7 @@ function Quote() {
 
     function timeSlotToParent(data) {
         setTimeSlot(data);
+        setSlotSelected(false);
     }
     
     function deliveryAddressToParent(data) {
@@ -171,21 +186,6 @@ function Quote() {
         setPaymentOption(pOption);
     }
 
-    // detect scrolling and adjust snapvalue accordingly
-    // document.addEventListener("scroll", (event) => {
-    //     if (tabValue === 0) {
-    //         scrolling = true;
-    //         const dist = window.scrollY / document.body.scrollHeight;
-    //         if (dist > 0.35) {
-    //             setSnapValue(3);
-    //         } else if (dist > 0.2) {
-    //             setSnapValue(2);
-    //         } else {
-    //             setSnapValue(1);
-    //         } 
-    //     }
-    // });
-
     useEffect(() => {
         //Get Quote Data
         if(id){
@@ -195,6 +195,11 @@ function Quote() {
         // hide navbar and footer
         document.getElementById("navbar-main").style.display = "none";
         document.getElementById("footer-main").style.display = "none";
+        // scroll to top on page load
+        const topSelector = document.getElementById('1');
+        if (topSelector !== null) {
+            topSelector.scrollIntoView({behavior: 'smooth'});
+        }
     }, []);
 
     useEffect(() => {
@@ -213,18 +218,6 @@ function Quote() {
     }, [tabValue]);
 
     useEffect(() => {
-        // scroll snap
-        const topSelector = document.getElementById(snapValue.toString());
-        // separate case for top component scroll snap
-        if (snapValue === 1) {
-            const topSelector = document.getElementById('offer');
-            if (topSelector !== null && !scrolling) {
-                topSelector.scrollIntoView({behavior: 'smooth'});
-            }
-        }   
-        if (topSelector !== null && !scrolling) {
-            topSelector.scrollIntoView({behavior: 'smooth'});
-        }
         // change between accept and next buttons names and styling
         let acceptSelector = document.getElementById('accept-btn');
         let declineSelector = document.getElementById('decline-btn');
@@ -248,16 +241,22 @@ function Quote() {
         <div>
             <div className="center">
                 <div className='true-top' id='1'>-</div>
-                {(quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number")) && <div className="quote-info-main">
+                {/* && quoteDetails.hasOwnProperty("registration_number") */}
+                {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main">
                     <div className="client-info-container">
                         <div className='info-container'>
                             <div id="scroll-to-top">
                                 {/* <span className="client-info"><b>Your quote info:</b> </span> */}
-                                <div className="client-info">{customerDetails.name}</div>
-                                <div className="client-info"><b>License plate:</b> {quoteDetails.registration_number}</div>
+                                {/* {customerDetails.name} or My Name */}
+                                <div className="client-info">{customerDetails.name}</div> 
+                                {/* {quoteDetails.registration_number} or FGHJKL7 */}
+                                <div className="client-info"><b>License plate:</b>{quoteDetails.registration_number}</div>
+                                {/* {customerDetails.order_postal_code} or 12345 */}
                                 <div className="client-info"><b>Billing address:</b> {customerDetails.order_postal_code}</div>
+                                {/* {customerDetails.email} or my.name@email.com */}
                                 <div className="client-info"><b>Email:</b> {customerDetails.email}</div>
-                                <div className="client-info"><b>Phone number:</b> {customerDetails.phone}</div>
+                                {/*  {customerDetails.phone} or 098765432 */}
+                                <div className="client-info"><b>Phone number:</b>{customerDetails.phone}</div>
                             </div>
                         </div>
                         <div className='edit-btn-container'>
@@ -272,6 +271,7 @@ function Quote() {
                             {glassDetails.map(element => 
                                 <span key={element.id} className="client-windows">{element.name}</span>
                             )}
+                            {/* <span className="client-windows">Windscreen</span> */}
                         </div>
                         <img onClick={() => setInfoOpen(false)} src={up} alt="" style={{width: '17px'}} className='client-up-icon' />
                     </div>
@@ -330,7 +330,8 @@ function Quote() {
                         />
                     </div>}
 
-                    {/* {schedulerData.length === 0 &&<div>
+                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
                             timeData={timeData}
@@ -339,14 +340,13 @@ function Quote() {
                         />
                     </div>} */}
 
-                    <div className="quote-scroll-target-2">-</div>
+                    <div className="quote-scroll-target-2" id='3'>-</div>
 
-                    {billingAddress.length > 0 && <div className='quote-component-last' id='3'>
+                    {billingAddress.length > 0 && <div className='quote-component-last'>
                         <LocationSelection
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
                          />
-                        <BeforeAfter />
                     </div>}
                 </div>}
             </div>
@@ -359,6 +359,9 @@ function Quote() {
                 <button className="btn btn-purple-radius mb-3 quote-btn" onClick={() => handleSnapChange('next')} id='accept-btn'>
                     {acceptBtn}
                 </button>
+            </div>}
+            {tabValue === 0 && <div className='quote-before-after'>
+                <BeforeAfter />
             </div>}
 
             {/* ---------------- Pay & Book page ---------------- */}

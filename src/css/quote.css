@@ -19,7 +19,7 @@
 
 .client-info-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     transition: 1s;
 }
@@ -78,7 +78,7 @@
     align-items: center;
     width: 100%;
     max-width: 550px;
-    position: fixed;
+    position: sticky;
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
@@ -108,9 +108,8 @@
 
 .scroll-container {
     animation: fadeIn 1s;
-    width: 100%;
+    height: 100%;
     max-width: 550px;
-    position: relative;
 }
 
 .quote-component {
@@ -118,7 +117,7 @@
 }
 
 .quote-component-last {
-    margin-bottom: 30vh;
+    margin-bottom: 10vh;
 }
 
 .quote-scroll-target {
@@ -182,3 +181,24 @@
     cursor: pointer;
 }
 
+.quote-before-after {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 50px 0;
+}
+
+.quote-before-after div {
+    max-width: 550px;
+}
+
+.quote-scheduler-red {
+    outline: 3px solid rgb(255, 55, 10);
+    border-radius: 15px;
+}
+
+.quote-scheduler-msg {
+    color: rgb(255, 55, 10);
+    font-size: 15px;
+    text-align: center;
+}
