@@ -84,9 +84,7 @@ function Quote() {
                             
                 // }
                 // setGlassDetails(dataG);
-                console.log(glassDetails);
-                setInfoOpen(true);
-                
+                console.log(glassDetails);                
                     
             })
             .catch(function(error) {
