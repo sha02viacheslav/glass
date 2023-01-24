@@ -10,7 +10,7 @@ export default function LicensePlate({licenseNumber, model, handleVehInputChange
                     <div className="yellow-box">
                         <div className="blue-box">
                             <img className='flag' src={flag} alt="" />
-                            <div className='gb'>GB</div>
+                            <div className='gb'>UK</div>
                         </div>
                         <input autoFocus className='license-input' type="text" value={licenseNumber} placeholder={placeholderVal} onChange={handleVehInputChange}/>
                     </div>

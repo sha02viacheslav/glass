@@ -151,7 +151,7 @@
 .popup-btn-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-top: 20px;
@@ -159,7 +159,7 @@
 
 .popup-btn-container button {
     width: 42%;
-    height: 55px;
+    height: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -184,4 +184,37 @@
 
 .popup-close:hover {
     cursor: pointer;
+}
+
+.popup-decline-reason, .popup-decline-reason-act {
+    width: 50%;
+    font-size: 17px;
+    margin: 2px 0;
+    border-radius: 8px;
+    display: flex;
+    justify-content: left;
+}
+
+.popup-decline-reason:hover {
+    background-color: #b085f556;
+    cursor: pointer;
+}
+
+.popup-decline-reason-act {
+    background-color: #b085f556;
+    cursor: default;
+}
+
+.popup-decline-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.popup-decline-container input {
+    width: 50%;
+    border-radius: 4px;
+    font-size: 17px;
 }

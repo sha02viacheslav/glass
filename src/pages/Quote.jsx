@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../css/quote.css';
+import '../css/license-plate.css';
 import SelectOfferNew from '../components/SelectOfferNew';
 import TimeSelectionNew from '../components/TimeSelectionNew';
 import LocationSelection from '../components/LocationSelection';
@@ -10,8 +11,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
 import expand from '../components/icons/expand.png';
 import up from '../components/icons/up.png';
+import flag from '../components/icons/uk-flag.png';
+import close from '../components/icons/x.png';
 import timeData from '../components/data/newTSDummy.json';
 import { trackPromise } from 'react-promise-tracker';
+import { useRef } from 'react';
 
 const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
 const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
@@ -23,9 +27,8 @@ function Quote() {
     const [isRetrieved, setIsRetrieved] = useState(false);
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
-    const [backBtn, setBackBtn] = useState('Back'); // can change to Back
     const [timeSlot, setTimeSlot] = useState("");
-    const [quoteInfoOpen, setInfoOpen] = useState(true);
+    const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
     const [quoteDetails, setQuoteDetails] = useState([]);
@@ -37,7 +40,9 @@ function Quote() {
     const [dateToPayment, setDateToPayment] = useState('');
     const [timeToPayment, setTimeToPayment] = useState('');
     const [slotSelected, setSlotSelected] = useState(false);
-    let scrolling = false;
+    const [declinePopup, setDeclinePopup] = useState(false);
+    const [declineReason, setDeclineReason] = useState(0);
+    const declineRef = useRef();
 
     // navigate back to customer page
     const navigate = useNavigate();
@@ -153,15 +158,17 @@ function Quote() {
             // change tab
             handleTabChange(1);
             updateQuoteData();
-        } else if (option === 'prev' && snapValue === 3) {
-            setSnapValue(2);
-            document.getElementById('2').scrollIntoView({behavior: 'smooth'});
-        } else if (option === 'prev' && snapValue === 2) {
-            setSnapValue(1);
-            document.getElementById('1').scrollIntoView({behavior: 'smooth'});
         } else {
             return;
         }
+    }
+
+    function handleDecline() {
+        setDeclinePopup(true);
+    }
+
+    function selectDeclineReason(option) {
+        setDeclineReason(option);
     }
 
     function handleTabChange(newValue) {
@@ -220,43 +227,68 @@ function Quote() {
     useEffect(() => {
         // change between accept and next buttons names and styling
         let acceptSelector = document.getElementById('accept-btn');
-        let declineSelector = document.getElementById('decline-btn');
         if (snapValue === 1 && acceptSelector != null) {
             setAcceptBtn('Next');
-            setBackBtn('Back');
         } else if (snapValue === 2 && acceptSelector !== null) {
             setAcceptBtn('Next');
-            setBackBtn('Back');
             acceptSelector.classList.remove('quote-accept');
-            declineSelector.classList.remove('quote-decline');
         } else if (snapValue === 3 && acceptSelector !== null && timeSlot !== '') {
             setAcceptBtn('Confirm Booking');
-            setBackBtn('Decline');
             acceptSelector.classList.add('quote-accept');
-            declineSelector.classList.add('quote-decline');
         }
     }, [snapValue, timeSlot]);
 
     return ( 
         <div>
+            {declinePopup && <div className="popup-background">
+                <div className='popup-container'>
+                    <div className="popup-close-container">
+                        <img className='popup-close' src={close} alt="" onClick={() => setDeclinePopup(false)}/>
+                    </div>                  
+                    <div className='popup-decline-container'>
+                        <div>Reason for declining</div>
+                        <div className={declineReason === 1 ? 'popup-decline-reason-act' : 'popup-decline-reason'} 
+                            onClick={() => selectDeclineReason(1)}>1. Too expensive</div>
+                        <div className={declineReason === 2 ? 'popup-decline-reason-act' : 'popup-decline-reason'} 
+                            onClick={() => selectDeclineReason(2)}>2. Job already done</div>
+                        <input type="text" ref={declineRef} placeholder='3. Other'/>
+                    </div>
+                    <div className="popup-btn-container">
+                        {/* needs a function to take back */}
+                        <button className="btn btn-purple-outline mb-3" onClick={() => setDeclinePopup(false)}>
+                            Close
+                        </button>
+                        <button className="btn btn-purple-radius mb-3" onClick={() => setDeclinePopup(false)}>
+                            Take back decline
+                        </button>
+                    </div>
+                </div>
+            </div>}
+
             <div className="center">
                 <div className='true-top' id='1'>-</div>
                 {/* && quoteDetails.hasOwnProperty("registration_number") */}
-                {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main">
+                {/* {quoteInfoOpen && <div className="quote-info-main"> */}
+                {(quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number")) && <div className="quote-info-main">
                     <div className="client-info-container">
                         <div className='info-container'>
                             <div id="scroll-to-top">
-                                {/* <span className="client-info"><b>Your quote info:</b> </span> */}
-                                {/* {customerDetails.name} or My Name */}
-                                <div className="client-info">{customerDetails.name}</div> 
-                                {/* {quoteDetails.registration_number} or FGHJKL7 */}
-                                <div className="client-info"><b>License plate:</b>{quoteDetails.registration_number}</div>
-                                {/* {customerDetails.order_postal_code} or 12345 */}
+                                <div className="yellow-box">
+                                    <div className="blue-box">
+                                        <img className='flag' src={flag} alt="" />
+                                        <div className='gb'>UK</div>
+                                    </div>
+                                    <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='Reg. Number'/>
+                                    {/* <input className='license-input' type="text" value='FGHJKL7' placeholder='Reg. Number'/> */}
+                                </div>
+                                <div className="client-info">{customerDetails.name}</div>
+                                {/* <div className="client-info">My Name</div> */}
                                 <div className="client-info"><b>Billing address:</b> {customerDetails.order_postal_code}</div>
-                                {/* {customerDetails.email} or my.name@email.com */}
+                                {/* <div className="client-info"><b>Billing address:</b> 12345</div> */}
                                 <div className="client-info"><b>Email:</b> {customerDetails.email}</div>
-                                {/*  {customerDetails.phone} or 098765432 */}
+                                {/* <div className="client-info"><b>Email:</b> my.name@email.com</div> */}
                                 <div className="client-info"><b>Phone number:</b>{customerDetails.phone}</div>
+                                {/* <div className="client-info"><b>Phone number:</b>098765432</div> */}
                             </div>
                         </div>
                         <div className='edit-btn-container'>
@@ -276,15 +308,24 @@ function Quote() {
                         <img onClick={() => setInfoOpen(false)} src={up} alt="" style={{width: '17px'}} className='client-up-icon' />
                     </div>
                 </div>}
-                {(!quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number")) && <div className="quote-info-compact">
+                {/*  && quoteDetails.hasOwnProperty("registration_number") */}
+                {!quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-compact">
                     <div className='client-info-compact'>
-                        <div className="client-info">{customerDetails.name}</div>
+                        <div className="yellow-box">
+                            <div className="blue-box">
+                                <img className='flag' src={flag} alt="" />
+                                <div className='gb'>UK</div>
+                            </div>
+                            <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='Reg. Number'/>
+                            {/* <input className='license-input' type="text" value='FGHJKL7' placeholder='Reg. Number'/> */}
+                        </div>
+                        {/* <div className="client-info">{customerDetails.name}</div> */}
                         <div className='compact-bottom-row'>
-                            <div className="client-info"><b>License plate:</b> {quoteDetails.registration_number}</div>
                             <div className='compact-bottom-row'>
                                 {glassDetails.map(element => 
                                     <span key={element.id} className="client-windows">{element.name}</span>
                                 )}
+                                {/* <span className="client-windows">Windscreen</span> */}
                             </div>
                         </div>
                     </div>
@@ -342,6 +383,7 @@ function Quote() {
 
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
+                    {/* > 0 for build, === 0 for local */}
                     {billingAddress.length > 0 && <div className='quote-component-last'>
                         <LocationSelection
                             userBillingAddress={billingAddress}
@@ -353,8 +395,8 @@ function Quote() {
             {/* accept / decline buttons */}
             {/*  && quoteDetails.x_studio_status_1 === "Published" */}
             {tabValue === 0 && quoteDetails.x_studio_status_1 === "Published" && <div className="accept-btn-container" id='accept-cont'>
-                <button className="btn btn-purple-outline mb-3 quote-btn" onClick={() => handleSnapChange('prev')} id='decline-btn'>
-                    {backBtn}
+                <button className="btn btn-purple-outline mb-3 quote-btn quote-decline" onClick={handleDecline} id='decline-btn'>
+                    Decline
                 </button>
                 <button className="btn btn-purple-radius mb-3 quote-btn" onClick={() => handleSnapChange('next')} id='accept-btn'>
                     {acceptBtn}

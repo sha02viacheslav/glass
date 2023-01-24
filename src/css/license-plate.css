@@ -25,10 +25,11 @@
     background-color: #fdd835;
     width: 270px;
     height: 50px;
-    border-radius: 10px;   
+    border-radius: 4px;   
     text-align: center;
     vertical-align: middle;
     margin-bottom: 6px;
+    box-shadow: 0 0 5px rgb(0 0 0 / 0.6);
 }
 
 .license-number {
@@ -36,9 +37,9 @@
 }
 
 .blue-box {
-    background-color: #1062af;
-    width: 60px;
-    margin-right: 20px;
+    background-color: #1165b3;
+    width: 28px;
+    margin-right: 5px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -47,7 +48,7 @@
 }
 
 .flag {
-    width: 22px;
+    width: 18px;
     margin-top: 19px;
 }
 
@@ -55,7 +56,8 @@
     display: inline-block;
     margin-top: 10px;
     height: 17px;
-    font-size: 16px;
+    font-size: 11px;
+    font-weight: 600;
     margin-bottom: 30px;
     color: white;
     line-height: 0;
@@ -65,6 +67,7 @@
     background: none;
     border: none;
     width: 100%;
+    font-weight: 600;
 }
 
 .right-container {
