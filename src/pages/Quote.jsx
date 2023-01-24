@@ -269,7 +269,7 @@ function Quote() {
                 <div className='true-top' id='1'>-</div>
                 {/* && quoteDetails.hasOwnProperty("registration_number") */}
                 {/* {quoteInfoOpen && <div className="quote-info-main"> */}
-                {(quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number")) && <div className="quote-info-main">
+                {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main">
                     <div className="client-info-container">
                         <div className='info-container'>
                             <div id="scroll-to-top">
@@ -361,8 +361,8 @@ function Quote() {
                     </div>
 
                     <div className="quote-scroll-target" id='2'>-</div>
-
-                    {schedulerData.length > 0 &&<div>
+                    {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {schedulerData.length > 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
                             timeData={schedulerData}
