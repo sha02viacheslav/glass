@@ -14,7 +14,7 @@
     width: 98%;
     max-width: 550px;
     border-radius: 10px;
-    padding: 7px;
+    position: relative;
 }
 
 .client-info-container {
@@ -22,6 +22,8 @@
     justify-content: space-between;
     align-items: center;
     transition: 1s;
+    position: relative;
+    padding: 5px;
 }
 
 .client-info {
@@ -61,6 +63,7 @@
     justify-content: space-between;
     width: 100%;
     line-height: 22px;
+    padding: 5px;
 }
 
 .working-gif {
@@ -146,6 +149,7 @@
     width: 100%;
     max-width: 550px;
     transition: 1s;
+    position: relative;
 }
 
 .client-info-compact {
@@ -200,4 +204,34 @@
     color: rgb(255, 55, 10);
     font-size: 15px;
     text-align: center;
+}
+
+.client-info-blinky {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgb(4, 224, 4);
+    box-shadow: 
+        0 0 5px 1px #fff,
+        0 0 8px 1px rgb(55, 255, 48);
+    color: transparent;
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    animation: blink-animation 3s infinite;
+}
+@keyframes blink-animation {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.client-info-blinky:hover {
+    cursor: default;
 }

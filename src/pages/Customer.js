@@ -11,8 +11,6 @@ import Estate from '../components/window-selection/Estate';
 import Sedan from '../components/window-selection/Sedan';
 import VANs from '../components/window-selection/VANs';
 import LicensePlate from '../components/LicensePlate';
-import { sub } from 'date-fns';
-import { BrowserNotSupportedSharp } from '@mui/icons-material';
 import {autocomplete} from 'getaddress-autocomplete';
 
 import { trackPromise } from 'react-promise-tracker';
@@ -39,9 +37,7 @@ const Customer = () => {
 
     // Dialog Options
     const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-    const [postalAddressOptions, setAddress] = useState();
+    // const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     // keep track if request can be submitted
     const firstNameRef = useRef('');
@@ -177,7 +173,7 @@ const Customer = () => {
                 email: emailRef.current.value,
                 address: billingAddressVal,
                 windows: selectedBrokenWindows,
-                registration: (licenseSearchVal || quoteInfo.registration),
+                registration: (licenseSearchVal),
                 bodyType: selectedCarType
             }
             sessionStorage.setItem('quoteInfo', JSON.stringify(newQuote));
@@ -266,7 +262,6 @@ const Customer = () => {
         if(licenseSearchVal){
             setLicense(licenseSearchVal.toUpperCase());
             getVehicleDetails(licenseSearchVal);
-            console.log("Use Effect Called!");
         }
         // scroll car into view on page load
         // if (!submitClicked) {
@@ -330,8 +325,50 @@ const Customer = () => {
         })
     }, []);
 
-    const handleVehInputChange = (event) => {
-        setLicense(event.target.value.toUpperCase());
+    // const handleVehInputChange = event => {
+    //     // format correcly
+    //     // check if license plate is standard or unique
+    //     if (event.target.value.length >= 3) {
+    //         if (Number.isInteger(Number(event.target.value.charAt(2)))) {
+    //             // license number is standard
+    //             // check if plate already includes space
+    //             if (event.target.value.charAt(4) === ' ') {
+    //                 return;
+    //             } else if (event.target.value.length === 7) {
+    //                 let input = event.target.value;
+    //                 input = input.slice(0,4) + ' ' + input.slice(4);
+    //                 setLicense(input);
+    //             }
+    //         }
+    //     } 
+    //     setLicense(event.target.value.toUpperCase());
+    //     console.log('hola');
+    //     // search for license plate
+    //     if(inputInterval.current)
+    //     {
+    //         clearTimeout(inputInterval.current);
+    //     }
+    //     inputInterval.current=setTimeout(function(){
+    //         console.log("Search");
+    //         console.log("Input Changed Called!");
+    //         getVehicleDetails(event.target.value);
+    //     },1000);
+    // }      
+    function handleVehInputChange(data) {
+        // format correcly
+        // check if license plate is standard or unique
+        let input = data;
+        if (data.length >= 3) {
+            if (Number.isInteger(Number(data.charAt(2)))) {
+                // license number is standard
+                // check if plate already includes space
+                if (data.charAt(4) !== ' ' && data.length === 7) {
+                    input = input.slice(0,4) + ' ' + input.slice(4);
+                }
+            }
+        } 
+        setLicense(input.toUpperCase());
+        // search for license plate
         if(inputInterval.current)
         {
             clearTimeout(inputInterval.current);
@@ -339,7 +376,7 @@ const Customer = () => {
         inputInterval.current=setTimeout(function(){
             console.log("Search");
             console.log("Input Changed Called!");
-            getVehicleDetails(event.target.value);
+            getVehicleDetails(data);
         },1000);
     }      
 
@@ -355,7 +392,7 @@ const Customer = () => {
                     <div className='tab-content'>
                         <div className="row" id='scroll-to-top'>
                         <LicensePlate 
-                            placeholderVal={'Reg. Number'}
+                            placeholderVal={'NU71 REG'}
                             licenseNumber={licenseSearchVal}
                             model={vehicleMakeModel}
                             handleVehInputChange={handleVehInputChange}
