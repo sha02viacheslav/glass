@@ -56,9 +56,9 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
         let mainContainer = document.getElementById('loc-container');
         let inputField = document.getElementById('autocomplete-field');
         if (mainContainer != null) {
-            let newWidth = (mainContainer.offsetWidth - 20).toString().concat('px');
+            let newWidth = (mainContainer.offsetWidth - 60).toString().concat('px');
             inputField.style.width = newWidth;
-            console.log(mainContainer.offsetWidth);
+            // console.log(mainContainer.offsetWidth);
         }
 
         setDeliveryAddress(userBillingAddress);

@@ -145,7 +145,7 @@ export default function Sedan({brokenWindowsToCustomer, brokenWindowsToComponent
             brokenWindowsToComponent.forEach(element => checkIfPreviouslySelected(element));
             setSelectedWindows(brokenWindowsToComponent);        
         }
-    }, []);
+    }, [brokenWindowsToComponent]);
 
     return (
         <div className={styles.container}>

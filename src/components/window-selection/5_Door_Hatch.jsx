@@ -145,7 +145,7 @@ export default function FiveDoorHatch({brokenWindowsToCustomer, brokenWindowsToC
             brokenWindowsToComponent.forEach(element => checkIfPreviouslySelected(element));
             setSelectedWindows(brokenWindowsToComponent);        
         }
-    }, []);
+    }, [brokenWindowsToComponent]);
 
     return (
         <div className={styles.container}>

@@ -243,7 +243,7 @@ export default function Vans({brokenWindowsToCustomer, brokenWindowsToComponent}
         } else {
             setIsBarnDoor(false);
         }
-    }, []);
+    }, [brokenWindowsToComponent]);
 
     return (
         <div className={styles.container}>

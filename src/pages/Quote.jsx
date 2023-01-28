@@ -78,7 +78,6 @@ function Quote() {
                 setGlassDetails(response.data.glassData);
                 setOffersDetails(response.data.offerData);
                 setBillingAddress(response.data.userData[0].order_postal_code);
-
                 
                 // var dataG = '';
                 // var countG = response.data.glassData;
@@ -179,7 +178,27 @@ function Quote() {
     }
 
     function backToCustomer() {
-        navigate('/react/customer');
+        // const licenseReg = 'BD51SMR';
+        const licenseReg = quoteDetails.registration_number;
+        const i = customerDetails.name.indexOf(' ');
+        const names = [customerDetails.name.slice(0,i), customerDetails.name.slice(i + 1)];
+        let quoteData = {
+            address: customerDetails.order_postal_code, 
+            firstName: names[0],
+            lastName: names[1],
+            email: customerDetails.email,
+            phone: customerDetails.phone,
+            selected: glassDetails
+            // address: '3 Valladale, Heylor, Shetland, Shetland Islands ZE2 9RJ', 
+            // firstName: names[0],
+            // lastName: names[1],
+            // email: 'my.name@email.com',
+            // phone: '0987654',
+            // selected: ['Windscreen']
+        };
+        quoteData = JSON.stringify(quoteData);
+        sessionStorage.setItem('quoteInfo', quoteData);
+        navigate('/react/customer/' + licenseReg);
     }
 
     function timeSlotToParent(data) {
@@ -193,26 +212,6 @@ function Quote() {
 
     function paymentOptionToParent(pOption){
         setPaymentOption(pOption);
-    }
-
-    function patternMatch() {
-        licenseRef.current.value = licenseRef.current.value.toUpperCase();
-        // check if license plate is standard or unique
-        if (licenseRef.current.value.length >= 3) {
-            if (Number.isInteger(Number(licenseRef.current.value.charAt(2)))) {
-                // license number is standard
-                // check if plate already includes space
-                if (licenseRef.current.value.charAt(4) === ' ') {
-                    return;
-                } else if (licenseRef.current.value.length === 7) {
-                    let input = licenseRef.current.value;
-                    input = input.slice(0,4) + ' ' + input.slice(4);
-                    licenseRef.current.value = input;
-                }
-            }
-        } else {
-            return;
-        }
     }
 
     useEffect(() => {
@@ -230,13 +229,19 @@ function Quote() {
             topSelector.scrollIntoView({behavior: 'smooth'});
         }
         // format license number correctly
+        setTempLicense(quoteDetails.registration_number);
         if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
             // license number is standard
             // check if plate already includes space
             if (tempLicenseNum.charAt(4) === ' ') {
                 return;
             } else if (tempLicenseNum.length === 7) {
-                let input = tempLicenseNum;
+                let input = '';
+                if (quoteDetails.registration_number !== undefined) {
+                    input = quoteDetails.registration_number;
+                } else {
+                    input = tempLicenseNum;
+                }
                 input = input.slice(0,4) + ' ' + input.slice(4);
                 setTempLicense(input);
             }
@@ -301,8 +306,7 @@ function Quote() {
             <div className="center">
                 <div className='true-top' id='1'>-</div>
                 {/* && quoteDetails.hasOwnProperty("registration_number") */}
-                {quoteInfoOpen && <div className="quote-info-main">
-                {/* {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main"> */}
+                {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main">
                     <div className="client-info-container">
                         {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
                             <div className="client-info-blinky">-</div>
@@ -314,17 +318,17 @@ function Quote() {
                                         <img className='flag' src={flag} alt="" />
                                         <div className='gb'>UK</div>
                                     </div>
-                                    {/* <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='NU71 REG'/> */}
-                                    <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' onChange={patternMatch} maxLength='8'/>
+                                    <input className='license-input' type="text" value={tempLicenseNum} placeholder='NU71 REG'/>
+                                    {/* <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' maxLength='8'/> */}
                                 </div>
-                                {/* <div className="client-info">{customerDetails.name}</div> */}
-                                <div className="client-info">My Name</div>
-                                {/* <div className="client-info"><b>Billing address:</b> {customerDetails.order_postal_code}</div> */}
-                                <div className="client-info"><b>Billing address:</b> 12345</div>
-                                {/* <div className="client-info"><b>Email:</b> {customerDetails.email}</div> */}
-                                <div className="client-info"><b>Email:</b> my.name@email.com</div>
-                                {/* <div className="client-info"><b>Phone number:</b>{customerDetails.phone}</div> */}
-                                <div className="client-info"><b>Phone number:</b>098765432</div>
+                                <div className="client-info">{customerDetails.name}</div>
+                                {/* <div className="client-info">My Name</div> */}
+                                <div className="client-info"><b>Billing address:</b> {customerDetails.order_postal_code}</div>
+                                {/* <div className="client-info"><b>Billing address:</b> 3 Valladale, Heylor, Shetland, Shetland Islands ZE2 9RJ</div> */}
+                                <div className="client-info"><b>Email:</b> {customerDetails.email}</div>
+                                {/* <div className="client-info"><b>Email:</b> my.name@email.com</div> */}
+                                <div className="client-info"><b>Phone number:</b>{customerDetails.phone}</div>
+                                {/* <div className="client-info"><b>Phone number:</b>098765432</div> */}
                             </div>
                         </div>
                         <div className='edit-btn-container'>
@@ -336,16 +340,16 @@ function Quote() {
                     <div className='quote-info-bottom'>
                         <div className='compact-bottom-row'>
                             <span className="client-info"><b>Selected windows:</b> </span>
-                            {/* {glassDetails.map(element => 
+                            {glassDetails.map(element => 
                                 <span key={element.id} className="client-windows">{element.name}</span>
-                            )} */}
-                            <span className="client-windows">Windscreen</span>
+                            )}
+                            {/* <span className="client-windows">Windscreen</span> */}
                         </div>
                         <img onClick={() => setInfoOpen(false)} src={up} alt="" style={{width: '17px'}} className='client-up-icon' />
                     </div>
                 </div>}
                 {/*  && quoteDetails.hasOwnProperty("registration_number") */}
-                {!quoteInfoOpen && <div className="quote-info-compact">
+                {!quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-compact">
                     {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
                         <div className="client-info-blinky">-</div>
                     </Tooltip>}
@@ -355,17 +359,17 @@ function Quote() {
                                 <img className='flag' src={flag} alt="" />
                                 <div className='gb'>UK</div>
                             </div>
-                            {/* <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='NU71 REG'/> */}
-                            <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' onChange={patternMatch} maxLength='8'/>
+                            <input className='license-input' type="text" value={tempLicenseNum} placeholder='NU71 REG'/>
+                            {/* <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' maxLength='8'/> */}
                         </div>
-                        {/* <div className="client-info">{customerDetails.name}</div> */}
-                        <div className="client-info">My name</div>
+                        <div className="client-info">{customerDetails.name}</div>
+                        {/* <div className="client-info">My name</div> */}
                         <div className='compact-bottom-row'>
                             <div className='compact-bottom-row'>
-                                {/* {glassDetails.map(element => 
+                                {glassDetails.map(element => 
                                     <span key={element.id} className="client-windows">{element.name}</span>
-                                )} */}
-                                <span className="client-windows">Windscreen</span>
+                                )}
+                                {/* <span className="client-windows">Windscreen</span> */}
                             </div>
                         </div>
                     </div>
@@ -389,7 +393,7 @@ function Quote() {
 
             <div className='center'>
                 {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-                {tabValue === 0 && <div className='scroll-container'>
+                {tabValue === 0 && quoteDetails.x_studio_status_1 === "Published" && <div className='scroll-container'>
                     {/* select offer */}
                     <div id='offer'>
                         <SelectOfferNew 
@@ -401,7 +405,7 @@ function Quote() {
                     </div>
 
                     <div className="quote-scroll-target" id='2'>-</div>
-                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length > 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
@@ -409,9 +413,9 @@ function Quote() {
                             liveBooking={false}
                             slot={timeSlot}
                         />
-                    </div>} */}
+                    </div>}
 
-                    {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
@@ -419,12 +423,12 @@ function Quote() {
                             liveBooking={false}
                             slot={""}
                         />
-                    </div>}
+                    </div>} */}
 
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
                     {/* > 0 for build, === 0 for local */}
-                    {billingAddress.length === 0 && <div className='quote-component-last'>
+                    {billingAddress.length > 0 && <div className='quote-component-last'>
                         <LocationSelection
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
@@ -434,7 +438,7 @@ function Quote() {
             </div>
             {/* accept / decline buttons */}
             {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-            {tabValue === 0 && <div className="accept-btn-container" id='accept-cont'>
+            {tabValue === 0 && quoteDetails.x_studio_status_1 === "Published" && <div className="accept-btn-container" id='accept-cont'>
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline" onClick={handleDecline} id='decline-btn'>
                     Decline
                 </button>
@@ -449,7 +453,7 @@ function Quote() {
             {/* ---------------- Pay & Book page ---------------- */}
 
             {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-            {tabValue === 1 && <div className='tab-content center'>
+            {tabValue === 1 && quoteDetails.x_studio_status_1 === "Published" && <div className='tab-content center'>
                 <Payment 
                     clientTime={timeToPayment}
                     clientDate={dateToPayment}

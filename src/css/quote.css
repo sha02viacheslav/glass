@@ -8,10 +8,17 @@
     margin-bottom: 60px;
 }
 
+.quote-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .quote-info-main {
     border: 1.5px solid #9a73dd;
     background-color: white;
-    width: 98%;
+    width: 100%;
     max-width: 550px;
     border-radius: 10px;
     position: relative;
@@ -76,23 +83,23 @@
 
 .accept-btn-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     width: 100%;
-    max-width: 550px;
+    /* max-width: 550px; */
     position: sticky;
     bottom: 10px;
     left: 50%;
-    transform: translateX(-50%);
-    -webkit-transform: translateX(-50%);
+    
 }
 
 .quote-btn {
-    width: 42%;
+    width: 200px;
     height: 55px;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0 20px;
 }
 
 .quote-accept {
@@ -111,7 +118,11 @@
 .scroll-container {
     animation: fadeIn 1s;
     height: 100%;
+    width: 100%;
     max-width: 550px;
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
 }
 
 .quote-component {

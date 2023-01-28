@@ -139,7 +139,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
             brokenWindowsToComponent.forEach(element => checkIfPreviouslySelected(element));
             setSelectedWindows(brokenWindowsToComponent);        
         }
-    }, []);
+    }, [brokenWindowsToComponent]);
 
     return (
         <div className={styles.container}>

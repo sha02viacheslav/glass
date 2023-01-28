@@ -151,7 +151,7 @@ export default function Estate({brokenWindowsToCustomer, brokenWindowsToComponen
             brokenWindowsToComponent.forEach(element => checkIfPreviouslySelected(element));
             setSelectedWindows(brokenWindowsToComponent);        
         }
-    }, []);
+    }, [brokenWindowsToComponent]);
 
     return (
         <div className={styles.container}>

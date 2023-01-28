@@ -19,8 +19,9 @@
     border-radius: 15px;
     width: 100%;
     max-width: 550px;
-    overflow: none;
     padding: 10px;
+    display: table;
+    text-align: center;
 }
 
 .time-select-main h1 {
@@ -170,7 +171,7 @@
     display: flex;
     justify-content: left;
     align-items: center;
-    width: 90%;
+    /* width: 90%; */
     margin-top: 25px;
     margin-bottom: 20px;
 }

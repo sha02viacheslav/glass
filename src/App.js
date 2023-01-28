@@ -59,6 +59,7 @@ function App() {
   return (
     <>
       <div className='main-content'>
+        <div className="empty-test">-</div>
       <LoadingIndicator/>
         <Header />
         <Routes>

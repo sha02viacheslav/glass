@@ -1,5 +1,5 @@
-import { useState, React, useRef, useEffect } from 'react'
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { useState, React, useRef, useEffect } from 'react';
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import axios from "axios";
@@ -28,12 +28,12 @@ const Customer = () => {
     const [vehicleBodyType, setVehicleBodyType] = useState('');
     const [vehicleModel, setVehicleModel] = useState('');
     const [vehicleModelYear, setVehicleModelYear] = useState('');
-    // const Ref = useRef('');
-    // const bodyTypeRef = useRef('');
-    // const modelRef = useRef('');
-    // const modelYearRef = useRef('');
-    // const [billingAddressVal, setBillingAddress] = useState('');
     const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '');
+    const firstName = quoteInfo.firstName || '';
+    const lastName = quoteInfo.lastName || '';
+    const email = quoteInfo.email || '';
+    const phone = quoteInfo.phone || '';
+    const selected = quoteInfo.selected || [];
 
     // Dialog Options
     const theme = useTheme();
@@ -45,14 +45,7 @@ const Customer = () => {
     const emailRef = useRef('');
     const phoneRef = useRef('');
     const billingRef = useRef('');
-    
-    const isNewQuote = () => {
-        if (quoteInfo.length > 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+
     // for determining which form is not filled
     const [incorrectFormIndex, setIncorrectFormIndex] = useState(99);
     const [vehicleTypes, setVehicleTypes] = useState(new Map());
@@ -62,16 +55,20 @@ const Customer = () => {
     const [onSubmitMessage, setOnSubmitMessage] = useState('');
     const navigate = useNavigate();
 
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
-
     // temporary things for car selection menu - Rainer
     const [menuOpen, setMenuOpen] = useState(false);
     const [selectedCarType, setSelectedCarType] = useState(quoteInfo.bodyType || '3door');
     const [anchorEl, setAnchorEl] = useState(null);
 
-    function handleMenuClick(event) {
+    // for getting the array of broken windows
+    const [selectedBrokenWindows, setSelectedBrokenWindows] = useState([]);
+    const brokenWindowsToCustomer = (windows) => {
+        setSelectedBrokenWindows(windows);
+    }
+    // preselect broken windows if editing quote
+    const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState([]);
+
+    function handleMenuClick(event) { 
         setMenuOpen(!menuOpen);
         setAnchorEl(event.currentTarget)
     }
@@ -164,32 +161,8 @@ const Customer = () => {
             return;
         } else {
             setSubmitClicked(true);
-            const newId = getRandomInt(10000);
-            const newQuote = {
-                id: newId,
-                firstName: firstNameRef.current.value,
-                lastName: lastNameRef.current.value,
-                number: phoneRef.current.value,
-                email: emailRef.current.value,
-                address: billingAddressVal,
-                windows: selectedBrokenWindows,
-                registration: (licenseSearchVal),
-                bodyType: selectedCarType
-            }
-            sessionStorage.setItem('quoteInfo', JSON.stringify(newQuote));
-            setIncorrectFormIndex(99);
-            saveQuotes(newQuote);
-            // navigate('/react/quote/' + newId);
         }
     }
-
-    // for getting the array of broken windows
-    const [selectedBrokenWindows, setSelectedBrokenWindows] = useState([]);
-    const brokenWindowsToCustomer = (windows) => {
-        setSelectedBrokenWindows(windows);
-    }
-    // preselect broken windows if editing quote
-    const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState(quoteInfo.windows || []);
 
     function getVehicleDetails(searchValue) {
         let body = {
@@ -272,7 +245,6 @@ const Customer = () => {
         document.getElementById("navbar-main").style.display = "inline";
         document.getElementById("footer-main").style.display = "inline";
 
-
         ///////////////////////////////////////////
         // Adding necessary data for Vehicle Types
         ///////////////////////////////////////////
@@ -304,9 +276,6 @@ const Customer = () => {
         vehicleTypes.set(type.toUpperCase(), "van");
         });
         // setVehicleTypes(vehicleTypesData);
-        console.log(vehicleTypes);
-
-
 
         ///////////////////////////////////////////
         // Integration of PostalCode/ Address AutoComplete API
@@ -325,35 +294,20 @@ const Customer = () => {
         })
     }, []);
 
-    // const handleVehInputChange = event => {
-    //     // format correcly
-    //     // check if license plate is standard or unique
-    //     if (event.target.value.length >= 3) {
-    //         if (Number.isInteger(Number(event.target.value.charAt(2)))) {
-    //             // license number is standard
-    //             // check if plate already includes space
-    //             if (event.target.value.charAt(4) === ' ') {
-    //                 return;
-    //             } else if (event.target.value.length === 7) {
-    //                 let input = event.target.value;
-    //                 input = input.slice(0,4) + ' ' + input.slice(4);
-    //                 setLicense(input);
-    //             }
-    //         }
-    //     } 
-    //     setLicense(event.target.value.toUpperCase());
-    //     console.log('hola');
-    //     // search for license plate
-    //     if(inputInterval.current)
-    //     {
-    //         clearTimeout(inputInterval.current);
-    //     }
-    //     inputInterval.current=setTimeout(function(){
-    //         console.log("Search");
-    //         console.log("Input Changed Called!");
-    //         getVehicleDetails(event.target.value);
-    //     },1000);
-    // }      
+    useEffect(() => {
+        // send previously selected windows to window selection component
+        let selectedWindows = [];
+        if (selected.length > 0) {
+            for (let i = 0; i < selected.length; i++) {
+                selectedWindows.push(selected[i].name); 
+            }
+            setBrokenWindowsToComponent(selectedWindows); 
+        }
+    }, []);
+
+    console.log(brokenWindowsToComponent);
+    console.log(quoteInfo);
+
     function handleVehInputChange(data) {
         // format correcly
         // check if license plate is standard or unique
@@ -481,13 +435,13 @@ const Customer = () => {
                                         <form action="" className="form-car my-md-5 my-4">
                                             <p className="fs-18 text-blue">Fill your personal details</p>
                                             <br />
-                                            <div className="row">
+                                            <div className="row" key={quoteInfo}>
                                                 <div className="col-md-6">
                                                     <div className="form-group mb-4">
                                                         <input ref={firstNameRef} type="text" 
                                                             className={incorrectFormIndex === 0 ? 'form-control form-not-filled' : 'form-control'} 
-                                                            placeholder="First Name" 
-                                                            defaultValue={isNewQuote ? quoteInfo.firstName : ''} />
+                                                            placeholder="First name" 
+                                                            defaultValue={firstName} />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6">
@@ -495,7 +449,7 @@ const Customer = () => {
                                                         <input ref={lastNameRef} type="text" 
                                                             className={incorrectFormIndex === 1 ? 'form-control form-not-filled' : 'form-control'} 
                                                             placeholder="Last name" 
-                                                            defaultValue={isNewQuote ? quoteInfo.lastName : ''} />
+                                                            defaultValue={lastName} />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6">
@@ -503,7 +457,7 @@ const Customer = () => {
                                                         <input ref={emailRef} type="text" 
                                                             className={incorrectFormIndex === 2 ? 'form-control form-not-filled' : 'form-control'} 
                                                             placeholder="Email" 
-                                                            defaultValue={isNewQuote ? quoteInfo.email : ''} />
+                                                            defaultValue={email} />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6">
@@ -511,23 +465,9 @@ const Customer = () => {
                                                         <input ref={phoneRef} type="text" 
                                                             className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'} 
                                                             placeholder="Phone" 
-                                                            defaultValue={isNewQuote ? quoteInfo.number : ''} />
+                                                            defaultValue={phone} />
                                                     </div>
                                                 </div>
-                                                {/* <div className="col-md-6">
-                                                    <div className="form-group mb-4">
-
-                                                            <Select
-                                                                    ref={billingRef}
-                                                                    className={incorrectFormIndex === 4 ? 'form-control form-not-filled' : 'form-control'} 
-                                                                    placeholder="Billing address" 
-                                                                    defaultValue={isNewQuote ? quoteInfo.address : ""}
-                                                                    noOptionsMessage={() => "Address not found!"}
-                                                                    onChange={handlePCodeChange}
-                                                                    options={pCodeAddressOptions}
-                                                                />
-                                                    </div>
-                                                </div> */}
                                                 <div className="col-md-12">
                                                     <div className="form-group mb-4">
                                                         <input id='billingAddress' ref={billingRef} type="text" 
