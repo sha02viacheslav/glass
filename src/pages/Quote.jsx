@@ -306,7 +306,7 @@ function Quote() {
             <div className="center">
                 <div className='true-top' id='1'>-</div>
                 {/* && quoteDetails.hasOwnProperty("registration_number") */}
-                {quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-main">
+                {quoteInfoOpen && <div className="quote-info-main">
                     <div className="client-info-container">
                         {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
                             <div className="client-info-blinky">-</div>
@@ -349,7 +349,7 @@ function Quote() {
                     </div>
                 </div>}
                 {/*  && quoteDetails.hasOwnProperty("registration_number") */}
-                {!quoteInfoOpen && quoteDetails.hasOwnProperty("registration_number") && <div className="quote-info-compact">
+                {!quoteInfoOpen && <div className="quote-info-compact">
                     {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
                         <div className="client-info-blinky">-</div>
                     </Tooltip>}
@@ -386,14 +386,14 @@ function Quote() {
                     isRetrieved={isRetrieved}
                 /> */}
             </div>}
-            {((tabValue === 1 || tabValue === 0) && quoteDetails.hasOwnProperty("registration_number")) && <div className="tab">
+            {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>
                 <button className={tabValue === 1 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(1)} id='pay-btn'>Live Booking</button>
             </div>}
 
             <div className='center'>
                 {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-                {tabValue === 0 && quoteDetails.x_studio_status_1 === "Published" && <div className='scroll-container'>
+                {tabValue === 0 && <div className='scroll-container'>
                     {/* select offer */}
                     <div id='offer'>
                         <SelectOfferNew 
@@ -415,7 +415,7 @@ function Quote() {
                         />
                     </div>}
 
-                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
@@ -423,12 +423,12 @@ function Quote() {
                             liveBooking={false}
                             slot={""}
                         />
-                    </div>} */}
+                    </div>}
 
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
                     {/* > 0 for build, === 0 for local */}
-                    {billingAddress.length > 0 && <div className='quote-component-last'>
+                    {billingAddress.length === 0 && <div className='quote-component-last'>
                         <LocationSelection
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
@@ -438,7 +438,7 @@ function Quote() {
             </div>
             {/* accept / decline buttons */}
             {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-            {tabValue === 0 && quoteDetails.x_studio_status_1 === "Published" && <div className="accept-btn-container" id='accept-cont'>
+            {tabValue === 0 && <div className="accept-btn-container" id='accept-cont'>
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline" onClick={handleDecline} id='decline-btn'>
                     Decline
                 </button>
@@ -453,7 +453,7 @@ function Quote() {
             {/* ---------------- Pay & Book page ---------------- */}
 
             {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-            {tabValue === 1 && quoteDetails.x_studio_status_1 === "Published" && <div className='tab-content center'>
+            {tabValue === 1 && <div className='tab-content center'>
                 <Payment 
                     clientTime={timeToPayment}
                     clientDate={dateToPayment}
