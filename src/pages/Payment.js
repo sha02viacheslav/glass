@@ -127,7 +127,7 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
                             <span className="text-purple fs-14 fw-normal float-end" onClick={() => openPopup('loc')}>EDIT</span>
                         </a>
                     </div>
-                    <p className="mb-0 fs-14">{pastLocs[pastLocs.length - 1]} </p>
+                    {/* <p className="mb-0 fs-14">{pastLocs[pastLocs.length - 1]} </p> */}
                     {isRetrieved && <p className="mb-0 fs-14">Arriving between <span className="fw-500"> {clientTime !== '' ? clientTime : ''}</span> </p>}
 
                     <div id="map-container-google-1" className="z-depth-1-half map-container mt-4" width="100%" style={{height: 400+"px"}}>

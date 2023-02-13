@@ -24,6 +24,7 @@ function Quote() {
 
     // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
     const [tabValue, setTabValue] = useState(0);
+    const [customerDetails, setCustomerDetails] = useState([]);
     const [isRetrieved, setIsRetrieved] = useState(false);
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
@@ -32,7 +33,6 @@ function Quote() {
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
     const [quoteDetails, setQuoteDetails] = useState([]);
-    const [customerDetails, setCustomerDetails] = useState([]);
     const [glassDetails, setGlassDetails] = useState([]);
     const [offersDetails, setOffersDetails] = useState([]);// || [];
     const [schedulerData, setSchedulerData] = useState([]);
@@ -44,98 +44,40 @@ function Quote() {
     const [declineReason, setDeclineReason] = useState(0);
     const [isBlinky, setIsBlinky] = useState(false);
     const declineRef = useRef();
-    const licenseRef = useRef();
     const [tempLicenseNum, setTempLicense] = useState('BD51SMR');
-    // let tempLicenseNum = 'BD51SMR';
-    // navigate back to customer page
     const navigate = useNavigate();
 
     // client info
     const {id} = useParams('');
     // getQuote(id);
     function getQuote(qid) {
-        // console.log(qid);
+        console.log('sent');
+        // let axios = require('axios');
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": qid
+            }
+        });
 
-        let body = {
-            action: "get_quote_data",
-            quote_id: qid
+        let config = {
+            method: 'post',
+            url: 'https://fixglass-staging-7245003.dev.odoo.com//api/v1/react/order/preview_quotation',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
         };
-        trackPromise(
-            axios
-            .post("https://fix.glass/odoo_apis/stag_call.php", body, {
-                headers: { "Content-Type": "multipart/form-data" }
-            })
-            .then(function(response) {
-                console.log(response.data);
-                console.log(response.data.QuoteData);
-                console.log(response.data.glassData);
-                console.log(response.data.userData[0]);
-                setQuoteDetails(response.data.QuoteData[0]);
-                if(response.data.QuoteData[0].x_studio_status_1 !== "Published"){
-                    setTabValue(3);
-                }
-                setCustomerDetails(response.data.userData[0]);
-                setGlassDetails(response.data.glassData);
-                setOffersDetails(response.data.offerData);
-                setBillingAddress(response.data.userData[0].order_postal_code);
-                
-                // var dataG = '';
-                // var countG = response.data.glassData;
-                // for(let i=0;i<countG.length;i++) {
-                //     dataG += '<span key='+countG[i].name+' className="client-windows">'+countG[i].name+'</span>';
-                            
-                // }
-                // setGlassDetails(dataG);
-                console.log(glassDetails);                
-                    
-            })
-            .catch(function(error) {
-                console.log(error);
-                //getAddress("No Data Found! Error in Address API .");
-            })
-        );
-    }
-    function getSchedulerData() {
-        let body = {
-            action: "get_schedule_data"
-        };
-        trackPromise(
-            axios
-            .post("https://fix.glass/odoo_apis/stag_call.php", body, {
-                headers: { "Content-Type": "multipart/form-data" }
-            })
-            .then(function(response) {
-                console.log(response.data);
-                setSchedulerData(response.data);
-            })
-            .catch(function(error) {
-                console.log(error);
-            })
-        );
-    }
 
-    function updateQuoteData(){
-        let body = {
-            action: "up_quote_data",
-            quote_id: id,
-            ptype: paymentOption,
-            pl_address:deliveryAddress,
-            schedule_date:timeSlot
-        };
-        console.log(body);
-        trackPromise(
-            axios
-            .post("https://fix.glass/odoo_apis/stag_call.php", body, {
-                headers: { "Content-Type": "multipart/form-data" }
-            })
-            .then(function(response) {
-                console.log(response.data);
-                // handleSnapChange('next');
-            })
-            .catch(function(error) {
-                console.log(error);
-            })
-        );
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response.data));
+            setCustomerDetails(response.data.result.data);
+            setBillingAddress(response.data.result.data.customer_order_postal_code);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     }
 
     function handleSnapChange(option) {
@@ -157,7 +99,7 @@ function Quote() {
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
             // change tab
             handleTabChange(1);
-            updateQuoteData();
+            // updateQuoteData();
             setIsBlinky(true);
         } else {
             return;
@@ -178,8 +120,8 @@ function Quote() {
     }
 
     function backToCustomer() {
-        // const licenseReg = 'BD51SMR';
-        const licenseReg = quoteDetails.registration_number;
+        const licenseReg = 'BD51SMR';
+        // const licenseReg = quoteDetails.registration_number;
         const i = customerDetails.name.indexOf(' ');
         const names = [customerDetails.name.slice(0,i), customerDetails.name.slice(i + 1)];
         let quoteData = {
@@ -189,12 +131,6 @@ function Quote() {
             email: customerDetails.email,
             phone: customerDetails.phone,
             selected: glassDetails
-            // address: '3 Valladale, Heylor, Shetland, Shetland Islands ZE2 9RJ', 
-            // firstName: names[0],
-            // lastName: names[1],
-            // email: 'my.name@email.com',
-            // phone: '0987654',
-            // selected: ['Windscreen']
         };
         quoteData = JSON.stringify(quoteData);
         sessionStorage.setItem('quoteInfo', quoteData);
@@ -218,7 +154,7 @@ function Quote() {
         //Get Quote Data
         if(id){
             getQuote(id);
-            getSchedulerData();
+            // getSchedulerData();
         }
         // hide navbar and footer
         document.getElementById("navbar-main").style.display = "none";
@@ -229,7 +165,7 @@ function Quote() {
             topSelector.scrollIntoView({behavior: 'smooth'});
         }
         // format license number correctly
-        setTempLicense(quoteDetails.registration_number);
+        setTempLicense('BD51SMR');
         if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
             // license number is standard
             // check if plate already includes space
@@ -305,7 +241,6 @@ function Quote() {
 
             <div className="center">
                 <div className='true-top' id='1'>-</div>
-                {/* && quoteDetails.hasOwnProperty("registration_number") */}
                 {quoteInfoOpen && <div className="quote-info-main">
                     <div className="client-info-container">
                         {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
@@ -319,16 +254,11 @@ function Quote() {
                                         <div className='gb'>UK</div>
                                     </div>
                                     <input className='license-input' type="text" value={tempLicenseNum} placeholder='NU71 REG'/>
-                                    {/* <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' maxLength='8'/> */}
                                 </div>
-                                <div className="client-info">{customerDetails.name}</div>
-                                {/* <div className="client-info">My Name</div> */}
-                                <div className="client-info"><b>Billing address:</b> {customerDetails.order_postal_code}</div>
-                                {/* <div className="client-info"><b>Billing address:</b> 3 Valladale, Heylor, Shetland, Shetland Islands ZE2 9RJ</div> */}
-                                <div className="client-info"><b>Email:</b> {customerDetails.email}</div>
-                                {/* <div className="client-info"><b>Email:</b> my.name@email.com</div> */}
-                                <div className="client-info"><b>Phone number:</b>{customerDetails.phone}</div>
-                                {/* <div className="client-info"><b>Phone number:</b>098765432</div> */}
+                                <div className="client-info">{customerDetails.customer_name}</div>
+                                <div className="client-info"><b>Billing address:</b> {customerDetails.customer_order_postal_code}</div>
+                                <div className="client-info"><b>Email:</b> {customerDetails.customer_email}</div>
+                                <div className="client-info"><b>Phone number:</b>{customerDetails.customer_phone}</div>
                             </div>
                         </div>
                         <div className='edit-btn-container'>
@@ -343,12 +273,10 @@ function Quote() {
                             {glassDetails.map(element => 
                                 <span key={element.id} className="client-windows">{element.name}</span>
                             )}
-                            {/* <span className="client-windows">Windscreen</span> */}
                         </div>
                         <img onClick={() => setInfoOpen(false)} src={up} alt="" style={{width: '17px'}} className='client-up-icon' />
                     </div>
                 </div>}
-                {/*  && quoteDetails.hasOwnProperty("registration_number") */}
                 {!quoteInfoOpen && <div className="quote-info-compact">
                     {isBlinky && <Tooltip disableFocusListener title='Booking confirmed'>
                         <div className="client-info-blinky">-</div>
@@ -360,16 +288,13 @@ function Quote() {
                                 <div className='gb'>UK</div>
                             </div>
                             <input className='license-input' type="text" value={tempLicenseNum} placeholder='NU71 REG'/>
-                            {/* <input ref={licenseRef} className='license-input' type="text" defaultValue={tempLicenseNum} placeholder='NU71 REG' maxLength='8'/> */}
                         </div>
-                        <div className="client-info">{customerDetails.name}</div>
-                        {/* <div className="client-info">My name</div> */}
+                        <div className="client-info">{customerDetails.customer_name}</div>
                         <div className='compact-bottom-row'>
                             <div className='compact-bottom-row'>
                                 {glassDetails.map(element => 
                                     <span key={element.id} className="client-windows">{element.name}</span>
                                 )}
-                                {/* <span className="client-windows">Windscreen</span> */}
                             </div>
                         </div>
                     </div>
@@ -392,7 +317,6 @@ function Quote() {
             </div>}
 
             <div className='center'>
-                {/*  && quoteDetails.x_studio_status_1 === "Published" */}
                 {tabValue === 0 && <div className='scroll-container'>
                     {/* select offer */}
                     <div id='offer'>
@@ -427,13 +351,13 @@ function Quote() {
 
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
-                    {/* > 0 for build, === 0 for local */}
-                    {billingAddress.length === 0 && <div className='quote-component-last'>
+                    <div className='quote-component-last'>
                         <LocationSelection
+                            key={billingAddress}
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
                          />
-                    </div>}
+                    </div>
                 </div>}
             </div>
             {/* accept / decline buttons */}

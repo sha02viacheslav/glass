@@ -1,8 +1,6 @@
 import { useState, React, useRef, useEffect } from 'react';
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useMediaQuery, Button, Menu, MenuItem } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import axios from "axios";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useMediaQuery, Button } from '@mui/material';
 // import all car components for window-selection
 import ThreeDoorHatch from '../components/window-selection/3_Door_Hatch';
 import FiveDoorHatch from '../components/window-selection/5_Door_Hatch';
@@ -12,8 +10,8 @@ import Sedan from '../components/window-selection/Sedan';
 import VANs from '../components/window-selection/VANs';
 import LicensePlate from '../components/LicensePlate';
 import {autocomplete} from 'getaddress-autocomplete';
-
 import { trackPromise } from 'react-promise-tracker';
+import axios from 'axios';
 
 const Customer = () => {
     const [quoteInfo, setQuoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo')) || []);
@@ -34,10 +32,7 @@ const Customer = () => {
     const email = quoteInfo.email || '';
     const phone = quoteInfo.phone || '';
     const selected = quoteInfo.selected || [];
-
-    // Dialog Options
-    const theme = useTheme();
-    // const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const navigate = useNavigate();
 
     // keep track if request can be submitted
     const firstNameRef = useRef('');
@@ -48,17 +43,13 @@ const Customer = () => {
 
     // for determining which form is not filled
     const [incorrectFormIndex, setIncorrectFormIndex] = useState(99);
-    const [vehicleTypes, setVehicleTypes] = useState(new Map());
 
     // when true, displays offer info
     const [submitClicked, setSubmitClicked] = useState(false);
     const [onSubmitMessage, setOnSubmitMessage] = useState('');
-    const navigate = useNavigate();
 
     // temporary things for car selection menu - Rainer
-    const [menuOpen, setMenuOpen] = useState(false);
     const [selectedCarType, setSelectedCarType] = useState(quoteInfo.bodyType || '3door');
-    const [anchorEl, setAnchorEl] = useState(null);
 
     // for getting the array of broken windows
     const [selectedBrokenWindows, setSelectedBrokenWindows] = useState([]);
@@ -68,27 +59,15 @@ const Customer = () => {
     // preselect broken windows if editing quote
     const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState([]);
 
-    function handleMenuClick(event) { 
-        setMenuOpen(!menuOpen);
-        setAnchorEl(event.currentTarget)
-    }
-    
-    function handleCarSelect(carClicked) {
-        setSelectedCarType(carClicked);
-        setMenuOpen(false);
-        setSelectedBrokenWindows([]);
-        setBrokenWindowsToComponent([]);
-        sessionStorage.setItem('askedTinted', JSON.stringify(false));
-    }
-
-    function handleMenuClose() {
-        setMenuOpen(false);
-        setAnchorEl(null);
-    }
-
     // functions for checking if necessary fields are filled and enable submit request
     function checkIfFilled(ref, errorMsg, formIndex) {
-        if (ref.current.value === '') {
+        if (formIndex === 5) {
+            if (ref === '') {
+                setOnSubmitMessage(errorMsg);
+                setIncorrectFormIndex(formIndex);
+                return true;
+            }
+        } else if (ref.current.value === '') {
             setOnSubmitMessage(errorMsg);
             setIncorrectFormIndex(formIndex);
             return true;
@@ -102,140 +81,64 @@ const Customer = () => {
             return true;
         }
     }
-    //saving quote data logics
-    function saveQuotes(quoteData) {
-        console.log(quoteData);
-        //qdata_in
-        let body = {
-            action: "qdata_in",
-            reg_number: quoteData.registration.toUpperCase(),
-            phone:quoteData.number,
-            firstName:quoteData.firstName,
-            lastName:quoteData.lastName,
-            postal:quoteData.address,
-            email:quoteData.email,
-            reg_year:vehicleRegYear,
-            make:vehicleMake,
-            body_type:vehicleBodyType,
-            model:vehicleModel,
-            model_year:vehicleModelYear,
-            glass_names:JSON.stringify(quoteData.windows)
-        };
-        // : emailRef.current.value,
-        //         : billingAddressVal,
-        //         windows: selectedBrokenWindows,
-        //         registration: (licenseRef || quoteInfo.registration),
-        //         : selectedCarType
-        trackPromise(
-            axios
-            .post("https://fix.glass/odoo_apis/stag_call.php", body, {
-                headers: { "Content-Type": "multipart/form-data" }
-            })
-            .then(function(response) {
-
-                console.log(response);
-                console.log('response');
-                console.log(body);
-                if(response.data.hasOwnProperty("QuoteID")){
-                    navigate('/react/quote/' + response.data.QuoteID);
-                }
-                
-            })
-            .catch(function(error) {
-                console.log(error);
-                //getAddress("No Data Found! Error in Address API .");
-            })
-        );
-    }
+    
     function handleSubmitClick() {
         const firstNameNotFilled = checkIfFilled(firstNameRef, 'First name not filled', 0);
         const lastNameNotFilled = checkIfFilled(lastNameRef, 'Last name not filled', 1);
         const emailNotFilled = checkIfFilled(emailRef, 'Email not filled', 2);
         const phoneNotFilled = checkIfFilled(phoneRef, 'Phone number not filled', 3);
         const billingNotFilled = checkIfFilled(billingRef, 'Postal code not filled', 4);
-
+        const licenseNumNotFilled = checkIfFilled(licenseSearchVal, 'License number not filled', 5);
         const windowNotFilled = checkIfSelected();
 
         // enable submit request if all form fields are filled (more conditions can be added)
-        if (firstNameNotFilled || lastNameNotFilled || emailNotFilled || phoneNotFilled || billingNotFilled || windowNotFilled) {
+        if (firstNameNotFilled || lastNameNotFilled || emailNotFilled || phoneNotFilled || billingNotFilled || windowNotFilled || licenseNumNotFilled) {
             return;
         } else {
-            setSubmitClicked(true);
+            // post data
+            setSubmitClicked(true); 
+            console.log('sent');
+            const name = firstNameRef.current.value.concat(' ', lastNameRef.current.value);
+            // let axios = require('axios');
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "customer_name": name,
+                    "customer_phone": phoneRef.current.value,
+                    "customer_email": emailRef.current.value,
+                    "customer_order_postal_code": billingRef.current.value,
+                    "registration_number": licenseSearchVal,
+                    "registration_year": "2010",
+                    "make": "make 2002",
+                    "model": "model 2002",
+                    "body_type": "body_type 2002",
+                    "model_year": "2002",
+                    "glass_location": selectedBrokenWindows
+                }
+            });
+
+            let config = {
+                method: 'post',
+                url: 'https://fixglass-staging-7245003.dev.odoo.com/api/v1/react/order/create_quotation',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: data
+            };
+
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response.data));
+                navigate("/react/quote/" + response.data.result.fe_token);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
         }
     }
 
-    function getVehicleDetails(searchValue) {
-        let body = {
-            action : 'search_uk_reg',
-            reg_number: searchValue
-        };
-        trackPromise(
-            axios
-            .post("https://fix.glass/odoo_apis/odoo_api_estglass.php", body, {
-                withCredentials: false,
-                headers: { 'Access-Control-Allow-Origin': '*', "Content-Type": "multipart/form-data" }
-            })
-            .then(function(response) {
-                if(response.data){
-                    console.log(response);
-                    // let vehicleDataObj = JSON.parse(response.data);
-                    let vehicleDataObj = response.data;
-                    if(vehicleDataObj.hasOwnProperty("CarData")){
-                        console.log("Vehicle Class in OBJ:" + vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle);
-                        if(vehicleTypes.has(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase())){
-                            console.log("Found Vehicle Type:" + vehicleTypes.get(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle));
-                            if(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase() == "HATCHBACK"){
-                                if(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.DoorPlanLiteral.includes("3")){
-                                    // 3 Door Hatchback
-                                    setSelectedCarType('3door');
-                                } else if(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.DoorPlanLiteral.includes("5")){
-                                    // 5 Door Hatchback
-                                    setSelectedCarType('5door');
-                                } else {
-                                    setSelectedCarType(vehicleTypes.get(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase()));
-                                }
-                            } else if(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase() == "COUPE"){
-                                if(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.NumberOfDoors == 4 || vehicleDataObj.CarData.Response.DataItems.SmmtDetails.NumberOfDoors == 5){  //vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.DoorPlanLiteral.toUpperCase() == "COUPE" && 
-                                    // Coupe with 4 or 5 Doors is Sedan
-                                    setSelectedCarType('sedan');
-                                } else {
-                                    setSelectedCarType(vehicleTypes.get(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase()));
-                                }
-                            } else {
-                                setSelectedCarType(vehicleTypes.get(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase()));
-                            }
-                            setVehicleData(JSON.stringify(response.data, undefined, 4));
-                            setVehicleMakeModel(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.MakeModel);
-                            setVehicleMake(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.Make);
-                            setVehicleModel(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.Model);
-                            setVehicleModelYear(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.YearOfManufacture);
-                            setVehicleRegYear(vehicleDataObj.CarData.Response.DataItems.VehicleRegistration.YearMonthFirstRegistered.slice(0, 4));
-                            setVehicleBodyType(vehicleDataObj.CarData.Response.DataItems.SmmtDetails.BodyStyle.toUpperCase());
-                        } else {
-                            setVehicleData("Error in Data! "+JSON.stringify(response.data, undefined, 4));
-                        }
-                    } else {
-                        setVehicleData("No Data Found!");
-                    }
-                }
-            })
-            .catch(function(error) {
-                console.log(error);
-                setVehicleData("No Data Found! Error in API.");
-            })
-        );
-    }
 
     useEffect(() => {
-        
-        ///////////////////////////////////////////
-        // Get Vehicle Data if Registration Number is found
-        ///////////////////////////////////////////
-
-        if(licenseSearchVal){
-            setLicense(licenseSearchVal.toUpperCase());
-            getVehicleDetails(licenseSearchVal);
-        }
         // scroll car into view on page load
         // if (!submitClicked) {
         //     const windowSelector = document.getElementById("scroll-focus");
@@ -245,48 +148,12 @@ const Customer = () => {
         document.getElementById("navbar-main").style.display = "inline";
         document.getElementById("footer-main").style.display = "inline";
 
-        ///////////////////////////////////////////
-        // Adding necessary data for Vehicle Types
-        ///////////////////////////////////////////
-
-        const v3HTypes = ["Car Derived Van", "Hatchback"];
-        const v5HTypes = ["Hatchback"];
-        const v5ETypes = ["Estate", "Light 4X4 Utility", "MPV", "SUV Convertible", "SUV Coupe", "SUV Estate", "SUV Hatchback", "SUV Saloon", "Taxi Cab", "TOURING", "Tower Wagon", "Van Derived Car"];
-        const v4STypes = ["COMPETITION", "Saloon"];
-        const v2CTypes = ["Convertible", "Coupe"];
-        const v1VTypes = ["Ambulance", "Box Van", "Car Transporter", "Chassis Cab", "Chassis Cowl", "Insulated Van", "Luton Van", "Minibus", "Motor Caravan", "Panel Van", "Pick Up", "Specially Fitted Van", "Tipper", "Window Van", "LCV"];
-        // const vehicleTypesData = new Map();
-
-        v3HTypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "3door");
-        });
-        v5HTypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "5door");
-        });
-        v5ETypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "estate");
-        });
-        v4STypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "sedan");
-        });
-        v2CTypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "coupe");
-        });
-        v1VTypes.forEach(type => {
-        vehicleTypes.set(type.toUpperCase(), "van");
-        });
-        // setVehicleTypes(vehicleTypesData);
-
-        ///////////////////////////////////////////
         // Integration of PostalCode/ Address AutoComplete API
-        ///////////////////////////////////////////
         autocomplete("billingAddress","SFB4ZD1fO0ONndTgHnmUmg26020", {
             delay: 500,
         });
 
-        ///////////////////////////////////////////
         // Preventing Default to show complete address with Postal Code
-        ///////////////////////////////////////////
         window.addEventListener("getaddress-autocomplete-address-selected", function(e){
             e.preventDefault();
             let tempAddress = e.address.formatted_address.filter(Boolean).join(", ")+" "+e.address.postcode;
@@ -305,9 +172,6 @@ const Customer = () => {
         }
     }, []);
 
-    console.log(brokenWindowsToComponent);
-    console.log(quoteInfo);
-
     function handleVehInputChange(data) {
         // format correcly
         // check if license plate is standard or unique
@@ -322,16 +186,6 @@ const Customer = () => {
             }
         } 
         setLicense(input.toUpperCase());
-        // search for license plate
-        if(inputInterval.current)
-        {
-            clearTimeout(inputInterval.current);
-        }
-        inputInterval.current=setTimeout(function(){
-            console.log("Search");
-            console.log("Input Changed Called!");
-            getVehicleDetails(data);
-        },1000);
     }      
 
 
@@ -352,31 +206,6 @@ const Customer = () => {
                             handleVehInputChange={handleVehInputChange}
                         />
                         <br />
-                        <Button 
-                            color='secondary' 
-                            id='basic-button'
-                            aria-controls={menuOpen ? 'basic-menu' : undefined}
-                            aria-haspopup='true'
-                            aria-expanded={menuOpen ? 'true' : undefined}
-                            onClick={handleMenuClick}>
-                                change car body type (temporary)
-                        </Button>
-                        <Menu
-                            id='basic-menu'
-                            anchorEl={anchorEl}
-                            open={menuOpen}
-                            onClose={handleMenuClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
-                            >
-                                <MenuItem onClick={() => handleCarSelect('coupe')}>Coupe</MenuItem>
-                                <MenuItem onClick={() => handleCarSelect('3door')}>3 Door Hatchback</MenuItem>
-                                <MenuItem onClick={() => handleCarSelect('5door')}>5 Door Hatchback</MenuItem>
-                                <MenuItem onClick={() => handleCarSelect('estate')}>Estate</MenuItem>
-                                <MenuItem onClick={() => handleCarSelect('sedan')}>Sedan</MenuItem>
-                                <MenuItem onClick={() => handleCarSelect('van')}>VAN</MenuItem>
-                        </Menu>
                             
                         </div>
                         <div className="row mt-4 mt-md-5 text-center">
