@@ -74,6 +74,7 @@ function Quote() {
             console.log(JSON.stringify(response.data));
             setCustomerDetails(response.data.result.data);
             setBillingAddress(response.data.result.data.customer_order_postal_code);
+            setOffersDetails(response.data.result.data.order_lines);
         })
         .catch(function (error) {
             console.log(error);
@@ -321,6 +322,7 @@ function Quote() {
                     {/* select offer */}
                     <div id='offer'>
                         <SelectOfferNew 
+                            key={offersDetails}
                             selectOfferToCustomer={offersDetails}
                             isRetrieved={isRetrieved}
                             paymentOptionToParent={paymentOptionToParent}

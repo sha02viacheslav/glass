@@ -17,47 +17,33 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
         setSelectOffer(pOption);
     }
 
-    useEffect(() => {
-        // calculate total price
-        let total = 0;
-        for (let i = 0; i < selectOfferToCustomer.length; i++) {
-            const infoRow = selectOfferToCustomer[i];
-            total += infoRow.price_total;
-        }
-        setTotalPrice(total.toFixed(2));
-        setSavePrice(total.toFixed(2));
-    }, []);
+    // useEffect(() => {
+    //     // calculate total price
+    //     let total = 0;
+    //     for (let i = 0; i < selectOfferToCustomer.length; i++) {
+    //         const infoRow = selectOfferToCustomer[i];
+    //         total += infoRow.price_total;
+    //     }
+    //     setTotalPrice(total.toFixed(2));
+    //     setSavePrice(total.toFixed(2));
+    // }, []);
 
     return (          
         <div className='select-offer'>
             <h3 className="text-24 text-blue SO-header">Quotation</h3>   
             <div className="table-container">
                 <table className='SO-table'>
-                    {/* Headers column */}
-                    {/* <tr>
-                        <td className='headers border-thick'>
-                            <div className="header-div first-col">
-                                {dummyData.headers[0]}
-                            </div>
-                        </td>
-                        <td className='headers border-thick'>
-                            <div className="header-div">
-                                {dummyData.headers[1]}
-                            </div>
-                        </td>
-                    </tr> */}
-                    {/* map data rows */}
                     {selectOfferToCustomer.map((element, rowIndex) => 
                         <tr key={rowIndex}>
                             <td className='info'>
                                 <div className='info-div first-col'>
-                                    {element.name}
+                                    {element.product}
                                 </div>
                             </td>
                             <td className='info'>
                                 <div className='info-div top-right'>
                                     <span className="original-price">
-                                        £ {element.price_subtotal.toFixed(2)}
+                                        £ {element.price_unit.toFixed(2)}
                                     </span>
                                     <span>
                                         £ {element.price_total.toFixed(2)}
@@ -98,19 +84,19 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
                         <span className="total-bold">
                             Untaxed amount
                         </span>
-                        <span>£ {totalPrice}</span>
+                        <span>£ {selectOfferToCustomer[0].price_subtotal}</span>
                     </div>
                     <div className="total-row">
                         <span className="total-bold">
-                            Tax 0%
+                            Tax x%
                         </span>
-                        <span>£ 0</span>
+                        <span>£ {selectOfferToCustomer[0].price_total - selectOfferToCustomer[0].price_subtotal}</span>
                     </div>
                     <div className="total-row total-last">
                         <span className="total-bold">
                             Total
                         </span>
-                        <span>£ {totalPrice}</span>
+                        <span>£ {selectOfferToCustomer[0].price_total}</span>
                     </div>
                 </div>
             </div>
@@ -121,7 +107,7 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
                 </div>
                 <button className={selectOffer === "4 Month Plan" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("4 Month Plan")}>
                     <span className="fs-14">4 month</span>
-                    <div className='PM-price'>£{(totalPrice / 4).toFixed(2)}</div>
+                    <div className='PM-price'>£{(selectOfferToCustomer[0].price_total / 4).toFixed(2)}</div>
                 </button>
                 <button className={selectOffer === "Insurance" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("Insurance")}>
                     <span className="fs-14">Insurance</span>
@@ -129,7 +115,7 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
                 </button>
                 <button className={selectOffer === "Single Payment" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("Single Payment")}>
                     <span className="fs-14">Single pay</span>
-                    <div className='PM-price'>£{totalPrice}</div>
+                    <div className='PM-price'>£{selectOfferToCustomer[0].price_total}</div>
                 </button>
             </div>
             <div className="PM-text-container">
