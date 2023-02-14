@@ -32,9 +32,7 @@ function Quote() {
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
-    const [quoteDetails, setQuoteDetails] = useState([]);
     const [glassDetails, setGlassDetails] = useState([]);
-    const [offersDetails, setOffersDetails] = useState([]);// || [];
     const [schedulerData, setSchedulerData] = useState([]);
     const [paymentOption, setPaymentOption] = useState([]);
     const [dateToPayment, setDateToPayment] = useState('');
@@ -46,6 +44,11 @@ function Quote() {
     const declineRef = useRef();
     const [tempLicenseNum, setTempLicense] = useState('BD51SMR');
     const navigate = useNavigate();
+    const [offersDetails, setOffersDetails] = useState([{
+        price_unit: 0,
+        price_total: 0,
+        price_subtotal: 0
+    }]);
 
     // client info
     const {id} = useParams('');
@@ -74,7 +77,10 @@ function Quote() {
             console.log(JSON.stringify(response.data));
             setCustomerDetails(response.data.result.data);
             setBillingAddress(response.data.result.data.customer_order_postal_code);
-            setOffersDetails(response.data.result.data.order_lines);
+            if (response.data.result.data.order_lines.length != 0) {
+                setOffersDetails(response.data.result.data.order_lines);
+            }
+            // setGlassDetails(response.data.result.data.glass_location);
         })
         .catch(function (error) {
             console.log(error);
@@ -121,17 +127,16 @@ function Quote() {
     }
 
     function backToCustomer() {
-        const licenseReg = 'BD51SMR';
-        // const licenseReg = quoteDetails.registration_number;
-        const i = customerDetails.name.indexOf(' ');
-        const names = [customerDetails.name.slice(0,i), customerDetails.name.slice(i + 1)];
+        const licenseReg = customerDetails.registration_number;
+        const i = customerDetails.customer_name.indexOf(' ');
+        const names = [customerDetails.customer_name.slice(0,i), customerDetails.customer_name.slice(i + 1)];
         let quoteData = {
-            address: customerDetails.order_postal_code, 
+            address: customerDetails.customer_order_postal_code, 
             firstName: names[0],
             lastName: names[1],
-            email: customerDetails.email,
-            phone: customerDetails.phone,
-            selected: glassDetails
+            email: customerDetails.customer_email,
+            phone: customerDetails.customer_phone,
+            selected: customerDetails.glass_location
         };
         quoteData = JSON.stringify(quoteData);
         sessionStorage.setItem('quoteInfo', quoteData);
@@ -166,7 +171,7 @@ function Quote() {
             topSelector.scrollIntoView({behavior: 'smooth'});
         }
         // format license number correctly
-        setTempLicense('BD51SMR');
+        setTempLicense(customerDetails.registration_number);
         if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
             // license number is standard
             // check if plate already includes space
@@ -174,8 +179,8 @@ function Quote() {
                 return;
             } else if (tempLicenseNum.length === 7) {
                 let input = '';
-                if (quoteDetails.registration_number !== undefined) {
-                    input = quoteDetails.registration_number;
+                if (customerDetails.registration_number !== undefined) {
+                    input = customerDetails.registration_number;
                 } else {
                     input = tempLicenseNum;
                 }
@@ -271,8 +276,8 @@ function Quote() {
                     <div className='quote-info-bottom'>
                         <div className='compact-bottom-row'>
                             <span className="client-info"><b>Selected windows:</b> </span>
-                            {glassDetails.map(element => 
-                                <span key={element.id} className="client-windows">{element.name}</span>
+                            {customerDetails.length != 0 && customerDetails.glass_location.map(element => 
+                                <span key={element} className="client-windows">{element}</span>
                             )}
                         </div>
                         <img onClick={() => setInfoOpen(false)} src={up} alt="" style={{width: '17px'}} className='client-up-icon' />
@@ -293,8 +298,8 @@ function Quote() {
                         <div className="client-info">{customerDetails.customer_name}</div>
                         <div className='compact-bottom-row'>
                             <div className='compact-bottom-row'>
-                                {glassDetails.map(element => 
-                                    <span key={element.id} className="client-windows">{element.name}</span>
+                                {customerDetails.length != 0 && customerDetails.glass_location.map(element => 
+                                    <span key={element} className="client-windows">{element}</span>
                                 )}
                             </div>
                         </div>

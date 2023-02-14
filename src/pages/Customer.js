@@ -31,7 +31,7 @@ const Customer = () => {
     const lastName = quoteInfo.lastName || '';
     const email = quoteInfo.email || '';
     const phone = quoteInfo.phone || '';
-    const selected = quoteInfo.selected || [];
+    const selected = quoteInfo.selected || [];   
     const navigate = useNavigate();
 
     // keep track if request can be submitted
@@ -159,14 +159,13 @@ const Customer = () => {
             let tempAddress = e.address.formatted_address.filter(Boolean).join(", ")+" "+e.address.postcode;
             setBillingAddress(tempAddress);
         })
-    }, []);
 
-    useEffect(() => {
         // send previously selected windows to window selection component
         let selectedWindows = [];
         if (selected.length > 0) {
             for (let i = 0; i < selected.length; i++) {
-                selectedWindows.push(selected[i].name); 
+                // capitalize first letter to match window name
+                selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1)); 
             }
             setBrokenWindowsToComponent(selectedWindows); 
         }

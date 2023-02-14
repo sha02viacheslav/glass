@@ -16,3 +16,9 @@ code {
   font-family: 'UKNumberPlate';
   src: local('UKNumberPlate'), url(./fonts/UKNumberPlate.ttf), format('truetype');
 }
+
+@font-face {
+  font-family: 'CourierPrime-Regular';
+  src: local('CourierPrime-Regular'), url(./fonts/CourierPrime-Regular.ttf), format('truetype');
+}
+

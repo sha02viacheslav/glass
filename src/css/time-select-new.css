@@ -124,14 +124,17 @@
 }
 
 .ts-date-day, .ts-date-today {
+    position: relative;
     font-size: 27px;
     height: 40px;
+    font-family: 'CourierPrime-Regular';
+    top: 0px;
 }
 
 .ts-date-today {
     background-color: rgb(70, 113, 255);
     color: white;
-    border-radius: 20px;
+    border-radius: 50%;
     width: 40px;
 }
 

@@ -18,14 +18,14 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
     }
 
     // useEffect(() => {
-    //     // calculate total price
-    //     let total = 0;
-    //     for (let i = 0; i < selectOfferToCustomer.length; i++) {
-    //         const infoRow = selectOfferToCustomer[i];
-    //         total += infoRow.price_total;
+    //     console.log(offerDetails);
+    //     if (offerDetails.lenght === 0) {
+    //         setOfferDetails([{
+    //                 price_subtotal: 0,
+    //                 price_total: 0
+    //         }])
+    //         console.log('did it');
     //     }
-    //     setTotalPrice(total.toFixed(2));
-    //     setSavePrice(total.toFixed(2));
     // }, []);
 
     return (          
