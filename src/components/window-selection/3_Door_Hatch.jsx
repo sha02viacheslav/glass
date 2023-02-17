@@ -1,4 +1,4 @@
-import { useEffect, useState, MouseEvent } from 'react';
+import { useEffect, useState } from 'react';
 import imageMapResize from 'image-map-resizer'; 
 import {Button, Dialog, DialogActions, DialogTitle, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import styles from '../../css/window-selection.module.css';
@@ -160,19 +160,21 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={threeDoor} alt="" />
-            <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={threeDoorTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={threeDoor} alt="" />
+                <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={threeDoorTinted} alt="" />
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlass} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlass} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={threeDoor} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={threeDoor} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -198,14 +200,14 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="730,638,806,930,1196,926,1268,640,1245,610,1109,562,998,552,894,561,762,603" shape="poly" />
-                <area onClick={() => selectWindow("rear")} coords="758,1551,779,1535,850,1588,1150,1590,1212,1535,1243,1551,1236,1595,1173,1653,1005,1668,816,1645,767,1604" shape="poly" />
-                <area onClick={() => selectWindow("r_1")}  coords="1282,738,1288,817,1250,875" shape="poly" />
-                <area onClick={() => selectWindow("r_2")}  coords="1282,855,1280,1282,1199,1295,1206,1044,1240,903" shape="poly" />
-                <area onClick={() => selectWindow("r_3")}  coords="1203,1311,1280,1298,1224,1503,1203,1425" shape="poly" />
-                <area onClick={() => selectWindow("l_1")}  coords="712,736,712,819,749,871" shape="poly" />
-                <area onClick={() => selectWindow("l_2")}  coords="716,853,756,903,790,1053,795,1293,714,1279" shape="poly" />
-                <area onClick={() => selectWindow("l_3")}  coords="716,1299,799,1311,776,1507" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="151,429,183,389,279,356,391,340,453,340,575,358,663,391,698,428,626,718,599,732,243,726,219,714,176,576" shape="poly"/>
+                <area onClick={() => selectWindow("rear")} coords="179,1338,208,1312,284,1358,565,1360,635,1311,674,1339,672,1383,620,1446,445,1475,258,1454,197,1415,174,1376,175,1355" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="641,716,732,605,709,438,651,674" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="645,722,732,619,718,1072,616,1087,626,848" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="617,1095,726,1078,663,1307,627,1302" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="203,707,131,443,116,611" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="130,641,196,710,216,834,228,1090,134,1073" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="131,1080,231,1095,213,1297,182,1302" shape="poly"/>
             </map>
         </div>
     )

@@ -166,20 +166,22 @@ export default function FiveDoorHatch({brokenWindowsToCustomer, brokenWindowsToC
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={fiveDoor} alt="" />
-            <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={fiveDoorTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={fiveDoor} alt="" />
+                <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={fiveDoorTinted} alt="" />
 
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlass} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlass} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={fiveDoor} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={fiveDoor} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -205,16 +207,16 @@ export default function FiveDoorHatch({brokenWindowsToCustomer, brokenWindowsToC
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="786,914,746,715,749,690,850,632,1003,610,1153,637,1252,685,1215,911,996,900" shape="poly" />
-                <area onClick={() => selectWindow("rear")} coords="1199,1473,1219,1539,1153,1588,1000,1607,848,1592,779,1542,795,1473,843,1489,1138,1493" shape="poly" />
-                <area onClick={() => selectWindow("r_1")} coords="1268,727,1273,849,1236,879" shape="poly" />
-                <area onClick={() => selectWindow("r_2")} coords="1273,868,1273,1080,1208,1114,1213,986,1229,893" shape="poly" />
-                <area onClick={() => selectWindow("r_3")} coords="1206,1166,1270,1143,1266,1330,1210,1333" shape="poly" />
-                <area onClick={() => selectWindow("r_4")} coords="1210,1345,1210,1387,1259,1440,1272,1343" shape="poly" />
-                <area onClick={() => selectWindow("l_1")} coords="733,730,726,847,765,879" shape="poly" />
-                <area onClick={() => selectWindow("l_2")} coords="728,867,767,897,786,982,793,1123,723,1079" shape="poly" />
-                <area onClick={() => selectWindow("l_3")} coords="723,1134,790,1164,790,1335,726,1331" shape="poly" />
-                <area onClick={() => selectWindow("l_4")} coords="730,1347,730,1449,790,1391,793,1349" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="210,709,166,494,172,468,306,408,410,396,489,398,625,437,675,469,683,501,643,712,426,693" shape="poly"/>
+                <area onClick={() => selectWindow("rear")} coords="196,1334,214,1257,268,1275,428,1284,585,1273,635,1257,650,1333,580,1389,425,1409,271,1391" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="654,679,747,627,720,478,687,509" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="627,922,743,858,747,636,655,686,635,768" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="624,952,623,1129,755,1133,747,905" shape="poly"/>
+                <area onClick={() => selectWindow("r_4")} coords="626,1134,626,1182,707,1261,750,1222,753,1141" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="195,682,160,512,122,499,103,627" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="105,641,199,691,219,787,223,919,95,869" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="227,956,225,1126,93,1130,96,903" shape="poly"/>
+                <area onClick={() => selectWindow("l_4")} coords="222,1132,219,1184,159,1253,99,1242,98,1138" shape="poly"/>
             </map>
         </div>
     )

@@ -160,20 +160,22 @@ export default function Coupe({brokenWindowsToCustomer, brokenWindowsToComponent
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={coupe} alt="" />
-            <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={coupeTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={coupe} alt="" />
+                <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={coupeTinted} alt="" />
 
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlassAlt} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlassAlt} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={coupe} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={coupe} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -199,14 +201,14 @@ export default function Coupe({brokenWindowsToCustomer, brokenWindowsToComponent
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="783,860,739,712,844,646,998,620,1160,650,1258,710,1219,865" shape="poly" />
-                <area onClick={() => selectWindow("rear")} coords="807,1278,1189,1276,1180,1513,1097,1548,1007,1560,890,1543,816,1513" shape="poly" />
-                <area onClick={() => selectWindow("r_1")} coords="1265,768,1270,831,1245,849" shape="poly" />
-                <area onClick={() => selectWindow("r_2")} coords="1266,850,1245,865,1217,1034,1215,1212,1259,1174" shape="poly" />
-                <area onClick={() => selectWindow("r_3")} coords="1273,1185,1224,1439,1215,1235" shape="poly" />
-                <area onClick={() => selectWindow("l_1")} coords="733,767,730,829,754,852" shape="poly" />
-                <area onClick={() => selectWindow("l_2")} coords="724,848,753,867,781,1017,783,1217,723,1157" shape="poly" />
-                <area onClick={() => selectWindow("l_3")} coords="728,1180,784,1240,779,1438" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="200,666,413,648,651,666,695,506,640,426,426,350,284,389,188,447,150,496" shape="poly"/>
+                <area onClick={() => selectWindow("rear")} coords="221,1075,247,1055,596,1057,627,1074,613,1308,557,1343,425,1361,304,1342,238,1315" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="659,655,762,597,756,518,694,528" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="634,1017,741,931,761,610,661,661,637,795" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="635,1028,642,1237,691,1189,742,939" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="189,650,147,506,97,518,87,607" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="190,658,90,619,103,934,218,1026,214,822" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="207,1244,218,1037,107,943,171,1223" shape="poly"/>
             </map>
         </div>
     )

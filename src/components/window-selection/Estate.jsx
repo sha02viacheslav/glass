@@ -172,20 +172,22 @@ export default function Estate({brokenWindowsToCustomer, brokenWindowsToComponen
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={estate} alt="" />
-            <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={estateTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={estate} alt="" />
+                <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={estateTinted} alt="" />
 
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlass} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlass} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={estate} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={estate} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -211,18 +213,18 @@ export default function Estate({brokenWindowsToCustomer, brokenWindowsToComponen
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="800,903,758,700,864,644,1010,626,1155,649,1238,700,1199,902,993,893" shape="poly" />
-                <area onClick={() => selectWindow("rear")} coords="807,1597,793,1657,855,1701,996,1720,1145,1703,1203,1659,1185,1597,1010,1622" shape="poly" />
-                <area onClick={() => selectWindow("r_1")} coords="1250,738,1256,849,1220,872" shape="poly" />
-                <area onClick={() => selectWindow("r_2")} coords="1252,867,1254,1065,1196,1093,1199,973,1217,890" shape="poly" />
-                <area onClick={() => selectWindow("r_3")} coords="1252,1117,1249,1292,1196,1294,1196,1144" shape="poly" />
-                <area onClick={() => selectWindow("r_4")} coords="1196,1307,1249,1311,1243,1394,1196,1348" shape="poly" />
-                <area onClick={() => selectWindow("r_5")} coords="1199,1374,1240,1415,1220,1572,1203,1539" shape="poly" />
-                <area onClick={() => selectWindow("l_1")} coords="749,732,744,842,779,872" shape="poly" />
-                <area onClick={() => selectWindow("l_2")} coords="746,864,776,883,799,969,802,1098,744,1059" shape="poly" />
-                <area onClick={() => selectWindow("l_3")} coords="744,1116,804,1138,802,1296,747,1296" shape="poly" />
-                <area onClick={() => selectWindow("l_4")} coords="751,1312,804,1309,807,1353,754,1393" shape="poly" />
-                <area onClick={() => selectWindow("l_5")} coords="800,1377,756,1418,779,1571,793,1543" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="224,700,425,684,627,702,664,503,659,477,502,415,344,414,190,474,185,506" shape="poly"/>
+                <area onClick={() => selectWindow("rear")} coords="214,1451,230,1383,277,1399,430,1405,580,1395,619,1380,635,1456,569,1499,430,1522,277,1503" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="639,667,723,621,729,500,670,515" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="637,677,721,631,724,843,615,892,619,766" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="612,920,610,1089,722,1094,726,884" shape="poly"/>
+                <area onClick={() => selectWindow("r_4")} coords="611,1098,608,1138,679,1205,718,1202,721,1102" shape="poly"/>
+                <area onClick={() => selectWindow("r_5")} coords="608,1150,703,1236,686,1383,642,1372,624,1325" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="210,674,174,509,112,499,117,615" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="236,893,231,769,213,683,119,626,118,844" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="239,924,240,1088,117,1092,116,890" shape="poly"/>
+                <area onClick={() => selectWindow("l_4")} coords="242,1094,240,1140,172,1198,123,1197,119,1099" shape="poly"/>
+                <area onClick={() => selectWindow("l_5")} coords="239,1153,228,1327,203,1373,159,1371,138,1227,177,1206" shape="poly"/>
             </map>
         </div>
     )

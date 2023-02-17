@@ -65,7 +65,7 @@ function Quote() {
 
         let config = {
             method: 'post',
-            url: 'https://fixglass-staging-7245003.dev.odoo.com//api/v1/react/order/preview_quotation',
+            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/preview_quotation',
             headers: {
                 'Content-Type': 'application/json'
             },

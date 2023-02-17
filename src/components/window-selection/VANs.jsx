@@ -280,23 +280,25 @@ export default function Vans({brokenWindowsToCustomer, brokenWindowsToComponent}
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={(!tinted && !isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanTailgater} alt="" />
-            <img className={(tinted && !isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanTailgaterTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={(!tinted && !isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanTailgater} alt="" />
+                <img className={(tinted && !isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanTailgaterTinted} alt="" />
 
 
-            <img className={(!tinted && isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanBarn} alt="" />
-            <img className={(tinted && isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanBarnTinted} alt="" />
+                <img className={(!tinted && isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanBarn} alt="" />
+                <img className={(tinted && isBarnDoor) ? styles.baseImage : styles.baseImageInactive} src={vanBarnTinted} alt="" />
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlass} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlass} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={vanBarn} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={vanBarn} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -332,21 +334,20 @@ export default function Vans({brokenWindowsToCustomer, brokenWindowsToComponent}
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="806,610,793,446,846,393,1003,372,1153,395,1205,444,1196,605,1000,584" shape="poly" />
-                <area onClick={() => selectWindow("r_rear")} coords="1017,1753,1016,1717,1210,1712,1222,1742,1122,1751" shape="poly" />
-                <area onClick={() => selectWindow("l_rear")} coords="987,1758,982,1719,792,1712,779,1742,848,1754" shape="poly" />
-                {/* {!isBarnDoor && <area onClick={() => selectWindow("rear")} alt="rear" title="rear" coords="779,1740,788,1715,1212,1715,1224,1742,991,1756" shape="poly" />} */}
-                <area onClick={() => selectWindow("r_1")} coords="1238,459,1242,553,1217,542" shape="poly" />
-                <area onClick={() => selectWindow("r_2")} coords="1245,568,1252,762,1190,773,1203,663,1220,554" shape="poly" />
-                <area onClick={() => selectWindow("r_3")} coords="1196,790,1254,780,1261,1159,1201,1168" shape="poly" />
-                <area onClick={() => selectWindow("r_4")} coords="1203,1189,1259,1177,1265,1540,1212,1547" shape="poly" />
-                <area onClick={() => selectWindow("r_5")} coords="1213,1563,1265,1558,1263,1678,1212,1650" shape="poly" />
-                <area onClick={() => selectWindow("l_1")} coords="762,448,753,548,779,541" shape="poly" />
-                <area onClick={() => selectWindow("l_2")} coords="756,566,779,559,807,732,802,778,747,760" shape="poly" />
-                <area onClick={() => selectWindow("l_3")} coords="746,783,807,790,799,1170,735,1158" shape="poly" />
-                <area onClick={() => selectWindow("l_4")} coords="737,1178,799,1185,792,1545,732,1542" shape="poly" />
-                <area onClick={() => selectWindow("l_5")} coords="739,1553,793,1562,786,1650,737,1675" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="227,408,435,383,629,405,640,238,586,177,431,158,273,180,211,233" shape="poly"/>
+                <area onClick={() => selectWindow("r_rear")} coords="427,1518,428,1546,653,1538,643,1509" shape="poly"/>
+                <area onClick={() => selectWindow("l_rear")} coords="424,1518,424,1548,202,1539,211,1508" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="637,336,715,364,703,240,652,243" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="608,572,617,476,639,343,715,372,716,556" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="607,581,716,563,719,951,611,968" shape="poly"/>
+                <area onClick={() => selectWindow("r_4")} coords="611,974,719,956,711,1340,624,1351" shape="poly"/>
+                <area onClick={() => selectWindow("r_5")} coords="623,1355,712,1345,714,1479,630,1449" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="215,337,136,364,147,238,202,239" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="136,372,216,345,239,567,132,551" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="132,562,242,581,239,971,127,945" shape="poly"/>
+                <area onClick={() => selectWindow("l_4")} coords="237,979,230,1346,119,1334,130,954" shape="poly"/>
+                <area onClick={() => selectWindow("l_5")} coords="227,1352,223,1440,130,1480,124,1341" shape="poly"/>
             </map>
         </div>
     )
-}
+} 

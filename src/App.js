@@ -68,7 +68,7 @@ function App() {
           <Route path='/react/pricing' element={<Pricing />} />
           <Route path='/react/contact' element={<Contact />} />
           <Route path='/react/customer' element={<Customer />} />
-          <Route path='/react/customer/:licenseRef' element={<Customer />} />
+          <Route path='/react/customer/:licenseNum' element={<Customer />} />
           <Route path='/react/payment' element={<Payment />} />
           <Route path='/react/paid' element={<Paid />} />
           <Route path='/react/quote/:id' element={<Quote />} />

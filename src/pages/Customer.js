@@ -9,6 +9,7 @@ import Estate from '../components/window-selection/Estate';
 import Sedan from '../components/window-selection/Sedan';
 import VANs from '../components/window-selection/VANs';
 import LicensePlate from '../components/LicensePlate';
+import RetrieveVehData from '../components/functions/RetrieveVehData';
 import {autocomplete} from 'getaddress-autocomplete';
 import { trackPromise } from 'react-promise-tracker';
 import axios from 'axios';
@@ -18,14 +19,11 @@ const Customer = () => {
     const  inputInterval = useRef('');
     const  pCodeInterval = useRef('');
     const [vehicleData, setVehicleData] = useState('');
-    const {licenseRef} = useParams();
-    const [licenseSearchVal, setLicense] = useState(licenseRef || '');
-    const [vehicleMakeModel, setVehicleMakeModel] = useState('Make & Model');
-    const [vehicleMake, setVehicleMake] = useState('');
-    const [vehicleRegYear, setVehicleRegYear] = useState('');
-    const [vehicleBodyType, setVehicleBodyType] = useState('');
-    const [vehicleModel, setVehicleModel] = useState('');
-    const [vehicleModelYear, setVehicleModelYear] = useState('');
+    const {licenseNum} = useParams();
+    const [licenseSearchVal, setLicense] = useState(licenseNum || '');
+    const licenseRef = useRef();
+    const [vehData, setVehData] = useState([]);
+    const [vehDataToCustomer, setVehDataToCustomer] = useState([]);
     const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '');
     const firstName = quoteInfo.firstName || '';
     const lastName = quoteInfo.lastName || '';
@@ -33,6 +31,7 @@ const Customer = () => {
     const phone = quoteInfo.phone || '';
     const selected = quoteInfo.selected || [];   
     const navigate = useNavigate();
+    const [vehicleTypes, setVehicleTypes] = useState(new Map());
 
     // keep track if request can be submitted
     const firstNameRef = useRef('');
@@ -49,7 +48,7 @@ const Customer = () => {
     const [onSubmitMessage, setOnSubmitMessage] = useState('');
 
     // temporary things for car selection menu - Rainer
-    const [selectedCarType, setSelectedCarType] = useState(quoteInfo.bodyType || '3door');
+    const [selectedCarType, setSelectedCarType] = useState('3door');
 
     // for getting the array of broken windows
     const [selectedBrokenWindows, setSelectedBrokenWindows] = useState([]);
@@ -81,6 +80,11 @@ const Customer = () => {
             return true;
         }
     }
+
+    function retrieveVehData(data) {
+        setVehDataToCustomer(data);
+        setSelectedCarType(data);
+    }
     
     function handleSubmitClick() {
         const firstNameNotFilled = checkIfFilled(firstNameRef, 'First name not filled', 0);
@@ -108,18 +112,18 @@ const Customer = () => {
                     "customer_email": emailRef.current.value,
                     "customer_order_postal_code": billingRef.current.value,
                     "registration_number": licenseSearchVal,
-                    "registration_year": "2010",
-                    "make": "make 2002",
-                    "model": "model 2002",
-                    "body_type": "body_type 2002",
-                    "model_year": "2002",
+                    "registration_year": vehData.YearMonthFirstRegistered,
+                    "make": vehData.Make,
+                    "model": vehData.Model,
+                    "body_type": vehDataToCustomer,
+                    "model_year": vehData.YearOfManufacture,
                     "glass_location": selectedBrokenWindows
                 }
             });
 
             let config = {
                 method: 'post',
-                url: 'https://fixglass-staging-7245003.dev.odoo.com/api/v1/react/order/create_quotation',
+                url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/create_quotation',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -137,8 +141,18 @@ const Customer = () => {
         }
     }
 
-
     useEffect(() => {
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=5fdd1a54-413d-40b4-a0fe-105b3e268d83&user_tag=&key_VRM=' + licenseNum)
+            .then(res => res.json())
+            .then(data => {
+                // console.log(data);
+                setVehData(data.Response.DataItems.VehicleRegistration);
+                
+            })
+            .catch(function(error) {
+                console.log(error);
+                setVehicleData("No Data Found! Error in API.");
+            })
         // scroll car into view on page load
         // if (!submitClicked) {
         //     const windowSelector = document.getElementById("scroll-focus");
@@ -194,6 +208,10 @@ const Customer = () => {
 
     return (
         <div>
+            <RetrieveVehData 
+                vehData={vehData}
+                dataToCustomer={retrieveVehData}
+            />
             <section className="sec-customer my-4 my-md-5">
                 <div className="container">
                     <div className='tab-content'>
@@ -201,7 +219,7 @@ const Customer = () => {
                         <LicensePlate 
                             placeholderVal={'NU71 REG'}
                             licenseNumber={licenseSearchVal}
-                            model={vehicleMakeModel}
+                            model={vehData.Make + ' ' + vehData.Model}
                             handleVehInputChange={handleVehInputChange}
                         />
                         <br />
@@ -255,7 +273,7 @@ const Customer = () => {
 
                                         <p className="fs-18 text-blue">Car Data (temporary)</p>
                                         <div className="form-group mb-4">
-                                            <textarea name="" id="" value={vehicleData} rows="4" className="form-control" placeholder="Details for glass or any other comment.">{vehicleData}</textarea>
+                                            <textarea name="" id="" value={vehData.Make + ' ' + vehData.Model + ' ' + vehData.DoorPlanLiteral} rows="4" className="form-control" placeholder="Details for glass or any other comment.">{vehDataToCustomer[0] + ' ' + vehDataToCustomer[1] + ' ' + vehDataToCustomer[2]}</textarea>
                                         </div>
                                         {/* <a href="#" className="btn btn-purple">Add Pictures</a> */}
                                         <Button variant="contained" color="secondary">Add Pictures</Button>

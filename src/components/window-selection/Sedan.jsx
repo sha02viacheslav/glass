@@ -166,20 +166,22 @@ export default function Sedan({brokenWindowsToCustomer, brokenWindowsToComponent
                 </Dialog>
             </div>
                 
-            {/* display either car with tinted windows or normal */}
-            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={sedan} alt="" />
-            <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={sedanTinted} alt="" />
+            <div className={styles.imgContainer}>
+                {/* display either car with tinted windows or normal */}
+                <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={sedan} alt="" />
+                <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={sedanTinted} alt="" />
 
 
-            {/* broken glass displays */}
-            {brokenWindows.filter(element => element.broken === true).map(element => 
-                <img 
-                    key={element.window} className={styles.brokenGlass} 
-                    src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
-            )}
+                {/* broken glass displays */}
+                {brokenWindows.filter(element => element.broken === true).map(element => 
+                    <img 
+                        key={element.window} className={styles.brokenGlass} 
+                        src={(tinted && element.hasTinted) ? element.tintedSource : element.source} alt="" />
+                )}
 
-            {/* transparent layer on top of all car-related images to maintain image map */}
-            <img className={styles.selectionLayer} src={sedan} alt="" usemap="#image-map" />
+                {/* transparent layer on top of all car-related images to maintain image map */}
+                <img className={styles.selectionLayer} src={sedan} alt="" usemap="#image-map" />
+            </div>
 
             {/* tinted window toggle */}
             <div>
@@ -205,16 +207,16 @@ export default function Sedan({brokenWindowsToCustomer, brokenWindowsToComponent
             </div> 
 
             <map name="image-map">
-                <area onClick={() => selectWindow("front")} coords="834,941,781,747,857,714,1000,699,1122,714,1217,751,1168,941,1002,932" shape="poly" />
-                <area onClick={() => selectWindow("rear")} coords="807,1550,837,1398,1168,1398,1189,1554,1000,1591" shape="poly" />
-                <area onClick={() => selectWindow("r_1")} coords="1242,755,1247,831,1213,856" shape="poly" />
-                <area onClick={() => selectWindow("r_2")} coords="1245,853,1245,1079,1173,1108,1183,1002,1210,867" shape="poly" />
-                <area onClick={() => selectWindow("r_3")} coords="1245,1112,1236,1350,1175,1308,1176,1140" shape="poly" />
-                <area onClick={() => selectWindow("r_4")} coords="1183,1328,1238,1367,1235,1418,1217,1425" shape="poly" />
-                <area onClick={() => selectWindow("l_1")} coords="758,754,788,860,754,837" shape="poly" />
-                <area onClick={() => selectWindow("l_2")} coords="754,854,788,870,818,1011,822,1105,751,1078" shape="poly" />
-                <area onClick={() => selectWindow("l_3")} coords="758,1109,823,1139,822,1307,763,1355" shape="poly" />
-                <area onClick={() => selectWindow("l_4")} coords="762,1367,765,1417,783,1429,816,1330" shape="poly" />
+                <area onClick={() => selectWindow("front")} coords="255,741,418,723,592,741,652,513,511,469,342,471,192,513" shape="poly"/>
+                <area onClick={() => selectWindow("rear")} coords="228,1339,352,1376,500,1375,619,1343,594,1196,568,1182,278,1183,251,1199" shape="poly"/>
+                <area onClick={() => selectWindow("r_1")} coords="622,663,703,619,698,500,664,513" shape="poly"/>
+                <area onClick={() => selectWindow("r_2")} coords="592,913,598,792,624,669,702,628,704,868" shape="poly"/>
+                <area onClick={() => selectWindow("r_3")} coords="592,926,595,1098,665,1147,709,1138,712,883" shape="poly"/>
+                <area onClick={() => selectWindow("r_4")} coords="589,1108,630,1255,699,1248,702,1156,664,1156" shape="poly"/>
+                <area onClick={() => selectWindow("l_1")} coords="225,659,183,519,144,513,139,622" shape="poly"/>
+                <area onClick={() => selectWindow("l_2")} coords="143,631,225,667,247,794,256,913,133,874" shape="poly"/>
+                <area onClick={() => selectWindow("l_3")} coords="257,924,254,1097,179,1148,141,1142,136,886" shape="poly"/>
+                <area onClick={() => selectWindow("l_4")} coords="257,1110,217,1254,158,1247,148,1154,187,1154" shape="poly"/>
             </map>
         </div>
     )

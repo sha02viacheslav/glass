@@ -2,6 +2,14 @@
 /* hold images together and maintain their scaling */
 .container {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.imgContainer {
+    position: relative;
+    width: 50%;
 }
 
 /* base car image */
@@ -10,16 +18,18 @@
     width: 100%;
     object-fit: cover;
     z-index: 1;
+    /* transform: scale(0.5); */
 }
 
 /* inactive layer (switching between tinted and normal) is underneath and invisible so it doesnt load when toggled */
 .baseImageInactive {
     position: absolute;
-    left: 0;
-    right: 0;
     width: 100%;
+    left: 0;
+    top: 0;
     z-index: 0;
-    opacity: 0;
+    opacity: 0.5;
+    /* transform: scale(0.5); */
     object-fit: cover;
 }
 
@@ -30,6 +40,7 @@
     width: 100%;
     z-index: 2;
     object-fit: cover;
+    /* transform: scale(0.5); */
 }
 
 /* used for Coupe */
@@ -46,4 +57,5 @@
     z-index: 3;
     opacity: 0;
     object-fit: cover;
+    /* transform: scale(0.5); */
 }
