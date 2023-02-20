@@ -133,8 +133,8 @@ const Customer = () => {
                     "body_type": vehDataToCustomer,
                     "model_year": vehData.YearOfManufacture,
                     "glass_location": selectedBrokenWindows,
-                    "VehicleData": vehData === undefined ? vehData : testVehData,
-                    "VehicleImageData": vehData === undefined ? vehImgData : testVehImgData
+                    "VehicleData": vehData.length !== 0 ? vehData : testVehData,
+                    "VehicleImageData": vehData.length !== 0 ? vehImgData : testVehImgData
                 }
             });
 
@@ -171,7 +171,7 @@ const Customer = () => {
                 setVehicleData("No Data Found! Error in API.");
             })
         // fetch vehicle image data
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=AV59XRB' + licenseNum)
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=' + licenseNum)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -239,10 +239,12 @@ const Customer = () => {
 
     return (
         <div>
-            <RetrieveVehData 
-                vehData={vehData === undefined ? vehData.VehicleRegistration : testVehData.VehicleRegistration}
+            {vehData.length !== 0 && <RetrieveVehData 
+                // vehData={vehData === undefined ? vehData.VehicleRegistration : testVehData.VehicleRegistration}
+                key={vehData}
+                vehData={vehData.VehicleRegistration}
                 dataToCustomer={retrieveVehData}
-            />
+            />}
             <section className="sec-customer my-4 my-md-5">
                 <div className="container">
                     <div className='tab-content'>
@@ -250,7 +252,8 @@ const Customer = () => {
                         <LicensePlate 
                             placeholderVal={'NU71 REG'}
                             licenseNumber={licenseSearchVal}
-                            model={vehData === undefined ? vehData.Make + ' ' + vehData.Model : testVehData.VehicleRegistration.Make + ' ' + testVehData.VehicleRegistration.MakeModel}
+                            // model={vehData != undefined ? vehData.Make + ' ' + vehData.Model : testVehData.VehicleRegistration.Make + ' ' + testVehData.VehicleRegistration.MakeModel}
+                            model={vehData.length !== 0 ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model : 'Make & Model'}
                             handleVehInputChange={handleVehInputChange}
                         />
                         <br />
