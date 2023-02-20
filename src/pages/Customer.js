@@ -1,6 +1,6 @@
 import { useState, React, useRef, useEffect } from 'react';
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useMediaQuery, Button } from '@mui/material';
+import { Button } from '@mui/material';
 // import all car components for window-selection
 import ThreeDoorHatch from '../components/window-selection/3_Door_Hatch';
 import FiveDoorHatch from '../components/window-selection/5_Door_Hatch';
@@ -11,27 +11,27 @@ import VANs from '../components/window-selection/VANs';
 import LicensePlate from '../components/LicensePlate';
 import RetrieveVehData from '../components/functions/RetrieveVehData';
 import {autocomplete} from 'getaddress-autocomplete';
-import { trackPromise } from 'react-promise-tracker';
 import axios from 'axios';
+import testVehData from '../components/data/testVehData.json';
+import testVehImgData from '../components/data/testVehImgData.json';
 
 const Customer = () => {
     const [quoteInfo, setQuoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo')) || []);
-    const  inputInterval = useRef('');
-    const  pCodeInterval = useRef('');
     const [vehicleData, setVehicleData] = useState('');
     const {licenseNum} = useParams();
     const [licenseSearchVal, setLicense] = useState(licenseNum || '');
     const licenseRef = useRef();
     const [vehData, setVehData] = useState([]);
+    const [vehImgData, setVehImgData] = useState([]);
     const [vehDataToCustomer, setVehDataToCustomer] = useState([]);
     const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '');
+    const [fullAddress, setFullAddress] = useState([]);
     const firstName = quoteInfo.firstName || '';
     const lastName = quoteInfo.lastName || '';
     const email = quoteInfo.email || '';
     const phone = quoteInfo.phone || '';
     const selected = quoteInfo.selected || [];   
     const navigate = useNavigate();
-    const [vehicleTypes, setVehicleTypes] = useState(new Map());
 
     // keep track if request can be submitted
     const firstNameRef = useRef('');
@@ -102,22 +102,39 @@ const Customer = () => {
             // post data
             setSubmitClicked(true); 
             console.log('sent');
+            console.log(fullAddress);
             const name = firstNameRef.current.value.concat(' ', lastNameRef.current.value);
-            // let axios = require('axios');
+            const formattedAddress = fullAddress.formatted_address.filter(Boolean).join(", ") + " " + fullAddress.postcode;
             let data = JSON.stringify({
                 "jsonrpc": "2.0",
                 "params": {
                     "customer_name": name,
                     "customer_phone": phoneRef.current.value,
                     "customer_email": emailRef.current.value,
-                    "customer_order_postal_code": billingRef.current.value,
+                    "customer_order_postal_code": formattedAddress, // full address 
+                    "customer_address": { // more detailed address info
+                        "postcode": fullAddress.postcode,
+                        "latitude": fullAddress.latitude,
+                        "longitude": fullAddress.longitude,
+                        "line_1": fullAddress.line_1,
+                        "line_2": fullAddress.line_2,
+                        "line_3": fullAddress.line_3,
+                        "line_4": fullAddress.line_4,
+                        "locality": fullAddress.locality,
+                        "town_or_city": fullAddress.town_or_city,
+                        "county": fullAddress.county,
+                        "district": fullAddress.district,
+                        "country": fullAddress.country
+                    },
                     "registration_number": licenseSearchVal,
                     "registration_year": vehData.YearMonthFirstRegistered,
                     "make": vehData.Make,
                     "model": vehData.Model,
                     "body_type": vehDataToCustomer,
                     "model_year": vehData.YearOfManufacture,
-                    "glass_location": selectedBrokenWindows
+                    "glass_location": selectedBrokenWindows,
+                    "VehicleData": vehData === undefined ? vehData : testVehData,
+                    "VehicleImageData": vehData === undefined ? vehImgData : testVehImgData
                 }
             });
 
@@ -142,17 +159,28 @@ const Customer = () => {
     }
 
     useEffect(() => {
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=5fdd1a54-413d-40b4-a0fe-105b3e268d83&user_tag=&key_VRM=' + licenseNum)
+        // fetch vehicle data
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=' + licenseNum)
             .then(res => res.json())
             .then(data => {
-                // console.log(data);
-                setVehData(data.Response.DataItems.VehicleRegistration);
-                
+                console.log(data);
+                setVehData(data.Response.DataItems);
             })
             .catch(function(error) {
                 console.log(error);
                 setVehicleData("No Data Found! Error in API.");
             })
+        // fetch vehicle image data
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=AV59XRB' + licenseNum)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                setVehImgData(data.Response.DataItems);
+            })
+            .catch(function(error) {
+                console.log(error);
+                setVehicleData("No Data Found! Error in API.");
+            })    
         // scroll car into view on page load
         // if (!submitClicked) {
         //     const windowSelector = document.getElementById("scroll-focus");
@@ -168,10 +196,13 @@ const Customer = () => {
         });
 
         // Preventing Default to show complete address with Postal Code
-        window.addEventListener("getaddress-autocomplete-address-selected", function(e){
+        window.addEventListener("getaddress-autocomplete-address-selected", function(e) {
             e.preventDefault();
+            // console.log(e.address);
+            setFullAddress(e.address);
             let tempAddress = e.address.formatted_address.filter(Boolean).join(", ")+" "+e.address.postcode;
             setBillingAddress(tempAddress);
+            // console.log(tempAddress);
         })
 
         // send previously selected windows to window selection component
@@ -209,7 +240,7 @@ const Customer = () => {
     return (
         <div>
             <RetrieveVehData 
-                vehData={vehData}
+                vehData={vehData === undefined ? vehData.VehicleRegistration : testVehData.VehicleRegistration}
                 dataToCustomer={retrieveVehData}
             />
             <section className="sec-customer my-4 my-md-5">
@@ -219,7 +250,7 @@ const Customer = () => {
                         <LicensePlate 
                             placeholderVal={'NU71 REG'}
                             licenseNumber={licenseSearchVal}
-                            model={vehData.Make + ' ' + vehData.Model}
+                            model={vehData === undefined ? vehData.Make + ' ' + vehData.Model : testVehData.VehicleRegistration.Make + ' ' + testVehData.VehicleRegistration.MakeModel}
                             handleVehInputChange={handleVehInputChange}
                         />
                         <br />

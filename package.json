@@ -21,6 +21,7 @@
     "image-map-resizer": "^1.0.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-gtm-module": "^2.0.11",
     "react-loader-spinner": "^5.3.4",
     "react-promise-tracker": "^2.1.1",
     "react-scripts": "5.0.1",

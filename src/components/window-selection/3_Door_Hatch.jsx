@@ -50,7 +50,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
         // add to array which is sent to customer page
         if (brokenWindows[index].broken) {
             const index2 = selectedWindows.findIndex(element => element === brokenWindows[index].name);
-            const index3 = selectedWindows.findIndex(element => element === brokenWindows[index].name.concat(' tinted'));
+            const index3 = selectedWindows.findIndex(element => element === brokenWindows[index].name.concat(' privacy'));
             // find if it was selected as a tinted glass or not and remove from array
             if (index2 >= 0) {
                 selectedWindows.splice(index2, 1);
@@ -60,7 +60,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
             } 
         } else {
             if (tinted && brokenWindows[index].hasTinted) {
-                selectedWindows.push(brokenWindows[index].name + ' tinted');
+                selectedWindows.push(brokenWindows[index].name + ' privacy');
             } else {
                 selectedWindows.push(brokenWindows[index].name);
             }
@@ -97,7 +97,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
             setTinted(false);
             // update tinted windows in brokenWindows array as not tinted
             for (let i = 0; i < selectedWindows.length; i++) {
-                selectedWindows[i] = selectedWindows[i].replace(' tinted', '');
+                selectedWindows[i] = selectedWindows[i].replace(' privacy', '');
             }
             // update tinted windows in selectedWindows array as not tinted
             setSelectedWindows(selectedWindows.slice());
@@ -107,7 +107,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
             for (let i = 0; i < selectedWindows.length; i++) {
                 const index = brokenWindows.findIndex(element => element.name === selectedWindows[i]);
                 if (brokenWindows[index].hasTinted === true) {
-                    selectedWindows[i] = selectedWindows[i].concat(' tinted');
+                    selectedWindows[i] = selectedWindows[i].concat(' privacy');
                 }
             }
             // update tinted windows in selectedWindows array as tinted
@@ -120,10 +120,10 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
     
     function checkIfPreviouslySelected(selection) {
         // currently not working with tinted windows
-        if (selection.includes(' tinted')) {
+        if (selection.includes(' privacy')) {
             tintedButtonHandle('yes');
         }
-        const index = brokenWindows.findIndex(element => element.name === selection.replace(' tinted', ''));
+        const index = brokenWindows.findIndex(element => element.name === selection.replace(' privacy', ''));
         if (index >= 0) {
             brokenWindows[index].broken = true;
         } else {
@@ -178,7 +178,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
 
             {/* tinted window toggle */}
             <div>
-                <span className="fs-18 text-blue">Tinted windows: </span>
+                <span className="fs-18 text-blue">Privacy windows: </span>
                 <ToggleButtonGroup
                     sx={{ ml: '10px' }}
                     color='secondary'
@@ -196,7 +196,7 @@ export default function ThreeDoorHatch({brokenWindowsToCustomer, brokenWindowsTo
                     <a 
                         className={element.broken ? 'btn btn-gray-active' : 'btn btn-gray'}
                         onClick={() => selectWindow(element.window)}
-                        >{(tinted && element.hasTinted) ? (element.name + ' tinted') : element.name}</a>)}
+                        >{(tinted && element.hasTinted) ? (element.name + ' privacy') : element.name}</a>)}
             </div> 
 
             <map name="image-map">

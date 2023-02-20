@@ -32,7 +32,6 @@ function Quote() {
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
-    const [glassDetails, setGlassDetails] = useState([]);
     const [schedulerData, setSchedulerData] = useState([]);
     const [paymentOption, setPaymentOption] = useState([]);
     const [dateToPayment, setDateToPayment] = useState('');
@@ -42,7 +41,7 @@ function Quote() {
     const [declineReason, setDeclineReason] = useState(0);
     const [isBlinky, setIsBlinky] = useState(false);
     const declineRef = useRef();
-    const [tempLicenseNum, setTempLicense] = useState('BD51SMR');
+    const [tempLicenseNum, setTempLicense] = useState('');
     const navigate = useNavigate();
     const [offersDetails, setOffersDetails] = useState([{
         price_unit: 0,
@@ -170,8 +169,14 @@ function Quote() {
         if (topSelector !== null) {
             topSelector.scrollIntoView({behavior: 'smooth'});
         }
+    }, []);
+
+    useEffect(() => {
         // format license number correctly
         setTempLicense(customerDetails.registration_number);
+        if (tempLicenseNum === undefined) {
+            return
+        }
         if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
             // license number is standard
             // check if plate already includes space
@@ -188,7 +193,7 @@ function Quote() {
                 setTempLicense(input);
             }
         }
-    }, []);
+    }, [customerDetails]);
 
     useEffect(() => {
         if (timeSlot !== '') {
@@ -336,7 +341,7 @@ function Quote() {
                     </div>
 
                     <div className="quote-scroll-target" id='2'>-</div>
-                    {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
+                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length > 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
@@ -344,7 +349,7 @@ function Quote() {
                             liveBooking={false}
                             slot={timeSlot}
                         />
-                    </div>}
+                    </div>} */}
 
                     {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
