@@ -160,7 +160,7 @@ const Customer = () => {
 
     useEffect(() => {
         // fetch vehicle data
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=' + licenseNum)
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=1bc41b7b-bbf2-46e0-ac77-1c7b3a233d9d&user_tag=&key_VRM=' + licenseNum)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -171,7 +171,7 @@ const Customer = () => {
                 setVehicleData("No Data Found! Error in API.");
             })
         // fetch vehicle image data
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=f2163ad0-945d-4c18-afa8-41577aff0361&user_tag=&key_VRM=' + licenseNum)
+        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=1bc41b7b-bbf2-46e0-ac77-1c7b3a233d9d&user_tag=&key_VRM=' + licenseNum)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
