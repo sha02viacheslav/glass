@@ -12,19 +12,18 @@ import timeData from '../components/data/newTSDummy.json';
 
 export default function Payment({clientTime, clientDate, clientAddress}) {
 
-    const [selectedSlot, setSelectedSlot] = useState(JSON.parse(sessionStorage.getItem('selectedSlot')) || '');
     const [pastSlots, setPastSlots] = useState(JSON.parse(sessionStorage.getItem('pastSlots')) || []);
     const [pastLocs, setPastLocs] = useState(JSON.parse(sessionStorage.getItem('pastLocs')) || []);
     const [isOpen, setIsOpen] = useState(false); // control popup
     const [isRetrieved, setIsRetrieved] = useState(true);
-    const quoteInfo = JSON.parse(sessionStorage.getItem('quoteInfo')) || []; 
     let currentDate = new Date();
     const months = monthsData;
     const [today, setToday] = useState('');
     const [componentDisplay, setComponentDisplay] = useState('');
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
-
+    // stripe constants
+    
     function timeSlotToParent(slotData) {
         pastSlots.push(slotData);
         setPastSlots(pastSlots.slice());
@@ -42,6 +41,10 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
     function closePopup() {
         setIsOpen(false);
         setComponentDisplay('');
+    }
+
+    function pay() {
+        
     }
 
     useEffect(() => {
