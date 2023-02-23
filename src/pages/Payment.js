@@ -9,6 +9,7 @@ import user from '../components/icons/user.png';
 import monthsData from '../components/data/months.json';
 import close from '../components/icons/x.png';
 import timeData from '../components/data/newTSDummy.json';
+import StripeContainer from '../components/stripe/StripeContainer';
 
 export default function Payment({clientTime, clientDate, clientAddress}) {
 
@@ -23,6 +24,7 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
     // stripe constants
+    const [showPay, setShowPay] = useState(false);
     
     function timeSlotToParent(slotData) {
         pastSlots.push(slotData);
@@ -148,11 +150,15 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
                         <Link to="/react/payment" className="btn btn-purple-outline w-100 mb-3">Cancel Booking</Link>
                     </div>
                 </div> */}
+                {
+                    showPay ? <StripeContainer /> : null
+                }
                 <div className="payment-btn-container">
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline">
                     Decline
                 </button>
-                <button className="btn btn-purple-radius mb-3 quote-btn quote-accept">
+                <button className="btn btn-purple-radius mb-3 quote-btn quote-accept"
+                    onClick={() => setShowPay(true)}>
                     Pay
                 </button>
             </div>
