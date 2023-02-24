@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import '../css/payment-method.css';
 import {autocomplete} from 'getaddress-autocomplete';
+import invoice from './icons/invoice.png';
+import axios from 'axios';
 
-export default function PaymentMethod({selectedPrice, billingAddress, name, email}) {
+export default function PaymentMethod({selectedPrice, billingAddress, name, email, qid}) {
 
     const [selectedMethod, setSelectedMethod] = useState(2);
     const [address, setAddress] = useState('');
@@ -37,15 +39,41 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
         // console.log("Address found at useEffect"+userBillingAddress);
     }, [selectedMethod]);  
 
+    function retrieveInvoice() {
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": qid
+            }
+        });
+        let config = {
+            method: 'post',
+            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_pdf',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            // figure out how to view pdf
+            console.log(JSON.stringify(response));
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+    }
+
     return (
         <div className='center'>
             <div className='payment-method'>
+                <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
             <h3 className="text-24 text-blue PM-header">Payment method</h3>
             <div className='PM-status'>Status: {status}</div>
             <div className='PM-btn-container'>
                 <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
                     <small className="fs-14">4 month</small>
-                    <h5 className='PM-price'>£ 100</h5>
+                    <h5 className='PM-price'>£ {(selectedPrice/4).toFixed(2)}</h5>
                 </button>
                 <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
                     <small className="fs-14">Insurance</small>
@@ -53,7 +81,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
                 </button>
                 <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
                     <small className="fs-14">Single pay</small>
-                    <h5 className='PM-price'>£ 400</h5>
+                    <h5 className='PM-price'>£ {selectedPrice}</h5>
                 </button>
             </div>
 
@@ -136,11 +164,9 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
                             </button>
                         </div>
                     </div>   
-                </div>}                          
+                </div>}   
             </div>
-
             </div>
-
         </div>
     )
 }

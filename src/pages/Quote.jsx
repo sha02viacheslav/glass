@@ -23,7 +23,7 @@ const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00',
 function Quote() {
 
     // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
-    const [tabValue, setTabValue] = useState(0);
+    const [tabValue, setTabValue] = useState(1);
     const [customerDetails, setCustomerDetails] = useState([]);
     const [isRetrieved, setIsRetrieved] = useState(false);
     const [snapValue, setSnapValue] = useState(1);
@@ -54,14 +54,12 @@ function Quote() {
     // getQuote(id);
     function getQuote(qid) {
         console.log('sent');
-        // let axios = require('axios');
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
                 "fe_token": qid
             }
         });
-
         let config = {
             method: 'post',
             url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/preview_quotation',
@@ -70,7 +68,6 @@ function Quote() {
             },
             data: data
         };
-
         axios(config)
         .then(function (response) {
             console.log(JSON.stringify(response.data));
@@ -393,7 +390,8 @@ function Quote() {
                 <Payment 
                     clientTime={timeToPayment}
                     clientDate={dateToPayment}
-                    clientAddress={billingAddress}/>                    
+                    clientAddress={billingAddress}
+                    qid={id}/>                    
             </div>}
         </div>
     );

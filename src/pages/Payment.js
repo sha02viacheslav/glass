@@ -10,8 +10,9 @@ import monthsData from '../components/data/months.json';
 import close from '../components/icons/x.png';
 import timeData from '../components/data/newTSDummy.json';
 import StripeContainer from '../components/stripe/StripeContainer';
+import axios from 'axios';
 
-export default function Payment({clientTime, clientDate, clientAddress}) {
+export default function Payment({clientTime, clientDate, clientAddress, qid}) {
 
     const [pastSlots, setPastSlots] = useState(JSON.parse(sessionStorage.getItem('pastSlots')) || []);
     const [pastLocs, setPastLocs] = useState(JSON.parse(sessionStorage.getItem('pastLocs')) || []);
@@ -23,6 +24,7 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
     const [componentDisplay, setComponentDisplay] = useState('');
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
+    const [invoiceData, setInvoiceData] = useState([]);
     // stripe constants
     const [showPay, setShowPay] = useState(false);
     
@@ -46,7 +48,7 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
     }
 
     function pay() {
-        
+        setShowPay(true);
     }
 
     useEffect(() => {
@@ -56,6 +58,29 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
         const currentYear = currentDate.getFullYear().toString();
         const newCurrentDate = currentDay.concat(' ', currentMonth).concat(' ', currentYear);
         setToday(newCurrentDate);
+        // get invoice data for payment
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": qid
+            }
+        });
+        let config = {
+            method: 'post',
+            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_invoice',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response));
+            setInvoiceData(response.data.result.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     }, []);
 
     return (
@@ -142,7 +167,10 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
                 </div>
                 <button onClick={() => setIsRetrieved(!isRetrieved)}>switch</button>
                 <PayBookTimeline />
-                <PaymentMethod />
+                <PaymentMethod 
+                    selectedPrice={invoiceData.amount_total}
+                    qid={qid}
+                />
                 <br /><br />
                 {/* <div className="row">
                     <div className="col-md-7 mx-auto">
@@ -151,14 +179,16 @@ export default function Payment({clientTime, clientDate, clientAddress}) {
                     </div>
                 </div> */}
                 {
-                    showPay ? <StripeContainer /> : null
+                    showPay ? <StripeContainer 
+                        qid={qid}
+                    /> : null
                 }
                 <div className="payment-btn-container">
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline">
                     Decline
                 </button>
                 <button className="btn btn-purple-radius mb-3 quote-btn quote-accept"
-                    onClick={() => setShowPay(true)}>
+                    onClick={pay}>
                     Pay
                 </button>
             </div>

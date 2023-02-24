@@ -1,6 +1,6 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import axios from "axios"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 const CARD_OPTIONS = {
@@ -23,10 +23,42 @@ const CARD_OPTIONS = {
 	}
 }
 
-export default function PaymentForm() {
+export default function PaymentForm(qid) {
     const [success, setSuccess ] = useState(false)
     const stripe = useStripe()
     const elements = useElements()
+
+    useEffect(() => {
+        if (success) {
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "fe_token": qid,
+                    "invoice_number": "INV/2023/02012",
+                    "payment_gateway": "stripe",
+                    "data": {
+                        "payment_status": success
+                    }
+                }
+            });
+            let config = {
+                method: 'post',
+                url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_invoice',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+                },
+                data: data
+            };
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response));
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        }
+    }, [success]);
 
 
     const handleSubmit = async (e) => {

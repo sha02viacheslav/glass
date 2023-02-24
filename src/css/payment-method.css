@@ -6,6 +6,7 @@
     max-width: 550px;
     overflow: hidden;
     margin-top: 30px;
+    position: relative;
 }
 
 .PM-header {
@@ -170,4 +171,18 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.PM-invoice {
+    width: 30px;
+    position: absolute;
+    right: 23px;
+    top: 23px;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.PM-invoice:hover {
+    background-color: #9a73dd41;
+    cursor: pointer;
 }
