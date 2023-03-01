@@ -23,12 +23,13 @@ const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00',
 function Quote() {
 
     // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
-    const [tabValue, setTabValue] = useState(1);
+    const [tabValue, setTabValue] = useState(0);
     const [customerDetails, setCustomerDetails] = useState([]);
     const [isRetrieved, setIsRetrieved] = useState(false);
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
     const [timeSlot, setTimeSlot] = useState("");
+    const [timeEnd, setTimeEnd] = useState("");
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -100,10 +101,35 @@ function Quote() {
             document.getElementById('2').scrollIntoView({behavior: 'smooth'});
             setSlotSelected(true);
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
-            // change tab
-            handleTabChange(1);
-            // updateQuoteData();
-            setIsBlinky(true);
+            // send booking data
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "fe_token": id,
+                    "booking_start_date": timeSlot,
+                    "booking_end_date": timeEnd  
+                }
+            });
+            let config = {
+                method: 'post',
+                url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/booking',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+                },
+                data: data
+            };
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response.data));
+                // change tab
+                handleTabChange(1);
+                // updateQuoteData();
+                setIsBlinky(true);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
         } else {
             return;
         }
@@ -142,6 +168,11 @@ function Quote() {
     function timeSlotToParent(data) {
         setTimeSlot(data);
         setSlotSelected(false);
+    }
+
+    function timeEndToParent(data) {
+        setTimeEnd(data);
+        console.log(data);
     }
     
     function deliveryAddressToParent(data) {
@@ -352,6 +383,7 @@ function Quote() {
                     {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
+                            timeEndToParent={timeEndToParent}
                             timeData={timeData}
                             liveBooking={false}
                             slot={""}

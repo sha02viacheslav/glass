@@ -6,13 +6,15 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Button, Menu } from '@mui/material';
 import { useEffect, useState } from 'react';
 import arrowIcon from './icons/down-arrow.png';
+import axios from 'axios';
+import CreateTimetable from './functions/CreateTimetable';
 
 const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
 const passedSlots = [10, 12, 14, 16, 18, 20, 22];
 const monthValues = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","June":"06","July":"07","Aug":"08","Sept":"09","Oct":"10","Nov":"11","Dec":"12"};
 const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
 
-export default function TimeSelection({timeSlotToParent, liveBooking, timeData, slot}) {
+export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBooking, timeData, slot}) {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedSlot, setSelectedSlot] = useState('');
@@ -29,6 +31,7 @@ export default function TimeSelection({timeSlotToParent, liveBooking, timeData, 
     const [isMobile, setIsMobile] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [bookings, setBookings] = useState([]);
 
     function handleMenuClick(event) {
         setMenuOpen(!menuOpen);
@@ -64,16 +67,17 @@ export default function TimeSelection({timeSlotToParent, liveBooking, timeData, 
         if (odooDay.length === 1) {
             odooDay = '0' + odooDay;
         }
-        // for sending slot info to odoo
+        // for sending slot info to odoo, slot starting time
         let odooSlot = currentYear.toString().concat('-',monthValues[monthSelected]).concat('-',odooDay);
-        odooSlot = odooSlot.concat(' ',timeheaders[timeSelected]).concat('',':00');
-        // let formalDate = monthSelected.concat(' ', daySelected).concat(' ', currentYear);
-        // let timeFrame = timeheaders[timeSelected].concat('-', timeheaders[timeSelected + 1]);
+        // send slot end time
+        let odooEnd = odooSlot.concat(' ',timeheaders[timeSelected + 1]);
+        odooSlot = odooSlot.concat(' ',timeheaders[timeSelected]);
         setSelectedSlot(idTag); 
         setSlotChanged(true);   
         if (!liveBooking) {
             // send data to parent page to enable next btn
             timeSlotToParent(odooSlot);  
+            timeEndToParent(odooEnd);
         }
     }
 
@@ -145,10 +149,38 @@ export default function TimeSelection({timeSlotToParent, liveBooking, timeData, 
             }
         }
         setPastIds(past);
+        // get past bookings
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "start_date": "2023-02-27",
+                "end_date": "2023-03-02",
+                "limit": "all",
+                "offset": 0
+            }
+        });
+        let config = {
+            method: 'post',
+            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/get_calendar',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response.data.result.data));
+            setBookings(response.data.result.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     }, []);
 
     return (
         <div >
+            <CreateTimetable />
             <div className='time-select-main'>
                 <h1>Set date and time</h1>
                     <div className='date-pick-container'>
@@ -252,7 +284,3 @@ export default function TimeSelection({timeSlotToParent, liveBooking, timeData, 
         </div>
     )
 }
-
-// ((index === 0) && (currentTime - passedSlots[time] >= 0)) ? 
-// <div className='ts-passed'>-</div> : 
-// (occup != 'Half' ? occup : <img src={stripes} alt="" />) 

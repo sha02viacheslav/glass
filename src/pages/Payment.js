@@ -69,7 +69,8 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
             method: 'post',
             url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_invoice',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
             },
             data: data
         };
@@ -172,12 +173,7 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
                     qid={qid}
                 />
                 <br /><br />
-                {/* <div className="row">
-                    <div className="col-md-7 mx-auto">
-                        <Link to="/react/paid" className="btn btn-purple-radius w-100 mb-3">Pay and Book</Link>
-                        <Link to="/react/payment" className="btn btn-purple-outline w-100 mb-3">Cancel Booking</Link>
-                    </div>
-                </div> */}
+                {/* temporary simplistic Stripe payment implementation */}
                 {
                     showPay ? <StripeContainer 
                         qid={qid}

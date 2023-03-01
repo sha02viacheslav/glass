@@ -90,7 +90,7 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
                         <span className="total-bold">
                             Tax x%
                         </span>
-                        <span>£ {selectOfferToCustomer[0].price_total - selectOfferToCustomer[0].price_subtotal}</span>
+                        <span>£ {(selectOfferToCustomer[0].price_total - selectOfferToCustomer[0].price_subtotal).toFixed(2)}</span>
                     </div>
                     <div className="total-row total-last">
                         <span className="total-bold">
