@@ -31,7 +31,6 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
     const [isMobile, setIsMobile] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [bookings, setBookings] = useState([]);
 
     function handleMenuClick(event) {
         setMenuOpen(!menuOpen);
@@ -149,33 +148,6 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
             }
         }
         setPastIds(past);
-        // get past bookings
-        let data = JSON.stringify({
-            "jsonrpc": "2.0",
-            "params": {
-                "start_date": "2023-02-27",
-                "end_date": "2023-03-02",
-                "limit": "all",
-                "offset": 0
-            }
-        });
-        let config = {
-            method: 'post',
-            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/get_calendar',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
-            },
-            data: data
-        };
-        axios(config)
-        .then(function (response) {
-            console.log(JSON.stringify(response.data.result.data));
-            setBookings(response.data.result.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
     }, []);
 
     return (
