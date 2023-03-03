@@ -1,10 +1,11 @@
 // import timeData from './data/emptyTSDummy.json';
 import axios from "axios";
 import { useEffect, useState } from "react";
-
+import testData from '../data/get_calendar_test.json';
 const monthValuesRev = {"0":"Jan","1":"Feb","2":"Mar","3":"Apr","4":"May","5":"June","6":"July","7":"Aug","8":"Sept","9":"Oct","10":"Nov","11":"Dec"};
+const monthValues = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","June":"06","July":"07","Aug":"08","Sept":"09","Oct":"10","Nov":"11","Dec":"12"};
 
-export default function CreateTimetable() {
+export default function CreateTimetable({timetableToClient}) {
 
     const currentDate = new Date();
     // getDate -> 1-31
@@ -14,6 +15,7 @@ export default function CreateTimetable() {
     const [futureDate, setFutureDate] = useState([]);
     const year = currentDate.getFullYear().toString();
     const month = monthValuesRev[currentDate.getMonth().toString()];
+    const monthNum = monthValues[month];
     let day = currentDate.getDate().toString();
 
     function createTimetable() {
@@ -23,7 +25,7 @@ export default function CreateTimetable() {
             day = newValue;
         }
         let newTimetable = [
-            [month, day, 8, 10, 12, 14, 16, 18, 20]
+            [month, day, Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3)]
         ];
         let nextDate = [];
         // set correct dates for following 21 days from current date
@@ -39,22 +41,21 @@ export default function CreateTimetable() {
             }
             const nextMonth = monthValuesRev[tomorrow.getMonth().toString()];
             const nextYear = tomorrow.getFullYear().toString();
-            newTimetable.push([nextMonth, nextDay, 8, 10, 12, 14, 16, 18, 20]);
+            newTimetable.push([nextMonth, nextDay, Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3)]);
             nextDate = [nextYear, nextMonth, nextDay];
         }
-        setTimetable(newTimetable);
         setFutureDate(nextDate);
         retrieveBookings(nextDate, newTimetable);
     }
 
     function retrieveBookings(nextDate, timetable) {
         // get past bookings
-        const today = year.concat('-', month).concat('-', day);
+        const today = year.concat('-', monthNum).concat('-', day);
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
                 "start_date": today,
-                "end_date": nextDate[0].concat('-', nextDate[1]).concat('-', nextDate[2]),
+                "end_date": nextDate[0].concat('-', monthValues[nextDate[1]]).concat('-', nextDate[2]),
                 "limit": "all",
                 "offset": 0
             }
@@ -72,14 +73,14 @@ export default function CreateTimetable() {
         .then(function (response) {
             console.log(JSON.stringify(response.data.result.data));
             setBookings(response.data.result.data);
-            fillTimeslots(timetable, response.data.result.data);
+            fillTimeslots(timetable, testData);
         })
         .catch(function (error) {
             console.log(error);
         })
     }
 
-    function fillTimeslots(timetable, bookingData) {
+    function fillTimeslots(times, bookingData) {
         // format bookings data into usable form
         let bookings = [];
         for (let i = 0; i < bookingData.length; i++) {
@@ -92,27 +93,67 @@ export default function CreateTimetable() {
         }
         // 0: "2023" 1: "03" 2: "02" 3: "11"
         // find indexes of booked slots
-        for (let i = 0; i < timetable.length; i++) {
-            const row = timetable[i];
+        for (let i = 0; i < times.length; i++) {
+            let row = times[i];
             for (let j = 0; j < bookings.length; j++) {
                 const booking = bookings[j];
-                let bookingMonth = '';
-                if (row[0] === bookingMonth) {
-
-                }
-            }
-            for (let element = 0; element < row.length; element++) {
-                if (Number.isInteger(element)) {
-                    // avoid month and day entries in each row
-                    
-                }
-            }            
+                const bookingMonth = booking[1];
+                const bookingDay = booking[2];
+                const bookingTime = Number(booking[3]);
+                if (monthValues[row[0]] === bookingMonth) {
+                    if (row[1] === bookingDay) {
+                        // find what time the booking is and mark 
+                        if (bookingTime <= 10) { 
+                            row[2] += 1;
+                        } 
+                        if (bookingTime > 10 && bookingTime <= 12) { 
+                            row[3] += 1;
+                        } 
+                        if (bookingTime > 12 && bookingTime <= 14) { 
+                            row[4] += 1;
+                        } 
+                        if (bookingTime > 14 && bookingTime <= 16) {
+                            row[5] += 1;
+                        } 
+                        if (bookingTime > 16 && bookingTime <= 18) {
+                            row[6] += 1;
+                        } 
+                        if (bookingTime > 18 && bookingTime <= 20) {
+                            row[7] += 1;
+                        } 
+                        if (bookingTime > 20) {
+                            row[8] += 1;
+                        } 
+                    }
+                } 
+            }         
         }
+        // set timeslot status based on number of slots filled: 0 -> empty, 1-2 -> half, 3+ -> full
+        for (let i = 0; i < times.length; i++) {
+            let row = times[i];  
+            for (let j = 2; j < row.length; j++) {
+                const element = row[j];
+                if (element === 0) {
+                    row[j] = 'Empty';
+                } else if (element === 1 || element == 2) {
+                    row[j] = 'Half';
+                } else if (element >= 3) {
+                    row[j] = 'Full';
+                }
+            }          
+        }
+        // console.log(times); 
+        setTimetable(times);
+        timetableToClient(times);
     }
 
     useEffect(() => {
         createTimetable();
-    }, []);
+    }, []);  
+
+    // useEffect(() => {
+    //     timetableToClient(timetable);
+    // }, [timetable]);
 
     return (
         <div>

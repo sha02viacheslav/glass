@@ -12,7 +12,6 @@ import expand from '../components/icons/expand.png';
 import up from '../components/icons/up.png';
 import flag from '../components/icons/uk-flag.png';
 import close from '../components/icons/x.png';
-import timeData from '../components/data/newTSDummy.json';
 import { trackPromise } from 'react-promise-tracker';
 import { ConstructionRounded } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
@@ -384,7 +383,7 @@ function Quote() {
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
                             timeEndToParent={timeEndToParent}
-                            timeData={timeData}
+                            // timeData={timeData}
                             liveBooking={false}
                             slot={""}
                         />

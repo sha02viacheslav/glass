@@ -6,7 +6,8 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Button, Menu } from '@mui/material';
 import { useEffect, useState } from 'react';
 import arrowIcon from './icons/down-arrow.png';
-import axios from 'axios';
+// import temp_timeData from './data/newTSDummy.json';
+// import axios from 'axios';
 import CreateTimetable from './functions/CreateTimetable';
 
 const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
@@ -14,12 +15,13 @@ const passedSlots = [10, 12, 14, 16, 18, 20, 22];
 const monthValues = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","June":"06","July":"07","Aug":"08","Sept":"09","Oct":"10","Nov":"11","Dec":"12"};
 const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
 
-export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBooking, timeData, slot}) {
+export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBooking, slot}) {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedSlot, setSelectedSlot] = useState('');
     const [slotChanged, setSlotChanged] = useState(false);
     const currentTime = selectedDate.getHours();
+    const [timeData, setTimeData] = useState([]);
     const [slots, setSlots] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pages, setPages] = useState([]);
@@ -41,6 +43,10 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
         setMenuOpen(false);
         setAnchorEl(null);
         setSelectedDate(newDate);
+    }
+
+    function getTimeData(data) {
+        setTimeData(data);
     }
 
     // function to select a given time slot
@@ -106,7 +112,7 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
         } else {
             setSlots(timeData.slice(7*currentPage-7, 7*currentPage));
         }
-    }, [currentPage]);
+    }, [currentPage, timeData]);
 
     useEffect(() => {
         // decipher odoo data into useable timeslot id
@@ -122,6 +128,18 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
             selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
             setSelectedSlot(selectionId);
         }
+        // find which slots have passed
+        let past = [];
+        if (timeData.length > 0) {
+            for (let i = 0; i < timeData[0].slice(2).length; i++) {
+                let idTag = timeData[0][0].concat(timeData[0][1]).concat(i.toString());
+                const timeCheck = passedSlots[i] - currentHour; 
+                if (timeCheck <= 0) {
+                    past.push(idTag);  
+                }
+            }
+        }
+        setPastIds(past); 
         // determine if table is viewed in mobile view and set cols in display accordingly
         let pageCount = [];
         if (window.innerWidth <= 800) {
@@ -138,21 +156,13 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
             }
         }
         setPages([...new Set(pageCount)]);
-        // find which slots have passed
-        let past = [];
-        for (let i = 0; i < timeData[0].slice(2).length; i++) {
-            let idTag = timeData[0][0].concat(timeData[0][1]).concat(i.toString());
-            const timeCheck = passedSlots[i] - currentHour; 
-            if (timeCheck <= 0) {
-                past.push(idTag);
-            }
-        }
-        setPastIds(past);
-    }, []);
+    }, [timeData]);
 
     return (
-        <div >
-            <CreateTimetable />
+        <div>
+            <CreateTimetable 
+                timetableToClient={getTimeData}
+            />
             <div className='time-select-main'>
                 <h1>Set date and time</h1>
                     <div className='date-pick-container'>
@@ -196,7 +206,7 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
                                 }} />
                         </LocalizationProvider>
                     </Menu>
-                <table className='ts-table'>
+                {timeData.length > 0 && <table className='ts-table' id='calendar'>
                     {/* map time headers on left side */}
                     <tr>
                         {timeheaders.map(element => 
@@ -232,7 +242,7 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
                             )}
                         </tr>
                     )}
-                </table>
+                </table>}
                     
                 <div className="ts-legend-container">
                     <div className="ts-legend-icon ts-past">-</div>
