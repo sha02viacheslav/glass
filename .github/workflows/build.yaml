@@ -1,7 +1,7 @@
 name: react
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 jobs:
   docker-prod:
     runs-on: ubuntu-latest
