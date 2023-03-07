@@ -16,6 +16,8 @@ RUN npm run build
 FROM nginx:1.23.3-alpine 
 
 COPY --from=build /src/build /usr/share/nginx/html
+COPY --from=build /src/build /usr/share/nginx/html/react
+
 
 
 
