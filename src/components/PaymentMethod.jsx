@@ -24,7 +24,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
 
     useEffect(() => {
         // Integration of PostalCode/ Address AutoComplete API
-        autocomplete("autocomplete-field","SFB4ZD1fO0ONndTgHnmUmg26020", { 
+        autocomplete("autocomplete-field", process.env.REACT_APP_AUTOCOMPLETE, { 
             delay: 500,
         });
 
@@ -50,7 +50,8 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
             method: 'post',
             url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_pdf',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
             },
             data: data
         };

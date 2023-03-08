@@ -114,7 +114,7 @@ function Quote() {
                 url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/booking',
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
                 },
                 data: data
             };

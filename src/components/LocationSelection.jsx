@@ -38,7 +38,7 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
 
     useEffect(() => {
         // Integration of PostalCode/ Address AutoComplete API
-        autocomplete("autocomplete-field","SFB4ZD1fO0ONndTgHnmUmg26020", { 
+        autocomplete("autocomplete-field", process.env.REACT_APP_AUTOCOMPLETE, { 
             delay: 500,
         });
 

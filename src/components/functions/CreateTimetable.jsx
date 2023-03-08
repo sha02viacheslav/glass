@@ -65,13 +65,13 @@ export default function CreateTimetable({timetableToClient}) {
             url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/get_calendar',
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
             },
             data: data
         };
         axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response.data.result.data));
+            console.log(JSON.stringify(response.data));
             setBookings(response.data.result.data);
             fillTimeslots(timetable, testData);
         })

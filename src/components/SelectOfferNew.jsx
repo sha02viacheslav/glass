@@ -7,8 +7,6 @@ export default function SelectOfferNew({selectOfferToCustomer, isRetrieved, paym
 
     // const selectOfferToCustomer = selectOfferToCustomer;
     const dummyData = data;
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [savePrice, setSavePrice] = useState(0);
     const [selectOffer, setSelectOffer] = useState(1);
     const [wiperSelected, setWiperSelected] = useState(false);
 
