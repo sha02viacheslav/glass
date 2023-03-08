@@ -63,15 +63,15 @@ function App() {
       <LoadingIndicator/>
         <Header />
         <Routes>
-          <Route path='/react' element={<Home />} />
-          <Route path='/react/services' element={<Services />} />
-          <Route path='/react/pricing' element={<Pricing />} />
-          <Route path='/react/contact' element={<Contact />} />
-          <Route path='/react/customer' element={<Customer />} />
-          <Route path='/react/customer/:licenseNum' element={<Customer />} />
-          <Route path='/react/payment' element={<Payment />} />
-          <Route path='/react/paid' element={<Paid />} />
-          <Route path='/react/quote/:id' element={<Quote />} />
+          <Route path='/' element={<Home />} />
+          <Route path='/services' element={<Services />} />
+          <Route path='/pricing' element={<Pricing />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/customer' element={<Customer />} />
+          <Route path='/customer/:licenseNum' element={<Customer />} />
+          <Route path='/payment' element={<Payment />} />
+          <Route path='/paid' element={<Paid />} />
+          <Route path='/quote/:id' element={<Quote />} />
         </Routes>
         <Footer />
       </div>

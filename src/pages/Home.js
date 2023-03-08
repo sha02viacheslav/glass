@@ -27,7 +27,9 @@ const Home = () => {
     }
     
     function directToCustomer() {
-        navigate("/react/customer/"+licenseRef.current.value.toUpperCase());
+        const licenseNum = licenseRef.current.value.toUpperCase();
+        console.log(licenseNum);
+        navigate("/customer/"+licenseNum);
     }
 
     return (

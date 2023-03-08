@@ -62,7 +62,7 @@ function Quote() {
         });
         let config = {
             method: 'post',
-            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/preview_quotation',
+            url: process.env.REACT_APP_PREVIEW_QUOTE,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -111,7 +111,7 @@ function Quote() {
             });
             let config = {
                 method: 'post',
-                url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/booking',
+                url: process.env.REACT_APP_ODOO_SEND_BOOKING,
                 headers: {
                     'Content-Type': 'application/json',
                     'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
@@ -161,7 +161,7 @@ function Quote() {
         };
         quoteData = JSON.stringify(quoteData);
         sessionStorage.setItem('quoteInfo', quoteData);
-        navigate('/react/customer/' + licenseReg);
+        navigate('/customer/' + licenseReg);
     }
 
     function timeSlotToParent(data) {

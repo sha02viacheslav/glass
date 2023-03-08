@@ -140,7 +140,7 @@ const Customer = () => {
 
             let config = {
                 method: 'post',
-                url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/order/create_quotation',
+                url: process.env.REACT_APP_CREATE_QUOTE,
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -160,7 +160,7 @@ const Customer = () => {
 
     useEffect(() => {
         // fetch vehicle data
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleData?v=2&api_nullitems=1&auth_apikey=1bc41b7b-bbf2-46e0-ac77-1c7b3a233d9d&user_tag=&key_VRM=' + licenseNum)
+        fetch(process.env.REACT_APP_VEH_DATA + licenseNum)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -171,7 +171,7 @@ const Customer = () => {
                 setVehicleData("No Data Found! Error in API.");
             })
         // fetch vehicle image data
-        fetch('https://uk1.ukvehicledata.co.uk/api/datapackage/VehicleImageData?v=2&api_nullitems=1&auth_apikey=1bc41b7b-bbf2-46e0-ac77-1c7b3a233d9d&user_tag=&key_VRM=' + licenseNum)
+        fetch(process.env.REACT_APP_VEH_IMG_DATA + licenseNum)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
