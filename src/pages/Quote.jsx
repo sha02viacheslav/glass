@@ -111,10 +111,10 @@ function Quote() {
             });
             let config = {
                 method: 'post',
-                url: process.env.REACT_APP_ODOO_SEND_BOOKING,
+                url: process.env.REACT_APP_SEND_BOOKING,
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-key': 'e2aa3aea-baaf-4d45-aed5-44be3fc34e83'
+                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
                 },
                 data: data
             };

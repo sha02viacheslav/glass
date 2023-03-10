@@ -2,9 +2,9 @@ import {useRef, useState} from 'react'
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import flag from '../components/icons/uk-flag.png';
+import { useEffect } from 'react';
 
 const Home = () => {
-    const [licenseNum, setLicenseNum] = useState('');
     const navigate = useNavigate();
     const licenseRef = useRef();
 
@@ -28,9 +28,12 @@ const Home = () => {
     
     function directToCustomer() {
         const licenseNum = licenseRef.current.value.toUpperCase();
-        console.log(licenseNum);
         navigate("/customer/"+licenseNum);
     }
+
+    useEffect(() => {
+        localStorage.setItem('version', JSON.stringify('1.1'));
+      }, []);
 
     return (
         <div>
@@ -40,13 +43,13 @@ const Home = () => {
                         <img src={process.env.PUBLIC_URL +"/img/bg-s1.png"} className="img-fluid hp-quote-bg-img" alt="" />
                         <div className="license-input-container">
                             {/* <input ref={licenseRef} type="text" className="form-control" placeholder="Reg. Number" aria-label="Recipient's username" aria-describedby="basic-addon2" onChange={handleVehInputChange}/> */}
-                            <div className="yellow-box-home" key={licenseNum}>
+                            <div className="yellow-box-home">
                                 <div className="blue-box">
                                     <img className='flag' src={flag} alt="" />
                                     <div className='gb'>UK</div>
                                 </div>
                                 {/* <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='Reg. Number'/> */}
-                                <input ref={licenseRef} className='license-input' type="text" defaultValue={licenseNum} placeholder='NU71 REG' onChange={patternMatch} maxLength='8'/>
+                                <input ref={licenseRef} className='license-input' type="text" placeholder='NU71 REG' onChange={patternMatch} maxLength='8'/>
                             </div>
                             <span className="input-group-text" id="basic-addon2">
                                 <Button

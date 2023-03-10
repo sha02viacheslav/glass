@@ -3,6 +3,8 @@ import '../css/payment-method.css';
 import {autocomplete} from 'getaddress-autocomplete';
 import invoice from './icons/invoice.png';
 import axios from 'axios';
+import PDFViewer from './functions/PDFViewer';
+import sample_pdf from '../images/test/sample_invoice.pdf';
 
 export default function PaymentMethod({selectedPrice, billingAddress, name, email, qid}) {
 
@@ -13,6 +15,8 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
     const [excess, setExcess] = useState(115);
     const [singlePay, setSinglePay] = useState('card');
     const [status, setStatus] = useState('not paid');
+    const [invoicePDF, setInvoicePDF] = useState('');
+    const [showInvoice, setShowInvoice] = useState(false);
 
     function updateExcess() {
         setExcess(Number(excessRef.current.value));
@@ -48,9 +52,10 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
         });
         let config = {
             method: 'post',
-            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_pdf',
+            url: process.env.REACT_APP_GET_INVOICE_PDF,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
             },
             data: data
         };
@@ -58,14 +63,26 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
         .then(function (response) {
             // figure out how to view pdf
             console.log(JSON.stringify(response));
+            setInvoicePDF(response.data.result.data.invoice_pdf_url);
+            setShowInvoice(true);
         })
         .catch(function (error) {
             console.log(error);
         })
     }
 
+    function handleInvoicePopup(status) {
+        setShowInvoice(status);
+    }
+
+    // console.log(invoicePDF);
+
     return (
         <div className='center'>
+            { showInvoice === true && <PDFViewer
+                invoicePDF={invoicePDF}
+                isOpen={handleInvoicePopup}
+            /> }
             <div className='payment-method'>
                 <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
             <h3 className="text-24 text-blue PM-header">Payment method</h3>

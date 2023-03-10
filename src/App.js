@@ -52,6 +52,7 @@ const LoadingIndicator = props => {
     </div>
   );
 }
+
 function App() {
   // useScript("https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js");
   // useScript("js/bootstrap.min.js");
