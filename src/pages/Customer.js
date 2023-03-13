@@ -191,7 +191,7 @@ const Customer = () => {
         document.getElementById("footer-main").style.display = "inline";
 
         // Integration of PostalCode/ Address AutoComplete API
-        autocomplete("billingAddress","SFB4ZD1fO0ONndTgHnmUmg26020", {
+        autocomplete("billingAddress",process.env.REACT_APP_AUTOCOMPLETE, {
             delay: 500,
         });
 

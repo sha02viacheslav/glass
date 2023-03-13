@@ -82,6 +82,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
             { showInvoice === true && <PDFViewer
                 invoicePDF={invoicePDF}
                 isOpen={handleInvoicePopup}
+                qid={qid}
             /> }
             <div className='payment-method'>
                 <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />

@@ -1,25 +1,48 @@
 import '../../css/payment-method.css';
 import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack5";
 import close from '../icons/x.png';
+import axios from 'axios';
 
 const url = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 pdfjs.GlobalWorkerOptions.workerSrc = url
 
-export default function PDFViewer({invoicePDF, isOpen}) {
+export default function PDFViewer({invoicePDF, isOpen, qid}) {
 
-    function downloadInvoice(url, fileName) {
-        fetch(url, { method: 'get', mode: 'no-cors', referrerPolicy: 'no-referrer' })
-        .then(res => res.blob())
-        .then(res => {
-            const aElement = document.createElement('a');
-            aElement.setAttribute('download', fileName);
-            const href = URL.createObjectURL(res);
-            aElement.href = href;
-            // aElement.setAttribute('href', href);
-            aElement.setAttribute('target', '_blank');
-            aElement.click();
-            URL.revokeObjectURL(href);
+    console.log(process.env.REACT_APP_GET_INVOICE_PDF_FILE);
+
+    function downloadInvoice() {
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": qid
+            }
         });
+        let config = {
+            method: 'post',
+            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_pdf',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            // figure out how to view pdf
+            console.log(JSON.stringify(response));
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+
+            // const aElement = document.createElement('a');
+            // aElement.setAttribute('download', 'fix.glass invoice');
+            // const href = URL.createObjectURL(res);
+            // aElement.href = href;
+            // // aElement.setAttribute('href', href);
+            // aElement.setAttribute('target', '_blank');
+            // aElement.click();
+            // URL.revokeObjectURL(href);
     }
 
     return (
@@ -29,9 +52,9 @@ export default function PDFViewer({invoicePDF, isOpen}) {
                 <img className='PDF-close' src={close} alt="" onClick={() => isOpen(false)}/>
             </Document>
             <div className="PDF-button-container">
-                <a className="btn btn-purple-radius mb-3 PDF-download">
+                <button className="btn btn-purple-radius mb-3 PDF-download" onClick={downloadInvoice}>
                     Download
-                </a>
+                </button>
             </div>
         </div>
     );
