@@ -150,7 +150,7 @@ const Customer = () => {
             axios(config)
             .then(function (response) {
                 console.log(JSON.stringify(response.data));
-                navigate("/react/quote/" + response.data.result.fe_token);
+                navigate("/quote/" + response.data.result.fe_token);
             })
             .catch(function (error) {
                 console.log(error);

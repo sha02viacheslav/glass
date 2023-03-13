@@ -1,6 +1,7 @@
 import '../../css/payment-method.css';
-import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
+import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack5";
 import close from '../icons/x.png';
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 export default function PDFViewer({invoicePDF, isOpen}) {
 
