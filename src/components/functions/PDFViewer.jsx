@@ -8,8 +8,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = url
 
 export default function PDFViewer({invoicePDF, isOpen, qid}) {
 
-    console.log(process.env.REACT_APP_GET_INVOICE_PDF_FILE);
-
     function downloadInvoice() {
         let data = JSON.stringify({
             "jsonrpc": "2.0",
@@ -18,11 +16,11 @@ export default function PDFViewer({invoicePDF, isOpen, qid}) {
             }
         });
         let config = {
-            method: 'post',
-            url: 'https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/get_pdf',
+            method: 'get',
+            url: process.env.REACT_APP_GET_INVOICE_PDF_FILE,
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+                // 'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
             },
             data: data
         };
@@ -35,14 +33,14 @@ export default function PDFViewer({invoicePDF, isOpen, qid}) {
             console.log(error);
         })
 
-            // const aElement = document.createElement('a');
-            // aElement.setAttribute('download', 'fix.glass invoice');
-            // const href = URL.createObjectURL(res);
-            // aElement.href = href;
-            // // aElement.setAttribute('href', href);
-            // aElement.setAttribute('target', '_blank');
-            // aElement.click();
-            // URL.revokeObjectURL(href);
+        // const aElement = document.createElement('a');
+        // aElement.setAttribute('download', 'fix.glass invoice');
+        // const href = URL.createObjectURL(res);
+        // aElement.href = href;
+        // // aElement.setAttribute('href', href);
+        // aElement.setAttribute('target', '_blank');
+        // aElement.click();
+        // URL.revokeObjectURL(href);
     }
 
     return (

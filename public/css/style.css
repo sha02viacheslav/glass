@@ -11,14 +11,14 @@ transition: 1s;
 }
 h2{
     font-style: normal;
-font-weight: 700;
-font-size: 50px;
+    font-weight: 700;
+    font-size: 2rem;
 }
 h3{
     font-style: normal;
-font-weight: 700;
-font-size: 35px;
-line-height: 50px;
+    font-weight: 700;
+    font-size: 35px;
+    line-height: 50px;
 }
 h4{
     font-style: normal;
@@ -35,7 +35,7 @@ p{
     line-height: 28px;
 }
 .text-blue{
-color: #2E006C !important;
+    color: #2E006C !important;
 }
 .text-gray{
     color: #999999 !important;

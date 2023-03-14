@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react'
-import PayBookTimeline from '../components/Timeline';
-import LocationSelection from '../components/LocationSelection';
-import TimeSelectionNew from '../components/TimeSelectionNew';
-import PaymentMethod from '../components/PaymentMethod';
+import { useEffect } from 'react';
+import PayBookTimeline from '../components/quotePage/Timeline';
+import LocationSelection from '../components/quotePage/LocationSelection';
+import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
+import PaymentMethod from '../components/quotePage/PaymentMethod';
 import { useState } from 'react';
 import '../css/payment.css';
 import user from '../components/icons/user.png';
 import monthsData from '../components/data/months.json';
 import close from '../components/icons/x.png';
 import timeData from '../components/data/newTSDummy.json';
-import StripeContainer from '../components/stripe/StripeContainer';
 import axios from 'axios';
 
 export default function Payment({clientTime, clientDate, clientAddress, qid}) {
@@ -173,12 +172,6 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
                     qid={qid}
                 />
                 <br /><br />
-                {/* temporary simplistic Stripe payment implementation */}
-                {
-                    showPay ? <StripeContainer 
-                        qid={qid}
-                    /> : null
-                }
                 <div className="payment-btn-container">
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline">
                     Decline

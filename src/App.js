@@ -2,19 +2,16 @@ import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { Routes, Route } from 'react-router-dom'
-// import useScript from "./customHooks/useScript";
-
 import Home from './pages/Home'
 import Services from './pages/Services'
 import Pricing from './pages/Pricing'
 import Contact from './pages/Contact'
 import Customer from './pages/Customer'
-import Payment from './pages/Payment';
 import Paid from './pages/Paid';
 import Quote from './pages/Quote';
-
 import { usePromiseTracker } from "react-promise-tracker";
 import { ThreeCircles } from 'react-loader-spinner';
+import PaymentAssist from './components/payment/PaymentAssist';
 
 const LoadingIndicator = props => {
   const { promiseInProgress } = usePromiseTracker();
@@ -54,9 +51,6 @@ const LoadingIndicator = props => {
 }
 
 function App() {
-  // useScript("https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js");
-  // useScript("js/bootstrap.min.js");
-  // useScript("js/popper.min.js");
   return (
     <>
       <div className='main-content'>
@@ -70,15 +64,12 @@ function App() {
           <Route path='/contact' element={<Contact />} />
           <Route path='/customer' element={<Customer />} />
           <Route path='/customer/:licenseNum' element={<Customer />} />
-          <Route path='/payment' element={<Payment />} />
+          <Route path='/payment/assist/:status' element={<PaymentAssist />} />
           <Route path='/paid' element={<Paid />} />
           <Route path='/quote/:id' element={<Quote />} />
         </Routes>
         <Footer />
       </div>
-    {/* <ScriptTag isHydrating={true} type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js" />
-    <ScriptTag isHydrating={true} type="text/javascript" src="js/bootstrap.min.js" />
-    <ScriptTag isHydrating={true} type="text/javascript" src="js/popper.min.js" /> */}
     </>
   );
 }

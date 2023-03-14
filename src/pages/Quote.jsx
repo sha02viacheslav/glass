@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import '../css/quote.css';
 import '../css/license-plate.css';
-import SelectOfferNew from '../components/SelectOfferNew';
-import TimeSelectionNew from '../components/TimeSelectionNew';
-import LocationSelection from '../components/LocationSelection';
+import SelectOfferNew from '../components/quotePage/SelectOfferNew';
+import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
+import LocationSelection from '../components/quotePage/LocationSelection';
 import BeforeAfter from '../components/BeforeAfter';
 import Payment from './Payment'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -12,8 +12,6 @@ import expand from '../components/icons/expand.png';
 import up from '../components/icons/up.png';
 import flag from '../components/icons/uk-flag.png';
 import close from '../components/icons/x.png';
-import { trackPromise } from 'react-promise-tracker';
-import { ConstructionRounded } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 
 const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
@@ -73,7 +71,7 @@ function Quote() {
             console.log(JSON.stringify(response.data));
             setCustomerDetails(response.data.result.data);
             setBillingAddress(response.data.result.data.customer_order_postal_code);
-            if (response.data.result.data.order_lines.length != 0) {
+            if (response.data.result.data.order_lines.length !== 0) {
                 setOffersDetails(response.data.result.data.order_lines);
             }
             // setGlassDetails(response.data.result.data.glass_location);
@@ -308,7 +306,7 @@ function Quote() {
                     <div className='quote-info-bottom'>
                         <div className='compact-bottom-row'>
                             <span className="client-info"><b>Selected windows:</b> </span>
-                            {customerDetails.length != 0 && customerDetails.glass_location.map(element => 
+                            {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
                                 <span key={element} className="client-windows">{element}</span>
                             )}
                         </div>
@@ -330,7 +328,7 @@ function Quote() {
                         <div className="client-info">{customerDetails.customer_name}</div>
                         <div className='compact-bottom-row'>
                             <div className='compact-bottom-row'>
-                                {customerDetails.length != 0 && customerDetails.glass_location.map(element => 
+                                {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
                                     <span key={element} className="client-windows">{element}</span>
                                 )}
                             </div>
@@ -342,12 +340,7 @@ function Quote() {
             {tabValue === 3 && <div className='center'>
                 <h2 className='thank-you-header'>Thank you!</h2>
                 <h1 className='extra-info'>We are preparing the quote...</h1>
-                {/* <button className="btn btn-purple-radius w-100 mb-3" onClick={() => handleTabChange(0)}>Show offers (temporary)</button> */}
                 <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" />
-                {/* <SelectOfferNew 
-                    selectOfferToCustomer={offersDetails}
-                    isRetrieved={isRetrieved}
-                /> */}
             </div>}
             {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>

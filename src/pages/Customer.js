@@ -109,6 +109,8 @@ const Customer = () => {
                 "jsonrpc": "2.0",
                 "params": {
                     "customer_name": name,
+                    "customer_f_name": firstNameRef.current.value,
+                    "customer_s_name": lastNameRef.current.value,
                     "customer_phone": phoneRef.current.value,
                     "customer_email": emailRef.current.value,
                     "customer_order_postal_code": formattedAddress, // full address 
