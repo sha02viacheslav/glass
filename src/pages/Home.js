@@ -27,12 +27,13 @@ const Home = () => {
     }
     
     function directToCustomer() {
-        const licenseNum = licenseRef.current.value.toUpperCase();
+        let licenseNum = licenseRef.current.value.toUpperCase();
+        licenseNum = licenseNum.replace(' ', '');
         navigate("/customer/"+licenseNum);
     }
 
     useEffect(() => {
-        localStorage.setItem('development version', JSON.stringify('1.1.14'));
+        localStorage.setItem('development version', JSON.stringify('1.1.21'));
       }, []);
 
     return (

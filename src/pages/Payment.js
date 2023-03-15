@@ -24,8 +24,7 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
     const [invoiceData, setInvoiceData] = useState([]);
-    // stripe constants
-    const [showPay, setShowPay] = useState(false);
+    const [payAssistStatus, setPayAssistStatus]= useState('');
     
     function timeSlotToParent(slotData) {
         pastSlots.push(slotData);
@@ -46,8 +45,45 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
         setComponentDisplay('');
     }
 
+    function payAssistToParent(status) {
+        if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
+            setPayAssistStatus(status);
+        }
+    }
+
     function pay() {
-        setShowPay(true);
+        if (payAssistStatus === 'go') {
+            console.log(invoiceData.invoice_number);
+            // create payment API call
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "fe_token": "ff74f4",
+                    "invoice_number": "STAGINV/2023/02043"
+                    // "fe_token": qid,
+                    // "invoice_number": invoiceData.invoice_number
+                }
+            });
+            let config = {
+                method: 'post',
+                url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+                },
+                data: data
+            };
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response));
+                window.open(response.data.result.result.data.url, '_blank', 'noreferrer');
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        } else {
+            return;
+        }
     }
 
     useEffect(() => {
@@ -170,6 +206,8 @@ export default function Payment({clientTime, clientDate, clientAddress, qid}) {
                 <PaymentMethod 
                     selectedPrice={invoiceData.amount_total}
                     qid={qid}
+                    payAssist={payAssistToParent}
+                    invoiceID={invoiceData.invoice_number}
                 />
                 <br /><br />
                 <div className="payment-btn-container">

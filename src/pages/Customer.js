@@ -18,7 +18,7 @@ import testVehImgData from '../components/data/testVehImgData.json';
 const Customer = () => {
     const [quoteInfo, setQuoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo')) || []);
     const [vehicleData, setVehicleData] = useState('');
-    const {licenseNum} = useParams();
+    const {licenseNum} = useParams('');
     const [licenseSearchVal, setLicense] = useState(licenseNum || '');
     const licenseRef = useRef();
     const [vehData, setVehData] = useState([]);
@@ -160,29 +160,44 @@ const Customer = () => {
         }
     }
 
+    function fetchVehData(license) {
+        if (license !== undefined) {
+            // fetch vehicle data
+            fetch(process.env.REACT_APP_VEH_DATA + license)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.Response.StatusCode === 'KeyInvalid' || data.Response.StatusCode === 'ItemNotFound' || data.Response.StatusCode === 'SandboxLimitation') {
+                        return;
+                    } else {
+                        setVehData(data.Response.DataItems);
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    setVehicleData("No Data Found! Error in API.");
+                })
+            // fetch vehicle image data
+            fetch(process.env.REACT_APP_VEH_IMG_DATA + license)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    console.log(data);
+                    if (data.Response.StatusCode === 'KeyInvalid' || data.Response.StatusCode === 'ItemNotFound' || data.Response.StatusCode === 'SandboxLimitation') {
+                        return;
+                    } else {
+                        setVehImgData(data.Response.DataItems);
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    setVehicleData("No Data Found! Error in API.");
+                })   
+        }
+    }
+
     useEffect(() => {
-        // fetch vehicle data
-        fetch(process.env.REACT_APP_VEH_DATA + licenseNum)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-                setVehData(data.Response.DataItems);
-            })
-            .catch(function(error) {
-                console.log(error);
-                setVehicleData("No Data Found! Error in API.");
-            })
-        // fetch vehicle image data
-        fetch(process.env.REACT_APP_VEH_IMG_DATA + licenseNum)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-                setVehImgData(data.Response.DataItems);
-            })
-            .catch(function(error) {
-                console.log(error);
-                setVehicleData("No Data Found! Error in API.");
-            })    
+        fetchVehData(licenseNum);
         // scroll car into view on page load
         // if (!submitClicked) {
         //     const windowSelector = document.getElementById("scroll-focus");
@@ -193,7 +208,7 @@ const Customer = () => {
         document.getElementById("footer-main").style.display = "inline";
 
         // Integration of PostalCode/ Address AutoComplete API
-        autocomplete("billingAddress",process.env.REACT_APP_AUTOCOMPLETE, {
+        autocomplete("billingAddress", process.env.REACT_APP_AUTOCOMPLETE, {
             delay: 500,
         });
 
@@ -222,6 +237,7 @@ const Customer = () => {
         // format correcly
         // check if license plate is standard or unique
         let input = data;
+        fetchVehData(input);
         if (data.length >= 3) {
             if (Number.isInteger(Number(data.charAt(2)))) {
                 // license number is standard
@@ -242,7 +258,6 @@ const Customer = () => {
     return (
         <div>
             {vehData.length !== 0 && <RetrieveVehData 
-                // vehData={vehData === undefined ? vehData.VehicleRegistration : testVehData.VehicleRegistration}
                 key={vehData}
                 vehData={vehData.VehicleRegistration}
                 dataToCustomer={retrieveVehData}
@@ -254,7 +269,6 @@ const Customer = () => {
                         <LicensePlate 
                             placeholderVal={'NU71 REG'}
                             licenseNumber={licenseSearchVal}
-                            // model={vehData != undefined ? vehData.Make + ' ' + vehData.Model : testVehData.VehicleRegistration.Make + ' ' + testVehData.VehicleRegistration.MakeModel}
                             model={vehData.length !== 0 ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model : 'Make & Model'}
                             handleVehInputChange={handleVehInputChange}
                         />

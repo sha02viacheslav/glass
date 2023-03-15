@@ -4,9 +4,8 @@ import {autocomplete} from 'getaddress-autocomplete';
 import invoice from '../icons/invoice.png';
 import axios from 'axios';
 import PDFViewer from '../functions/PDFViewer';
-// import sample_pdf from '../images/test/sample_invoice.pdf';
 
-export default function PaymentMethod({selectedPrice, billingAddress, name, email, qid}) {
+export default function PaymentMethod({selectedPrice, postcode, f_name, s_name, qid, payAssist, invoiceID}) {
 
     const [selectedMethod, setSelectedMethod] = useState(2);
     const [address, setAddress] = useState('');
@@ -18,6 +17,9 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
     const [invoicePDF, setInvoicePDF] = useState('');
     const [showInvoice, setShowInvoice] = useState(false);
     const [monthlyPayments, setMonthlyPayments] = useState([]);
+    const [preApproval, setPreApproval] = useState('');
+    const [loadingApproval, setLoadingApproval] = useState(false);
+    const [PAErrorMsg, setPAErrorMsg] = useState('');
 
     function updateExcess() {
         setExcess(Number(excessRef.current.value));
@@ -29,7 +31,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
 
     useEffect(() => {
         // Integration of PostalCode/ Address AutoComplete API
-        autocomplete("autocomplete-field","SFB4ZD1fO0ONndTgHnmUmg26020", { 
+        autocomplete("autocomplete-field", process.env.REACT_APP_AUTOCOMPLETE, { 
             delay: 500,
         });
 
@@ -77,32 +79,52 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
     }
 
     function handleCreditCheck() {
-        let data = JSON.stringify({
-            "jsonrpc": "2.0",
-            "params": {
-                "f_name": "John",
-                "s_name": "Doe",
-                "addr1": "Bluebell Cottage",
-                "postcode": "po201ah"
-            }
-        });
-        let config = {
-            method: 'post',
-            url: "https://fixglass-staging-2-7305738.dev.odoo.com/api/v1/react/invoice/payment/assist/preappoval",
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
-            },
-            data: data
-        };
-        axios(config)
-        .then(function (response) {
-            console.log(JSON.stringify(response));
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+        setLoadingApproval(true);
+        // pre approval API call
+        if (!preApproval) {
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "f_name": "John",
+                    "s_name": "Doe",
+                    "addr1": "Bluebell Cottage",
+                    "postcode": "po201ah"
+                }
+            });
+            let config = {
+                method: 'post',
+                url: process.env.REACT_APP_PAYMENT_ASSIST_PRE,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+                },
+                data: data
+            };
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response));
+                setLoadingApproval(false);
+                if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
+                    payAssist('go');
+                    setPreApproval('go');
+                    setPAErrorMsg('');
+                } else if (response.data.result.message === 'Success' && !response.data.result.result.data.approved) {
+                    setPreApproval('nogo');
+                    setPAErrorMsg('');
+                } else {
+                    setPAErrorMsg(response.data.result.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        } 
     }
+
+    useEffect(() => {
+        // communicate with Payment (parent)
+        payAssist('opened-nogo');
+    }, []);
 
     useEffect(() => {
         if (selectedMethod === 1) {
@@ -110,9 +132,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
             let data = JSON.stringify({
                 "jsonrpc": "2.0",
                 "params": {
-                    // "fe_token": qid
-                    "fe_token": "b5d432",
-                    "invoice_number": "INV/2023/02016"
+                    "fe_token": qid
                 }
             });
             let config = {
@@ -134,7 +154,6 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
             })
         }
     }, [selectedMethod]);
-    // console.log(monthlyPayments.summary);
 
     return (
         <div className='center'>
@@ -142,6 +161,7 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
                 invoicePDF={invoicePDF}
                 isOpen={handleInvoicePopup}
                 qid={qid}
+                invoiceID={invoiceID}
             /> }
             <div className='payment-method'>
                 <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
@@ -150,15 +170,15 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
             <div className='PM-btn-container'>
                 <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
                     <small className="fs-14">4 month</small>
-                    <h5 className='PM-price'>£ {(selectedPrice/4).toFixed(2)}</h5>
+                    <div className='PM-price'>£ {(selectedPrice/4).toFixed(2)}</div>
                 </button>
                 <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
                     <small className="fs-14">Insurance</small>
-                    <h5 className='PM-price'>£ {excess}</h5>
+                    <div className='PM-price'>£ {excess}</div>
                 </button>
                 <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
                     <small className="fs-14">Single pay</small>
-                    <h5 className='PM-price'>£ {selectedPrice}</h5>
+                    <div className='PM-price'>£ {selectedPrice}</div>
                 </button>
             </div>
 
@@ -167,12 +187,22 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
                     <p className="text-purple mb-2">4-Month</p>
                     {monthlyPayments.length !== 0 && <div>
                         <p>{monthlyPayments.summary}</p>
-                        {monthlyPayments.schedule.map(element => 
-                            <span key={element.date}>
-                                {element.date}
-                            </span>
-                        )}
+                        <div className='PA-plan-container'>
+                            {monthlyPayments.schedule.map(element => 
+                                <div className='PA-plan-element' key={element.date}>
+                                    <div className='PA-plan-date'>
+                                        {element.date}
+                                    </div>
+                                    <div className='PA-plan-price'>
+                                        £ {(element.amount / 100).toFixed(2)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>}
+                    <div className='PA-status-failed'>
+                        {PAErrorMsg}
+                    </div>
                     <div className='PM-insurance-container'>
                         <div className="PM-insurance-sub">
                             <input type="text" 
@@ -193,10 +223,16 @@ export default function PaymentMethod({selectedPrice, billingAddress, name, emai
                             defaultValue={address}
                             value={address} /> 
                         <div className='PM-proceed-btn-cont'>
-                            <button className="PM-proceed-btn" onClick={handleCreditCheck}>
-                                Get Pre Approval
-                            </button>
+                            {preApproval === '' && <button className="PM-proceed-btn" onClick={handleCreditCheck}>
+                                { (loadingApproval) ? 'Processing...' : 'Get Pre Approval' }
+                            </button>}
                         </div>
+                        {preApproval === 'go' && <div className='PA-status-success'>
+                            Success! You can now proceed to payment.
+                        </div>}
+                        {preApproval === 'nogo' && <div className='PA-status-failed'>
+                            Pre approval failed.
+                        </div>}
                     </div>   
                 </div>}
                 {selectedMethod === 2 && <div>
