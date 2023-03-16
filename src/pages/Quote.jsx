@@ -112,6 +112,8 @@ function Quote() {
             return;
         }
     }
+
+
     
     function confirmBooking() {
         let first = '';
