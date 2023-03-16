@@ -874,7 +874,7 @@ const Footer = () => {
                                                         All used glass will be collected and recycled
                                                     </h2>
                                                     <Link
-                                                        to="/react/customer"
+                                                        to="/customer"
                                                         className="btn  text-purple bg-white"
                                                     >
                                                         Get a Quote
@@ -921,7 +921,7 @@ const Footer = () => {
                                             </div>
                                         </div>
                                         <div className="col-md-6">
-                                            <Link to="/react/customer" className="btn btn-et w-100">
+                                            <Link to="/customer" className="btn btn-et w-100">
                                                 Get a Quote
                                             </Link>
                                         </div>
@@ -959,13 +959,13 @@ const Footer = () => {
                                 <div className="col-md-2 ps-lg-4">
                                     <ul className="list-f">
                                         <li>
-                                            <Link to="/react/services">Services</Link>
+                                            <Link to="/services">Services</Link>
                                         </li>
                                         <li>
-                                            <Link to="/react/pricing">Pricing</Link>
+                                            <Link to="/pricing">Pricing</Link>
                                         </li>
                                         <li>
-                                            <Link to="/react/contact">Contact us</Link>
+                                            <Link to="/contact">Contact us</Link>
                                         </li>
                                     </ul>
                                 </div>
