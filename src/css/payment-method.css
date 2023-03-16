@@ -1,6 +1,6 @@
 
 .payment-method {
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.09);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
     border-radius: 15px;
     width: 100%;
     max-width: 550px;
@@ -129,6 +129,12 @@
 .PM-address {
     color: rgb(24, 24, 24);
     height: 50px;
+}
+
+.PM-postalcode {
+    color: rgb(24, 24, 24);
+    height: 50px;
+    margin-top: 2%;
 }
 
 .PM-email {

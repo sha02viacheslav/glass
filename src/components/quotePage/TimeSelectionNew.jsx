@@ -75,8 +75,8 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
         // for sending slot info to odoo, slot starting time
         let odooSlot = currentYear.toString().concat('-',monthValues[monthSelected]).concat('-',odooDay);
         // send slot end time
-        let odooEnd = odooSlot.concat(' ',timeheaders[timeSelected + 1]);
-        odooSlot = odooSlot.concat(' ',timeheaders[timeSelected]);
+        let odooEnd = odooSlot.concat(' ',timeheaders[timeSelected + 1]).concat('',':00');
+        odooSlot = odooSlot.concat(' ',timeheaders[timeSelected]).concat('',':00');
         setSelectedSlot(idTag); 
         setSlotChanged(true);   
         if (!liveBooking) {

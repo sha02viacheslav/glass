@@ -4,6 +4,7 @@ import '../css/license-plate.css';
 import SelectOfferNew from '../components/quotePage/SelectOfferNew';
 import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
 import LocationSelection from '../components/quotePage/LocationSelection';
+import PaymentMethod from '../components/quotePage/PaymentMethod';
 import BeforeAfter from '../components/BeforeAfter';
 import Payment from './Payment'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -46,6 +47,10 @@ function Quote() {
         price_total: 0,
         price_subtotal: 0
     }]);
+    const [payAssistStatus, setPayAssistStatus]= useState('');
+    const [invoiceData, setInvoiceData] = useState([]);
+    const [PAData, setPAData] = useState([]);
+    const [preApproval, setPreApproval] = useState('');
 
     // client info
     const {id} = useParams('');
@@ -74,7 +79,6 @@ function Quote() {
             if (response.data.result.data.order_lines.length !== 0) {
                 setOffersDetails(response.data.result.data.order_lines);
             }
-            // setGlassDetails(response.data.result.data.glass_location);
         })
         .catch(function (error) {
             console.log(error);
@@ -84,52 +88,143 @@ function Quote() {
     function handleSnapChange(option) {
         // naviagate scroll snap
         if (snapValue === 1 && option === 'next' && timeSlot === '') {
+            // offer to time select if timeslot is not selected
             setSnapValue(2);
             document.getElementById('2').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
+            // offer to location if timeslot is selected
             setSnapValue(3);
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
+            // time select to location if timeslot is selected
             setSnapValue(3);
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
-            // setSnapValue(2);
             // scroll snap to time select if no slot selected
             document.getElementById('2').scrollIntoView({behavior: 'smooth'});
             setSlotSelected(true);
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
+            // pay
+            confirmBooking()   
             // send booking data
-            let data = JSON.stringify({
-                "jsonrpc": "2.0",
-                "params": {
-                    "fe_token": id,
-                    "booking_start_date": timeSlot,
-                    "booking_end_date": timeEnd  
-                }
-            });
-            let config = {
-                method: 'post',
-                url: process.env.REACT_APP_SEND_BOOKING,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
-                },
-                data: data
-            };
-            axios(config)
-            .then(function (response) {
-                console.log(JSON.stringify(response.data));
-                // change tab
-                handleTabChange(1);
-                // updateQuoteData();
-                setIsBlinky(true);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+            sendBookingData()
         } else {
             return;
         }
+    }
+    
+    function confirmBooking() {
+        let first = '';
+        let second = '';
+        let post = '';
+        let addr = '';
+        if (PAData.length === 0) {
+            first = customerDetails.customer_f_name;
+            second = customerDetails.customer_s_name;
+            post = customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8);
+            addr = customerDetails.customer_order_postal_code.slice(0, -8);
+        } else {
+            first = PAData[0];
+            second = PAData[1];
+            post = PAData[3];
+            addr = PAData[4];
+        }
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "f_name": first,
+                "s_name": second,
+                "addr1": addr,
+                "postcode": post
+            }
+        });
+        let config = {
+            method: 'post',
+            url: process.env.REACT_APP_PAYMENT_ASSIST_PRE,
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response));
+            // setLoadingApproval(false);
+            if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
+                // payAssist('go');
+                // setPreApproval('go');
+                // setPAErrorMsg('');
+                PABegin();
+            } else if (response.data.result.message === 'Success' && !response.data.result.result.data.approved) {
+                // setPreApproval('nogo');
+                // setPAErrorMsg('');
+            } else {
+                // setPAErrorMsg(response.data.result.message);
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+    }
+
+    function PABegin() {
+        // create payment API call
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": id,
+                "invoice_number": invoiceData.invoice_number
+            }
+        });
+        let config = {
+            method: 'post',
+            url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response));
+            window.open(response.data.result.result.data.url, '_blank', 'noreferrer');
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+    }
+
+    function sendBookingData() {
+        let data = JSON.stringify({
+            "jsonrpc": "2.0",
+            "params": {
+                "fe_token": id,
+                "booking_start_date": timeSlot,
+                "booking_end_date": timeEnd  
+            }
+        });
+        let config = {
+            method: 'post',
+            url: process.env.REACT_APP_SEND_BOOKING,
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+            },
+            data: data
+        };
+        axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response.data));
+            // change tab
+            // handleTabChange(1);
+            // updateQuoteData();
+            setIsBlinky(true);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     }
 
     function handleDecline() {
@@ -140,9 +235,14 @@ function Quote() {
         setDeclineReason(option);
     }
 
-    function handleTabChange(newValue) {
-        setTabValue(newValue);
-        setSnapValue(1);
+    // function handleTabChange(newValue) {
+    //     setTabValue(newValue);
+    //     setSnapValue(1);
+    // }
+
+    function PADataToParent(data) {
+        setPAData(data);
+        // console.log(data);
     }
 
     function backToCustomer() {
@@ -176,15 +276,24 @@ function Quote() {
         setDeliveryAddress(data);
     }
 
-    function paymentOptionToParent(pOption){
-        setPaymentOption(pOption);
+    // function paymentOptionToParent(pOption){
+    //     setPaymentOption(pOption);
+    // }
+
+    function payAssistToParent(status) {
+        if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
+            setPayAssistStatus(status);
+        }
+    }
+
+    function invDataToParent(data) {
+        setInvoiceData(data);
     }
 
     useEffect(() => {
         //Get Quote Data
         if(id){
             getQuote(id);
-            // getSchedulerData();
         }
         // hide navbar and footer
         document.getElementById("navbar-main").style.display = "none";
@@ -243,7 +352,7 @@ function Quote() {
             setAcceptBtn('Next');
             acceptSelector.classList.remove('quote-accept');
         } else if (snapValue === 3 && acceptSelector !== null && timeSlot !== '') {
-            setAcceptBtn('Confirm Booking');
+            setAcceptBtn('Pay');
             acceptSelector.classList.add('quote-accept');
         }
     }, [snapValue, timeSlot]);
@@ -342,34 +451,31 @@ function Quote() {
                 <h1 className='extra-info'>We are preparing the quote...</h1>
                 <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" />
             </div>}
-            {(tabValue === 1 || tabValue === 0) && <div className="tab">
+            {/* {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>
                 <button className={tabValue === 1 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(1)} id='pay-btn'>Live Booking</button>
-            </div>}
+            </div>} */}
 
             <div className='center'>
                 {tabValue === 0 && <div className='scroll-container'>
                     {/* select offer */}
                     <div id='offer'>
-                        <SelectOfferNew 
-                            key={offersDetails}
-                            selectOfferToCustomer={offersDetails}
-                            isRetrieved={isRetrieved}
-                            paymentOptionToParent={paymentOptionToParent}
-                        />
+                        {customerDetails.length !== 0 && <PaymentMethod 
+                            offerDetails={offersDetails}
+                            f_name={customerDetails.customer_f_name}
+                            s_name={customerDetails.customer_s_name}
+                            email={customerDetails.customer_email}
+                            c_address={customerDetails.customer_order_postal_code.slice(0, -8)}
+                            c_postalcode={customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)}
+                            qid={id}
+                            payAssist={payAssistToParent}
+                            invData={invDataToParent}
+                            PADataToParent={PADataToParent}
+                        />}
                         <br /><br />
                     </div>
 
                     <div className="quote-scroll-target" id='2'>-</div>
-                    {/* {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
-                    {schedulerData.length > 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
-                        <TimeSelectionNew 
-                            timeSlotToParent={timeSlotToParent}
-                            timeData={schedulerData}
-                            liveBooking={false}
-                            slot={timeSlot}
-                        />
-                    </div>} */}
 
                     {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
                     {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
@@ -394,7 +500,6 @@ function Quote() {
                 </div>}
             </div>
             {/* accept / decline buttons */}
-            {/*  && quoteDetails.x_studio_status_1 === "Published" */}
             {tabValue === 0 && <div className="accept-btn-container" id='accept-cont'>
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline" onClick={handleDecline} id='decline-btn'>
                     Decline
@@ -409,14 +514,13 @@ function Quote() {
 
             {/* ---------------- Pay & Book page ---------------- */}
 
-            {/*  && quoteDetails.x_studio_status_1 === "Published" */}
-            {tabValue === 1 && <div className='tab-content center'>
+            {/* {tabValue === 1 && <div className='tab-content center'>
                 <Payment 
                     clientTime={timeToPayment}
                     clientDate={dateToPayment}
                     clientAddress={billingAddress}
                     qid={id}/>                    
-            </div>}
+            </div>} */}
         </div>
     );
 }
