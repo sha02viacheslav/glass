@@ -1,9 +1,0 @@
-{
-    "headers": ["Products", "Amount"],
-    "info": [
-        ["BMW 4 SERIES WINDSCREEN OEM ORIGINAL PART", 350.00, 227.50],
-        ["BMW 4 SERIES REAR DROP OEM ORIGINAL PART", 200.00, 180.00]
-    ],
-    "wipers": 20.00,
-    "tax": 0
-}

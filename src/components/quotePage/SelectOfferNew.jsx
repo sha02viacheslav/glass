@@ -1,13 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../../css/select-offer.css';
-import Checkbox from '@mui/material/Checkbox';
-import data from '../data/selectOfferNewDummy.json';
+// import Checkbox from '@mui/material/Checkbox';
 
-export default function SelectOfferNew({selectOfferToCustomer}) {
+export default function SelectOfferNew({selectOfferToCustomer, priceToParent}) {
 
-    const dummyData = data;
+    // const dummyData = data;
     // const [selectOffer, setSelectOffer] = useState(1);
-    const [wiperSelected, setWiperSelected] = useState(false);
+    // const [wiperSelected, setWiperSelected] = useState(false);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalUnitPrice, setTotalUnitPrice] = useState(0);
+
+    function calculateTotalPrice() {
+        let total = 0;
+        let unit_total = 0;
+        for (let i = 0; i < selectOfferToCustomer.length; i++) {
+            const price = selectOfferToCustomer[i].price_total;
+            const unit = selectOfferToCustomer[i].price_subtotal;
+            total += price;
+            unit_total += unit;
+        }
+        setTotalPrice(total.toFixed(2));
+        setTotalUnitPrice(unit_total.toFixed(2));
+        priceToParent([{
+            total: total.toFixed(2),
+            subtotal: unit_total.toFixed(2)
+        }])
+    }
+
+    useEffect(() => {
+        calculateTotalPrice();
+    }, []);
 
     return (          
         <div className='select-offer'>
@@ -22,17 +44,17 @@ export default function SelectOfferNew({selectOfferToCustomer}) {
                             </td>
                             <td className='info'>
                                 <div className='info-div top-right'>
-                                    <span className="original-price">
+                                    <span>
                                         £ {element.price_unit.toFixed(2)}
                                     </span>
-                                    <span>
+                                    {/* <span>
                                         £ {element.price_total.toFixed(2)}
-                                    </span>
+                                    </span> */}
                                 </div>
                             </td>
                         </tr>
                     )}
-                    <tr>
+                    {/* <tr>
                         <td className='info'>
                             <div className="info-div first-col-wipers">
                                 Claim new wipers
@@ -55,7 +77,7 @@ export default function SelectOfferNew({selectOfferToCustomer}) {
                                     }}/>
                             </div>
                         </td>
-                    </tr>
+                    </tr> */}
                 </table>
             </div>
             <div className="total-container-out">
@@ -64,19 +86,19 @@ export default function SelectOfferNew({selectOfferToCustomer}) {
                         <span className="total-bold">
                             Untaxed amount
                         </span>
-                        <span>£ {selectOfferToCustomer[0].price_subtotal}</span>
+                        <span>£ {totalUnitPrice}</span>
                     </div>
                     <div className="total-row">
                         <span className="total-bold">
-                            Tax x%
+                            Tax 20%
                         </span>
-                        <span>£ {(selectOfferToCustomer[0].price_total - selectOfferToCustomer[0].price_subtotal).toFixed(2)}</span>
+                        <span>£ {(totalPrice - totalUnitPrice).toFixed(2)}</span>
                     </div>
                     <div className="total-row total-last">
                         <span className="total-bold">
                             Total
                         </span>
-                        <span>£ {selectOfferToCustomer[0].price_total}</span>
+                        <span>£ {totalPrice}</span>
                     </div>
                 </div>
             </div>
@@ -84,38 +106,3 @@ export default function SelectOfferNew({selectOfferToCustomer}) {
         </div>
     )
 } 
-
-
-
-
-{/* <div className='PM-container'>
-<div className='PM'>
-    <div>Payment</div>
-    <div>Options</div>
-</div>
-<button className={selectOffer === "4 Month Plan" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("4 Month Plan")}>
-    <span className="fs-14">4 month</span>
-    <div className='PM-price'>£{(selectOfferToCustomer[0].price_total / 4).toFixed(2)}</div>
-</button>
-<button className={selectOffer === "Insurance" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("Insurance")}>
-    <span className="fs-14">Insurance</span>
-    <div className='PM-price'>£ Excess</div>
-</button>
-<button className={selectOffer === "Single Payment" ? 'PM-btn-active' : 'PM-btn'} onClick={() => setPaymentOption("Single Payment")}>
-    <span className="fs-14">Single pay</span>
-    <div className='PM-price'>£{selectOfferToCustomer[0].price_total}</div>
-</button>
-</div>
-<div className="PM-text-container">
-{selectOffer === 1 && <div className="PM-text">
-    Amet minim mollit non deserunt ullamco est sit est aliqua dolor 
-    do amet sint. Velit officia consequat e duis enim velit mollit. Exercitation veniam  onequat sunt nostrud amet
-</div>}
-{selectOffer === 2 && <div className="PM-text">
-    Impetus fabellas democritum quo ei. Doctus legimus feugait ei sit. Ea mea ludus interesset disputationi. Ut amet docendi mentitum eam, sumo
-</div>}
-{selectOffer === 3 && <div className="PM-text">
-    Ex neglegentur vituperatoribus sit. Sed viris quidam erroribus et, an velit mollis scaevola his. Case cibo 
-    inermis ne mea, has vocent partiendo eu. Ius ex diam nostrud tractatos, sit 
-</div>}
-</div> */}

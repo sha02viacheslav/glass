@@ -12,8 +12,6 @@ import LicensePlate from '../components/LicensePlate';
 import RetrieveVehData from '../components/functions/RetrieveVehData';
 import {autocomplete} from 'getaddress-autocomplete';
 import axios from 'axios';
-import testVehData from '../components/data/testVehData.json';
-import testVehImgData from '../components/data/testVehImgData.json';
 
 const Customer = () => {
     const [quoteInfo, setQuoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo')) || []);
@@ -135,8 +133,8 @@ const Customer = () => {
                     "body_type": vehDataToCustomer,
                     "model_year": vehData.YearOfManufacture,
                     "glass_location": selectedBrokenWindows,
-                    "VehicleData": vehData.length !== 0 ? vehData : testVehData,
-                    "VehicleImageData": vehData.length !== 0 ? vehImgData : testVehImgData
+                    "VehicleData": vehData,
+                    "VehicleImageData": vehImgData
                 }
             });
 
@@ -151,7 +149,7 @@ const Customer = () => {
 
             axios(config)
             .then(function (response) {
-                console.log(JSON.stringify(response.data));
+                // console.log(JSON.stringify(response.data));
                 navigate("/quote/" + response.data.result.fe_token);
             })
             .catch(function (error) {
@@ -166,7 +164,7 @@ const Customer = () => {
             fetch(process.env.REACT_APP_VEH_DATA + license)
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
                     if (data.Response.StatusCode === 'KeyInvalid' || data.Response.StatusCode === 'ItemNotFound' || data.Response.StatusCode === 'SandboxLimitation') {
                         return;
                     } else {
@@ -181,8 +179,7 @@ const Customer = () => {
             fetch(process.env.REACT_APP_VEH_IMG_DATA + license)
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
-                    console.log(data);
+                    // console.log(data);
                     if (data.Response.StatusCode === 'KeyInvalid' || data.Response.StatusCode === 'ItemNotFound' || data.Response.StatusCode === 'SandboxLimitation') {
                         return;
                     } else {

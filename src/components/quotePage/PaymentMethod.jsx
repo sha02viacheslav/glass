@@ -6,12 +6,12 @@ import axios from 'axios';
 import PDFViewer from '../functions/PDFViewer';
 import SelectOfferNew from './SelectOfferNew';
 
-export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_name, s_name, email, qid, payAssist, invData, PADataToParent}) {
+export default function PaymentMethod({offerDetails, customerInfo, qid, payAssist, invData, PADataToParent}) {
 
-    const [selectedMethod, setSelectedMethod] = useState(2);
+    const [selectedMethod, setSelectedMethod] = useState(4);
     const [address, setAddress] = useState('');
-    const userBillingAddress = c_address;
-    const [postalCode, setPostalCode]= useState(c_postalcode);
+    const userBillingAddress = customerInfo[0].c_address;
+    const [postalCode, setPostalCode]= useState(customerInfo[0].c_postalcode);
     const excessRef = useRef('');
     const [excess, setExcess] = useState(115);
     const [singlePay, setSinglePay] = useState('card');
@@ -25,6 +25,8 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
     const PAf_nameRef = useRef('');
     const PAs_nameRef = useRef('');
     const PAemailRef = useRef('');
+    const [priceTotals, setPriceTotals] = useState([{total: 0}]);
+    const [PAproceed, setPAproceed] = useState(false);
 
     function updateExcess() {
         setExcess(Number(excessRef.current.value));
@@ -40,6 +42,10 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
         const email = PAemailRef.current.value;
         const data = [firstName, secondName, email, postalCode, address];
         PADataToParent(data);
+    }
+
+    function getTotalPrices(data) {
+        setPriceTotals(data);
     }
 
     useEffect(() => {
@@ -80,7 +86,7 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
         axios(config)
         .then(function (response) {
             // figure out how to view pdf
-            console.log(JSON.stringify(response));
+            // console.log(JSON.stringify(response));
             setInvoicePDF(response.data.result.data.invoice_pdf_url);
             setShowInvoice(true);
         })
@@ -99,10 +105,7 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
         
     }
 
-    useEffect(() => {
-        // communicate with Payment (parent)
-        payAssist('opened-nogo');
-        // get invoice data for payment
+    function getInvoiceData() {
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
@@ -120,16 +123,23 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
         };
         axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response));
+            // console.log(JSON.stringify(response));
             setInvoiceData(response.data.result.data);
             invData(response.data.result.data);
         })
         .catch(function (error) {
             console.log(error);
         })
-    }, []);
+    }
 
     useEffect(() => {
+        // communicate with Payment (parent)
+        payAssist('opened-nogo');
+        // get invoice data for payment
+        getInvoiceData();
+    }, []);
+
+    function retrievePlan() {
         if (selectedMethod === 1) {
             // retrieve payment assist plan data
             let data = JSON.stringify({
@@ -149,8 +159,39 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
             };
             axios(config)
             .then(function (response) {
-                console.log(JSON.stringify(response));
+                // console.log(JSON.stringify(response));
                 setMonthlyPayments(response.data.result.result.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        }
+    }
+
+    useEffect(() => {
+        if (selectedMethod === 1 && !PAproceed) {
+            // retrieve payment assist plan data
+            let data = JSON.stringify({
+                "jsonrpc": "2.0",
+                "params": {
+                    "fe_token": qid
+                }
+            });
+            let config = {
+                method: 'post',
+                url: process.env.REACT_APP_INVOICE_CONFIRM,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+                },
+                data: data
+            };
+            axios(config)
+            .then(function (response) {
+                // console.log(JSON.stringify(response));
+                setPAproceed(true);
+                retrievePlan();
+                getInvoiceData();
             })
             .catch(function (error) {
                 console.log(error);
@@ -160,151 +201,144 @@ export default function PaymentMethod({offerDetails, c_address, c_postalcode, f_
 
     return (
         <div className='center'>
-            { showInvoice === true && <PDFViewer
-                invoicePDF={invoicePDF}
-                isOpen={handleInvoicePopup}
-                qid={qid}
-                invoiceID={invoiceData.invoice_number}
-            /> }
-            <div className='payment-method'>
-                <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
-            <h3 className="text-24 text-blue PM-header">Quotation</h3>
-            <div className='PM-status'>Status: {status}</div>
-            {/* show quotation price details */}
-            <SelectOfferNew 
-                selectOfferToCustomer={offerDetails}
-            />
-            <div className='PM-btn-container'>
-                <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
-                    <small className="fs-14">4 month</small>
-                    <div className='PM-price'>£ {(offerDetails[0].price_total/4).toFixed(2)}</div>
-                </button>
-                <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
-                    <small className="fs-14">Insurance</small>
-                    <div className='PM-price'>£ {excess}</div>
-                </button>
-                <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
-                    <small className="fs-14">Single pay</small>
-                    <div className='PM-price'>£ {invoiceData.amount_total}</div>
-                </button>
-            </div>
+                { showInvoice === true && <PDFViewer
+                    invoicePDF={invoicePDF}
+                    isOpen={handleInvoicePopup}
+                    qid={qid}
+                    invoiceID={invoiceData.invoice_number}
+                /> }
+                <div className='payment-method'>
+                    <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
+                <h3 className="text-24 text-blue PM-header">Quotation</h3>
+                <div className='PM-status'>Status: {status}</div>
+                {/* show quotation price details */}
+                <SelectOfferNew 
+                    selectOfferToCustomer={offerDetails}
+                    priceToParent={getTotalPrices}
+                />
+                <div className='PM-btn-container'>
+                    <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
+                        <small className="fs-14">4 month</small>
+                        <div className='PM-price'>£ {(priceTotals[0].total/4).toFixed(2)}</div>
+                    </button>
+                    <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
+                        <small className="fs-14">Insurance</small>
+                        <div className='PM-price'>£ {priceTotals[0].total}</div>
+                    </button>
+                    <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
+                        <small className="fs-14">Single pay</small>
+                        <div className='PM-price'>£ {priceTotals[0].total}</div>
+                    </button>
+                </div>
 
-            <div className='PM-payment-option'>
-                {selectedMethod === 1 && <div>
-                    <p className="text-purple mb-2">4-Month</p>
-                    {monthlyPayments.length !== 0 && <div>
-                        <p>{monthlyPayments.summary}</p>
-                        <div className='PA-plan-container'>
-                            {monthlyPayments.schedule.map(element => 
-                                <div className='PA-plan-element' key={element.date}>
-                                    <div className='PA-plan-date'>
-                                        {element.date}
-                                    </div>
-                                    <div className='PA-plan-price'>
-                                        £ {(element.amount / 100).toFixed(2)}
-                                    </div>
-                                </div>  
-                            )}
-                        </div>
-                    </div>}
-                    <div className='PA-status-failed'>
-                        {PAErrorMsg}
-                    </div>
-                    <div className='PM-insurance-container'>
-                        <div className="PM-insurance-sub">
-                            <input type="text" 
-                                className='form-control PM-top-input'
-                                ref={PAf_nameRef}
-                                defaultValue={f_name}
-                                onChange={updatePAInfo}/>
-                            <input type="text" 
-                                className='form-control PM-top-input'
-                                ref={PAs_nameRef}
-                                defaultValue={s_name}
-                                onChange={updatePAInfo}/>
-                        </div>
-                        <input type="text" 
-                            className='form-control PM-email'
-                            defaultValue={email}
-                            ref={PAemailRef}
-                            onChange={updatePAInfo}/>
-                        <input 
-                            id="autocomplete-field" 
-                            type='text'
-                            className='form-control PM-address'
-                            onChange={handlePCodeChange}
-                            defaultValue={address}
-                            value={address} /> 
-                        <input type="text" 
-                            className='form-control PM-postalcode'
-                            defaultValue={postalCode}
-                            onChange={updatePAInfo}/>
-                        {/* <div className='PM-proceed-btn-cont'>
-                            {preApproval === '' && <button className="PM-proceed-btn" onClick={handleCreditCheck}>
-                                { (loadingApproval) ? 'Processing...' : 'Get Pre Approval' }
-                            </button>}
-                        </div>
-                        {preApproval === 'go' && <div className='PA-status-success'>
-                            Success! You can now proceed to payment.
+                <div className='PM-payment-option'>
+                    {selectedMethod === 1 && <div>
+                        <p className="text-purple mb-2">4-Month</p>
+                        {monthlyPayments.length !== 0 && <div>
+                            <p>{monthlyPayments.summary}</p>
+                            <div className='PA-plan-container'>
+                                {monthlyPayments.schedule.map(element => 
+                                    <div className='PA-plan-element' key={element.date}>
+                                        <div className='PA-plan-date'>
+                                            {element.date}
+                                        </div>
+                                        <div className='PA-plan-price'>
+                                            £ {(element.amount / 100).toFixed(2)}
+                                        </div>
+                                    </div>  
+                                )}
+                            </div>
                         </div>}
-                        {preApproval === 'nogo' && <div className='PA-status-failed'>
-                            Pre approval failed.
-                        </div>} */}
-                    </div>   
-                </div>}
-                {selectedMethod === 2 && <div>
-                    <p className="text-purple mb-2">Insurance</p>
-                    <div className='PM-insurance-container'>
-                        <div className="PM-insurance-sub">
-                            <input type="text" 
-                                className='form-control PM-top-input'
-                                placeholder='Insurance Number'/>
-                            <input type="text" 
-                                className='form-control PM-top-input'
-                                defaultValue={f_name + ' ' + s_name}/>
+                        <div className='PA-status-failed'>
+                            {PAErrorMsg}
                         </div>
-                        <div className="PM-insurance-sub">
+                        <div className='PM-insurance-container'>
+                            <div className="PM-insurance-sub">
+                                <input type="text" 
+                                    className='form-control PM-top-input'
+                                    ref={PAf_nameRef}
+                                    defaultValue={customerInfo[0].f_name}
+                                    onChange={updatePAInfo}/>
+                                <input type="text" 
+                                    className='form-control PM-top-input'
+                                    ref={PAs_nameRef}
+                                    defaultValue={customerInfo[0].s_name}
+                                    onChange={updatePAInfo}/>
+                            </div>
                             <input type="text" 
-                                className='form-control PM-insurance-input'
-                                placeholder='Insurance provider'/>
+                                className='form-control PM-email'
+                                defaultValue={customerInfo[0].email}
+                                ref={PAemailRef}
+                                onChange={updatePAInfo}/>
+                            <input 
+                                id="autocomplete-field" 
+                                type='text'
+                                className='form-control PM-address'
+                                onChange={handlePCodeChange}
+                                defaultValue={address}
+                                value={address} /> 
                             <input type="text" 
-                                className='form-control PM-insurance-date'
-                                placeholder='Date of damage (dd-mm-yyyy)'/>
-                        </div>
-                        <input 
-                            id="autocomplete-field" 
-                            type='text'
-                            className='form-control PM-address'
-                            onChange={handlePCodeChange}
-                            defaultValue={address}
-                            value={address} /> 
-                        <div className='PM-excess-cont'>
-                            <span>Excess: </span>
-                            <span> £</span>
-                            <input ref={excessRef} type="text" 
-                                className='form-control'
-                                defaultValue={excess}
-                                onChange={updateExcess}/>
-                        </div>
-                    </div>     
-                </div>} 
-                {selectedMethod === 3 && <div>
-                    <p className="text-purple mb-2">Single pay</p>
-                    <div className='PM-insurance-container'>
-                        <div className='PM-single-pay'>
-                            <button className={singlePay === 'card' ? 'PM-proceed-active' : "PM-proceed-btn"} 
-                                onClick={() => setSinglePay('card')}>
-                                Pay with card
-                            </button>
-                            <button className={singlePay === 'cash' ? 'PM-proceed-active' : "PM-proceed-btn"} 
-                                onClick={() => setSinglePay('cash')}>
-                                Pay in cash
-                            </button>
-                        </div>
-                    </div>   
-                </div>}   
-            </div>
-            </div>
+                                className='form-control PM-postalcode'
+                                defaultValue={postalCode}
+                                onChange={updatePAInfo}/>
+                        </div>   
+                    </div>}
+                    {selectedMethod === 2 && <div>
+                        <p className="text-purple mb-2">Insurance</p>
+                        <div className='PM-insurance-container'>
+                            <div className="PM-insurance-sub">
+                                <input type="text" 
+                                    className='form-control PM-top-input'
+                                    placeholder='Insurance Number'/>
+                                <input type="text" 
+                                    className='form-control PM-top-input'
+                                    defaultValue={customerInfo[0].f_name + ' ' + customerInfo[0].s_name}/>
+                            </div>
+                            <div className="PM-insurance-sub">
+                                <input type="text" 
+                                    className='form-control PM-insurance-input'
+                                    placeholder='Insurance provider'/>
+                                <input type="text" 
+                                    className='form-control PM-insurance-date'
+                                    placeholder='Date of damage (dd-mm-yyyy)'/>
+                            </div>
+                            <input 
+                                id="autocomplete-field" 
+                                type='text'
+                                className='form-control PM-address'
+                                onChange={handlePCodeChange}
+                                defaultValue={address}
+                                value={address} /> 
+                            <div className='PM-excess-cont'>
+                                <span>Excess: </span>
+                                <span> £</span>
+                                <input ref={excessRef} type="text" 
+                                    className='form-control'
+                                    defaultValue={excess}
+                                    onChange={updateExcess}/>
+                            </div>
+                        </div>     
+                    </div>} 
+                    {selectedMethod === 3 && <div>
+                        <p className="text-purple mb-2">Single pay</p>
+                        <div className='PM-insurance-container'>
+                            <div className='PM-single-pay'>
+                                <button className={singlePay === 'card' ? 'PM-proceed-active' : "PM-proceed-btn"} 
+                                    onClick={() => setSinglePay('card')}>
+                                    Pay with card
+                                </button>
+                                <button className={singlePay === 'cash' ? 'PM-proceed-active' : "PM-proceed-btn"} 
+                                    onClick={() => setSinglePay('cash')}>
+                                    Pay in cash
+                                </button>
+                            </div>
+                        </div>   
+                    </div>}   
+                    {selectedMethod === 4 && <div className='transparent-element'>
+                        -
+                    </div> }                    
+                </div>
+                </div>
         </div>
     )
 }

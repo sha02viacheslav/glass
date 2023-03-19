@@ -1,7 +1,6 @@
 // import timeData from './data/emptyTSDummy.json';
 import axios from "axios";
 import { useEffect, useState } from "react";
-import testData from '../data/get_calendar_test.json';
 const monthValuesRev = {"0":"Jan","1":"Feb","2":"Mar","3":"Apr","4":"May","5":"June","6":"July","7":"Aug","8":"Sept","9":"Oct","10":"Nov","11":"Dec"};
 const monthValues = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","June":"06","July":"07","Aug":"08","Sept":"09","Oct":"10","Nov":"11","Dec":"12"};
 
@@ -10,9 +9,9 @@ export default function CreateTimetable({timetableToClient}) {
     const currentDate = new Date();
     // getDate -> 1-31
     // getMonth -> 0-11
-    const [timetable, setTimetable] = useState([]);
-    const [bookings, setBookings] = useState([]);
-    const [futureDate, setFutureDate] = useState([]);
+    // const [timetable, setTimetable] = useState([]);
+    // const [bookings, setBookings] = useState([]);
+    // const [futureDate, setFutureDate] = useState([]);
     const year = currentDate.getFullYear().toString();
     const month = monthValuesRev[currentDate.getMonth().toString()];
     const monthNum = monthValues[month];
@@ -44,7 +43,7 @@ export default function CreateTimetable({timetableToClient}) {
             newTimetable.push([nextMonth, nextDay, Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3), Math.floor(Math.random()*3)]);
             nextDate = [nextYear, nextMonth, nextDay];
         }
-        setFutureDate(nextDate);
+        // setFutureDate(nextDate);
         retrieveBookings(nextDate, newTimetable);
     }
 
@@ -71,9 +70,9 @@ export default function CreateTimetable({timetableToClient}) {
         };
         axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response.data.result.data));
-            setBookings(response.data.result.data);
-            fillTimeslots(timetable, testData);
+            // console.log(JSON.stringify(response.data.result.data));
+            // setBookings(response.data.result.data);
+            fillTimeslots(timetable, response.data.result.data);
         })
         .catch(function (error) {
             console.log(error);
@@ -143,17 +142,13 @@ export default function CreateTimetable({timetableToClient}) {
             }          
         }
         // console.log(times); 
-        setTimetable(times);
+        // setTimetable(times);
         timetableToClient(times);
     }
 
     useEffect(() => {
         createTimetable();
     }, []);  
-
-    // useEffect(() => {
-    //     timetableToClient(timetable);
-    // }, [timetable]);
 
     return (
         <div>

@@ -127,6 +127,7 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
             const timeIndex = timeheaders.indexOf(timeSplit);
             selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
             setSelectedSlot(selectionId);
+            timeSlotToParent(selectionId);
         }
         // find which slots have passed
         let past = [];

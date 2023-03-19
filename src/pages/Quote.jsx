@@ -1,12 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import '../css/quote.css';
 import '../css/license-plate.css';
-import SelectOfferNew from '../components/quotePage/SelectOfferNew';
 import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
 import LocationSelection from '../components/quotePage/LocationSelection';
 import PaymentMethod from '../components/quotePage/PaymentMethod';
 import BeforeAfter from '../components/BeforeAfter';
-import Payment from './Payment'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
 import expand from '../components/icons/expand.png';
@@ -23,7 +21,6 @@ function Quote() {
     // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
     const [tabValue, setTabValue] = useState(0);
     const [customerDetails, setCustomerDetails] = useState([]);
-    const [isRetrieved, setIsRetrieved] = useState(false);
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
     const [timeSlot, setTimeSlot] = useState("");
@@ -31,8 +28,7 @@ function Quote() {
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
-    const [schedulerData, setSchedulerData] = useState([]);
-    const [paymentOption, setPaymentOption] = useState([]);
+    // const [paymentOption, setPaymentOption] = useState([]);
     const [dateToPayment, setDateToPayment] = useState('');
     const [timeToPayment, setTimeToPayment] = useState('');
     const [slotSelected, setSlotSelected] = useState(false);
@@ -50,13 +46,10 @@ function Quote() {
     const [payAssistStatus, setPayAssistStatus]= useState('');
     const [invoiceData, setInvoiceData] = useState([]);
     const [PAData, setPAData] = useState([]);
-    const [preApproval, setPreApproval] = useState('');
 
     // client info
     const {id} = useParams('');
-    // getQuote(id);
     function getQuote(qid) {
-        console.log('sent');
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
@@ -94,10 +87,14 @@ function Quote() {
         } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
             // offer to location if timeslot is selected
             setSnapValue(3);
+            // send booking data
+            sendBookingData()
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
             // time select to location if timeslot is selected
             setSnapValue(3);
+            // send booking data
+            sendBookingData()
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
             // scroll snap to time select if no slot selected
@@ -106,8 +103,6 @@ function Quote() {
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
             // pay
             confirmBooking()   
-            // send booking data
-            sendBookingData()
         } else {
             return;
         }
@@ -151,7 +146,7 @@ function Quote() {
         };
         axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response));
+            // console.log(JSON.stringify(response));
             // setLoadingApproval(false);
             if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
                 // payAssist('go');
@@ -172,6 +167,7 @@ function Quote() {
 
     function PABegin() {
         // create payment API call
+        // console.log(invoiceData.invoice_number);
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
@@ -218,7 +214,7 @@ function Quote() {
         };
         axios(config)
         .then(function (response) {
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             // change tab
             // handleTabChange(1);
             // updateQuoteData();
@@ -271,7 +267,7 @@ function Quote() {
 
     function timeEndToParent(data) {
         setTimeEnd(data);
-        console.log(data);
+        // console.log(data);
     }
     
     function deliveryAddressToParent(data) {
@@ -331,19 +327,19 @@ function Quote() {
         }
     }, [customerDetails]);
 
-    useEffect(() => {
-        if (timeSlot !== '') {
-            // format timeslot data to send to live booking tab
-            // data:"2023-01-12 12:00:00"
-            const dateTime = timeSlot.split(' ');
-            const dateSplit = dateTime[0].split('-');
-            const timeSplit = dateTime[1].substring(0, 5);
-            const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
-            const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-            setDateToPayment(date);
-            setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-        }
-    }, [tabValue]);
+    // useEffect(() => {
+    //     if (timeSlot !== '') {
+    //         // format timeslot data to send to live booking tab
+    //         // data:"2023-01-12 12:00:00"
+    //         const dateTime = timeSlot.split(' ');
+    //         const dateSplit = dateTime[0].split('-');
+    //         const timeSplit = dateTime[1].substring(0, 5);
+    //         const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
+    //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
+    //         setDateToPayment(date);
+    //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
+    //     }
+    // }, [tabValue]);
 
     useEffect(() => {
         // change between accept and next buttons names and styling
@@ -448,7 +444,7 @@ function Quote() {
                     <img onClick={() => setInfoOpen(true)} className='client-info-icon' src={expand} alt="" />
                 </div> }
             </div>
-            {tabValue === 3 && <div className='center'>
+            {offersDetails[0].price_total === 0 && <div className='center'>
                 <h2 className='thank-you-header'>Thank you!</h2>
                 <h1 className='extra-info'>We are preparing the quote...</h1>
                 <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" />
@@ -458,17 +454,19 @@ function Quote() {
                 <button className={tabValue === 1 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(1)} id='pay-btn'>Live Booking</button>
             </div>} */}
 
-            <div className='center'>
+            {offersDetails[0].price_total > 1 && <div className='center'>
                 {tabValue === 0 && <div className='scroll-container'>
                     {/* select offer */}
                     <div id='offer'>
                         {customerDetails.length !== 0 && <PaymentMethod 
                             offerDetails={offersDetails}
-                            f_name={customerDetails.customer_f_name}
-                            s_name={customerDetails.customer_s_name}
-                            email={customerDetails.customer_email}
-                            c_address={customerDetails.customer_order_postal_code.slice(0, -8)}
-                            c_postalcode={customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)}
+                            customerInfo={[{
+                                f_name: customerDetails.customer_f_name,
+                                s_name: customerDetails.customer_s_name,
+                                email: customerDetails.customer_email,
+                                c_address: customerDetails.customer_order_postal_code.slice(0, -8),
+                                c_postalcode: customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)
+                            }]}
                             qid={id}
                             payAssist={payAssistToParent}
                             invData={invDataToParent}
@@ -480,15 +478,14 @@ function Quote() {
                     <div className="quote-scroll-target" id='2'>-</div>
 
                     {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
-                    {schedulerData.length === 0 &&<div className={slotSelected ? 'quote-scheduler-red' : undefined}>
+                    <div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
                             timeEndToParent={timeEndToParent}
-                            // timeData={timeData}
                             liveBooking={false}
-                            slot={""}
+                            slot={customerDetails.booking_start_date}
                         />
-                    </div>}
+                    </div>
 
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
@@ -500,9 +497,9 @@ function Quote() {
                          />
                     </div>
                 </div>}
-            </div>
+            </div>}
             {/* accept / decline buttons */}
-            {tabValue === 0 && <div className="accept-btn-container" id='accept-cont'>
+            {(offersDetails[0].price_total > 1 && tabValue === 0) && <div className="accept-btn-container" id='accept-cont'>
                 <button className="btn btn-purple-outline mb-3 quote-btn quote-decline" onClick={handleDecline} id='decline-btn'>
                     Decline
                 </button>

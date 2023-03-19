@@ -33,7 +33,7 @@ const Home = () => {
     }
 
     useEffect(() => {
-        localStorage.setItem('development version', JSON.stringify('1.1.24'));
+        localStorage.setItem('development version', JSON.stringify('1.1.25'));
       }, []);
 
     return (
