@@ -209,27 +209,27 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                 /> }
                 <div className='payment-method'>
                     <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
-                <h3 className="text-24 text-blue PM-header">Quotation</h3>
-                <div className='PM-status'>Status: {status}</div>
-                {/* show quotation price details */}
-                <SelectOfferNew 
-                    selectOfferToCustomer={offerDetails}
-                    priceToParent={getTotalPrices}
-                />
-                <div className='PM-btn-container'>
-                    <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
-                        <small className="fs-14">4 month</small>
-                        <div className='PM-price'>£ {(priceTotals[0].total/4).toFixed(2)}</div>
-                    </button>
-                    <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
-                        <small className="fs-14">Insurance</small>
-                        <div className='PM-price'>£ {priceTotals[0].total}</div>
-                    </button>
-                    <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
-                        <small className="fs-14">Single pay</small>
-                        <div className='PM-price'>£ {priceTotals[0].total}</div>
-                    </button>
-                </div>
+                    <h3 className="text-24 text-blue PM-header">Quotation</h3>
+                    <div className='PM-status'>Status: {status}</div>
+                    {/* show quotation price details */}
+                    <SelectOfferNew 
+                        selectOfferToCustomer={offerDetails}
+                        priceToParent={getTotalPrices}
+                    />
+                    <div className='PM-btn-container'>
+                        <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
+                            <small className="fs-14">4 month</small>
+                            <div className='PM-price'>£ {(priceTotals[0].total/4).toFixed(2)}</div>
+                        </button>
+                        <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
+                            <small className="fs-14">Insurance</small>
+                            <div className='PM-price'>£ {priceTotals[0].total}</div>
+                        </button>
+                        <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
+                            <small className="fs-14">Single pay</small>
+                            <div className='PM-price'>£ {priceTotals[0].total}</div>
+                        </button>
+                    </div>
 
                 <div className='PM-payment-option'>
                     {selectedMethod === 1 && <div>

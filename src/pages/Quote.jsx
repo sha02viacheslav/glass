@@ -4,6 +4,7 @@ import '../css/license-plate.css';
 import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
 import LocationSelection from '../components/quotePage/LocationSelection';
 import PaymentMethod from '../components/quotePage/PaymentMethod';
+import PaymentPreview from '../components/quotePage/PaymentPreview';
 import BeforeAfter from '../components/BeforeAfter';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
@@ -327,19 +328,19 @@ function Quote() {
         }
     }, [customerDetails]);
 
-    // useEffect(() => {
-    //     if (timeSlot !== '') {
-    //         // format timeslot data to send to live booking tab
-    //         // data:"2023-01-12 12:00:00"
-    //         const dateTime = timeSlot.split(' ');
-    //         const dateSplit = dateTime[0].split('-');
-    //         const timeSplit = dateTime[1].substring(0, 5);
-    //         const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
-    //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-    //         setDateToPayment(date);
-    //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-    //     }
-    // }, [tabValue]);
+    useEffect(() => {
+        if (timeSlot !== '') {
+            // format timeslot data to send to live booking tab
+            // data:"2023-01-12 12:00:00"
+            const dateTime = timeSlot.split(' ');
+            const dateSplit = dateTime[0].split('-');
+            const timeSplit = dateTime[1].substring(0, 5);
+            const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
+            const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
+            setDateToPayment(date);
+            setTimeToPayment(timeSplit.concat('-', timeSplitNext));
+        }
+    }, [tabValue]);
 
     useEffect(() => {
         // change between accept and next buttons names and styling
@@ -447,7 +448,16 @@ function Quote() {
             {offersDetails[0].price_total === 0 && <div className='center'>
                 <h2 className='thank-you-header'>Thank you!</h2>
                 <h1 className='extra-info'>We are preparing the quote...</h1>
-                <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" />
+                {/* <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" /> */}
+                {customerDetails.length !== 0 && <PaymentPreview 
+                    customerInfo={[{
+                        f_name: customerDetails.customer_f_name,
+                        s_name: customerDetails.customer_s_name,
+                        email: customerDetails.customer_email,
+                        c_address: customerDetails.customer_order_postal_code.slice(0, -8),
+                        c_postalcode: customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)
+                    }]}
+                />}
             </div>}
             {/* {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>

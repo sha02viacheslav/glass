@@ -122,12 +122,18 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
         if (slot != '') {
             const dbId = slot;
             const dateTime = dbId.split(' ');
-            const dateSplit = dateTime[0].split('-');
+            let dateSplit = dateTime[0].split('-');
             const timeSplit = dateTime[1].substring(0, 5);
             const timeIndex = timeheaders.indexOf(timeSplit);
-            selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
-            setSelectedSlot(selectionId);
-            timeSlotToParent(selectionId);
+            const timeCheck = Number(dateTime[1].substring(0, 2));
+            if ((timeCheck - currentHour <= 0) && (Number(dateSplit[2]) === today)) {
+                // if the slot has passed dont set it
+                return;
+            } else {
+                selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
+                setSelectedSlot(selectionId);
+                timeSlotToParent(selectionId);
+            }
         }
         // find which slots have passed
         let past = [];
