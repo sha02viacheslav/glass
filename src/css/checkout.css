@@ -1,0 +1,9 @@
+.inlineimage{max-width:470px;margin-right: 8px;margin-left: 10px}.images{display: inline-block;max-width: 98%;height: auto;width: 22%;margin: 1%;left:20px;text-align: center}
+.form-control {
+  height: 48px;
+}
+.slick-slide img {
+  height: 60px;
+  width: 100%;
+  border-radius: 6px;
+}
