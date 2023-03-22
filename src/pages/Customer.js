@@ -100,7 +100,7 @@ const Customer = () => {
             // post data
             setSubmitClicked(true); 
             console.log('sent');
-            console.log(fullAddress);
+            // console.log(fullAddress);
             const name = firstNameRef.current.value.concat(' ', lastNameRef.current.value);
             const formattedAddress = fullAddress.formatted_address.filter(Boolean).join(", ") + " " + fullAddress.postcode;
             let data = JSON.stringify({

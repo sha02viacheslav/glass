@@ -44,12 +44,12 @@ export default function SelectOfferNew({selectOfferToCustomer, priceToParent}) {
                             </td>
                             <td className='so-info'>
                                 <div className='info-div top-right'>
-                                    <span>
+                                    {element.discount > 0 && <span className='original-price'>
                                         £ {element.price_unit.toFixed(2)}
+                                    </span>}
+                                    <span>
+                                        £ {element.price_subtotal.toFixed(2)}
                                     </span>
-                                    {/* <span>
-                                        £ {element.price_total.toFixed(2)}
-                                    </span> */}
                                 </div>
                             </td>
                         </tr>

@@ -48,7 +48,7 @@ export default function PaymentPreview({customerInfo}) {
                         <div>
                             <p>This loan comprises of 4 monthly payments, with the first taken immediately on setup.</p>
                         </div>
-                        <div className='PM-insurance-container'>
+                        {/* <div className='PM-insurance-container'>
                             <div className="PM-insurance-sub">
                                 <input type="text" 
                                     className='form-control PM-top-input'
@@ -68,11 +68,11 @@ export default function PaymentPreview({customerInfo}) {
                             <input type="text" 
                                 className='form-control PM-postalcode'
                                 defaultValue={customerInfo[0].c_postalcode}/>
-                        </div>   
+                        </div>    */}
                     </div>}
                     {selectedMethod === 2 && <div>
                         <p className="text-purple mb-2">Insurance</p>
-                        <div className='PM-insurance-container'>
+                        {/* <div className='PM-insurance-container'>
                             <div className="PM-insurance-sub">
                                 <input type="text" 
                                     className='form-control PM-top-input'
@@ -102,7 +102,7 @@ export default function PaymentPreview({customerInfo}) {
                                     defaultValue='0'
                                 />
                             </div>
-                        </div>     
+                        </div>      */}
                     </div>} 
                     {selectedMethod === 3 && <div>
                         <p className="text-purple mb-2">Single pay</p>

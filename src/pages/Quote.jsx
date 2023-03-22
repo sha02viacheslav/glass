@@ -5,6 +5,7 @@ import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
 import LocationSelection from '../components/quotePage/LocationSelection';
 import PaymentMethod from '../components/quotePage/PaymentMethod';
 import PaymentPreview from '../components/quotePage/PaymentPreview';
+import SlotsPreview from '../components/quotePage/SlotsPreview';
 import BeforeAfter from '../components/BeforeAfter';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
@@ -25,7 +26,6 @@ function Quote() {
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
     const [timeSlot, setTimeSlot] = useState("");
-    const [timeEnd, setTimeEnd] = useState("");
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -195,13 +195,13 @@ function Quote() {
         })
     }
 
-    function sendBookingData() {
+    function sendBookingData(selection) {
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
                 "fe_token": id,
-                "booking_start_date": timeSlot,
-                "booking_end_date": timeEnd  
+                "booking_start_date": selection[0].start,
+                "booking_end_date": selection[0].end  
             }
         });
         let config = {
@@ -262,13 +262,9 @@ function Quote() {
     }
 
     function timeSlotToParent(data) {
+        sendBookingData(data);
         setTimeSlot(data);
         setSlotSelected(false);
-    }
-
-    function timeEndToParent(data) {
-        setTimeEnd(data);
-        // console.log(data);
     }
     
     function deliveryAddressToParent(data) {
@@ -456,6 +452,7 @@ function Quote() {
                         c_postalcode: customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)
                     }]}
                 />}
+                <SlotsPreview />
             </div>}
             {/* {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>
@@ -489,7 +486,6 @@ function Quote() {
                     <div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
-                            timeEndToParent={timeEndToParent}
                             liveBooking={false}
                             slot={customerDetails.booking_start_date}
                         />
@@ -498,11 +494,15 @@ function Quote() {
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
                     <div className='quote-component-last'>
-                        <LocationSelection
+                        {customerDetails.length !== 0 && <LocationSelection
                             key={billingAddress}
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
-                         />
+                            ids={[{
+                                customerId: customerDetails.customer_id,
+                                addressId: customerDetails.delivery_address.address_id
+                            }]}
+                         />}
                     </div>
                 </div>}
             </div>}

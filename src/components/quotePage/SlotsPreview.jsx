@@ -13,22 +13,19 @@ import CreateTimetable from '../functions/CreateTimetable';
 const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
 const passedSlots = [10, 12, 14, 16, 18, 20, 22];
 const monthValues = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","June":"06","July":"07","Aug":"08","Sept":"09","Oct":"10","Nov":"11","Dec":"12"};
-const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
-const fullMonthValues = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthValuesRev = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function TimeSelection({timeSlotToParent, liveBooking, slot}) {
+export default function SlotsPreview() {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedSlot, setSelectedSlot] = useState('');
-    const [slotChanged, setSlotChanged] = useState(false);
-    const currentTime = selectedDate.getHours();
     const [timeData, setTimeData] = useState([]);
     const [slots, setSlots] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pages, setPages] = useState([]);
     const [pastIds, setPastIds] = useState([]);
     const today = selectedDate.getDate();
-    const currentMonth = fullMonthValues[selectedDate.getMonth()];
+    const currentMonth = monthValuesRev[selectedDate.getMonth()];
     // const today = 9; // dummy data version
     const currentHour = new Date().getHours();
     const currentYear = new Date().getFullYear();
@@ -76,35 +73,8 @@ export default function TimeSelection({timeSlotToParent, liveBooking, slot}) {
         }
         // for sending slot info to odoo, slot starting time
         let odooSlot = currentYear.toString().concat('-',monthValues[monthSelected]).concat('-',odooDay);
-        // send slot end time
-        let odooEnd = odooSlot.concat(' ',timeheaders[timeSelected + 1]).concat('',':00');
         odooSlot = odooSlot.concat(' ',timeheaders[timeSelected]).concat('',':00');
         setSelectedSlot(idTag); 
-        setSlotChanged(true);   
-        if (!liveBooking) {
-            // send data to parent page to enable next btn
-            timeSlotToParent([{start: odooSlot, end: odooEnd}]); 
-            // timeEndToParent(odooEnd); 
-        }
-    }
-
-    // function only runs in live booking tab
-    function confirmSelection() {
-        // save the slot selection and push to past slots
-        sessionStorage.setItem('selectedSlot', JSON.stringify(selectedSlot));  
-        let pastSlots = JSON.parse(sessionStorage.getItem('pastSlots')) || [];
-        pastSlots.push(selectedSlot.date.concat(' ', selectedSlot.time));
-        sessionStorage.setItem('pastSlots', JSON.stringify(pastSlots));  
-        // send data to parent page to enable next btn
-        timeSlotToParent(selectedSlot.date.concat(' ', selectedSlot.time));  
-    }
-
-    function changePage(navValue) {
-        if (navValue === 'next'  && pages.includes(currentPage + 1)) {
-            setCurrentPage(currentPage + 1);
-        } else if (navValue === 'prev'  && pages.includes(currentPage - 1)) {
-            setCurrentPage(currentPage - 1);
-        }
     }
 
     // navigating calendar pages and disable passed slots
@@ -117,24 +87,6 @@ export default function TimeSelection({timeSlotToParent, liveBooking, slot}) {
     }, [currentPage, timeData]);
 
     useEffect(() => {
-        // decipher odoo data into useable timeslot id
-        // odoo:"2023-01-12 12:00:00"
-        // id:"Jan122"
-        let selectionId = '';
-        if (slot != '') {
-            const dbId = slot;
-            const dateTime = dbId.split(' ');
-            let dateSplit = dateTime[0].split('-');
-            const timeSplit = dateTime[1].substring(0, 5);
-            const timeIndex = timeheaders.indexOf(timeSplit);
-            const timeCheck = Number(dateTime[1].substring(0, 2));
-            if ((timeCheck - currentHour > 0) || (Number(dateSplit[2]) !== today)) {
-                // only set prev selected slot if it has not passed
-                selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
-                setSelectedSlot(selectionId);
-                timeSlotToParent(selectionId);                     
-            }
-        }
         // find which slots have passed
         let past = [];
         if (timeData.length > 0) {
@@ -165,12 +117,20 @@ export default function TimeSelection({timeSlotToParent, liveBooking, slot}) {
         setPages([...new Set(pageCount)]);
     }, [timeData]);
 
+    function changePage(navValue) {
+        if (navValue === 'next'  && pages.includes(currentPage + 1)) {
+            setCurrentPage(currentPage + 1);
+        } else if (navValue === 'prev'  && pages.includes(currentPage - 1)) {
+            setCurrentPage(currentPage - 1);
+        }
+    }
+
     return (
-        <div>
+        <div className='ts-preview-test'>
             <CreateTimetable 
                 timetableToClient={getTimeData}
             />
-            <div className='time-select-main'>
+            <div className='time-select-preview'>
                 <h1>Set date and time</h1>
                     <div className='date-pick-container'>
                         {/* <span className='time-select-month'>December</span> */}
@@ -260,14 +220,6 @@ export default function TimeSelection({timeSlotToParent, liveBooking, slot}) {
                     <span className="ts-legend-text">Half booked</span>
                     <div className="ts-legend-icon ts-free">-</div>
                     <span className="ts-legend-text">Free</span>
-                    {liveBooking && <div className='ts-confirm-btn-container'>
-                        <button 
-                            id='pay-book-confirm'
-                            className={slotChanged ? 'ts-confirm-btn' : 'ts-confirm-btn-disable'}
-                            onClick={confirmSelection}>
-                                Confirm
-                        </button>
-                    </div>}
                 </div>
             </div>
         </div>
