@@ -334,7 +334,7 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                                 </button>
                             </div>
                         </div>
-                        <Checkout method={singlePay} />
+                        <Checkout method={singlePay} amount={priceTotals[0].total} />
                     </div>}   
                     {selectedMethod === 4 && <div className='transparent-element'>
                         -

@@ -11,7 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = () => {
+const CheckoutForm = ({amount}) => {
   const cardRef = useRef(null);
   const stripe = useStripe();
   const elements = useElements();
@@ -46,7 +46,8 @@ const CheckoutForm = () => {
 
     const res = await axios.post('http://localhost:3001/stripe/checkout', {
       paymentMethod: paymentMethod.id,
-      cardDetails
+      cardDetails,
+      amount
     })
 
     // 3d secuire verification
@@ -101,7 +102,7 @@ const CheckoutForm = () => {
   )
 };
 
-const Checkout = ({ method }) => {
+const Checkout = ({ method, amount }) => {
   // const [clientSecret, setClientSecret] = useState("")
 
   // useEffect(() => {
@@ -120,7 +121,7 @@ const Checkout = ({ method }) => {
     <>
       {method === 'card' && (
         <Elements stripe={stripePromise}>
-          <CheckoutForm />
+          <CheckoutForm amount={amount} />
         </Elements>
       )}
     </>
