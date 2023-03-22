@@ -413,7 +413,7 @@ function Quote() {
                     </div>
                     <div className='quote-info-bottom'>
                         <div className='compact-bottom-row'>
-                            <span className="client-info"><b>Selected windows:</b> </span>
+                            <span className="quote-selectedwindows"><b>Selected windows:</b> </span>
                             {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
                                 <span key={element} className="client-windows">{element}</span>
                             )}
@@ -435,11 +435,9 @@ function Quote() {
                         </div>
                         <div className="client-info">{customerDetails.customer_name}</div>
                         <div className='compact-bottom-row'>
-                            <div className='compact-bottom-row'>
-                                {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
-                                    <span key={element} className="client-windows">{element}</span>
-                                )}
-                            </div>
+                            {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
+                                <span key={element} className="client-windows">{element}</span>
+                            )}
                         </div>
                     </div>
                     <img onClick={() => setInfoOpen(true)} className='client-info-icon' src={expand} alt="" />

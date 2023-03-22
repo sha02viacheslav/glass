@@ -1,5 +1,5 @@
 import '../../css/time-select-new.css';
-import stripes from '../icons/stripes.png';
+import stripes from '../icons/stripes_s.png';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
@@ -126,13 +126,11 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
             const timeSplit = dateTime[1].substring(0, 5);
             const timeIndex = timeheaders.indexOf(timeSplit);
             const timeCheck = Number(dateTime[1].substring(0, 2));
-            if ((timeCheck - currentHour <= 0) && (Number(dateSplit[2]) === today)) {
-                // if the slot has passed dont set it
-                return;
-            } else {
+            if ((timeCheck - currentHour > 0) && (Number(dateSplit[2]) !== today)) {
+                // only set prev selected slot if it has not passed
                 selectionId = monthValuesRev[dateSplit[1]].concat(dateSplit[2]).concat(timeIndex);
                 setSelectedSlot(selectionId);
-                timeSlotToParent(selectionId);
+                timeSlotToParent(selectionId);                     
             }
         }
         // find which slots have passed
@@ -244,7 +242,7 @@ export default function TimeSelection({timeSlotToParent, timeEndToParent, liveBo
                                     className={ (element[0] + element[1] + time.toString()) === selectedSlot ? 'ts-' + occup + ' ts-td-active' : 'ts-' + occup}>
                                         { pastIds.includes(element[0] + element[1] + time.toString()) ? 
                                         <div className='ts-passed'>-</div> : 
-                                        (occup != 'Half' ? occup : <img src={stripes} alt="" />)  }
+                                        (occup != 'Half' ? occup : <img src={stripes} alt="" /> )  }
                                 </td>
                             )}
                         </tr>

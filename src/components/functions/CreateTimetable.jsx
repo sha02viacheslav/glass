@@ -132,9 +132,9 @@ export default function CreateTimetable({timetableToClient}) {
             let row = times[i];  
             for (let j = 2; j < row.length; j++) {
                 const element = row[j];
-                if (element === 0) {
+                if (element === 0 || element === 1) {
                     row[j] = 'Empty';
-                } else if (element === 1 || element == 2) {
+                } else if (element == 2) {
                     row[j] = 'Half';
                 } else if (element >= 3) {
                     row[j] = 'Full';
