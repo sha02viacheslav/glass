@@ -5,6 +5,8 @@ import invoice from '../icons/invoice.png';
 import axios from 'axios';
 import PDFViewer from '../functions/PDFViewer';
 import SelectOfferNew from './SelectOfferNew';
+
+import Checkout from './Checkout';
 import Tooltip from '@mui/material/Tooltip';
 
 export default function PaymentMethod({offerDetails, customerInfo, qid, payAssist, invData, PADataToParent}) {
@@ -343,7 +345,8 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                                     Pay in cash
                                 </button>
                             </div>
-                        </div>   
+                        </div>
+                        <Checkout method={singlePay} amount={priceTotals[0].total} />
                     </div>}   
                     {selectedMethod === 4 && <div className='transparent-element'>
                         -
