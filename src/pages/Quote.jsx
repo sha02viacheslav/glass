@@ -4,6 +4,8 @@ import '../css/license-plate.css';
 import TimeSelectionNew from '../components/quotePage/TimeSelectionNew';
 import LocationSelection from '../components/quotePage/LocationSelection';
 import PaymentMethod from '../components/quotePage/PaymentMethod';
+import PaymentPreview from '../components/quotePage/PaymentPreview';
+import SlotsPreview from '../components/quotePage/SlotsPreview';
 import BeforeAfter from '../components/BeforeAfter';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
@@ -24,7 +26,6 @@ function Quote() {
     const [snapValue, setSnapValue] = useState(1);
     const [acceptBtn, setAcceptBtn] = useState('Next'); // can change to Next
     const [timeSlot, setTimeSlot] = useState("");
-    const [timeEnd, setTimeEnd] = useState("");
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -194,13 +195,13 @@ function Quote() {
         })
     }
 
-    function sendBookingData() {
+    function sendBookingData(selection) {
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
                 "fe_token": id,
-                "booking_start_date": timeSlot,
-                "booking_end_date": timeEnd  
+                "booking_start_date": selection[0].start,
+                "booking_end_date": selection[0].end  
             }
         });
         let config = {
@@ -261,13 +262,9 @@ function Quote() {
     }
 
     function timeSlotToParent(data) {
+        sendBookingData(data);
         setTimeSlot(data);
         setSlotSelected(false);
-    }
-
-    function timeEndToParent(data) {
-        setTimeEnd(data);
-        // console.log(data);
     }
     
     function deliveryAddressToParent(data) {
@@ -327,19 +324,19 @@ function Quote() {
         }
     }, [customerDetails]);
 
-    // useEffect(() => {
-    //     if (timeSlot !== '') {
-    //         // format timeslot data to send to live booking tab
-    //         // data:"2023-01-12 12:00:00"
-    //         const dateTime = timeSlot.split(' ');
-    //         const dateSplit = dateTime[0].split('-');
-    //         const timeSplit = dateTime[1].substring(0, 5);
-    //         const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
-    //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-    //         setDateToPayment(date);
-    //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-    //     }
-    // }, [tabValue]);
+    useEffect(() => {
+        if (timeSlot !== '') {
+            // format timeslot data to send to live booking tab
+            // data:"2023-01-12 12:00:00"
+            const dateTime = timeSlot.split(' ');
+            const dateSplit = dateTime[0].split('-');
+            const timeSplit = dateTime[1].substring(0, 5);
+            const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
+            const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
+            setDateToPayment(date);
+            setTimeToPayment(timeSplit.concat('-', timeSplitNext));
+        }
+    }, [tabValue]);
 
     useEffect(() => {
         // change between accept and next buttons names and styling
@@ -412,7 +409,7 @@ function Quote() {
                     </div>
                     <div className='quote-info-bottom'>
                         <div className='compact-bottom-row'>
-                            <span className="client-info"><b>Selected windows:</b> </span>
+                            <span className="quote-selectedwindows"><b>Selected windows:</b> </span>
                             {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
                                 <span key={element} className="client-windows">{element}</span>
                             )}
@@ -434,11 +431,9 @@ function Quote() {
                         </div>
                         <div className="client-info">{customerDetails.customer_name}</div>
                         <div className='compact-bottom-row'>
-                            <div className='compact-bottom-row'>
-                                {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
-                                    <span key={element} className="client-windows">{element}</span>
-                                )}
-                            </div>
+                            {customerDetails.length !== 0 && customerDetails.glass_location.map(element => 
+                                <span key={element} className="client-windows">{element}</span>
+                            )}
                         </div>
                     </div>
                     <img onClick={() => setInfoOpen(true)} className='client-info-icon' src={expand} alt="" />
@@ -447,7 +442,17 @@ function Quote() {
             {offersDetails[0].price_total === 0 && <div className='center'>
                 <h2 className='thank-you-header'>Thank you!</h2>
                 <h1 className='extra-info'>We are preparing the quote...</h1>
-                <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" />
+                {/* <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" /> */}
+                {customerDetails.length !== 0 && <PaymentPreview 
+                    customerInfo={[{
+                        f_name: customerDetails.customer_f_name,
+                        s_name: customerDetails.customer_s_name,
+                        email: customerDetails.customer_email,
+                        c_address: customerDetails.customer_order_postal_code.slice(0, -8),
+                        c_postalcode: customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)
+                    }]}
+                />}
+                <SlotsPreview />
             </div>}
             {/* {(tabValue === 1 || tabValue === 0) && <div className="tab">
                 <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>
@@ -481,7 +486,6 @@ function Quote() {
                     <div className={slotSelected ? 'quote-scheduler-red' : undefined}>
                         <TimeSelectionNew 
                             timeSlotToParent={timeSlotToParent}
-                            timeEndToParent={timeEndToParent}
                             liveBooking={false}
                             slot={customerDetails.booking_start_date}
                         />
@@ -490,11 +494,15 @@ function Quote() {
                     <div className="quote-scroll-target-2" id='3'>-</div>
 
                     <div className='quote-component-last'>
-                        <LocationSelection
+                        {customerDetails.length !== 0 && <LocationSelection
                             key={billingAddress}
                             userBillingAddress={billingAddress}
                             deliveryAddressToParent={deliveryAddressToParent}
-                         />
+                            ids={[{
+                                customerId: customerDetails.customer_id,
+                                addressId: customerDetails.delivery_address.address_id
+                            }]}
+                         />}
                     </div>
                 </div>}
             </div>}

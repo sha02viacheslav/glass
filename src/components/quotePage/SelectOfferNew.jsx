@@ -37,19 +37,19 @@ export default function SelectOfferNew({selectOfferToCustomer, priceToParent}) {
                 <table className='SO-table'>
                     {selectOfferToCustomer.map((element, rowIndex) => 
                         <tr key={rowIndex}>
-                            <td className='info'>
+                            <td className='so-info'>
                                 <div className='info-div first-col'>
                                     {element.product}
                                 </div>
                             </td>
-                            <td className='info'>
+                            <td className='so-info'>
                                 <div className='info-div top-right'>
-                                    <span>
+                                    {element.discount > 0 && <span className='original-price'>
                                         £ {element.price_unit.toFixed(2)}
+                                    </span>}
+                                    <span>
+                                        £ {element.price_subtotal.toFixed(2)}
                                     </span>
-                                    {/* <span>
-                                        £ {element.price_total.toFixed(2)}
-                                    </span> */}
                                 </div>
                             </td>
                         </tr>
@@ -63,7 +63,7 @@ export default function SelectOfferNew({selectOfferToCustomer, priceToParent}) {
                         <td className='info'>
                             <div className="info-div wipers">
                                     <div>
-                                        <div className='original-price'>£ {dummyData.wipers.toFixed(2)}</div>
+                                        <div className='original-price'>£ 10</div>
                                         <div>£ 0</div>
                                     </div>
                                 <Checkbox 

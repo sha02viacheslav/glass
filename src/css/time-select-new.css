@@ -1,5 +1,5 @@
 /* everything using display flex */
-.time-select-main, .date-pick-container, .time-select-month, .date-nav-container, .date-nav-btn, .ts-date-today, .ts-table tr:nth-child(n + 2) > td:nth-child(1), .ts-date-day, .ts-time {
+.time-select-main, .time-select-preview, .date-pick-container, .time-select-month, .date-nav-container, .date-nav-btn, .ts-date-today, .ts-table tr:nth-child(n + 2) > td:nth-child(1), .ts-date-day, .ts-time {
     display: flex;
 }
 
@@ -13,7 +13,12 @@
     align-items: center;
 }
 
-.time-select-main {
+.ts-preview-test {
+    width: 100%;
+    max-width: 550px;
+}
+
+.time-select-main, .time-select-preview {
     flex-direction: column;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
     border-radius: 15px;
@@ -24,7 +29,11 @@
     text-align: center;
 }
 
-.time-select-main h1 {
+.time-select-preview {
+    margin-top: 80px;
+}
+
+.time-select-main h1, .time-select-preview h1 {
     line-height: 40px;
     font-weight: 500;
     font-size: 20px;
@@ -99,11 +108,12 @@
 .ts-Empty {
     background-color: white;
     color: transparent;
+    text-indent: 105%;
 }
 
 .ts-Half img {
-    width: 100%;
-    height: 105%;
+    width: 110%;
+    height: 110%;
     object-fit: fill;
 }
 
@@ -111,6 +121,7 @@
     background-color: #dfdfdf;
     color: transparent;
     height: 100%;
+    text-indent: 105%;
 }
 
 .ts-table tr:nth-child(n + 2) > td:nth-child(1) {

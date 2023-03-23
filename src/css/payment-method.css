@@ -20,6 +20,13 @@
     margin-bottom: 5px;
 }
 
+.PM-invoice-status {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color:#9a73dd;
+}
+
 .PM-button, .PM-button-active {
     background: none;
     width: 30%;
@@ -200,7 +207,7 @@
     top: 0;
     display: flex;
     justify-content: center;
-    background-color: rgba(37, 37, 37, 0.219);
+    background-color: rgba(37, 37, 37, 0.837);
     z-index: 99;
 }
 
@@ -214,7 +221,8 @@
     position: fixed;
     display: flex;
     justify-content: center;
-    bottom: 30px;
+    bottom: -15%;
+    width: 100%;
 }
 
 .PDF-download {

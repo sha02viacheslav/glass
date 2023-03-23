@@ -41,9 +41,9 @@
     padding-right: 5px;
 }
 
-.info {
+.so-info {
     max-width: 200px;
-    height: 50px;
+    height: fit-content;
     padding: 5px;
     white-space: pre-wrap;
 }

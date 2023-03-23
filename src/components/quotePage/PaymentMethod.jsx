@@ -5,7 +5,9 @@ import invoice from '../icons/invoice.png';
 import axios from 'axios';
 import PDFViewer from '../functions/PDFViewer';
 import SelectOfferNew from './SelectOfferNew';
+
 import Checkout from './Checkout';
+import Tooltip from '@mui/material/Tooltip';
 
 export default function PaymentMethod({offerDetails, customerInfo, qid, payAssist, invData, PADataToParent}) {
 
@@ -20,7 +22,6 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
     const [invoicePDF, setInvoicePDF] = useState('');
     const [showInvoice, setShowInvoice] = useState(false);
     const [monthlyPayments, setMonthlyPayments] = useState([]);
-    const [loadingApproval, setLoadingApproval] = useState(false);
     const [PAErrorMsg, setPAErrorMsg] = useState('');
     const [invoiceData, setInvoiceData] = useState([]);
     const PAf_nameRef = useRef('');
@@ -28,6 +29,8 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
     const PAemailRef = useRef('');
     const [priceTotals, setPriceTotals] = useState([{total: 0}]);
     const [PAproceed, setPAproceed] = useState(false);
+    const [invoiceMessage, setInvoiceMessage] = useState('');
+    const [startPAprocess, setStartPAprocess] = useState(false);
 
     function updateExcess() {
         setExcess(Number(excessRef.current.value));
@@ -69,6 +72,7 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
     // console.log(postalCode);
 
     function retrieveInvoice() {
+        // get url of invoice PDF
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
@@ -87,23 +91,23 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
         axios(config)
         .then(function (response) {
             // figure out how to view pdf
-            // console.log(JSON.stringify(response));
-            setInvoicePDF(response.data.result.data.invoice_pdf_url);
-            setShowInvoice(true);
+            console.log(JSON.stringify(response));
+            if (response.data.result.data.invoice_pdf_url !== '') {
+                setInvoicePDF(response.data.result.data.invoice_pdf_url);
+                setShowInvoice(true);
+                setInvoiceMessage('');
+            } else {
+                setInvoiceMessage('Invoice can be created after booking is confirmed');
+            }
         })
         .catch(function (error) {
             console.log(error);
+            setShowInvoice(false);  
         })
     }
 
     function handleInvoicePopup(status) {
         setShowInvoice(status);
-    }
-
-    function handleCreditCheck() {
-        setLoadingApproval(true);
-        // pre approval API call
-        
     }
 
     function getInvoiceData() {
@@ -189,7 +193,7 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
             };
             axios(config)
             .then(function (response) {
-                // console.log(JSON.stringify(response));
+                console.log(JSON.stringify(response));
                 setPAproceed(true);
                 retrievePlan();
                 getInvoiceData();
@@ -209,28 +213,31 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                     invoiceID={invoiceData.invoice_number}
                 /> }
                 <div className='payment-method'>
-                    <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
-                <h3 className="text-24 text-blue PM-header">Quotation</h3>
-                <div className='PM-status'>Status: {status}</div>
-                {/* show quotation price details */}
-                <SelectOfferNew 
-                    selectOfferToCustomer={offerDetails}
-                    priceToParent={getTotalPrices}
-                />
-                <div className='PM-btn-container'>
-                    <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
-                        <small className="fs-14">4 month</small>
-                        <div className='PM-price'>£ {(priceTotals[0].total/4).toFixed(2)}</div>
-                    </button>
-                    <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
-                        <small className="fs-14">Insurance</small>
-                        <div className='PM-price'>£ {priceTotals[0].total}</div>
-                    </button>
-                    <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
-                        <small className="fs-14">Single pay</small>
-                        <div className='PM-price'>£ {priceTotals[0].total}</div>
-                    </button>
-                </div>
+                    <Tooltip disableFocusListener title='Invoice'>
+                        <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt="" />
+                    </Tooltip>
+                    <h3 className="text-24 text-blue PM-header">Quotation</h3>
+                    <div className='PM-invoice-status'>{invoiceMessage}</div>
+                    <div className='PM-status'>Status: {status}</div>
+                    {/* show quotation price details */}
+                    <SelectOfferNew 
+                        selectOfferToCustomer={offerDetails}
+                        priceToParent={getTotalPrices}
+                    />
+                    <div className='PM-btn-container'>
+                        <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
+                            <small className="fs-14">4 month</small>
+                            <div className='PM-price'>£ {(priceTotals[0].total/4).toFixed(2)}</div>
+                        </button>
+                        <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
+                            <small className="fs-14">Insurance</small>
+                            <div className='PM-price'>£ {priceTotals[0].total}</div>
+                        </button>
+                        <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
+                            <small className="fs-14">Single pay</small>
+                            <div className='PM-price'>£ {priceTotals[0].total}</div>
+                        </button>
+                    </div>
 
                 <div className='PM-payment-option'>
                     {selectedMethod === 1 && <div>
@@ -253,7 +260,7 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                         <div className='PA-status-failed'>
                             {PAErrorMsg}
                         </div>
-                        <div className='PM-insurance-container'>
+                        {startPAprocess && <div className='PM-insurance-container'>
                             <div className="PM-insurance-sub">
                                 <input type="text" 
                                     className='form-control PM-top-input'
@@ -282,7 +289,12 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                                 className='form-control PM-postalcode'
                                 defaultValue={postalCode}
                                 onChange={updatePAInfo}/>
-                        </div>   
+                        </div>}   
+                        <div className='PM-proceed-btn-cont'>
+                            {!startPAprocess && <button className='PM-proceed-btn' onClick={() => setStartPAprocess(true)}>
+                                Pay with Payment Assist
+                            </button>}
+                        </div>
                     </div>}
                     {selectedMethod === 2 && <div>
                         <p className="text-purple mb-2">Insurance</p>

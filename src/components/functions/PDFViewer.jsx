@@ -33,17 +33,36 @@ export default function PDFViewer({invoicePDF, isOpen, qid, invoiceID}) {
             })
     }
 
+    function closePopup(type) {
+        if (type === 'btn') {
+            isOpen(false);
+        } else if (type === 'bg') {
+            isOpen(false);
+        } else if (type === 'doc') {
+            return;
+        }
+    }
+
+    document.onclick = function(e){
+        if(e.target.id == 'bg'){
+            isOpen(false);
+        }
+        if(e.target.id === 'doc'){
+         	return;
+        }
+    };
+
     return (
-        <div className="PDFviewer">
-            <Document className='PDFinvoice' file={invoicePDF}>
+        <div className="PDFviewer" id='bg'>
+            <Document className='PDFinvoice' file={invoicePDF} id='doc'>
                 <Page pageNumber={1} />
                 <img className='PDF-close' src={close} alt="" onClick={() => isOpen(false)}/>
+                <div className="PDF-button-container">
+                    <button className="btn btn-purple-radius mb-3 PDF-download" onClick={downloadInvoice}>
+                        Download
+                    </button>
+                </div>
             </Document>
-            <div className="PDF-button-container">
-                <button className="btn btn-purple-radius mb-3 PDF-download" onClick={downloadInvoice}>
-                    Download
-                </button>
-            </div>
         </div>
     );
 }
