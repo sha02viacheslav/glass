@@ -29,7 +29,7 @@ function Quote() {
     const [quoteInfoOpen, setInfoOpen] = useState(false);
     const [billingAddress, setBillingAddress] = useState('');
     const [deliveryAddress, setDeliveryAddress] = useState('');
-    // const [paymentOption, setPaymentOption] = useState([]);
+    const [paymentOption, setPaymentOption] = useState([{p_option: 0}]);
     const [dateToPayment, setDateToPayment] = useState('');
     const [timeToPayment, setTimeToPayment] = useState('');
     const [slotSelected, setSlotSelected] = useState(false);
@@ -47,6 +47,7 @@ function Quote() {
     const [payAssistStatus, setPayAssistStatus]= useState('');
     const [invoiceData, setInvoiceData] = useState([]);
     const [PAData, setPAData] = useState([]);
+    const [PAurl, setPAurl] = useState('');
 
     // client info
     const {id} = useParams('');
@@ -88,28 +89,28 @@ function Quote() {
         } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
             // offer to location if timeslot is selected
             setSnapValue(3);
-            // send booking data
-            sendBookingData()
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
             // time select to location if timeslot is selected
             setSnapValue(3);
-            // send booking data
-            sendBookingData()
             document.getElementById('3').scrollIntoView({behavior: 'smooth'});
         } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
             // scroll snap to time select if no slot selected
             document.getElementById('2').scrollIntoView({behavior: 'smooth'});
             setSlotSelected(true);
         } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
-            // pay
-            confirmBooking()   
+            if (paymentOption[0].p_option === 4 || paymentOption[0].detail === 'Select payment method') {
+                // scroll to PM component if no payment method is selected
+                setSnapValue(1);
+                document.getElementById('1').scrollIntoView({behavior: 'smooth'});
+            } else if (paymentOption[0].p_option === 1 && paymentOption[0].detail !== 'Select payment method') {
+                // pay with Payment Assist
+                confirmBooking();     
+            }
         } else {
             return;
         }
     }
-
-
     
     function confirmBooking() {
         let first = '';
@@ -189,19 +190,20 @@ function Quote() {
         .then(function (response) {
             console.log(JSON.stringify(response));
             window.open(response.data.result.result.data.url, '_blank', 'noreferrer');
+            setPAurl(response.data.result.result.data.url);
         })
         .catch(function (error) {
             console.log(error);
         })
     }
 
-    function sendBookingData(selection) {
+    function sendBookingData(slot_selected) {
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
                 "fe_token": id,
-                "booking_start_date": selection[0].start,
-                "booking_end_date": selection[0].end  
+                "booking_start_date": slot_selected[0].start,
+                "booking_end_date": slot_selected[0].end  
             }
         });
         let config = {
@@ -271,13 +273,16 @@ function Quote() {
         setDeliveryAddress(data);
     }
 
-    // function paymentOptionToParent(pOption){
-    //     setPaymentOption(pOption);
-    // }
+    function paymentOptionToParent(pOption){
+        setPaymentOption(pOption);
+    }
 
     function payAssistToParent(status) {
         if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
             setPayAssistStatus(status);
+        }
+        if (status === 'go') {
+            PABegin();
         }
     }
 
@@ -324,33 +329,39 @@ function Quote() {
         }
     }, [customerDetails]);
 
-    useEffect(() => {
-        if (timeSlot !== '') {
-            // format timeslot data to send to live booking tab
-            // data:"2023-01-12 12:00:00"
-            const dateTime = timeSlot.split(' ');
-            const dateSplit = dateTime[0].split('-');
-            const timeSplit = dateTime[1].substring(0, 5);
-            const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
-            const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-            setDateToPayment(date);
-            setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-        }
-    }, [tabValue]);
+    // useEffect(() => {
+    //     if (timeSlot !== '') {
+    //         // format timeslot data to send to live booking tab
+    //         // data:"2023-01-12 12:00:00"
+    //         const dateTime = timeSlot.split(' ');
+    //         const dateSplit = dateTime[0].split('-');
+    //         const timeSplit = dateTime[1].substring(0, 5);
+    //         const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
+    //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
+    //         setDateToPayment(date);
+    //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
+    //     }
+    // }, [tabValue]);
 
     useEffect(() => {
         // change between accept and next buttons names and styling
         let acceptSelector = document.getElementById('accept-btn');
         if (snapValue === 1 && acceptSelector != null) {
             setAcceptBtn('Next');
+            acceptSelector.classList.remove('quote-accept');
         } else if (snapValue === 2 && acceptSelector !== null) {
             setAcceptBtn('Next');
             acceptSelector.classList.remove('quote-accept');
         } else if (snapValue === 3 && acceptSelector !== null && timeSlot !== '') {
-            setAcceptBtn('Pay');
+            if (paymentOption[0].p_option === 1) {
+                // detail coming from payment method
+                setAcceptBtn(paymentOption[0].detail);
+            } else {
+                setAcceptBtn('Select payment method');  
+            }
             acceptSelector.classList.add('quote-accept');
         }
-    }, [snapValue, timeSlot]);
+    }, [snapValue, timeSlot, paymentOption]);
 
     return ( 
         <div>
@@ -461,7 +472,7 @@ function Quote() {
 
             {offersDetails[0].price_total > 1 && <div className='center'>
                 {tabValue === 0 && <div className='scroll-container'>
-                    {/* select offer */}
+                    {/* select offer / payment method */}
                     <div id='offer'>
                         {customerDetails.length !== 0 && <PaymentMethod 
                             offerDetails={offersDetails}
@@ -476,9 +487,11 @@ function Quote() {
                             payAssist={payAssistToParent}
                             invData={invDataToParent}
                             PADataToParent={PADataToParent}
+                            PAurl={PAurl}
+                            method={paymentOptionToParent}
                         />}
-                        <br /><br />
                     </div>
+                    <br /><br />
 
                     <div className="quote-scroll-target" id='2'>-</div>
 

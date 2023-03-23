@@ -39,12 +39,11 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
 
     function updateDeliveryAddress(fullAddress) {
         console.log(fullAddress);
-        // retrieve payment assist plan data
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
-                "customer_id": 169,
-                "address_id": 171,
+                "customer_id": 184,
+                "address_id": 186,
                 "line_1": fullAddress.line_1,
                 "line_2": fullAddress.line_2,
                 "postcode": fullAddress.postcode,
@@ -53,6 +52,14 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
                 "town_or_city": fullAddress.town_or_city,
                 "county": fullAddress.county,
                 "country": fullAddress.country
+                // "line_1": "Vt Wealth Management Ltd",
+                // "line_2": "2-4 Balgownie Crescent",
+                // "postcode": "AB23 8ER",
+                // "latitude": 57.1785527,
+                // "longitude": -2.0920297,
+                // "town_or_city": "Aberdeen",
+                // "county": "Aberdeenshire",
+                // "country": "Scotland"
             }
         });
         let config = {
@@ -60,7 +67,7 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
             url: process.env.REACT_APP_UPDATE_DELIVERY,
             headers: {
                 'Content-Type': 'application/json',
-                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY
+                'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
             },
             data: data
         };

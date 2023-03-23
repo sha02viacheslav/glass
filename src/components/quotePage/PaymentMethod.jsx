@@ -9,7 +9,16 @@ import SelectOfferNew from './SelectOfferNew';
 import Checkout from './Checkout';
 import Tooltip from '@mui/material/Tooltip';
 
-export default function PaymentMethod({offerDetails, customerInfo, qid, payAssist, invData, PADataToParent}) {
+export default function PaymentMethod({
+    offerDetails, 
+    customerInfo, 
+    qid, 
+    payAssist, 
+    invData, 
+    PADataToParent, 
+    PAurl,
+    method
+}) {
 
     const [selectedMethod, setSelectedMethod] = useState(4);
     const [address, setAddress] = useState('');
@@ -67,9 +76,18 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
             setPostalCode(postalcode);
         });
         setAddress(userBillingAddress);
-        // console.log("Address found at useEffect"+userBillingAddress);
-    }, [selectedMethod]);  
-    // console.log(postalCode);
+        // update selected payment method in quote page (parent)
+        let msg = '';
+        if (startPAprocess && PAurl === '') {
+            // if user is in check eligibility phase
+            msg = 'Check Eligibility';
+        } else if (startPAprocess && PAurl !== '') {
+            msg = 'Continue Payment Assist'
+        } else if (!startPAprocess) {
+            msg = 'Select payment method';
+        }
+        method([{p_option: selectedMethod, detail: msg}]);
+    }, [selectedMethod, startPAprocess, PAurl]);  
 
     function retrieveInvoice() {
         // get url of invoice PDF
@@ -137,9 +155,12 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
         })
     }
 
-    useEffect(() => {
+    function checkEligibility() {
         // communicate with Payment (parent)
-        payAssist('opened-nogo');
+        payAssist('go');
+    }
+
+    useEffect(() => {
         // get invoice data for payment
         getInvoiceData();
     }, []);
@@ -291,6 +312,13 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                                 onChange={updatePAInfo}/>
                         </div>}   
                         <div className='PM-proceed-btn-cont'>
+                            {(startPAprocess && PAurl === '') && <button className='PM-proceed-btn' onClick={checkEligibility}>
+                                Check Eligibility
+                            </button>}
+                            {(startPAprocess && PAurl !== '') && <a className='PA-link' href={PAurl}>{PAurl}</a>}
+                            {(startPAprocess && PAurl !== '') && <button className='PM-proceed-btn' onClick={checkEligibility}>
+                                Continue
+                            </button>}
                             {!startPAprocess && <button className='PM-proceed-btn' onClick={() => setStartPAprocess(true)}>
                                 Pay with Payment Assist
                             </button>}
@@ -331,6 +359,14 @@ export default function PaymentMethod({offerDetails, customerInfo, qid, payAssis
                                     onChange={updateExcess}/>
                             </div>
                         </div>     
+                        <div className='PM-proceed-btn-cont'>
+                            <button className='PM-proceed-btn' onClick={checkEligibility}>
+                                Check Eligibility
+                            </button>
+                             <button className='PM-proceed-btn' onClick={checkEligibility}>
+                                Continue
+                            </button>
+                        </div>
                     </div>} 
                     {selectedMethod === 3 && <div>
                         <p className="text-purple mb-2">Single pay</p>

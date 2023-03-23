@@ -157,6 +157,10 @@
     justify-content: right;
 }
 
+.PA-link {
+    font-size: 16px;
+}
+
 .PM-proceed-btn, .PM-proceed-active {
     background: none;
     width: 40%;
