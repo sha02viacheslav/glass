@@ -9,6 +9,8 @@ import SelectOfferNew from './SelectOfferNew';
 import Checkout from './Checkout';
 import Tooltip from '@mui/material/Tooltip';
 
+const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
+
 export default function PaymentMethod({
     offerDetails, 
     customerInfo, 
@@ -72,7 +74,6 @@ export default function PaymentMethod({
             let tempAddress = e.address.formatted_address.filter(Boolean).join(", ");
             let postalcode = e.address.postcode;
             setAddress(tempAddress);
-            console.log(postalcode);
             setPostalCode(postalcode);
         });
         setAddress(userBillingAddress);
@@ -185,7 +186,7 @@ export default function PaymentMethod({
             };
             axios(config)
             .then(function (response) {
-                // console.log(JSON.stringify(response));
+                console.log(JSON.stringify(response.data.result.result.data));
                 setMonthlyPayments(response.data.result.result.data);
             })
             .catch(function (error) {
@@ -269,7 +270,8 @@ export default function PaymentMethod({
                                 {monthlyPayments.schedule.map(element => 
                                     <div className='PA-plan-element' key={element.date}>
                                         <div className='PA-plan-date'>
-                                            {element.date}
+                                            {/* {element.date} */}
+                                            {element.date.slice(8,10) + ' ' + monthValuesRev[element.date.slice(5,7)] + ' ' + element.date.slice(0, 4)}
                                         </div>
                                         <div className='PA-plan-price'>
                                             £ {(element.amount / 100).toFixed(2)}
@@ -350,21 +352,27 @@ export default function PaymentMethod({
                                 onChange={handlePCodeChange}
                                 defaultValue={address}
                                 value={address} /> 
-                            <div className='PM-excess-cont'>
-                                <span>Excess: </span>
-                                <span> £</span>
-                                <input ref={excessRef} type="text" 
-                                    className='form-control'
-                                    defaultValue={excess}
-                                    onChange={updateExcess}/>
+                            <div className="PM-insurance-sub">
+                                <div className='PM-excess-cont'>
+                                    <span>Excess: </span>
+                                    <span> £</span>
+                                    <input ref={excessRef} type="text" 
+                                        className='form-control'
+                                        defaultValue={excess}
+                                        onChange={updateExcess}/>
+                                </div>
+                                <div className='PM-insurace-doc-cont'>
+                                    <button>Choose</button>
+                                    <span>Upload insurance policy</span>
+                                </div>
                             </div>
                         </div>     
-                        <div className='PM-proceed-btn-cont'>
-                            <button className='PM-proceed-btn' onClick={checkEligibility}>
-                                Check Eligibility
+                        <div className='PM-insurance-btn-cont'>
+                            <button className='PM-proceed-btn'>
+                                Excess Card Pay
                             </button>
-                             <button className='PM-proceed-btn' onClick={checkEligibility}>
-                                Continue
+                             <button className='PM-proceed-btn'>
+                                Excess Cash Pay
                             </button>
                         </div>
                     </div>} 

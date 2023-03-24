@@ -15,8 +15,8 @@ import flag from '../components/icons/uk-flag.png';
 import close from '../components/icons/x.png';
 import Tooltip from '@mui/material/Tooltip';
 
-const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
-const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
+// const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
+// const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
 
 function Quote() {
 
@@ -515,6 +515,7 @@ function Quote() {
                                 customerId: customerDetails.customer_id,
                                 addressId: customerDetails.delivery_address.address_id
                             }]}
+                            deliveryAddressToChild={customerDetails.delivery_address}
                          />}
                     </div>
                 </div>}

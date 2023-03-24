@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRef, useState } from 'react';
 import Slider from "react-slick";
 import '../../css/checkout.css';
-import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick.css";  
 import "slick-carousel/slick/slick-theme.css";
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
@@ -76,18 +76,18 @@ const CheckoutForm = ({amount}) => {
   return (
     <form onSubmit={handleSubmit} className="PM-header">
       <Slider dots={false} infinite={true} speed={500} autoplay={true} slidesToShow={6} slidesToScroll={1} arrows={false}>
-        <div><img className="img-responsive images" src="/img/brands/visa.png" alt="visa" style={{ border: '1px solid gray' }} /></div>
-        <div><img className="img-responsive images" src="/img/brands/maestro.png" alt="maestro" /></div>
-        <div><img className="img-responsive images" src="/img/brands/mastercard.png" alt="mastercard" /></div>
-        <div><img className="img-responsive images" src="/img/brands/discover.png" alt="discover-card" /></div>
-        <div><img className="img-responsive images" src="/img/brands/ae.png" alt="american-express" /></div>
-        <div><img className="img-responsive images" src="/img/brands/dc.png" alt="dc" /></div>
-        <div><img className="img-responsive images" src="/img/brands/jcb.svg" alt="jcb" /></div>
-        <div><img className="img-responsive images" src="/img/brands/UnionPay.png" alt="UnionPay" /></div>
-        <div><img className="img-responsive images" src="/img/brands/cb.jpg" alt="cb" /></div>
-        <div><img className="img-responsive images" src="/img/brands/dankort.png" alt="dankort" /></div>
-        <div><img className="img-responsive images" src="/img/brands/interac.png" alt="interac" /></div>
-        <div><img className="img-responsive images" src="/img/brands/rupay.png" alt="rupay" style={{ border: '1px solid gray' }} /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/visa.png" alt="visa" style={{ border: '1px solid gray' }} /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/maestro.png" alt="maestro" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/mastercard.png" alt="mastercard" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/discover.png" alt="discover-card" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/ae.png" alt="american-express" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/dc.png" alt="dc" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/jcb.svg" alt="jcb" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/UnionPay.png" alt="UnionPay" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/cb.jpg" alt="cb" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/dankort.png" alt="dankort" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/interac.png" alt="interac" /></div>
+        <div><img className="img-responsive images slick-slide-img" src="/img/brands/rupay.png" alt="rupay" style={{ border: '1px solid gray' }} /></div>
       </Slider>
       <div className="form-control" style={{ height: 48, paddingTop: 14 }}>
         <CardElement ref={cardRef} onChange={handleCardChange} options={{ style: { base: { fontSize: '15px' } }}} />

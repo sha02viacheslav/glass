@@ -4,46 +4,50 @@ import { useEffect, useState } from 'react';
 import {autocomplete} from 'getaddress-autocomplete';
 import axios from 'axios';
 
-export default function LocationSelection({userBillingAddress, deliveryAddressToParent, ids}) {
+export default function LocationSelection({userBillingAddress, deliveryAddressToParent, ids, deliveryAddressToChild}) {
 
     const [address, setAddress] = useState('');
     const [addressInput, setAddressInput] = useState(false);
+    const customer_id = ids[0].customerId;
+    const address_id = ids[0].addressId;
+    const [deliveryAddress, setDeliveryAddress] = useState('');
+    const del = deliveryAddressToChild;
 
     function handleAdressCheck() {
         if (addressInput) {
-            // console.log("Address found at handleAdressCheck True Case"+userBillingAddress);
             setAddressInput(false);
-            setDeliveryAddress(userBillingAddress);
+            newDeliveryAddress(userBillingAddress);
             const field = document.getElementById('autocomplete-field');
             field.setAttribute('readonly', '');
         } else {
-            // console.log("Address found at handleAdressCheck ELSE Case"+userBillingAddress);
             setAddressInput(true);
-            setDeliveryAddress('');
             const field = document.getElementById('autocomplete-field');
-            field.removeAttribute('readonly');
-            field.focus();
-            // const field = document.getElementById('address-field');
-            // field.setAttribute('contentEditable', '');
+            if (deliveryAddress === address) {
+                newDeliveryAddress('');
+                field.removeAttribute('readonly');
+                field.focus();
+            } else {
+                newDeliveryAddress(deliveryAddress);
+                field.removeAttribute('readonly');
+            }          
         }
     }
 
     const handlePCodeChange = (event) => {
-        setDeliveryAddress(event.target.value);
+        newDeliveryAddress(event.target.value);
     }
 
-    function setDeliveryAddress(address){
+    function newDeliveryAddress(address){
         deliveryAddressToParent(address);
         setAddress(address);
     }
 
     function updateDeliveryAddress(fullAddress) {
-        console.log(fullAddress);
         let data = JSON.stringify({
             "jsonrpc": "2.0",
             "params": {
-                "customer_id": 184,
-                "address_id": 186,
+                "customer_id": customer_id,
+                "address_id": address_id,
                 "line_1": fullAddress.line_1,
                 "line_2": fullAddress.line_2,
                 "postcode": fullAddress.postcode,
@@ -52,18 +56,10 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
                 "town_or_city": fullAddress.town_or_city,
                 "county": fullAddress.county,
                 "country": fullAddress.country
-                // "line_1": "Vt Wealth Management Ltd",
-                // "line_2": "2-4 Balgownie Crescent",
-                // "postcode": "AB23 8ER",
-                // "latitude": 57.1785527,
-                // "longitude": -2.0920297,
-                // "town_or_city": "Aberdeen",
-                // "county": "Aberdeenshire",
-                // "country": "Scotland"
             }
         });
         let config = {
-            method: 'put',
+            method: 'post',
             url: process.env.REACT_APP_UPDATE_DELIVERY,
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +86,7 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
         window.addEventListener("getaddress-autocomplete-address-selected", function(e){
             e.preventDefault();
             let tempAddress = e.address.formatted_address.filter(Boolean).join(", ")+" "+e.address.postcode;
-            setDeliveryAddress(tempAddress);
+            newDeliveryAddress(tempAddress);
             updateDeliveryAddress(e.address);
             // let allLocs = JSON.parse(sessionStorage.getItem('pastLocs')) || [];
             // allLocs.push(tempAddress);
@@ -106,8 +102,12 @@ export default function LocationSelection({userBillingAddress, deliveryAddressTo
             // console.log(mainContainer.offsetWidth);
         }
 
-        setDeliveryAddress(userBillingAddress);
-        // console.log("Address found at useEffect"+userBillingAddress);
+        newDeliveryAddress(userBillingAddress);
+
+        // format delivery address
+        const deliveryFromAPI = del.line_1 + ', ' + del.line_2 + ', ' + del.town_or_city + ', ' + del.county + ' ' + del.postcode;
+        // console.log(deliveryFromAPI);
+        setDeliveryAddress(deliveryFromAPI);
     }, []);
 
     return(

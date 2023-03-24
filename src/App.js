@@ -65,8 +65,10 @@ function App() {
           <Route path='/customer' element={<Customer />} />
           <Route path='/customer/:licenseNum' element={<Customer />} />
           <Route path='/payment/assist/:status' element={<PaymentAssist />} />
+          <Route path='/payment/:status' element={<PaymentAssist />} />
           <Route path='/paid' element={<Paid />} />
           <Route path='/quote/:id' element={<Quote />} />
+          <Route path='/quote/in/:id' element={<Quote />} />
         </Routes>
         <Footer />
       </div>

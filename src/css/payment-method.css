@@ -130,7 +130,46 @@
 .PM-excess-cont input {
     color: rgb(24, 24, 24);
     height: 50px;
-    margin-right: 5px;
+}
+
+.PM-insurace-doc-cont {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    width: 49%;
+    margin-top: 2%;
+    border: 1px solid #ced4da;
+    height: 50px;
+    border-radius: 6px;
+    padding: .375rem .75rem;
+}
+
+.PM-insurace-doc-cont button {
+    background: #fff;
+    color: #9a73dd;
+    width: 75px;
+    height: 35px;
+    border-radius: 6px;
+    border: 1px solid #9a73dd;
+    text-align: center;
+    line-height: 20px;
+    font-size: 16px;
+    margin-right: 7px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.PM-insurace-doc-cont button:hover {
+    background: #9a73dd;
+    color: #fff;
+}
+
+.PM-insurace-doc-cont span {
+    font-size: 13px;
+    color: #909396;
+    white-space: nowrap;
+    line-height: 20px;
 }
 
 .PM-address {
@@ -155,6 +194,13 @@
     display: flex;
     flex-direction: row;
     justify-content: right;
+}
+
+.PM-insurance-btn-cont {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .PA-link {

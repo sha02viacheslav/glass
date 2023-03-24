@@ -318,11 +318,6 @@ const Customer = () => {
                                             <textarea name="" id="" rows="4" className="form-control h-auto" placeholder="Details for glass or any other comment."></textarea>
                                         </div>
 
-                                        <p className="fs-18 text-blue">Car Data (temporary)</p>
-                                        <div className="form-group mb-4">
-                                            <textarea name="" id="" value={vehData.Make + ' ' + vehData.Model + ' ' + vehData.DoorPlanLiteral} rows="4" className="form-control" placeholder="Details for glass or any other comment.">{vehDataToCustomer[0] + ' ' + vehDataToCustomer[1] + ' ' + vehDataToCustomer[2]}</textarea>
-                                        </div>
-                                        {/* <a href="#" className="btn btn-purple">Add Pictures</a> */}
                                         <Button variant="contained" color="secondary">Add Pictures</Button>
                                         <small className="d-block mt-2">*Recommended</small>
                                         <form action="" className="form-car my-md-5 my-4">
