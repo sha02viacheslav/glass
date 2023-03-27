@@ -189,6 +189,46 @@
     margin-bottom: 2%;
 }
 
+.pm-proceed-btn {
+    padding: 0.75rem;
+    background-color: #fff;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6d6e78;
+    transition: background .15s ease, border .15s ease, box-shadow .15s ease;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02);
+    width: 100px;
+    text-align: left;
+    line-height: 20px;
+}
+
+.pm-proceed-btn.pm-proceed-selected {
+    border: 1px solid #0570de;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02), 0 0 0 1px #0570de;
+}
+
+.p-TabIcon {
+    height: 1.2em;
+    width: auto;
+    fill: #6d6e78;
+}
+
+.pm-proceed-btn.pm-proceed-selected.card-btn .p-TabIcon {
+    fill: #0570de;
+}
+
+.pm-proceed-btn span {
+    padding-top: 0.25rem;
+    transition: color .1s ease;
+    color: #6d6e78;
+}
+
+.pm-proceed-btn.pm-proceed-selected span {
+    color: #0570de;
+}
+
 .PM-proceed-btn-cont {
     width: 100%;
     display: flex;
@@ -232,8 +272,7 @@
 
 .PM-single-pay {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    gap: 12px;
 }
 
 .PM-invoice {
