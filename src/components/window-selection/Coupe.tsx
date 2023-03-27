@@ -1,51 +1,50 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogTitle, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import imageMapResize from 'image-map-resizer'
+import coupeTinted from '@glass/assets/images/window-selection/Coupe/Coupe 2.png'
+import coupe from '@glass/assets/images/window-selection/Coupe/Coupe 3.png'
+import front from '@glass/assets/images/window-selection/Coupe/front.png'
+import l_1 from '@glass/assets/images/window-selection/Coupe/l_1.png'
+import l_2 from '@glass/assets/images/window-selection/Coupe/l_2.png'
+import l_3 from '@glass/assets/images/window-selection/Coupe/l_3.png'
+import l_3_t from '@glass/assets/images/window-selection/Coupe/l_3_t.png'
+import r_1 from '@glass/assets/images/window-selection/Coupe/r_1.png'
+import r_2 from '@glass/assets/images/window-selection/Coupe/r_2.png'
+import r_3 from '@glass/assets/images/window-selection/Coupe/r_3.png'
+import r_3_t from '@glass/assets/images/window-selection/Coupe/r_3_t.png'
+import rear from '@glass/assets/images/window-selection/Coupe/rear.png'
+import rear_t from '@glass/assets/images/window-selection/Coupe/rear_t.png'
 import styles from '../../css/window-selection.module.css'
-import front from '../../images/window-selection/Sedan/front.png'
-import l_1 from '../../images/window-selection/Sedan/l_1.png'
-import l_2 from '../../images/window-selection/Sedan/l_2.png'
-import l_3 from '../../images/window-selection/Sedan/l_3.png'
-import l_3_t from '../../images/window-selection/Sedan/l_3_t.png'
-import l_4 from '../../images/window-selection/Sedan/l_4.png'
-import l_4_t from '../../images/window-selection/Sedan/l_4_t.png'
-import r_1 from '../../images/window-selection/Sedan/r_1.png'
-import r_2 from '../../images/window-selection/Sedan/r_2.png'
-import r_3 from '../../images/window-selection/Sedan/r_3.png'
-import r_3_t from '../../images/window-selection/Sedan/r_3_t.png'
-import r_4 from '../../images/window-selection/Sedan/r_4.png'
-import r_4_t from '../../images/window-selection/Sedan/r_4_t.png'
-import rear from '../../images/window-selection/Sedan/rear.png'
-import rear_t from '../../images/window-selection/Sedan/rear_t.png'
-import sedanTinted from '../../images/window-selection/Sedan/Sedan 1.png'
-import sedan from '../../images/window-selection/Sedan/Sedan 3.png'
 
-export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponent }) {
+export type CoupeProps = {
+  brokenWindowsToCustomer: (value: string[]) => void
+  brokenWindowsToComponent: string[]
+}
+
+const Coupe: React.FC<CoupeProps> = ({ brokenWindowsToCustomer, brokenWindowsToComponent }) => {
   // display popup
   const [popup, setPopup] = useState(false)
   // determine if back windows are tinted
   const [tinted, setTinted] = useState(false)
   const [tintedValue, setTintedValue] = useState('no')
   // toggle first time popup appears, popup should show just once
-  const [popupConfirm, setPopupConfirm] = useState(JSON.parse(sessionStorage.getItem('askedTinted')) || false)
+  const [popupConfirm, setPopupConfirm] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
   // array of possible window selections for Coupe
   const [brokenWindows, setBrokenWindows] = useState([
     { name: 'Windscreen', window: 'front', broken: false, source: front, hasTinted: false },
     { name: 'Backlight', window: 'rear', broken: false, source: rear, hasTinted: true, tintedSource: rear_t },
     { name: 'Left front quarter', window: 'l_1', broken: false, source: l_1, hasTinted: false },
     { name: 'Left front drop', window: 'l_2', broken: false, source: l_2, hasTinted: false },
-    { name: 'Left rear vent', window: 'l_3', broken: false, source: l_3, hasTinted: true, tintedSource: l_3_t },
-    { name: 'Left rear quarter', window: 'l_4', broken: false, source: l_4, hasTinted: true, tintedSource: l_4_t },
+    { name: 'Left rear quarter', window: 'l_3', broken: false, source: l_3, hasTinted: true, tintedSource: l_3_t },
     { name: 'Right front quarter', window: 'r_1', broken: false, source: r_1, hasTinted: false },
     { name: 'Right front drop', window: 'r_2', broken: false, source: r_2, hasTinted: false },
-    { name: 'Right rear vent', window: 'r_3', broken: false, source: r_3, hasTinted: true, tintedSource: r_3_t },
-    { name: 'Right rear quarter', window: 'r_4', broken: false, source: r_4, hasTinted: true, tintedSource: r_4_t },
+    { name: 'Right rear quarter', window: 'r_3', broken: false, source: r_3, hasTinted: true, tintedSource: r_3_t },
   ])
   // special array for sending selected broken windows to customer page
-  const [selectedWindows, setSelectedWindows] = useState([])
+  const [selectedWindows, setSelectedWindows] = useState<string[]>([])
 
   // handle window selection
-  function selectWindow(windowClicked) {
+  function selectWindow(windowClicked: string) {
     const index = brokenWindows.findIndex((element) => element.window === windowClicked)
     // display popup if a window which can be tinted is clicked for the first time
     if (!popupConfirm && brokenWindows[index].hasTinted) {
@@ -84,7 +83,7 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
     brokenWindowsToCustomer(selectedWindows)
   }, [selectedWindows])
 
-  function handlePopup(answer) {
+  function handlePopup(answer: boolean) {
     setTinted(answer)
     setPopup(false)
     setPopupConfirm(true)
@@ -97,7 +96,7 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
   }
 
   // handle tinted toggle button
-  function tintedButtonHandle(newValue) {
+  function tintedButtonHandle(newValue: string) {
     if (newValue === 'no') {
       setTinted(false)
       // update tinted windows in brokenWindows array as not tinted
@@ -111,7 +110,7 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
       // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         const index = brokenWindows.findIndex((element) => element.name === selectedWindows[i])
-        if (brokenWindows[index].hasTinted === true) {
+        if (brokenWindows[index].hasTinted) {
           selectedWindows[i] = selectedWindows[i].concat(' privacy')
         }
       }
@@ -123,7 +122,7 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
     setBrokenWindows(brokenWindows.slice())
   }
 
-  function checkIfPreviouslySelected(selection) {
+  function checkIfPreviouslySelected(selection: string) {
     // currently not working with tinted windows
     if (selection.includes(' privacy')) {
       tintedButtonHandle('yes')
@@ -131,8 +130,6 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
     const index = brokenWindows.findIndex((element) => element.name === selection.replace(' privacy', ''))
     if (index >= 0) {
       brokenWindows[index].broken = true
-    } else {
-      return
     }
   }
 
@@ -161,23 +158,23 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
 
       <div className={styles.imgContainer}>
         {/* display either car with tinted windows or normal */}
-        <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={sedan} alt='' />
-        <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={sedanTinted} alt='' />
+        <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={coupe} alt='' />
+        <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={coupeTinted} alt='' />
 
         {/* broken glass displays */}
         {brokenWindows
-          .filter((element) => element.broken === true)
+          .filter((element) => element.broken)
           .map((element) => (
             <img
               key={element.window}
-              className={styles.brokenGlass}
+              className={styles.brokenGlassAlt}
               src={tinted && element.hasTinted ? element.tintedSource : element.source}
               alt=''
             />
           ))}
 
         {/* transparent layer on top of all car-related images to maintain image map */}
-        <img className={styles.selectionLayer} src={sedan} alt='' useMap='#image-map' />
+        <img className={styles.selectionLayer} src={coupe} alt='' useMap='#image-map' />
       </div>
 
       {/* tinted window toggle */}
@@ -209,23 +206,23 @@ export default function Sedan({ brokenWindowsToCustomer, brokenWindowsToComponen
       <map name='image-map'>
         <area
           onClick={() => selectWindow('front')}
-          coords='255,741,418,723,592,741,652,513,511,469,342,471,192,513'
+          coords='200,666,413,648,651,666,695,506,640,426,426,350,284,389,188,447,150,496'
           shape='poly'
         />
         <area
           onClick={() => selectWindow('rear')}
-          coords='228,1339,352,1376,500,1375,619,1343,594,1196,568,1182,278,1183,251,1199'
+          coords='221,1075,247,1055,596,1057,627,1074,613,1308,557,1343,425,1361,304,1342,238,1315'
           shape='poly'
         />
-        <area onClick={() => selectWindow('r_1')} coords='622,663,703,619,698,500,664,513' shape='poly' />
-        <area onClick={() => selectWindow('r_2')} coords='592,913,598,792,624,669,702,628,704,868' shape='poly' />
-        <area onClick={() => selectWindow('r_3')} coords='592,926,595,1098,665,1147,709,1138,712,883' shape='poly' />
-        <area onClick={() => selectWindow('r_4')} coords='589,1108,630,1255,699,1248,702,1156,664,1156' shape='poly' />
-        <area onClick={() => selectWindow('l_1')} coords='225,659,183,519,144,513,139,622' shape='poly' />
-        <area onClick={() => selectWindow('l_2')} coords='143,631,225,667,247,794,256,913,133,874' shape='poly' />
-        <area onClick={() => selectWindow('l_3')} coords='257,924,254,1097,179,1148,141,1142,136,886' shape='poly' />
-        <area onClick={() => selectWindow('l_4')} coords='257,1110,217,1254,158,1247,148,1154,187,1154' shape='poly' />
+        <area onClick={() => selectWindow('r_1')} coords='659,655,762,597,756,518,694,528' shape='poly' />
+        <area onClick={() => selectWindow('r_2')} coords='634,1017,741,931,761,610,661,661,637,795' shape='poly' />
+        <area onClick={() => selectWindow('r_3')} coords='635,1028,642,1237,691,1189,742,939' shape='poly' />
+        <area onClick={() => selectWindow('l_1')} coords='189,650,147,506,97,518,87,607' shape='poly' />
+        <area onClick={() => selectWindow('l_2')} coords='190,658,90,619,103,934,218,1026,214,822' shape='poly' />
+        <area onClick={() => selectWindow('l_3')} coords='207,1244,218,1037,107,943,171,1223' shape='poly' />
       </map>
     </div>
   )
 }
+
+export { Coupe as default }

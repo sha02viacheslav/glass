@@ -159,7 +159,7 @@ const VANs: React.FC<VansProps> = ({ brokenWindowsToCustomer, brokenWindowsToCom
       // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         const index = brokenWindows.findIndex((element) => element.name === selectedWindows[i])
-        if (brokenWindows[index].hasTinted === true) {
+        if (brokenWindows[index].hasTinted) {
           selectedWindows[i] = selectedWindows[i].concat(' privacy')
         }
       }
@@ -309,7 +309,7 @@ const VANs: React.FC<VansProps> = ({ brokenWindowsToCustomer, brokenWindowsToCom
 
         {/* broken glass displays */}
         {brokenWindows
-          .filter((element) => element.broken === true)
+          .filter((element) => element.broken)
           .map((element) => (
             <img
               key={element.window}
