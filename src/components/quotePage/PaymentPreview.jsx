@@ -1,54 +1,60 @@
-import { useState } from 'react';
-import '../../css/payment-method.css';
-import SelectOfferNew from './SelectOfferNew';
+import { useState } from 'react'
+import '../../css/payment-method.css'
+import SelectOfferNew from './SelectOfferNew'
 
-const previewOffer = [{
+const previewOffer = [
+  {
     product: 'Your order',
     price_subtotal: 0,
     price_total: 0,
-    price_unit: 0
-}]
+    price_unit: 0,
+  },
+]
 
-export default function PaymentPreview({customerInfo}) {
+export default function PaymentPreview({}) {
+  const [singlePay, setSinglePay] = useState('card')
+  const [selectedMethod, setSelectedMethod] = useState(4)
 
-    const [singlePay, setSinglePay] = useState('card');
-    const [selectedMethod, setSelectedMethod] = useState(4);
+  function updateTotalPrice() {}
 
-    function updateTotalPrice(data) {
+  return (
+    <div className='payment-method'>
+      <h3 className='text-24 text-blue PM-header'>Quotation</h3>
+      <div className='PM-status'>Status: processing</div>
+      {/* show quotation price details */}
+      <SelectOfferNew selectOfferToCustomer={previewOffer} priceToParent={updateTotalPrice} />
+      <div className='PM-btn-container'>
+        <button
+          className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'}
+          onClick={() => setSelectedMethod(1)}
+        >
+          <small className='fs-14'>4 month</small>
+          <div className='PM-price'>£ 0</div>
+        </button>
+        <button
+          className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'}
+          onClick={() => setSelectedMethod(2)}
+        >
+          <small className='fs-14'>Insurance</small>
+          <div className='PM-price'>£ 0</div>
+        </button>
+        <button
+          className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'}
+          onClick={() => setSelectedMethod(3)}
+        >
+          <small className='fs-14'>Single pay</small>
+          <div className='PM-price'>£ 0</div>
+        </button>
+      </div>
 
-    }
-
-    return(
-            <div className="payment-method">
-                <h3 className="text-24 text-blue PM-header">Quotation</h3>
-                <div className='PM-status'>Status: processing</div>
-                {/* show quotation price details */}
-                <SelectOfferNew 
-                    selectOfferToCustomer={previewOffer}
-                    priceToParent={updateTotalPrice}
-                />
-                <div className='PM-btn-container'>
-                    <button className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(1)}>
-                        <small className="fs-14">4 month</small>
-                        <div className='PM-price'>£ 0</div>
-                    </button>
-                    <button className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(2)}>
-                        <small className="fs-14">Insurance</small>
-                        <div className='PM-price'>£ 0</div>
-                    </button>
-                    <button className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'} onClick={() => setSelectedMethod(3)}>
-                        <small className="fs-14">Single pay</small>
-                        <div className='PM-price'>£ 0</div>
-                    </button>
-                </div>
-
-                <div className='PM-payment-option'>
-                    {selectedMethod === 1 && <div>
-                        <p className="text-purple mb-2">4-Month</p>
-                        <div>
-                            <p>This loan comprises of 4 monthly payments, with the first taken immediately on setup.</p>
-                        </div>
-                        {/* <div className='PM-insurance-container'>
+      <div className='PM-payment-option'>
+        {selectedMethod === 1 && (
+          <div>
+            <p className='text-purple mb-2'>4-Month</p>
+            <div>
+              <p>This loan comprises of 4 monthly payments, with the first taken immediately on setup.</p>
+            </div>
+            {/* <div className='PM-insurance-container'>
                             <div className="PM-insurance-sub">
                                 <input type="text" 
                                     className='form-control PM-top-input'
@@ -69,10 +75,12 @@ export default function PaymentPreview({customerInfo}) {
                                 className='form-control PM-postalcode'
                                 defaultValue={customerInfo[0].c_postalcode}/>
                         </div>    */}
-                    </div>}
-                    {selectedMethod === 2 && <div>
-                        <p className="text-purple mb-2">Insurance</p>
-                        {/* <div className='PM-insurance-container'>
+          </div>
+        )}
+        {selectedMethod === 2 && (
+          <div>
+            <p className='text-purple mb-2'>Insurance</p>
+            {/* <div className='PM-insurance-container'>
                             <div className="PM-insurance-sub">
                                 <input type="text" 
                                     className='form-control PM-top-input'
@@ -103,26 +111,31 @@ export default function PaymentPreview({customerInfo}) {
                                 />
                             </div>
                         </div>      */}
-                    </div>} 
-                    {selectedMethod === 3 && <div>
-                        <p className="text-purple mb-2">Single pay</p>
-                        <div className='PM-insurance-container'>
-                            <div className='PM-single-pay'>
-                                <button className={singlePay === 'card' ? 'PM-proceed-active' : "PM-proceed-btn"} 
-                                    onClick={() => setSinglePay('card')}>
-                                    Pay with card
-                                </button>
-                                <button className={singlePay === 'cash' ? 'PM-proceed-active' : "PM-proceed-btn"} 
-                                    onClick={() => setSinglePay('cash')}>
-                                    Pay in cash
-                                </button>
-                            </div>
-                        </div>   
-                    </div>}   
-                    {selectedMethod === 4 && <div className='transparent-element'>
-                        -
-                    </div> }                    
-                </div>
+          </div>
+        )}
+        {selectedMethod === 3 && (
+          <div>
+            <p className='text-purple mb-2'>Single pay</p>
+            <div className='PM-insurance-container'>
+              <div className='PM-single-pay'>
+                <button
+                  className={singlePay === 'card' ? 'PM-proceed-active' : 'PM-proceed-btn'}
+                  onClick={() => setSinglePay('card')}
+                >
+                  Pay with card
+                </button>
+                <button
+                  className={singlePay === 'cash' ? 'PM-proceed-active' : 'PM-proceed-btn'}
+                  onClick={() => setSinglePay('cash')}
+                >
+                  Pay in cash
+                </button>
+              </div>
             </div>
-    )
+          </div>
+        )}
+        {selectedMethod === 4 && <div className='transparent-element'>-</div>}
+      </div>
+    </div>
+  )
 }

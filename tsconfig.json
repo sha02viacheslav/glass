@@ -26,7 +26,7 @@
     "jsxImportSource": "@emotion/react",
     "baseUrl": ".",
     "paths": {
-      "@glass/assets/*": ["src/assets/*"],
+      "@glass/assets/*": ["./src/assets/*"],
       "@glass/components/*": ["src/components/*"],
       "@glass/constants": ["src/core/constants"],
       "@glass/enums": ["src/core/enums"],
@@ -37,9 +37,9 @@
       "@glass/services": ["src/core/services"],
       "@glass/services/*": ["src/core/services/*"],
       "@glass/styles/*": ["src/styles/*"],
-      "@glass/utils/*": ["src/core/utils/*"],
+      "@glass/utils/*": ["src/core/utils/*"]
     }
   },
-  "exclude": ["node_modules", "mocks"],
+  "exclude": ["node_modules"],
   "include": [".eslintrc.js", "./**/*"]
 }

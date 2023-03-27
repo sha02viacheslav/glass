@@ -102,5 +102,5 @@ module.exports = {
       version: 'detect',
     },
   },
-  ignorePatterns: ['mocks/*'],
+  ignorePatterns: [],
 }

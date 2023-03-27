@@ -40,11 +40,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:staging": "env-cmd -f .env.development react-scripts start",
-    "start:production": "env-cmd -f .env.production react-scripts start",
-    "build": "env-cmd -f .env.development react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start:staging": "env-cmd -f .env.development craco start",
+    "start:production": "env-cmd -f .env.production craco start",
+    "build": "env-cmd -f .env.development craco build",
+    "test": "craco test",
+    "eject": "craco eject",
+    "lint": "eslint -c .eslintrc.js --ext .tsx .",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier-eslint --write \"src/**/*.jsx\" \"src/**/*.js\" \"tests/**/*.test.ts\" \"tests/**/*.test.tsx\" \"./*.js\""
   },
   "eslintConfig": {
     "extends": [
@@ -65,6 +68,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.10",
     "@types/react": "^18.0.29",
