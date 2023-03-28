@@ -1,27 +1,31 @@
-import { useRef, useState } from 'react'
-import { Elements, useStripe } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
+import React, { useRef, useState } from 'react'
+import { useStripe } from '@stripe/react-stripe-js'
 import axios from 'axios'
-import '../../css/checkout.css'
+import './checkout.css'
 
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY)
+export type CheckoutFormProps = {
+  amount: number
+}
 
-const CheckoutForm = ({ amount }) => {
+export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount }) => {
   const stripe = useStripe()
 
   const [cardNumber, setCardNumber] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
   const [cvc, setCvc] = useState('')
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<{
+    incorrect_number?: string
+    card_declined?: string
+    expired_card?: string
+    incorrect_cvc?: string
+    processing_error?: string
+  }>({})
   const [success, setSuccess] = useState(false)
 
-  const cardNumberRef = useRef(null)
+  const cardNumberRef = useRef<HTMLInputElement>(null)
 
-  const handleCardNumberChange = (event) => {
-    let value = event.target.value
-    value = value.replace(/\s/g, '')
+  const handleCardNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(/\s/g, '')
     let formattedValue = ''
     for (let i = 0; i < value.length; i++) {
       if (i % 4 === 0 && i > 0) {
@@ -32,9 +36,8 @@ const CheckoutForm = ({ amount }) => {
     setCardNumber(formattedValue)
   }
 
-  function handleExpiryChange(event) {
-    const input = event.target.value
-    const formattedInput = input
+  const handleExpiryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedInput = event.target.value
       .replace(/\D/g, '') // Remove all non-digits
       .slice(0, 4) // Limit to 4 characters
       .replace(/(\d{2})(\d{0,2})/, '$1 / $2') // Add space after 2 digits
@@ -48,11 +51,11 @@ const CheckoutForm = ({ amount }) => {
     }
   }
 
-  const handleCvcChange = (event) => {
+  const handleCvcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCvc(event.target.value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // TODO: Handle payment submission
 
@@ -71,7 +74,7 @@ const CheckoutForm = ({ amount }) => {
           }
         } else {
           // let paymentId = data.id
-          if (data.actionRequired) {
+          if (data.actionRequired && stripe) {
             const { paymentIntent, error } = await stripe.confirmCardPayment(data.clientSecret)
             if (error) {
               setErrors({ processing_error: 'Error in payment, please try again later' })
@@ -87,11 +90,11 @@ const CheckoutForm = ({ amount }) => {
   }
 
   const handleCardNumberFocus = () => {
-    cardNumberRef.current.classList.add('focused')
+    cardNumberRef?.current?.classList.add('focused')
   }
 
   const handleCardNumberBlur = () => {
-    cardNumberRef.current.classList.remove('focused')
+    cardNumberRef?.current?.classList.remove('focused')
   }
 
   if (success) return <div className='mt-2 h5 py-4 success-msg'>Successfully Paid!</div>
@@ -112,7 +115,7 @@ const CheckoutForm = ({ amount }) => {
             inputMode='numeric'
             pattern='[0-9\s]{13,19}'
             autoComplete='cc-number'
-            maxLength='19'
+            maxLength={19}
             placeholder='1234 1234 1234 1234'
             value={cardNumber}
             onChange={handleCardNumberChange}
@@ -176,7 +179,7 @@ const CheckoutForm = ({ amount }) => {
               inputMode='numeric'
               pattern='[0-9]{3,4}'
               autoComplete='cc-csc'
-              maxLength='4'
+              maxLength={4}
               placeholder='CVC'
               value={cvc}
               onChange={handleCvcChange}
@@ -225,17 +228,3 @@ const CheckoutForm = ({ amount }) => {
     </form>
   )
 }
-
-const Checkout = ({ method, amount }) => {
-  return (
-    <>
-      {method === 'card' && (
-        <Elements stripe={stripePromise}>
-          <CheckoutForm amount={amount} />
-        </Elements>
-      )}
-    </>
-  )
-}
-
-export default Checkout
