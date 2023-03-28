@@ -16,7 +16,7 @@ import SlotsPreview from '../components/quotePage/SlotsPreview'
 import TimeSelectionNew from '../components/quotePage/TimeSelectionNew'
 
 // const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
-// const timeheaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
+// const timeHeaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
 
 function Quote() {
   // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
@@ -319,7 +319,7 @@ function Quote() {
   //         const dateTime = timeSlot.split(' ');
   //         const dateSplit = dateTime[0].split('-');
   //         const timeSplit = dateTime[1].substring(0, 5);
-  //         const timeSplitNext = timeheaders[timeheaders.indexOf(timeSplit) + 1];
+  //         const timeSplitNext = timeHeaders[timeHeaders.indexOf(timeSplit) + 1];
   //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
   //         setDateToPayment(date);
   //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
@@ -402,7 +402,7 @@ function Quote() {
                       <img className='flag' src={flag} alt='' />
                       <div className='gb'>UK</div>
                     </div>
-                    <input className='license-input' type='text' value={tempLicenseNum} placeholder='NU71 REG' />
+                    <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
                   </div>
                   <div className='client-info'>{customerDetails.customer_name}</div>
                   <div className='client-info'>
@@ -458,7 +458,7 @@ function Quote() {
                   <img className='flag' src={flag} alt='' />
                   <div className='gb'>UK</div>
                 </div>
-                <input className='license-input' type='text' value={tempLicenseNum} placeholder='NU71 REG' />
+                <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
               </div>
               <div className='client-info'>{customerDetails.customer_name}</div>
               <div className='compact-bottom-row'>
