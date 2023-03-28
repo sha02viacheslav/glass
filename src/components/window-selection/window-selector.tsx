@@ -32,11 +32,12 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     JSON.parse(sessionStorage.getItem('askedVanBody') || 'false'),
   )
   const [bodyPopup, setBodyPopup] = useState(false)
+  const [showMap, setShowMap] = useState<boolean>(false)
 
   // toggle first time popup appears, popup should show just once
   const [popupConfirm, setPopupConfirm] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
   // array of possible window selections for Coupe
-  const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>(WINDOWS[carType])
+  const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
   const [selectedWindows, setSelectedWindows] = useState<string[]>([])
 
@@ -94,7 +95,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     if (brokenWindowsToCustomer) brokenWindowsToCustomer(selectedWindows)
   }, [selectedWindows])
 
-  function handlePopup(answer: boolean) {
+  const handlePopup = (answer: boolean) => {
     setTinted(answer)
     setPopup(false)
     setPopupConfirm(true)
@@ -115,7 +116,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   // handle tinted toggle button
-  function tintedButtonHandle(newValue: string) {
+  const tintedButtonHandle = (newValue: string) => {
     if (newValue === 'no') {
       setTinted(false)
       // update tinted windows in brokenWindows array as not tinted
@@ -142,7 +143,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   // switch between barn door and tailgater
-  function bodyChange(isBarn: boolean) {
+  const bodyChange = (isBarn: boolean) => {
     setIsBarnDoor(isBarn)
     if (isBarn) {
       setBodyValue(CarType.BARN)
@@ -218,8 +219,20 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   useEffect(() => {
-    // necessary to maintain proper image map scaling
-    imageMapResize()
+    if (!!carType) {
+      setBrokenWindows(WINDOWS[carType])
+      // Should rerender map
+      setShowMap(false)
+      setTimeout(() => {
+        setShowMap(true)
+        setTimeout(() => {
+          imageMapResize()
+        }, 300)
+      })
+    }
+  }, [carType])
+
+  useEffect(() => {
     // preselect windows if previously selected
     if (brokenWindowsToComponent && brokenWindowsToComponent.length > 0) {
       brokenWindowsToComponent?.forEach((element) => checkIfPreviouslySelected(element))
@@ -276,7 +289,15 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           ))}
 
         {/* transparent layer on top of all car-related images to maintain image map */}
-        <img className={styles.selectionLayer} src={CAR_IMAGES[carType]} alt='' useMap='#window-image-map' />
+        {showMap && (
+          <img
+            id='window-image-map'
+            className={styles.selectionLayer}
+            src={CAR_IMAGES[carType]}
+            alt=''
+            useMap='#window-image-map'
+          />
+        )}
       </div>
 
       {/* tinted window toggle */}
@@ -335,12 +356,19 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           </a>
         ))}
       </div>
-
-      <map name='window-image-map'>
-        {Object.entries(COORDS[carType]).map(([key, val]) => (
-          <area key={key} onClick={() => selectWindow(key as WinLoc)} coords={val} shape='poly' alt='window-selector' />
-        ))}
-      </map>
+      {showMap && (
+        <map name='window-image-map'>
+          {Object.entries(COORDS[carType]).map(([key, val]) => (
+            <area
+              key={`${carType}-${key}`}
+              onClick={() => selectWindow(key as WinLoc)}
+              coords={val}
+              shape='poly'
+              alt='window-selector'
+            />
+          ))}
+        </map>
+      )}
     </div>
   )
 }
