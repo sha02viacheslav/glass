@@ -13,15 +13,15 @@ import '../css/payment.css'
 
 export default function Payment({ clientTime, clientDate, clientAddress, qid }) {
   const [pastSlots, setPastSlots] = useState(JSON.parse(sessionStorage.getItem('pastSlots')) || [])
-  const [pastLocs, setPastLocs] = useState(JSON.parse(sessionStorage.getItem('pastLocs')) || [])
+  const [pastLocs] = useState(JSON.parse(sessionStorage.getItem('pastLocs')) || [])
   const [isOpen, setIsOpen] = useState(false) // control popup
   const [isRetrieved, setIsRetrieved] = useState(true)
   let currentDate = new Date()
   const months = monthsData
   const [today, setToday] = useState('')
   const [componentDisplay, setComponentDisplay] = useState('')
-  const [billingAddress, setBillingAddress] = useState('')
-  const [deliveryAddress, setDeliveryAddress] = useState('')
+  const [billingAddress] = useState('')
+  const [, setDeliveryAddress] = useState('')
   const [invoiceData, setInvoiceData] = useState([])
   const [payAssistStatus, setPayAssistStatus] = useState('')
 
@@ -52,7 +52,6 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
 
   function pay() {
     if (payAssistStatus === 'go') {
-      console.log(invoiceData.invoice_number)
       // create payment API call
       let data = JSON.stringify({
         jsonrpc: '2.0',
@@ -74,11 +73,10 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
       }
       axios(config)
         .then(function (response) {
-          console.log(JSON.stringify(response))
           window.open(response.data.result.result.data.url, '_blank', 'noreferrer')
         })
-        .catch(function (error) {
-          console.log(error)
+        .catch((error) => {
+          console.error(error)
         })
     } else {
       return
@@ -110,11 +108,10 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
     }
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response))
         setInvoiceData(response.data.result.data)
       })
-      .catch(function (error) {
-        console.log(error)
+      .catch((error) => {
+        console.error(error)
       })
   }, [])
 

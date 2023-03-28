@@ -1,20 +1,16 @@
+import React, { useEffect, useState } from 'react'
 import { Box, Stepper, Step, StepLabel, Typography, StepContent } from '@mui/material'
-import before from '../../images/test/test_broken.jpg'
-import after from '../../images/test/test_fixed.jpg'
+import before from '@glass/assets/images/test/test_broken.jpg'
+import after from '@glass/assets/images/test/test_fixed.jpg'
 import cameraIcon from '../icons/camera.png'
 import '../../css/timeline.css'
-import { useEffect, useState } from 'react'
 
 const steps = ['Order placed', 'ETA', 'On our way', 'Job started', 'Finished']
 
-export default function PayBookTimeline() {
-  const [activeStep, setActiveStep] = useState(0)
+export const PayBookTimeline: React.FC = () => {
+  const [activeStep] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
-  const [imgUploaded, setImgUploaded] = useState(false)
-
-  function handleNextStep() {
-    setActiveStep((prevStep) => prevStep + 1)
-  }
+  const [imgUploaded] = useState(false)
 
   useEffect(() => {
     if (window.innerWidth <= 800) {

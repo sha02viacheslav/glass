@@ -365,7 +365,6 @@ const Customer: React.FC = () => {
                                 placeholder='Billing address'
                                 onChange={handlePCodeChange}
                                 value={billingAddressVal}
-                                defaultValue={billingAddressVal}
                               />
                             </div>
                           </div>
