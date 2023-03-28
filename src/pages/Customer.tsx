@@ -1,28 +1,25 @@
-import { useState, React, useRef, useEffect } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
-import { Link, useParams, useNavigate } from 'react-router-dom'
-// import all car components for window-selection
-import RetrieveVehData from '../components/functions/RetrieveVehData'
-import LicensePlate from '../components/LicensePlate'
-import ThreeDoorHatch from '../components/window-selection/3_Door_Hatch'
-import FiveDoorHatch from '../components/window-selection/5_Door_Hatch'
-import Coupe from '../components/window-selection/Coupe'
-import Estate from '../components/window-selection/Estate'
-import Sedan from '../components/window-selection/Sedan'
-import VANs from '../components/window-selection/VANs'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { LicensePlate } from '@glass/components/LicensePlate'
+import { WindowSelector } from '@glass/components/window-selection/window-selector'
+import { CarType } from '@glass/enums'
+import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
+import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
+import { Address, VehicleData } from '@glass/models'
 
-const Customer = () => {
-  const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo')) || [])
+const Customer: React.FC = () => {
+  const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
   const [, setVehicleData] = useState('')
-  const { licenseNum } = useParams('')
+  const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
-  const [vehData, setVehData] = useState([])
+  const [vehData, setVehData] = useState<VehicleData | undefined>()
   const [vehImgData, setVehImgData] = useState([])
-  const [vehDataToCustomer, setVehDataToCustomer] = useState([])
+  const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
   const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
-  const [fullAddress, setFullAddress] = useState([])
+  const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
   const firstName = quoteInfo.firstName || ''
   const lastName = quoteInfo.lastName || ''
   const email = quoteInfo.email || ''
@@ -31,11 +28,11 @@ const Customer = () => {
   const navigate = useNavigate()
 
   // keep track if request can be submitted
-  const firstNameRef = useRef('')
-  const lastNameRef = useRef('')
-  const emailRef = useRef('')
-  const phoneRef = useRef('')
-  const billingRef = useRef('')
+  const firstNameRef = useRef<HTMLInputElement>(null)
+  const lastNameRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const phoneRef = useRef<HTMLInputElement>(null)
+  const billingRef = useRef<HTMLInputElement>(null)
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -45,29 +42,24 @@ const Customer = () => {
   const [onSubmitMessage, setOnSubmitMessage] = useState('')
 
   // temporary things for car selection menu - Rainer
-  const [selectedCarType, setSelectedCarType] = useState('3door')
+  const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
 
   // for getting the array of broken windows
-  const [selectedBrokenWindows, setSelectedBrokenWindows] = useState([])
-  const brokenWindowsToCustomer = (windows) => {
+  const [selectedBrokenWindows, setSelectedBrokenWindows] = useState<string[]>([])
+  const brokenWindowsToCustomer = (windows: string[]) => {
     setSelectedBrokenWindows(windows)
   }
   // preselect broken windows if editing quote
-  const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState([])
+  const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState<string[]>([])
 
   // functions for checking if necessary fields are filled and enable submit request
-  function checkIfFilled(ref, errorMsg, formIndex) {
-    if (formIndex === 5) {
-      if (ref === '') {
-        setOnSubmitMessage(errorMsg)
-        setIncorrectFormIndex(formIndex)
-        return true
-      }
-    } else if (ref.current.value === '') {
+  const checkIfFilled = (value: string | undefined, errorMsg: string, formIndex: number) => {
+    if (!value) {
       setOnSubmitMessage(errorMsg)
       setIncorrectFormIndex(formIndex)
       return true
     }
+    return false
   }
 
   // check if any windows are selected before submit request
@@ -76,19 +68,22 @@ const Customer = () => {
       setOnSubmitMessage('Select windows that need replacing')
       return true
     }
+    return false
   }
 
-  function retrieveVehData(data) {
+  const retrieveVehData = (data: CarType) => {
     setVehDataToCustomer(data)
     setSelectedCarType(data)
   }
 
+  useRetrieveVehData(vehData?.VehicleRegistration, retrieveVehData)
+
   function handleSubmitClick() {
-    const firstNameNotFilled = checkIfFilled(firstNameRef, 'First name not filled', 0)
-    const lastNameNotFilled = checkIfFilled(lastNameRef, 'Last name not filled', 1)
-    const emailNotFilled = checkIfFilled(emailRef, 'Email not filled', 2)
-    const phoneNotFilled = checkIfFilled(phoneRef, 'Phone number not filled', 3)
-    const billingNotFilled = checkIfFilled(billingRef, 'Postal code not filled', 4)
+    const firstNameNotFilled = checkIfFilled(firstNameRef?.current?.value, 'First name not filled', 0)
+    const lastNameNotFilled = checkIfFilled(lastNameRef?.current?.value, 'Last name not filled', 1)
+    const emailNotFilled = checkIfFilled(emailRef?.current?.value, 'Email not filled', 2)
+    const phoneNotFilled = checkIfFilled(phoneRef?.current?.value, 'Phone number not filled', 3)
+    const billingNotFilled = checkIfFilled(billingRef?.current?.value, 'Postal code not filled', 4)
     const licenseNumNotFilled = checkIfFilled(licenseSearchVal, 'License number not filled', 5)
     const windowNotFilled = checkIfSelected()
 
@@ -106,69 +101,67 @@ const Customer = () => {
     } else {
       // post data
       setSubmitClicked(true)
-      const name = firstNameRef.current.value.concat(' ', lastNameRef.current.value)
-      const formattedAddress = fullAddress.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress.postcode
-      let data = JSON.stringify({
+      const name = firstNameRef?.current?.value.concat(' ', lastNameRef?.current?.value || '')
+      const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
+      const data = JSON.stringify({
         jsonrpc: '2.0',
         params: {
           customer_name: name,
-          customer_f_name: firstNameRef.current.value,
-          customer_s_name: lastNameRef.current.value,
-          customer_phone: phoneRef.current.value,
-          customer_email: emailRef.current.value,
+          customer_f_name: firstNameRef?.current?.value,
+          customer_s_name: lastNameRef?.current?.value,
+          customer_phone: phoneRef?.current?.value,
+          customer_email: emailRef?.current?.value,
           customer_order_postal_code: formattedAddress, // full address
           customer_address: {
             // more detailed address info
-            postcode: fullAddress.postcode,
-            latitude: fullAddress.latitude,
-            longitude: fullAddress.longitude,
-            line_1: fullAddress.line_1,
-            line_2: fullAddress.line_2,
-            line_3: fullAddress.line_3,
-            line_4: fullAddress.line_4,
-            locality: fullAddress.locality,
-            town_or_city: fullAddress.town_or_city,
-            county: fullAddress.county,
-            district: fullAddress.district,
-            country: fullAddress.country,
+            postcode: fullAddress?.postcode,
+            latitude: fullAddress?.latitude,
+            longitude: fullAddress?.longitude,
+            line_1: fullAddress?.line_1,
+            line_2: fullAddress?.line_2,
+            line_3: fullAddress?.line_3,
+            line_4: fullAddress?.line_4,
+            locality: fullAddress?.locality,
+            town_or_city: fullAddress?.town_or_city,
+            county: fullAddress?.county,
+            district: fullAddress?.district,
+            country: fullAddress?.country,
           },
           registration_number: licenseSearchVal,
-          registration_year: vehData.YearMonthFirstRegistered,
-          make: vehData.Make,
-          model: vehData.Model,
+          registration_year: vehData?.YearMonthFirstRegistered,
+          make: vehData?.Make,
+          model: vehData?.Model,
           body_type: vehDataToCustomer,
-          model_year: vehData.YearOfManufacture,
+          model_year: vehData?.YearOfManufacture,
           glass_location: selectedBrokenWindows,
           VehicleData: vehData,
           VehicleImageData: vehImgData,
         },
       })
 
-      let config = {
+      axios({
         method: 'post',
         url: process.env.REACT_APP_CREATE_QUOTE,
         headers: {
           'Content-Type': 'application/json',
         },
         data: data,
-      }
-
-      axios(config)
-        .then(function (response) {
-          // console.log(JSON.stringify(response.data));
+      })
+        .then((response) => {
           navigate('/quote/' + response.data.result.fe_token)
         })
-        .catch(() => {})
+        .catch((error) => {
+          console.error(error)
+        })
     }
   }
 
-  function fetchVehData(license) {
+  const fetchVehData = (license: string | undefined) => {
     if (license !== undefined) {
       // fetch vehicle data
       fetch(process.env.REACT_APP_VEH_DATA + license)
         .then((res) => res.json())
         .then((data) => {
-          // console.log(data);
           if (
             data.Response.StatusCode === 'KeyInvalid' ||
             data.Response.StatusCode === 'ItemNotFound' ||
@@ -210,27 +203,29 @@ const Customer = () => {
     //     const windowSelector = document.getElementById("scroll-focus");
     //     windowSelector.scrollIntoView();
     // }
-    // necessary incase returning from quote page navbar would not load unless the page is refreshed
-    document.getElementById('navbar-main').style.display = 'inline'
-    document.getElementById('footer-main').style.display = 'inline'
+    // necessary in case returning from quote page navbar would not load unless the page is refreshed
+    const navbarMain = document.getElementById('navbar-main')
+    const footerMain = document.getElementById('footer-main')
+    if (navbarMain) navbarMain.style.display = 'inline'
+    if (footerMain) footerMain.style.display = 'inline'
 
     // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('billingAddress', process.env.REACT_APP_AUTOCOMPLETE, {
+    autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
       delay: 500,
     })
 
     // Preventing Default to show complete address with Postal Code
     window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
       e.preventDefault()
-      // console.log(e.address);
-      setFullAddress(e.address)
-      let tempAddress = e.address.formatted_address.filter(Boolean).join(', ') + ' ' + e.address.postcode
+      // @ts-ignore
+      const address: Address = e.address
+      setFullAddress(address)
+      const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
       setBillingAddress(tempAddress)
-      // console.log(tempAddress);
     })
 
     // send previously selected windows to window selection component
-    let selectedWindows = []
+    const selectedWindows: string[] = []
     if (selected.length > 0) {
       for (let i = 0; i < selected.length; i++) {
         // capitalize first letter to match window name
@@ -240,32 +235,29 @@ const Customer = () => {
     }
   }, [])
 
-  function handleVehInputChange(data) {
-    // format correcly
+  const handleVehInputChange = (data: string | undefined) => {
+    // format correctly
     // check if license plate is standard or unique
     let input = data
     fetchVehData(input)
-    if (data.length >= 3) {
+    if (data && data.length >= 3) {
       if (Number.isInteger(Number(data.charAt(2)))) {
         // license number is standard
         // check if plate already includes space
         if (data.charAt(4) !== ' ' && data.length === 7) {
-          input = input.slice(0, 4) + ' ' + input.slice(4)
+          input = data.slice(0, 4) + ' ' + data.slice(4)
         }
       }
     }
-    setLicense(input.toUpperCase())
+    setLicense(input?.toUpperCase() || '')
   }
 
-  const handlePCodeChange = (event) => {
+  const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setBillingAddress(event.target.value)
   }
 
   return (
     <div>
-      {vehData.length !== 0 && (
-        <RetrieveVehData key={vehData} vehData={vehData.VehicleRegistration} dataToCustomer={retrieveVehData} />
-      )}
       <section className='sec-customer my-4 my-md-5'>
         <div className='container'>
           <div className='tab-content'>
@@ -274,7 +266,7 @@ const Customer = () => {
                 placeholderVal={'NU71 REG'}
                 licenseNumber={licenseSearchVal}
                 model={
-                  vehData.length !== 0
+                  !!vehData
                     ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model
                     : 'Make & Model'
                 }
@@ -293,42 +285,11 @@ const Customer = () => {
 
                     <div className='parent'>
                       {/* car image display */}
-                      {selectedCarType === '3door' && (
-                        <ThreeDoorHatch
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
-                      {selectedCarType === '5door' && (
-                        <FiveDoorHatch
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
-                      {selectedCarType === 'coupe' && (
-                        <Coupe
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
-                      {selectedCarType === 'estate' && (
-                        <Estate
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
-                      {selectedCarType === 'sedan' && (
-                        <Sedan
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
-                      {selectedCarType === 'van' && (
-                        <VANs
-                          brokenWindowsToCustomer={brokenWindowsToCustomer}
-                          brokenWindowsToComponent={brokenWindowsToComponent}
-                        />
-                      )}
+                      <WindowSelector
+                        carType={selectedCarType}
+                        brokenWindowsToCustomer={brokenWindowsToCustomer}
+                        brokenWindowsToComponent={brokenWindowsToComponent}
+                      />
                       <br />
                       <br />
                       <p className='fs-18 text-blue'>Your comments (optional)</p>
@@ -336,7 +297,7 @@ const Customer = () => {
                         <textarea
                           name=''
                           id=''
-                          rows='4'
+                          rows={4}
                           className='form-control h-auto'
                           placeholder='Details for glass or any other comment.'
                         ></textarea>

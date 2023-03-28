@@ -5,7 +5,6 @@
     border-radius: 15px;
     width: 100%;
     max-width: 550px;
-    /* margin-top: 60px; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -28,7 +27,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
     margin-bottom: 10px;
     margin-left: 14px;
 }
@@ -51,7 +50,6 @@
     padding: 10px;
     border-radius: 10px;
     color: #9a73dd;
-    /* width: 500px; */
     font-size: 15px;
     height: 45px;
 }

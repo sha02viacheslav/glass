@@ -1,10 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import '../css/license-plate.css'
 import flag from './icons/uk-flag.png'
 
-export default function LicensePlate({ licenseNumber, model, handleVehInputChange, placeholderVal }) {
+export type LicensePlateProps = {
+  licenseNumber: string
+  model: string
+  handleVehInputChange: (value: string | undefined) => void
+  placeholderVal: string
+}
+
+export const LicensePlate: React.FC<LicensePlateProps> = ({
+  licenseNumber,
+  model,
+  handleVehInputChange,
+  placeholderVal,
+}) => {
   const [licenseNum, setLicenseNum] = useState('')
-  const licenseRef = useRef()
+  const licenseRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setLicenseNum(licenseNumber)
@@ -41,8 +53,8 @@ export default function LicensePlate({ licenseNumber, model, handleVehInputChang
               type='text'
               value={licenseNum}
               placeholder={placeholderVal}
-              onChange={() => handleVehInputChange(licenseRef.current.value)}
-              maxLength='8'
+              onChange={() => handleVehInputChange(licenseRef?.current?.value)}
+              maxLength={8}
             />
           </div>
           <p className='fw-500 mb-0 ms-2'>

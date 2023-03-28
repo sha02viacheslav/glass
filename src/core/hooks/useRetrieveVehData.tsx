@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { CarType } from '@glass/enums'
+import { VehicleRegistration } from '@glass/models'
 
 const vehTypes = [
   ['CAR DERIVED VAN', 'HATCHBACK', '3 DOOR HATCHBACK'],
@@ -39,19 +41,32 @@ const vehTypes = [
   ],
 ]
 
-const mapBodyType = ['3door', '5door', 'estate', 'sedan', 'coupe', 'van']
+const mapBodyType = [
+  CarType.THREE_DOOR,
+  CarType.FIVE_DOOR,
+  CarType.ESTATE,
+  CarType.SEDAN,
+  CarType.COUPE,
+  CarType.BARN,
+  CarType.TAILGATER,
+]
 
-export default function RetrieveVehData({ vehData, dataToCustomer }) {
+export const useRetrieveVehData = (
+  vehData: VehicleRegistration | undefined,
+  dataToCustomer: (value: CarType) => void,
+) => {
   useEffect(() => {
-    const vehClass = vehData.DoorPlanLiteral
-    let body = ''
+    if (vehData) {
+      const vehClass = vehData.DoorPlanLiteral
+      let body: CarType | undefined
 
-    for (let i = 0; i < vehTypes.length; i++) {
-      const typeArray = vehTypes[i]
-      if (typeArray.includes(vehClass)) {
-        body = mapBodyType[i]
+      for (let i = 0; i < vehTypes.length; i++) {
+        const typeArray = vehTypes[i]
+        if (typeArray.includes(vehClass)) {
+          body = mapBodyType[i]
+        }
       }
+      if (body) dataToCustomer(body)
     }
-    dataToCustomer(body)
   }, [vehData])
 }

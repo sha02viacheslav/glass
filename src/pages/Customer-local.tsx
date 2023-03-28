@@ -1,46 +1,16 @@
-import { useState, React, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import SendIcon from '@mui/icons-material/Send'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  useMediaQuery,
-  TextField,
-  IconButton,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-} from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Menu, MenuItem, TextField } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom'
-import { StickyContainer, Sticky } from 'react-sticky'
-// import all car components for window-selection
-import ThreeDoorHatch from '../components/window-selection/3_Door_Hatch'
-import FiveDoorHatch from '../components/window-selection/5_Door_Hatch'
-import Coupe from '../components/window-selection/Coupe'
-import Estate from '../components/window-selection/Estate'
-import Sedan from '../components/window-selection/Sedan'
-import VanBarnDoor from '../components/window-selection/VAN_Barn_door'
-import VanTailgater from '../components/window-selection/VAN_Tailgater'
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-}
+import { Sticky, StickyContainer } from 'react-sticky'
+import { WindowSelector } from '@glass/components/window-selection/window-selector'
+import { CarType } from '@glass/enums'
 
 const customStyles = {
   content: {
@@ -52,31 +22,27 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
   },
 }
-const Customer = () => {
+const Customer: React.FC = () => {
   const { licenseRef } = useParams()
 
-  const [selectedDate, handleDateChange] = useState(new Date())
+  const [selectedDate, handleDateChange] = useState<Date | null>(new Date())
 
   // Dialog Options
   const [open, setOpen] = useState(false)
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
-
-  const [postalAddressOptions, setAddress] = useState()
 
   // temporary things for car selection menu - Rainer
   const [menuOpen, setMenuOpen] = useState(false)
-  const [selectedCarType, setSelectedCarType] = useState('3door')
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
-  function handleMenuClick(event) {
+  function handleMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
     setMenuOpen(!menuOpen)
     setAnchorEl(event.currentTarget)
   }
 
-  function handleCarSelect(carClicked) {
+  function handleCarSelect(carClicked: CarType) {
     setSelectedCarType(carClicked)
     setMenuOpen(false)
   }
@@ -88,31 +54,17 @@ const Customer = () => {
 
   function getVehicleDetails() {
     // With all properties
-    let body = {
+    const body = {
       action: 'search',
       reg_number: licenseRef,
     }
     axios
       .post('https://estglass.co.uk/form_latest/odoo_api_estglass.php', body)
-      .then(function (response) {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
+      .then(() => {})
+      .catch((error) => {
+        console.error(error)
       })
   }
-  // handleOnInputChange = ()=>{
-  //     alert("")
-  // };
-
-  // const handleOnInputChange = async () => {
-  //     const response = await fetch(
-  //       "https://jsonplaceholder.typicode.com/todos/"
-  //     ).then((response) => response.json());
-
-  //     // update the state
-  //     setAddress(response);
-  //   };
 
   useEffect(() => {
     getVehicleDetails()
@@ -162,15 +114,7 @@ const Customer = () => {
               <div className='tab-pane fade show active' id='home' role='tabpanel' aria-labelledby='home-tab'>
                 <Typography align='center' margin={2} zIndex={150}>
                   <Sticky>
-                    {({
-                      style,
-                      // the following are also available but unused here
-                      isSticky,
-                      wasSticky,
-                      distanceFromTop,
-                      distanceFromBottom,
-                      calculatedHeight,
-                    }) => (
+                    {({ style }) => (
                       <Button
                         style={style}
                         color={'primary'}
@@ -184,12 +128,11 @@ const Customer = () => {
                   </Sticky>
                 </Typography>
                 <Dialog
-                  // fullScreen={fullScreen}
                   open={open}
                   onClose={handleClose}
                   aria-labelledby='modal-modal-title'
                   aria-describedby='modal-modal-description'
-                  style={customStyles}
+                  sx={customStyles}
                 >
                   <DialogTitle margin={2}>
                     <Box display='flex' alignItems='center'>
@@ -201,22 +144,23 @@ const Customer = () => {
                       </Box>
                     </Box>
                   </DialogTitle>
-                  <DialogContent margin={2}>
+                  <DialogContent sx={{ margin: 2 }}>
                     <div className='row m-2'>
                       <div className='col-md-12 mt-2'>
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DateTimePicker
-                            margin={2}
-                            label='Select Booking Date&Time'
-                            minDate={new Date()}
-                            maxDate={new Date().setDate(new Date().getDate() + 7)}
-                            minutesStep={5}
-                            minTime={new Date(0, 0, 0, 8)}
-                            maxTime={new Date(0, 0, 0, 18, 45)}
-                            value={selectedDate}
-                            onChange={handleDateChange}
-                            renderInput={(params) => <TextField margin='normal' {...params} />}
-                          />
+                          <Box sx={{ margin: 2 }}>
+                            <DateTimePicker
+                              label='Select Booking Date&Time'
+                              minDate={new Date()}
+                              maxDate={new Date(new Date().setDate(new Date().getDate() + 7))}
+                              minutesStep={5}
+                              minTime={new Date(0, 0, 0, 8)}
+                              maxTime={new Date(0, 0, 0, 18, 45)}
+                              value={selectedDate}
+                              onChange={handleDateChange}
+                              renderInput={(params) => <TextField margin='normal' {...params} />}
+                            />
+                          </Box>
                         </LocalizationProvider>
                       </div>
                     </div>
@@ -292,15 +236,14 @@ const Customer = () => {
                           'aria-labelledby': 'basic-button',
                         }}
                       >
-                        <MenuItem onClick={() => handleCarSelect('coupe')}>Coupe</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('3door')}>3 Door Hatchback</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('5door')}>5 Door Hatchback</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('estate')}>Estate</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('sedan')}>Sedan</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('barn')}>VAN Barn Door</MenuItem>
-                        <MenuItem onClick={() => handleCarSelect('tailgater')}>VAN Tailgater</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.COUPE)}>Coupe</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.THREE_DOOR)}>3 Door Hatchback</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.FIVE_DOOR)}>5 Door Hatchback</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.ESTATE)}>Estate</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.SEDAN)}>Sedan</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.BARN)}>VAN Barn Door</MenuItem>
+                        <MenuItem onClick={() => handleCarSelect(CarType.TAILGATER)}>VAN Tailgater</MenuItem>
                       </Menu>
-                      {/* <p className="mb-0">  <a href="#" className="text-purple text-decoration-none">EDIT</a></p> */}
                     </div>
                   </div>
                 </div>
@@ -342,22 +285,13 @@ const Customer = () => {
                     </div>
                     <div className='parent'>
                       {/* car image display */}
-                      {selectedCarType === '3door' && <ThreeDoorHatch />}
-                      {selectedCarType === '5door' && <FiveDoorHatch />}
-                      {selectedCarType === 'coupe' && <Coupe />}
-                      {selectedCarType === 'estate' && <Estate />}
-                      {selectedCarType === 'sedan' && <Sedan />}
-                      {selectedCarType === 'barn' && <VanBarnDoor />}
-                      {selectedCarType === 'tailgater' && <VanTailgater />}
-                      {/* <div className="img-carmain position-relative my-md-5 my-4">
-                                            <img src={process.env.PUBLIC_URL + "/img/final-car.png"} className="img-fluid d-block mx-auto" alt="" />
-                                        </div> */}
+                      <WindowSelector carType={selectedCarType} />
                       <p className='fs-18 text-blue'>Your comments (optional)</p>
                       <div className='form-group mb-4'>
                         <textarea
                           name=''
                           id=''
-                          rows='4'
+                          rows={4}
                           className='form-control h-auto'
                           placeholder='Lorem ipsum dolor sit..'
                         ></textarea>
