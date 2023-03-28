@@ -1,10 +1,13 @@
-export default function BeforeAfter() {
+import React from 'react'
+import { PUBLIC_URL } from '@glass/envs'
+
+export const BeforeAfter: React.FC = () => {
   return (
     <div className='item'>
       <div className='row g-0'>
         <div className='col-6'>
           <div className='item-img odd animated wow fadeIn'>
-            <img src={process.env.PUBLIC_URL + '/img/gallery/before1.jpg'} className='img-fluid' alt='' />
+            <img src={PUBLIC_URL + '/img/gallery/before1.jpg'} className='img-fluid' alt='' />
             <div className='ribbon'>
               <span>BEFORE</span>
             </div>
@@ -17,7 +20,7 @@ export default function BeforeAfter() {
         </div>
         <div className='col-6'>
           <div className='item-img even animated wow fadeIn'>
-            <img src={process.env.PUBLIC_URL + '/img/gallery/after1.jpg'} className='img-fluid' alt='' />
+            <img src={PUBLIC_URL + '/img/gallery/after1.jpg'} className='img-fluid' alt='' />
             <div className='ribbon ribbon-cyan'>
               <span>AFTER</span>
             </div>
