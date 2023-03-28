@@ -4,7 +4,7 @@ import { Button, Menu } from '@mui/material'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
-import CreateTimetable from '../functions/CreateTimetable'
+import { useCreateTimetable } from '../../core/hooks/useCreateTimetable'
 import arrowIcon from '../icons/down-arrow.png'
 import stripes from '../icons/stripes_s.png'
 
@@ -70,6 +70,8 @@ export default function TimeSelection({ timeSlotToParent, liveBooking, slot }) {
   const [isMobile, setIsMobile] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
+
+  useCreateTimetable(getTimeData)
 
   function handleMenuClick(event) {
     setMenuOpen(!menuOpen)
@@ -202,7 +204,6 @@ export default function TimeSelection({ timeSlotToParent, liveBooking, slot }) {
 
   return (
     <div>
-      <CreateTimetable timetableToClient={getTimeData} />
       <div className='time-select-main'>
         <h1>Set date and time</h1>
         <div className='date-pick-container'>
@@ -263,44 +264,46 @@ export default function TimeSelection({ timeSlotToParent, liveBooking, slot }) {
         {timeData.length > 0 && (
           <table className='ts-table' id='calendar'>
             {/* map time headers on left side */}
-            <tr>
-              {timeheaders.map((element) => (
-                <td key={element}>
-                  <div className='ts-time'>{element}</div>
-                </td>
-              ))}
-            </tr>
-            {/* map slots and dates */}
-            {slots.map((element, index) => (
-              <tr key={index}>
-                {/* first row maps dates */}
-                <td className='ts-date-container'>
-                  <div className='ts-date-month'>{element[0]}</div>
-                  <div className={Number(element[1]) != today ? 'ts-date-day' : 'ts-date-today'}>{element[1]}</div>
-                </td>
-                {/* subsequent rows map timeslots */}
-                {element.slice(2).map((occup, time) => (
-                  <td
-                    id={element[0] + element[1] + time.toString()}
-                    onClick={() => selectSlot(element[0], element[1], time)}
-                    key={time}
-                    className={
-                      element[0] + element[1] + time.toString() === selectedSlot
-                        ? 'ts-' + occup + ' ts-td-active'
-                        : 'ts-' + occup
-                    }
-                  >
-                    {pastIds.includes(element[0] + element[1] + time.toString()) ? (
-                      <div className='ts-passed'>Aaaaa</div>
-                    ) : occup != 'Half' ? (
-                      occup
-                    ) : (
-                      <img src={stripes} alt='' />
-                    )}
+            <tbody>
+              <tr>
+                {timeheaders.map((element) => (
+                  <td key={element}>
+                    <div className='ts-time'>{element}</div>
                   </td>
                 ))}
               </tr>
-            ))}
+              {/* map slots and dates */}
+              {slots.map((element, index) => (
+                <tr key={index}>
+                  {/* first row maps dates */}
+                  <td className='ts-date-container'>
+                    <div className='ts-date-month'>{element[0]}</div>
+                    <div className={Number(element[1]) != today ? 'ts-date-day' : 'ts-date-today'}>{element[1]}</div>
+                  </td>
+                  {/* subsequent rows map timeslots */}
+                  {element.slice(2).map((occup, time) => (
+                    <td
+                      id={element[0] + element[1] + time.toString()}
+                      onClick={() => selectSlot(element[0], element[1], time)}
+                      key={time}
+                      className={
+                        element[0] + element[1] + time.toString() === selectedSlot
+                          ? 'ts-' + occup + ' ts-td-active'
+                          : 'ts-' + occup
+                      }
+                    >
+                      {pastIds.includes(element[0] + element[1] + time.toString()) ? (
+                        <div className='ts-passed'>Aaaaa</div>
+                      ) : occup != 'Half' ? (
+                        occup
+                      ) : (
+                        <img src={stripes} alt='' />
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
           </table>
         )}
 

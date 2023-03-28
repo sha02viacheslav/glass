@@ -76,7 +76,7 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
       url: process.env.REACT_APP_UPDATE_DELIVERY,
       headers: {
         'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
+        'api-key': process.env.REACT_APP_API_KEY,
       },
       data: data,
     }

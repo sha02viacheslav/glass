@@ -67,7 +67,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
         url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
         headers: {
           'Content-Type': 'application/json',
-          'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
+          'api-key': process.env.REACT_APP_API_KEY,
         },
         data: data,
       }
@@ -102,7 +102,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
       url: process.env.REACT_APP_GET_INVOICE,
       headers: {
         'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
+        'api-key': process.env.REACT_APP_API_KEY,
       },
       data: data,
     }

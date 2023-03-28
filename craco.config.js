@@ -10,6 +10,7 @@ module.exports = {
       '@glass/enums': path.resolve(__dirname, 'src/core/enums'),
       '@glass/hooks': path.resolve(__dirname, 'src/core/hooks'),
       '@glass/models': path.resolve(__dirname, 'src/core/models'),
+      '@glass/services': path.resolve(__dirname, 'src/core/services'),
     },
   },
 }

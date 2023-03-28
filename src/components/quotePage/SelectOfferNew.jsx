@@ -36,20 +36,21 @@ export default function SelectOfferNew({ selectOfferToCustomer, priceToParent })
     <div className='select-offer'>
       <div className='table-container'>
         <table className='SO-table'>
-          {selectOfferToCustomer.map((element, rowIndex) => (
-            <tr key={rowIndex}>
-              <td className='so-info'>
-                <div className='info-div first-col'>{element.product}</div>
-              </td>
-              <td className='so-info'>
-                <div className='info-div top-right'>
-                  {element.discount > 0 && <span className='original-price'>£ {element.price_unit.toFixed(2)}</span>}
-                  <span>£ {element.price_subtotal.toFixed(2)}</span>
-                </div>
-              </td>
-            </tr>
-          ))}
-          {/* <tr>
+          <tbody>
+            {selectOfferToCustomer.map((element, rowIndex) => (
+              <tr key={rowIndex}>
+                <td className='so-info'>
+                  <div className='info-div first-col'>{element.product}</div>
+                </td>
+                <td className='so-info'>
+                  <div className='info-div top-right'>
+                    {element.discount > 0 && <span className='original-price'>£ {element.price_unit.toFixed(2)}</span>}
+                    <span>£ {element.price_subtotal.toFixed(2)}</span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {/* <tr>
                         <td className='info'>
                             <div className="info-div first-col-wipers">
                                 Claim new wipers
@@ -73,6 +74,7 @@ export default function SelectOfferNew({ selectOfferToCustomer, priceToParent })
                             </div>
                         </td>
                     </tr> */}
+          </tbody>
         </table>
       </div>
       <div className='total-container-out'>
