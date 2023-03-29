@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Services = () => {
+export const Services: React.FC = () => {
   return (
     <div>
       <section className='sec-banner-s'>
@@ -9,7 +9,7 @@ const Services = () => {
           <p className='content-s text-white'>Amet minim mollit non deserunt ullamco est sit aliqua dolor</p>
         </div>
       </section>
-      <section className='sec-carslider section'>
+      <section className='sec-car-slider section'>
         <div className='container'>
           <div className='row text-center gy-md-5 gy-4' autoFocus>
             <div className='col-md-3 col-sm-6'>
@@ -228,5 +228,3 @@ const Services = () => {
     </div>
   )
 }
-
-export default Services
