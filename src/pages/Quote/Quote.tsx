@@ -1,63 +1,64 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import axios from 'axios'
+import moment from 'moment'
 import { useNavigate, useParams } from 'react-router-dom'
-import expand from '../../assets/icons/expand.png'
-import flag from '../../assets/icons/uk-flag.png'
-import up from '../../assets/icons/up.png'
-import close from '../../assets/icons/x.png'
-import { BeforeAfter } from '../../components/BeforeAfter'
-import { LocationSelection } from '../../components/quotePage/LocationSelection'
-import { PaymentMethod } from '../../components/quotePage/PaymentMethod'
-import { PaymentPreview } from '../../components/quotePage/PaymentPreview'
-import { SlotsPreview } from '../../components/quotePage/SlotsPreview'
-import { TimeSelection } from '../../components/quotePage/TimeSelection'
+import expand from '@glass/assets/icons/expand.png'
+import flag from '@glass/assets/icons/uk-flag.png'
+import up from '@glass/assets/icons/up.png'
+import close from '@glass/assets/icons/x.png'
+import { BeforeAfter } from '@glass/components/BeforeAfter'
+import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
+import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
+import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
+import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
+import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
+import { CustomerDetail, Invoice, Offer, PaymentOption } from '@glass/models'
+import '@glass/components/LicensePlate/license-plate.css'
 import './quote.css'
-import '../../components/LicensePlate/license-plate.css'
 
-// const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
-// const timeHeaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
-
-function Quote() {
+export const Quote: React.FC = () => {
   // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
   const [tabValue] = useState(0)
-  const [customerDetails, setCustomerDetails] = useState([])
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
   const [snapValue, setSnapValue] = useState(1)
   const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
   const [timeSlot, setTimeSlot] = useState('')
   const [quoteInfoOpen, setInfoOpen] = useState(false)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
-  const [paymentOption, setPaymentOption] = useState([{ p_option: 0 }])
+  const [paymentOption, setPaymentOption] = useState<PaymentOption[]>([{ p_option: 0, detail: '' }])
   const [slotSelected, setSlotSelected] = useState(false)
   const [declinePopup, setDeclinePopup] = useState(false)
-  const [declineReason, setDeclineReason] = useState(0)
-  const [isBlinky, setIsBlinky] = useState(false)
-  const declineRef = useRef()
+  const [declineReason, setDeclineReason] = useState<number>(0)
+  const [isBlink, setIsBlink] = useState(false)
+  const declineRef = useRef<HTMLInputElement>(null)
   const [tempLicenseNum, setTempLicense] = useState('')
   const navigate = useNavigate()
-  const [offersDetails, setOffersDetails] = useState([
+  const [offersDetails, setOffersDetails] = useState<Offer[]>([
     {
+      product: '',
+      discount: 0,
       price_unit: 0,
       price_total: 0,
       price_subtotal: 0,
     },
   ])
   const [payAssistStatus, setPayAssistStatus] = useState('')
-  const [invoiceData, setInvoiceData] = useState([])
-  const [PAData, setPAData] = useState([])
-  const [PAUrl, setPAurl] = useState('')
+  const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
+  const [PAData, setPAData] = useState<(string | undefined)[]>([])
+  const [PAUrl, setPAUrl] = useState<string>('')
 
   // client info
-  const { id } = useParams('')
-  function getQuote(qid) {
-    let data = JSON.stringify({
+  const { id } = useParams()
+  const getQuote = (qid: string) => {
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: qid,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_PREVIEW_QUOTE,
       headers: {
@@ -76,29 +77,34 @@ function Quote() {
       .catch(() => {})
   }
 
-  function handleSnapChange(option) {
-    // naviagate scroll snap
+  const handleSnapChange = (option: string) => {
+    // navigate scroll snap
     if (snapValue === 1 && option === 'next' && timeSlot === '') {
       // offer to time select if timeslot is not selected
       setSnapValue(2)
-      document.getElementById('2').scrollIntoView({ behavior: 'smooth' })
+      const dom = document.getElementById('2')
+      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
     } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
       // offer to location if timeslot is selected
       setSnapValue(3)
-      document.getElementById('3').scrollIntoView({ behavior: 'smooth' })
+      const dom = document.getElementById('3')
+      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
     } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
       // time select to location if timeslot is selected
       setSnapValue(3)
-      document.getElementById('3').scrollIntoView({ behavior: 'smooth' })
+      const dom = document.getElementById('3')
+      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
     } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
       // scroll snap to time select if no slot selected
-      document.getElementById('2').scrollIntoView({ behavior: 'smooth' })
+      const dom = document.getElementById('2')
+      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
       setSlotSelected(true)
     } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
       if (paymentOption[0].p_option === 4 || paymentOption[0].detail === 'Select payment method') {
         // scroll to PM component if no payment method is selected
         setSnapValue(1)
-        document.getElementById('1').scrollIntoView({ behavior: 'smooth' })
+        const dom = document.getElementById('1')
+        if (dom) dom.scrollIntoView({ behavior: 'smooth' })
       } else if (paymentOption[0].p_option === 1 && paymentOption[0].detail !== 'Select payment method') {
         // pay with Payment Assist
         confirmBooking()
@@ -107,22 +113,24 @@ function Quote() {
   }
 
   function confirmBooking() {
-    let first = ''
-    let second = ''
-    let post = ''
-    let addr = ''
+    let first: string
+    let second: string
+    let post: string
+    let addr: string
     if (PAData.length === 0) {
-      first = customerDetails.customer_f_name
-      second = customerDetails.customer_s_name
-      post = customerDetails.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8)
-      addr = customerDetails.customer_order_postal_code.slice(0, -8)
+      first = customerDetails?.customer_f_name || ''
+      second = customerDetails?.customer_s_name || ''
+      post =
+        customerDetails?.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8) ||
+        ''
+      addr = customerDetails?.customer_order_postal_code.slice(0, -8) || ''
     } else {
-      first = PAData[0]
-      second = PAData[1]
-      post = PAData[3]
-      addr = PAData[4]
+      first = PAData[0] || ''
+      second = PAData[1] || ''
+      post = PAData[3] || ''
+      addr = PAData[4] || ''
     }
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         f_name: first,
@@ -131,7 +139,7 @@ function Quote() {
         postcode: post,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_PAYMENT_ASSIST_PRE,
       headers: {
@@ -142,18 +150,10 @@ function Quote() {
     }
     axios(config)
       .then(function (response) {
-        // console.log(JSON.stringify(response));
-        // setLoadingApproval(false);
         if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
-          // payAssist('go');
-          // setPreApproval('go');
-          // setPAErrorMsg('');
           PABegin()
         } else if (response.data.result.message === 'Success' && !response.data.result.result.data.approved) {
-          // setPreApproval('nogo');
-          // setPAErrorMsg('');
         } else {
-          // setPAErrorMsg(response.data.result.message);
         }
       })
       .catch(() => {})
@@ -162,14 +162,14 @@ function Quote() {
   function PABegin() {
     // create payment API call
     // console.log(invoiceData.invoice_number);
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: id,
-        invoice_number: invoiceData.invoice_number,
+        invoice_number: invoiceData?.invoice_number,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
       headers: {
@@ -181,21 +181,21 @@ function Quote() {
     axios(config)
       .then(function (response) {
         window.open(response.data.result.result.data.url, '_blank', 'noreferrer')
-        setPAurl(response.data.result.result.data.url)
+        setPAUrl(response.data.result.result.data.url)
       })
       .catch(() => {})
   }
 
-  function sendBookingData(slot_selected) {
-    let data = JSON.stringify({
+  const sendBookingData = (slot_selected: string) => {
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: id,
-        booking_start_date: slot_selected[0].start,
-        booking_end_date: slot_selected[0].end,
+        booking_start_date: moment(slot_selected[0]).format('YYYY-DD-MM HH'),
+        booking_end_date: moment(slot_selected[0]).add(2, 'hours').format('YYYY-DD-MM HH'),
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_SEND_BOOKING,
       headers: {
@@ -206,7 +206,7 @@ function Quote() {
     }
     axios(config)
       .then(() => {
-        setIsBlinky(true)
+        setIsBlink(true)
       })
       .catch(() => {})
   }
@@ -215,52 +215,45 @@ function Quote() {
     setDeclinePopup(true)
   }
 
-  function selectDeclineReason(option) {
+  const selectDeclineReason = (option: number) => {
     setDeclineReason(option)
   }
 
-  // function handleTabChange(newValue) {
-  //     setTabValue(newValue);
-  //     setSnapValue(1);
-  // }
-
-  function PADataToParent(data) {
+  const PADataToParent = (data: (string | undefined)[]) => {
     setPAData(data)
-    // console.log(data);
   }
 
-  function backToCustomer() {
-    const licenseReg = customerDetails.registration_number
-    const i = customerDetails.customer_name.indexOf(' ')
-    const names = [customerDetails.customer_name.slice(0, i), customerDetails.customer_name.slice(i + 1)]
-    let quoteData = {
-      address: customerDetails.customer_order_postal_code,
+  const backToCustomer = () => {
+    const licenseReg = customerDetails?.registration_number
+    const i = customerDetails?.customer_name.indexOf(' ') || 0
+    const names = [customerDetails?.customer_name.slice(0, i), customerDetails?.customer_name.slice(i + 1)]
+    const quoteData = JSON.stringify({
+      address: customerDetails?.customer_order_postal_code,
       firstName: names[0],
       lastName: names[1],
-      email: customerDetails.customer_email,
-      phone: customerDetails.customer_phone,
-      selected: customerDetails.glass_location,
-    }
-    quoteData = JSON.stringify(quoteData)
+      email: customerDetails?.customer_email,
+      phone: customerDetails?.customer_phone,
+      selected: customerDetails?.glass_location,
+    })
     sessionStorage.setItem('quoteInfo', quoteData)
     navigate('/customer/' + licenseReg)
   }
 
-  function timeSlotToParent(data) {
+  const timeSlotToParent = (data: string) => {
     sendBookingData(data)
     setTimeSlot(data)
     setSlotSelected(false)
   }
 
-  function deliveryAddressToParent(data) {
+  const deliveryAddressToParent = (data: string) => {
     setDeliveryAddress(data)
   }
 
-  function paymentOptionToParent(pOption) {
+  const paymentOptionToParent = (pOption: PaymentOption[]) => {
     setPaymentOption(pOption)
   }
 
-  function payAssistToParent(status) {
+  const payAssistToParent = (status: string) => {
     if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
       setPayAssistStatus(status)
     }
@@ -269,18 +262,19 @@ function Quote() {
     }
   }
 
-  function invDataToParent(data) {
+  const invDataToParent = (data: Invoice) => {
     setInvoiceData(data)
   }
 
   useEffect(() => {
-    //Get Quote Data
-    if (id) {
-      getQuote(id)
-    }
+    // Get Quote Data
+    if (id) getQuote(id)
+
     // hide navbar and footer
-    document.getElementById('navbar-main').style.display = 'none'
-    document.getElementById('footer-main').style.display = 'none'
+    const navbarMain = document.getElementById('navbar-main')
+    const footerMain = document.getElementById('footer-main')
+    if (navbarMain) navbarMain.style.display = 'none'
+    if (footerMain) footerMain.style.display = 'none'
     // scroll to top on page load
     const topSelector = document.getElementById('1')
     if (topSelector !== null) {
@@ -289,25 +283,27 @@ function Quote() {
   }, [])
 
   useEffect(() => {
-    // format license number correctly
-    setTempLicense(customerDetails.registration_number)
-    if (tempLicenseNum === undefined) {
-      return
-    }
-    if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
-      // license number is standard
-      // check if plate already includes space
-      if (tempLicenseNum.charAt(4) === ' ') {
+    if (customerDetails) {
+      // format license number correctly
+      setTempLicense(customerDetails.registration_number)
+      if (tempLicenseNum === undefined) {
         return
-      } else if (tempLicenseNum.length === 7) {
-        let input = ''
-        if (customerDetails.registration_number !== undefined) {
-          input = customerDetails.registration_number
-        } else {
-          input = tempLicenseNum
+      }
+      if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
+        // license number is standard
+        // check if plate already includes space
+        if (tempLicenseNum.charAt(4) === ' ') {
+          return
+        } else if (tempLicenseNum.length === 7) {
+          let input: string
+          if (customerDetails.registration_number !== undefined) {
+            input = customerDetails.registration_number
+          } else {
+            input = tempLicenseNum
+          }
+          input = input.slice(0, 4) + ' ' + input.slice(4)
+          setTempLicense(input)
         }
-        input = input.slice(0, 4) + ' ' + input.slice(4)
-        setTempLicense(input)
       }
     }
   }, [customerDetails])
@@ -328,7 +324,7 @@ function Quote() {
 
   useEffect(() => {
     // change between accept and next buttons names and styling
-    let acceptSelector = document.getElementById('accept-btn')
+    const acceptSelector = document.getElementById('accept-btn')
     if (snapValue === 1 && acceptSelector != null) {
       setAcceptBtn('Next')
       acceptSelector.classList.remove('quote-accept')
@@ -390,9 +386,9 @@ function Quote() {
         {quoteInfoOpen && (
           <div className='quote-info-main'>
             <div className='client-info-container'>
-              {isBlinky && (
+              {isBlink && (
                 <Tooltip disableFocusListener title='Booking confirmed'>
-                  <div className='client-info-blinky'>-</div>
+                  <div className='client-info-blink'>-</div>
                 </Tooltip>
               )}
               <div className='info-container'>
@@ -404,16 +400,16 @@ function Quote() {
                     </div>
                     <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
                   </div>
-                  <div className='client-info'>{customerDetails.customer_name}</div>
+                  <div className='client-info'>{customerDetails?.customer_name}</div>
                   <div className='client-info'>
-                    <b>Billing address:</b> {customerDetails.customer_order_postal_code}
+                    <b>Billing address:</b> {customerDetails?.customer_order_postal_code}
                   </div>
                   <div className='client-info'>
-                    <b>Email:</b> {customerDetails.customer_email}
+                    <b>Email:</b> {customerDetails?.customer_email}
                   </div>
                   <div className='client-info'>
                     <b>Phone number:</b>
-                    {customerDetails.customer_phone}
+                    {customerDetails?.customer_phone}
                   </div>
                 </div>
               </div>
@@ -425,10 +421,10 @@ function Quote() {
             </div>
             <div className='quote-info-bottom'>
               <div className='compact-bottom-row'>
-                <span className='quote-selectedwindows'>
+                <span className='quote-selected-windows'>
                   <b>Selected windows:</b>{' '}
                 </span>
-                {customerDetails.length !== 0 &&
+                {!!customerDetails &&
                   customerDetails.glass_location.map((element) => (
                     <span key={element} className='client-windows'>
                       {element}
@@ -447,9 +443,9 @@ function Quote() {
         )}
         {!quoteInfoOpen && (
           <div className='quote-info-compact'>
-            {isBlinky && (
+            {isBlink && (
               <Tooltip disableFocusListener title='Booking confirmed'>
-                <div className='client-info-blinky'>-</div>
+                <div className='client-info-blink'>-</div>
               </Tooltip>
             )}
             <div className='client-info-compact'>
@@ -460,9 +456,9 @@ function Quote() {
                 </div>
                 <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
               </div>
-              <div className='client-info'>{customerDetails.customer_name}</div>
+              <div className='client-info'>{customerDetails?.customer_name}</div>
               <div className='compact-bottom-row'>
-                {customerDetails.length !== 0 &&
+                {!!customerDetails &&
                   customerDetails.glass_location.map((element) => (
                     <span key={element} className='client-windows'>
                       {element}
@@ -479,28 +475,10 @@ function Quote() {
           <h2 className='thank-you-header'>Thank you!</h2>
           <h1 className='extra-info'>We are preparing the quote...</h1>
           {/* <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" /> */}
-          {customerDetails.length !== 0 && (
-            <PaymentPreview
-              customerInfo={[
-                {
-                  f_name: customerDetails.customer_f_name,
-                  s_name: customerDetails.customer_s_name,
-                  email: customerDetails.customer_email,
-                  c_address: customerDetails.customer_order_postal_code.slice(0, -8),
-                  c_postalcode: customerDetails.customer_order_postal_code.substring(
-                    customerDetails.customer_order_postal_code.length - 8,
-                  ),
-                },
-              ]}
-            />
-          )}
+          {!!customerDetails && <PaymentPreview />}
           <SlotsPreview />
         </div>
       )}
-      {/* {(tabValue === 1 || tabValue === 0) && <div className="tab">
-                <button className={tabValue === 0 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(0)}>Customer</button>
-                <button className={tabValue === 1 ? 'tab-button-active' : 'tab-button'} onClick={() => handleTabChange(1)} id='pay-btn'>Live Booking</button>
-            </div>} */}
 
       {offersDetails[0].price_total > 1 && (
         <div className='center'>
@@ -508,14 +486,12 @@ function Quote() {
             <div className='scroll-container'>
               {/* select offer / payment method */}
               <div id='offer'>
-                {customerDetails.length !== 0 && (
+                {!!customerDetails && (
                   <PaymentMethod
                     offerDetails={offersDetails}
                     customerInfo={[
                       {
-                        customer_f_name: customerDetails.customer_f_name,
-                        customer_s_name: customerDetails.customer_s_name,
-                        customer_email: customerDetails.customer_email,
+                        ...customerDetails,
                         c_address: customerDetails.customer_order_postal_code.slice(0, -8),
                         c_postalcode: customerDetails.customer_order_postal_code.substring(
                           customerDetails.customer_order_postal_code.length - 8,
@@ -543,7 +519,7 @@ function Quote() {
                 <TimeSelection
                   timeSlotToParent={timeSlotToParent}
                   liveBooking={false}
-                  slot={customerDetails.booking_start_date}
+                  slot={customerDetails?.booking_start_date}
                 />
               </div>
 
@@ -552,7 +528,7 @@ function Quote() {
               </div>
 
               <div className='quote-component-last'>
-                {customerDetails.length !== 0 && (
+                {!!customerDetails && (
                   <LocationSelection
                     key={billingAddress}
                     userBillingAddress={billingAddress}

@@ -29,7 +29,7 @@ const fullMonthValues = [
 export type TimeSelectionProps = {
   timeSlotToParent: (value: string) => void
   liveBooking: boolean
-  slot: string
+  slot: string | undefined
 }
 
 export const TimeSelection: React.FC<TimeSelectionProps> = ({ timeSlotToParent, liveBooking, slot }) => {
@@ -135,7 +135,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({ timeSlotToParent, 
     // odoo:"2023-01-12 12:00:00"
     // id:"Jan122"
     let selectionId = ''
-    if (slot != '') {
+    if (!!slot) {
       const dateTime = slot.split(' ')
       const dateSplit = dateTime[0].split('-')
       const timeSplit = dateTime[1].substring(0, 5)

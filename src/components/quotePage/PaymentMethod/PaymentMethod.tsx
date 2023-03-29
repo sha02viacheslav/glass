@@ -15,7 +15,7 @@ import './payment-method.css'
 export type PaymentMethodProps = {
   offerDetails: Offer[]
   customerInfo: CustomerDetail[]
-  qid: string
+  qid: string | undefined
   payAssist: (value: string) => void
   invData: (value: Invoice) => void
   PADataToParent: (value: (string | undefined)[]) => void

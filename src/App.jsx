@@ -9,7 +9,7 @@ import Customer from './pages/Customer'
 import Home from './pages/Home'
 import Paid from './pages/Paid'
 import Pricing from './pages/Pricing'
-import Quote from './pages/Quote/Quote'
+import { Quote } from './pages/Quote'
 import Services from './pages/Services'
 import './App.css'
 
