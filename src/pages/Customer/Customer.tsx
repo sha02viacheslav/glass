@@ -10,7 +10,7 @@ import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, VehicleData } from '@glass/models'
 
-const Customer: React.FC = () => {
+export const Customer: React.FC = () => {
   const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
   const [, setVehicleData] = useState('')
   const { licenseNum } = useParams()
@@ -413,5 +413,3 @@ const Customer: React.FC = () => {
     </div>
   )
 }
-
-export default Customer

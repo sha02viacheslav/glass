@@ -22,7 +22,7 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
   },
 }
-const Customer: React.FC = () => {
+export const CustomerLocal: React.FC = () => {
   const { licenseRef } = useParams()
 
   const [selectedDate, handleDateChange] = useState<Date | null>(new Date())
@@ -723,5 +723,3 @@ const Customer: React.FC = () => {
     </div>
   )
 }
-
-export default Customer

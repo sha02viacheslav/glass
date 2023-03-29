@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Paid = () => {
+export const Paid: React.FC = () => {
   return (
     <div>
       <section className='sec-pay my-md-5 my-4'>
@@ -44,8 +44,7 @@ const Paid = () => {
                 <div
                   id='map-container-google-1'
                   className='z-depth-1-half map-container mt-4'
-                  width='100%'
-                  style={{ height: 400 + 'px' }}
+                  style={{ height: 400 + 'px', width: '100%' }}
                 >
                   <iframe
                     src='https://maps.google.com/maps?q=manhatan&t=&z=13&ie=UTF8&iwloc=&output=embed'
@@ -113,5 +112,3 @@ const Paid = () => {
     </div>
   )
 }
-
-export default Paid

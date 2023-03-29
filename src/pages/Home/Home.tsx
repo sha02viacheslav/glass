@@ -1,35 +1,39 @@
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 import { useEffect } from 'react'
 import { Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import flag from '../assets/icons/uk-flag.png'
+import flag from '@glass/assets/icons/uk-flag.png'
 
-const Home = () => {
+export const Home: React.FC = () => {
   const navigate = useNavigate()
-  const licenseRef = useRef()
+  const licenseRef = useRef<HTMLInputElement>(null)
 
-  function patternMatch() {
-    licenseRef.current.value = licenseRef.current.value.toUpperCase()
-    // check if license plate is standard or unique
-    if (licenseRef.current.value.length >= 3) {
-      if (Number.isInteger(Number(licenseRef.current.value.charAt(2)))) {
-        // license number is standard
-        // check if plate already includes space
-        if (licenseRef.current.value.charAt(4) === ' ') {
-          return
-        } else if (licenseRef.current.value.length === 7) {
-          let input = licenseRef.current.value
-          input = input.slice(0, 4) + ' ' + input.slice(4)
-          licenseRef.current.value = input
+  const patternMatch = () => {
+    if (licenseRef.current) {
+      licenseRef.current.value = licenseRef.current.value.toUpperCase()
+      // check if license plate is standard or unique
+      if (licenseRef.current.value.length >= 3) {
+        if (Number.isInteger(Number(licenseRef.current.value.charAt(2)))) {
+          // license number is standard
+          // check if plate already includes space
+          if (licenseRef.current.value.charAt(4) === ' ') {
+            return
+          } else if (licenseRef.current.value.length === 7) {
+            let input = licenseRef.current.value
+            input = input.slice(0, 4) + ' ' + input.slice(4)
+            licenseRef.current.value = input
+          }
         }
       }
     }
   }
 
-  function directToCustomer() {
-    let licenseNum = licenseRef.current.value.toUpperCase()
-    licenseNum = licenseNum.replace(' ', '')
-    navigate('/customer/' + licenseNum)
+  const directToCustomer = () => {
+    if (licenseRef.current?.value) {
+      let licenseNum = licenseRef.current.value.toUpperCase()
+      licenseNum = licenseNum.replace(' ', '')
+      navigate('/customer/' + licenseNum)
+    }
   }
 
   useEffect(() => {
@@ -56,7 +60,7 @@ const Home = () => {
                   type='text'
                   placeholder='NU71 REG'
                   onChange={patternMatch}
-                  maxLength='8'
+                  maxLength={8}
                 />
               </div>
               <span className='input-group-text' id='basic-addon2'>
@@ -69,5 +73,3 @@ const Home = () => {
     </div>
   )
 }
-
-export default Home
