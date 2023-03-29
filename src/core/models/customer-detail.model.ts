@@ -12,4 +12,6 @@ export type CustomerDetail = {
   glass_location: string[]
   delivery_address: Address
   booking_start_date: string
+  c_address: string
+  c_postalcode: string
 }

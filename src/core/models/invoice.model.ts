@@ -1,3 +1,3 @@
 export type Invoice = {
-  invoice_number: number
+  invoice_number: string
 }

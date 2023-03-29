@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './select-offer.css'
-import { Offer } from '@glass/models'
+import { Offer, PriceTotal } from '@glass/models'
 
 export type SelectOfferNewProps = {
   selectOfferToCustomer: Offer[]
-  priceToParent: (value: { total: number; subtotal: number }[]) => void
+  priceToParent: (value: PriceTotal[]) => void
 }
 
 export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({ selectOfferToCustomer, priceToParent }) => {

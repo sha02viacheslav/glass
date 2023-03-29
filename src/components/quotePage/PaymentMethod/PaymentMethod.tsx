@@ -1,115 +1,117 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
-import { Checkout } from './Checkout'
-import { SelectOfferNew } from './SelectOfferNew'
-import invoice from '../../assets/icons/invoice.png'
-import PDFViewer from '../functions/PDFViewer'
-import '../../css/payment-method.css'
+import moment from 'moment'
+import invoice from '@glass/assets/icons/invoice.png'
+import { PdfViewer } from '@glass/components/PdfViewer'
+import { Checkout } from '@glass/components/quotePage/Checkout'
+import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
+import { PaymentType } from '@glass/enums'
+import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
+import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOption, PriceTotal } from '@glass/models'
+import './payment-method.css'
 
-const monthValuesRev = {
-  '01': 'Jan',
-  '02': 'Feb',
-  '03': 'Mar',
-  '04': 'Apr',
-  '05': 'May',
-  '06': 'June',
-  '07': 'July',
-  '08': 'Aug',
-  '09': 'Sept',
-  10: 'Oct',
-  11: 'Nov',
-  12: 'Dec',
+export type PaymentMethodProps = {
+  offerDetails: Offer[]
+  customerInfo: CustomerDetail[]
+  qid: string
+  payAssist: (value: string) => void
+  invData: (value: Invoice) => void
+  PADataToParent: (value: (string | undefined)[]) => void
+  PAUrl: string
+  method: (value: PaymentOption[]) => void
 }
 
-export default function PaymentMethod({
+export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   offerDetails,
   customerInfo,
   qid,
   payAssist,
   invData,
   PADataToParent,
-  PAurl,
+  PAUrl,
   method,
-}) {
+}) => {
   const [selectedMethod, setSelectedMethod] = useState(4)
   const [address, setAddress] = useState('')
   const userBillingAddress = customerInfo[0].c_address
   const [postalCode, setPostalCode] = useState(customerInfo[0].c_postalcode)
-  const excessRef = useRef('')
-  const [excess, setExcess] = useState(115)
-  const [singlePay, setSinglePay] = useState('card')
+  const excessRef = useRef<HTMLInputElement>(null)
+  const [excess, setExcess] = useState<number>(115)
+  const [singlePay, setSinglePay] = useState<PaymentType>(PaymentType.CARD)
   const [status] = useState('not paid')
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
-  const [monthlyPayments, setMonthlyPayments] = useState([])
+  const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
   const [PAErrorMsg] = useState('')
-  const [invoiceData, setInvoiceData] = useState([])
-  const PAf_nameRef = useRef('')
-  const PAs_nameRef = useRef('')
-  const PAemailRef = useRef('')
-  const [priceTotals, setPriceTotals] = useState([{ total: 0 }])
-  const [PAproceed, setPAproceed] = useState(false)
+  const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
+  const PAf_nameRef = useRef<HTMLInputElement>(null)
+  const PAs_nameRef = useRef<HTMLInputElement>(null)
+  const PAEmailRef = useRef<HTMLInputElement>(null)
+  const [priceTotals, setPriceTotals] = useState<PriceTotal[]>([{ total: 0, subtotal: 0 }])
+  const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
-  const [startPAprocess, setStartPAprocess] = useState(false)
+  const [startPAProcess, setStartPAProcess] = useState(false)
 
-  function updateExcess() {
-    setExcess(Number(excessRef.current.value))
+  const updateExcess = () => {
+    if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
   }
 
-  const handlePCodeChange = (event) => {
+  const handlePCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(event.target.value)
   }
 
-  function updatePAInfo() {
-    const firstName = PAf_nameRef.current.value
-    const secondName = PAs_nameRef.current.value
-    const email = PAemailRef.current.value
+  const updatePAInfo = () => {
+    const firstName = PAf_nameRef?.current?.value
+    const secondName = PAs_nameRef?.current?.value
+    const email = PAEmailRef?.current?.value
     const data = [firstName, secondName, email, postalCode, address]
     PADataToParent(data)
   }
 
-  function getTotalPrices(data) {
+  const getTotalPrices = (data: PriceTotal[]) => {
     setPriceTotals(data)
   }
 
   useEffect(() => {
     // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('autocomplete-field', process.env.REACT_APP_AUTOCOMPLETE, {
+    autocomplete('autocomplete-field', REACT_APP_AUTOCOMPLETE, {
       delay: 500,
     })
     // Preventing Default to show complete address with Postal Code
     window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
       e.preventDefault()
-      let tempAddress = e.address.formatted_address.filter(Boolean).join(', ')
-      let postalcode = e.address.postcode
+      // @ts-ignore
+      const address: Address = e.address
+      const tempAddress = address.formatted_address.filter(Boolean).join(', ')
+      const postalcode = address.postcode
       setAddress(tempAddress)
       setPostalCode(postalcode)
     })
     setAddress(userBillingAddress)
     // update selected payment method in quote page (parent)
     let msg = ''
-    if (startPAprocess && PAurl === '') {
+    if (startPAProcess && PAUrl === '') {
       // if user is in check eligibility phase
       msg = 'Check Eligibility'
-    } else if (startPAprocess && PAurl !== '') {
+    } else if (startPAProcess && PAUrl !== '') {
       msg = 'Continue Payment Assist'
-    } else if (!startPAprocess) {
+    } else if (!startPAProcess) {
       msg = 'Select payment method'
     }
     method([{ p_option: selectedMethod, detail: msg }])
-  }, [selectedMethod, startPAprocess, PAurl])
+  }, [selectedMethod, startPAProcess, PAUrl])
 
   function retrieveInvoice() {
     // get url of invoice PDF
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: qid,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_GET_INVOICE_PDF,
       headers: {
@@ -134,18 +136,18 @@ export default function PaymentMethod({
       })
   }
 
-  function handleInvoicePopup(status) {
+  const handleInvoicePopup = (status: boolean) => {
     setShowInvoice(status)
   }
 
   function getInvoiceData() {
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: qid,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_GET_INVOICE,
       headers: {
@@ -154,13 +156,10 @@ export default function PaymentMethod({
       },
       data: data,
     }
-    axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response));
-        setInvoiceData(response.data.result.data)
-        invData(response.data.result.data)
-      })
-      .catch(() => {})
+    axios(config).then((response) => {
+      setInvoiceData(response.data.result.data)
+      invData(response.data.result.data)
+    })
   }
 
   function checkEligibility() {
@@ -176,13 +175,13 @@ export default function PaymentMethod({
   function retrievePlan() {
     if (selectedMethod === 1) {
       // retrieve payment assist plan data
-      let data = JSON.stringify({
+      const data = JSON.stringify({
         jsonrpc: '2.0',
         params: {
           fe_token: qid,
         },
       })
-      let config = {
+      const config = {
         method: 'post',
         url: process.env.REACT_APP_PAYMENT_ASSIST_PLAN,
         headers: {
@@ -191,24 +190,22 @@ export default function PaymentMethod({
         },
         data: data,
       }
-      axios(config)
-        .then(function (response) {
-          setMonthlyPayments(response.data.result.result.data)
-        })
-        .catch(() => {})
+      axios(config).then((response) => {
+        setMonthlyPayments(response.data.result.result.data)
+      })
     }
   }
 
   useEffect(() => {
-    if (selectedMethod === 1 && !PAproceed) {
+    if (selectedMethod === 1 && !PAProceed) {
       // retrieve payment assist plan data
-      let data = JSON.stringify({
+      const data = JSON.stringify({
         jsonrpc: '2.0',
         params: {
           fe_token: qid,
         },
       })
-      let config = {
+      const config = {
         method: 'post',
         url: process.env.REACT_APP_INVOICE_CONFIRM,
         headers: {
@@ -217,25 +214,18 @@ export default function PaymentMethod({
         },
         data: data,
       }
-      axios(config)
-        .then(() => {
-          setPAproceed(true)
-          retrievePlan()
-          getInvoiceData()
-        })
-        .catch(() => {})
+      axios(config).then(() => {
+        setPAProceed(true)
+        retrievePlan()
+        getInvoiceData()
+      })
     }
   }, [selectedMethod])
 
   return (
     <div className='center'>
-      {showInvoice === true && (
-        <PDFViewer
-          invoicePDF={invoicePDF}
-          isOpen={handleInvoicePopup}
-          qid={qid}
-          invoiceID={invoiceData.invoice_number}
-        />
+      {showInvoice && !!invoiceData && (
+        <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} invoiceID={invoiceData.invoice_number} />
       )}
       <div className='payment-method'>
         <Tooltip disableFocusListener title='Invoice'>
@@ -274,20 +264,13 @@ export default function PaymentMethod({
           {selectedMethod === 1 && (
             <div>
               <p className='text-purple mb-2'>4-Month</p>
-              {monthlyPayments.length !== 0 && (
+              {!!monthlyPayments && (
                 <div>
                   <p>{monthlyPayments.summary}</p>
                   <div className='PA-plan-container'>
                     {monthlyPayments.schedule.map((element) => (
                       <div className='PA-plan-element' key={element.date}>
-                        <div className='PA-plan-date'>
-                          {/* {element.date} */}
-                          {element.date.slice(8, 10) +
-                            ' ' +
-                            monthValuesRev[element.date.slice(5, 7)] +
-                            ' ' +
-                            element.date.slice(0, 4)}
-                        </div>
+                        <div className='PA-plan-date'>{moment(element.date).format('MMM dd YYYY')}</div>
                         <div className='PA-plan-price'>£ {(element.amount / 100).toFixed(2)}</div>
                       </div>
                     ))}
@@ -295,29 +278,29 @@ export default function PaymentMethod({
                 </div>
               )}
               <div className='PA-status-failed'>{PAErrorMsg}</div>
-              {startPAprocess && (
+              {startPAProcess && (
                 <div className='PM-insurance-container'>
                   <div className='PM-insurance-sub'>
                     <input
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAf_nameRef}
-                      defaultValue={customerInfo[0].f_name}
+                      defaultValue={customerInfo[0].customer_f_name}
                       onChange={updatePAInfo}
                     />
                     <input
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAs_nameRef}
-                      defaultValue={customerInfo[0].s_name}
+                      defaultValue={customerInfo[0].customer_s_name}
                       onChange={updatePAInfo}
                     />
                   </div>
                   <input
                     type='text'
                     className='form-control PM-email'
-                    defaultValue={customerInfo[0].email}
-                    ref={PAemailRef}
+                    defaultValue={customerInfo[0].customer_email}
+                    ref={PAEmailRef}
                     onChange={updatePAInfo}
                   />
                   <input
@@ -337,23 +320,23 @@ export default function PaymentMethod({
                 </div>
               )}
               <div className='PM-proceed-btn-cont'>
-                {startPAprocess && PAurl === '' && (
+                {startPAProcess && PAUrl === '' && (
                   <button className='PM-proceed-btn' onClick={checkEligibility}>
                     Check Eligibility
                   </button>
                 )}
-                {startPAprocess && PAurl !== '' && (
-                  <a className='PA-link' href={PAurl}>
-                    {PAurl}
+                {startPAProcess && PAUrl !== '' && (
+                  <a className='PA-link' href={PAUrl}>
+                    {PAUrl}
                   </a>
                 )}
-                {startPAprocess && PAurl !== '' && (
+                {startPAProcess && PAUrl !== '' && (
                   <button className='PM-proceed-btn' onClick={checkEligibility}>
                     Continue
                   </button>
                 )}
-                {!startPAprocess && (
-                  <button className='PM-proceed-btn' onClick={() => setStartPAprocess(true)}>
+                {!startPAProcess && (
+                  <button className='PM-proceed-btn' onClick={() => setStartPAProcess(true)}>
                     Pay with Payment Assist
                   </button>
                 )}
@@ -369,7 +352,7 @@ export default function PaymentMethod({
                   <input
                     type='text'
                     className='form-control PM-top-input'
-                    defaultValue={customerInfo[0].f_name + ' ' + customerInfo[0].s_name}
+                    defaultValue={customerInfo[0].customer_f_name + ' ' + customerInfo[0].customer_s_name}
                   />
                 </div>
                 <div className='PM-insurance-sub'>
@@ -400,7 +383,7 @@ export default function PaymentMethod({
                       onChange={updateExcess}
                     />
                   </div>
-                  <div className='PM-insurace-doc-cont'>
+                  <div className='PM-insurance-doc-cont'>
                     <button>Choose</button>
                     <span>Upload insurance policy</span>
                   </div>
@@ -417,8 +400,8 @@ export default function PaymentMethod({
               <div className='PM-insurance-container'>
                 <div className='PM-single-pay'>
                   <button
-                    className={`pm-proceed-btn card-btn ${singlePay === 'card' ? 'pm-proceed-selected' : ''}`}
-                    onClick={() => setSinglePay('card')}
+                    className={`pm-proceed-btn card-btn ${singlePay === PaymentType.CARD ? 'pm-proceed-selected' : ''}`}
+                    onClick={() => setSinglePay(PaymentType.CARD)}
                   >
                     <div className='position-relative w-100'>
                       <svg
@@ -437,8 +420,8 @@ export default function PaymentMethod({
                     <span>Card</span>
                   </button>
                   <button
-                    className={`pm-proceed-btn ${singlePay === 'cash' ? 'pm-proceed-selected' : ''}`}
-                    onClick={() => setSinglePay('cash')}
+                    className={`pm-proceed-btn ${singlePay === PaymentType.CASH ? 'pm-proceed-selected' : ''}`}
+                    onClick={() => setSinglePay(PaymentType.CASH)}
                   >
                     <div className='position-relative w-100'>
                       <div className='p-TabIconContainer'>

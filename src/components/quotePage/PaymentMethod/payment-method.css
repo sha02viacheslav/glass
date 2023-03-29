@@ -1,0 +1,336 @@
+.payment-method {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
+  border-radius: 15px;
+  width: 100%;
+  max-width: 550px;
+  overflow: hidden;
+  margin-top: 30px;
+  position: relative;
+}
+
+.PM-header {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.PM-status {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.PM-invoice-status {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #9a73dd;
+}
+
+.PM-button,
+.PM-button-active {
+  background: none;
+  width: 30%;
+  height: 60px;
+  border-radius: 10px;
+  border: 1px solid #9a73dd;
+  color: #9a73dd;
+  text-align: center;
+  line-height: 20px;
+}
+
+.PM-button:hover {
+  color: white;
+  background-color: #9a73dd;
+}
+
+.PM-button-active {
+  color: white;
+  background-color: #9a73dd;
+}
+
+.PM-btn-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.PM-payment-option {
+  text-align: center;
+  width: 100%;
+  height: 110%;
+  /* min-height: 280px; */
+  margin-bottom: 20px;
+  top: 0;
+  padding: 15px;
+}
+
+.PM-option-text {
+  text-align: justify;
+}
+
+.PM-disabled {
+  opacity: 0;
+}
+
+.PM-price {
+  font-size: 1rem;
+}
+
+.PM-insurance-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.PM-insurance-sub {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.PM-top-input {
+  color: rgb(24, 24, 24);
+  height: 50px;
+  width: 49%;
+  margin-bottom: 2%;
+}
+
+.PM-insurance-date {
+  width: 49%;
+  color: rgb(24, 24, 24);
+  height: 50px;
+  margin-bottom: 2%;
+}
+
+.PM-insurance-input {
+  color: rgb(24, 24, 24);
+  height: 50px;
+  width: 49%;
+  margin-bottom: 2%;
+}
+
+.PM-excess-cont {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 49%;
+  margin-top: 2%;
+}
+
+.PM-excess-cont span {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.PM-excess-cont input {
+  color: rgb(24, 24, 24);
+  height: 50px;
+}
+
+.PM-insurance-doc-cont {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  width: 49%;
+  margin-top: 2%;
+  border: 1px solid #ced4da;
+  height: 50px;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+}
+
+.PM-insurance-doc-cont button {
+  background: #fff;
+  color: #9a73dd;
+  width: 75px;
+  height: 35px;
+  border-radius: 6px;
+  border: 1px solid #9a73dd;
+  text-align: center;
+  line-height: 20px;
+  font-size: 16px;
+  margin-right: 7px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.PM-insurance-doc-cont button:hover {
+  background: #9a73dd;
+  color: #fff;
+}
+
+.PM-insurance-doc-cont span {
+  font-size: 13px;
+  color: #909396;
+  white-space: nowrap;
+  line-height: 20px;
+}
+
+.PM-address {
+  color: rgb(24, 24, 24);
+  height: 50px;
+}
+
+.PM-postalcode {
+  color: rgb(24, 24, 24);
+  height: 50px;
+  margin-top: 2%;
+}
+
+.PM-email {
+  color: rgb(24, 24, 24);
+  height: 50px;
+  margin-bottom: 2%;
+}
+
+.pm-proceed-btn {
+  padding: 0.75rem;
+  background-color: #fff;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6d6e78;
+  transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02);
+  width: 100px;
+  text-align: left;
+  line-height: 20px;
+}
+
+.pm-proceed-btn.pm-proceed-selected {
+  border: 1px solid #0570de;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02), 0 0 0 1px #0570de;
+}
+
+.p-TabIcon {
+  height: 1.2em;
+  width: auto;
+  fill: #6d6e78;
+}
+
+.pm-proceed-btn.pm-proceed-selected.card-btn .p-TabIcon {
+  fill: #0570de;
+}
+
+.pm-proceed-btn span {
+  padding-top: 0.25rem;
+  transition: color 0.1s ease;
+  color: #6d6e78;
+}
+
+.pm-proceed-btn.pm-proceed-selected span {
+  color: #0570de;
+}
+
+.PM-proceed-btn-cont {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+}
+
+.PM-insurance-btn-cont {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.PA-link {
+  font-size: 16px;
+}
+
+.PM-proceed-btn,
+.PM-proceed-active {
+  background: none;
+  width: 40%;
+  height: 45px;
+  border-radius: 10px;
+  border: 1px solid #9a73dd;
+  color: #9a73dd;
+  text-align: center;
+  line-height: 20px;
+  margin-top: 2%;
+  font-size: 16px;
+}
+
+.PM-proceed-btn:hover {
+  color: white;
+  background-color: #9a73dd;
+}
+
+.PM-proceed-active {
+  color: white;
+  background-color: #9a73dd;
+}
+
+.PM-single-pay {
+  display: flex;
+  gap: 12px;
+}
+
+.PM-invoice {
+  width: 30px;
+  position: absolute;
+  right: 23px;
+  top: 23px;
+  border-radius: 5px;
+  padding: 3px;
+}
+
+.PM-invoice:hover {
+  background-color: #9a73dd41;
+  cursor: pointer;
+}
+
+.PA-plan-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.PA-plan-element {
+  width: fit-content;
+  height: 50px;
+  border-radius: 10px;
+  border: 1px solid black;
+  text-align: center;
+  padding: 1% 3%;
+  line-height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.PA-plan-date {
+  font-size: 0.8rem;
+}
+
+.PA-plan-price {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.PA-status-success,
+.PA-status-failed {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.PA-status-success {
+  color: rgb(134, 207, 23);
+}
+
+.PA-status-failed {
+  color: red;
+}

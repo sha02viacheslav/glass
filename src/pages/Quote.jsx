@@ -8,8 +8,8 @@ import up from '../assets/icons/up.png'
 import close from '../assets/icons/x.png'
 import { BeforeAfter } from '../components/BeforeAfter'
 import { LocationSelection } from '../components/quotePage/LocationSelection'
-import PaymentMethod from '../components/quotePage/PaymentMethod'
-import PaymentPreview from '../components/quotePage/PaymentPreview'
+import { PaymentMethod } from '../components/quotePage/PaymentMethod'
+import { PaymentPreview } from '../components/quotePage/PaymentPreview'
 import { SlotsPreview } from '../components/quotePage/SlotsPreview'
 import { TimeSelection } from '../components/quotePage/TimeSelection'
 import '../css/quote.css'
@@ -46,7 +46,7 @@ function Quote() {
   const [payAssistStatus, setPayAssistStatus] = useState('')
   const [invoiceData, setInvoiceData] = useState([])
   const [PAData, setPAData] = useState([])
-  const [PAurl, setPAurl] = useState('')
+  const [PAUrl, setPAurl] = useState('')
 
   // client info
   const { id } = useParams('')
@@ -513,9 +513,9 @@ function Quote() {
                     offerDetails={offersDetails}
                     customerInfo={[
                       {
-                        f_name: customerDetails.customer_f_name,
-                        s_name: customerDetails.customer_s_name,
-                        email: customerDetails.customer_email,
+                        customer_f_name: customerDetails.customer_f_name,
+                        customer_s_name: customerDetails.customer_s_name,
+                        customer_email: customerDetails.customer_email,
                         c_address: customerDetails.customer_order_postal_code.slice(0, -8),
                         c_postalcode: customerDetails.customer_order_postal_code.substring(
                           customerDetails.customer_order_postal_code.length - 8,
@@ -526,7 +526,7 @@ function Quote() {
                     payAssist={payAssistToParent}
                     invData={invDataToParent}
                     PADataToParent={PADataToParent}
-                    PAurl={PAurl}
+                    PAUrl={PAUrl}
                     method={paymentOptionToParent}
                   />
                 )}
