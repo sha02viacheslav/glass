@@ -1,8 +1,9 @@
+import React from 'react'
 import { useParams } from 'react-router-dom'
-import '../../css/payment-assist.css'
+import './payment-assist.css'
 
-export default function PaymentAssist() {
-  const { status } = useParams('')
+export const PaymentAssist: React.FC = () => {
+  const { status } = useParams()
 
   return (
     <div className='center'>
