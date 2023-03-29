@@ -1,0 +1,16 @@
+export enum WinLoc {
+  FRONT = 'front',
+  REAR = 'rear',
+  L1 = 'l_1',
+  L2 = 'l_2',
+  L3 = 'l_3',
+  L4 = 'l_4',
+  L5 = 'l_5',
+  L_REAR = 'l_rear',
+  R1 = 'r_1',
+  R2 = 'r_2',
+  R3 = 'r_3',
+  R4 = 'r_4',
+  R5 = 'r_5',
+  R_REAR = 'r_rear',
+}

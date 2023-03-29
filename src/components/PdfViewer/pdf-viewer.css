@@ -1,0 +1,54 @@
+.pdf-viewer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  background-color: rgba(37, 37, 37, 0.837);
+  z-index: 99;
+}
+
+.pdf-invoice {
+  scale: 0.8;
+  top: -5%;
+  position: relative;
+}
+
+.PDF-button-container {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  bottom: -15%;
+  width: 100%;
+}
+
+.PDF-download {
+  width: 200px;
+  height: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.PDF-close {
+  width: 35px;
+  margin-right: 5px;
+  position: fixed;
+  top: 1%;
+  right: 1%;
+}
+
+.PDF-close:hover {
+  cursor: pointer;
+}
+
+.react-pdf__Page__textContent,
+.textLayer {
+  display: none;
+}
+
+.react-pdf__Page__annotations,
+.annotationLayer {
+  display: none;
+}

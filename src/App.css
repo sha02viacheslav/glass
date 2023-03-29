@@ -63,7 +63,8 @@ area:hover {
   margin-top: 10px;
 }
 
-.tab-button, .tab-button-active {
+.tab-button,
+.tab-button-active {
   background: none;
   border: none;
   border-bottom: 1px solid #bdbdbd;
@@ -88,8 +89,12 @@ area:hover {
 }
 
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* error message on submit request on customer page */
@@ -111,7 +116,6 @@ area:hover {
   border-radius: 15px;
 }
 
-
 .hp-reg-form-container {
   flex: 0 0 auto;
   width: 50%;
@@ -120,17 +124,17 @@ area:hover {
 .lost-quote-btn {
   margin-left: 20px;
   background: none;
-  border: 2px solid #9557E8;
+  border: 2px solid #9557e8;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 400;
-  line-height: 1.5; 
+  line-height: 1.5;
   padding: 9px 20px;
-  color: #9557E8;
+  color: #9557e8;
 }
 
 .lost-quote-btn:hover {
-  background-color: #9557E8;
+  background-color: #9557e8;
   color: white;
 }
 
