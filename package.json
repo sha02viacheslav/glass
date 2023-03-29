@@ -41,9 +41,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:staging": "env-cmd -f .env.development craco start",
-    "start:production": "env-cmd -f .env.production craco start",
-    "build": "env-cmd -f .env.development craco build",
+    "start": "craco start",
+    "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
     "lint": "eslint -c .eslintrc.js --ext .tsx .",
