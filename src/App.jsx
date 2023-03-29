@@ -1,4 +1,3 @@
-import './App.css'
 import { ThreeCircles } from 'react-loader-spinner'
 import { usePromiseTracker } from 'react-promise-tracker'
 import { Routes, Route } from 'react-router-dom'
@@ -10,8 +9,9 @@ import Customer from './pages/Customer'
 import Home from './pages/Home'
 import Paid from './pages/Paid'
 import Pricing from './pages/Pricing'
-import Quote from './pages/Quote'
+import Quote from './pages/Quote/Quote'
 import Services from './pages/Services'
+import './App.css'
 
 const LoadingIndicator = () => {
   const { promiseInProgress } = usePromiseTracker()
