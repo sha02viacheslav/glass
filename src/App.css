@@ -157,7 +157,8 @@ area:hover {
 }
 
 .pay-now {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   padding: 10px;
   background-color: #0a2540;
@@ -169,8 +170,49 @@ area:hover {
   cursor: pointer;
   font-weight: 700;
   background: #0a2540;
+  align-items: center;
+  position: relative;
+}
+
+.pay-now .pay-text {
+  margin: auto;
+}
+
+.pay-now .pay-icon {
+  position: absolute;
+  right: 10px;
+}
+
+.pay-now.invalid .pay-text {
+  color: #ffffff99;
 }
 
 .text-left {
   text-align: left;
+}
+
+.terms {
+  font-size: 14px;
+}
+
+.terms a {
+  color: #484848;
+}
+
+.pay-success {
+  fill: #2ab784;
+  border: 2px solid #2ab784;
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+}
+
+.success-msg {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 24px;
 }
