@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Pricing = () => {
+export const Pricing: React.FC = () => {
   return (
     <div>
       <section className='sec-banner-p'>
@@ -373,5 +373,3 @@ const Pricing = () => {
     </div>
   )
 }
-
-export default Pricing
