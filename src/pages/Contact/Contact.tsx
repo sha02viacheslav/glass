@@ -1,20 +1,18 @@
 import React from 'react'
 
-const Contact = () => {
+export const Contact: React.FC = () => {
   return (
     <div>
       <section className='map'>
         <div
           id='map-container-google-1'
           className='z-depth-1-half map-container position-relative'
-          width='100%'
-          style={{ height: 400 + 'px' }}
+          style={{ height: 400 + 'px', width: '100%' }}
         >
           <iframe
             src='https://maps.google.com/maps?q=manhatan&t=&z=13&ie=UTF8&iwloc=&output=embed'
             width='100%'
             height='100%'
-            frameBorder='0'
             style={{ border: 0 }}
             allowFullScreen
           ></iframe>
@@ -82,5 +80,3 @@ const Contact = () => {
     </div>
   )
 }
-
-export default Contact
