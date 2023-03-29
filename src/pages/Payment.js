@@ -7,8 +7,8 @@ import user from '../components/icons/user.png'
 import close from '../components/icons/x.png'
 import LocationSelection from '../components/quotePage/LocationSelection'
 import PaymentMethod from '../components/quotePage/PaymentMethod'
-import PayBookTimeline from '../components/quotePage/Timeline'
-import TimeSelectionNew from '../components/quotePage/TimeSelectionNew'
+import { PayBookTimeline } from '../components/quotePage/PayBookTimeline'
+import { TimeSelection } from '../components/quotePage/TimeSelection'
 import '../css/payment.css'
 
 export default function Payment({ clientTime, clientDate, clientAddress, qid }) {
@@ -125,7 +125,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
             </div>
 
             {componentDisplay === 'time' && (
-              <TimeSelectionNew
+              <TimeSelection
                 timeSlotToParent={timeSlotToParent}
                 timeData={timeData}
                 liveBooking={false}

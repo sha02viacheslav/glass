@@ -4,7 +4,6 @@ import { loadStripe } from '@stripe/stripe-js'
 import { CheckoutForm } from '@glass/components/quotePage/Checkout/CheckoutForm'
 import { PaymentMethod } from '@glass/enums'
 import { REACT_APP_STRIPE_PUBLIC_KEY } from '@glass/envs'
-import './checkout.css'
 
 // Make sure to call `loadStripe` outside a component’s render to avoid
 // recreating the `Stripe` object on every render.

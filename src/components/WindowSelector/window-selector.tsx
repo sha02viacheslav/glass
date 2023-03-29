@@ -4,7 +4,7 @@ import imageMapResize from 'image-map-resizer'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, COORDS, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
 import { WindowSelection } from '@glass/models'
-import styles from '../../css/window-selection.module.css'
+import styles from './window-selection.module.css'
 
 export type WindowSelectorProps = {
   carType: CarType

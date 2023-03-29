@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import '../../css/payment-method.css'
 import Tooltip from '@mui/material/Tooltip'
 import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
-import { Checkout } from './Checkout/Checkout'
-import SelectOfferNew from './SelectOfferNew'
+import { Checkout } from './Checkout'
+import { SelectOfferNew } from './SelectOfferNew'
+import invoice from '../../assets/icons/invoice.png'
 import PDFViewer from '../functions/PDFViewer'
-import invoice from '../icons/invoice.png'
+import '../../css/payment-method.css'
 
 const monthValuesRev = {
   '01': 'Jan',

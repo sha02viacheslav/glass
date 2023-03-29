@@ -1,6 +1,6 @@
 import '../../css/payment-method.css'
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack5'
-import close from '../icons/x.png'
+import close from '../../assets/icons/x.png'
 
 const url = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 pdfjs.GlobalWorkerOptions.workerSrc = url

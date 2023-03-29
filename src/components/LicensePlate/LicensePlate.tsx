@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import '../css/license-plate.css'
-import flag from './icons/uk-flag.png'
+import flag from '@glass/assets/icons/uk-flag.png'
+import './license-plate.css'
 
 export type LicensePlateProps = {
   licenseNumber: string

@@ -1,19 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
-import '../css/quote.css'
-import '../css/license-plate.css'
 import Tooltip from '@mui/material/Tooltip'
 import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
-import BeforeAfter from '../components/BeforeAfter'
-import expand from '../components/icons/expand.png'
-import flag from '../components/icons/uk-flag.png'
-import up from '../components/icons/up.png'
-import close from '../components/icons/x.png'
+import expand from '../assets/icons/expand.png'
+import flag from '../assets/icons/uk-flag.png'
+import up from '../assets/icons/up.png'
+import close from '../assets/icons/x.png'
+import { BeforeAfter } from '../components/BeforeAfter'
 import { LocationSelection } from '../components/quotePage/LocationSelection'
 import PaymentMethod from '../components/quotePage/PaymentMethod'
 import PaymentPreview from '../components/quotePage/PaymentPreview'
-import SlotsPreview from '../components/quotePage/SlotsPreview'
-import TimeSelectionNew from '../components/quotePage/TimeSelectionNew'
+import { SlotsPreview } from '../components/quotePage/SlotsPreview'
+import { TimeSelection } from '../components/quotePage/TimeSelection'
+import '../css/quote.css'
+import '../components/LicensePlate/license-plate.css'
 
 // const monthValuesRev = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"June","07":"July","08":"Aug","09":"Sept","10":"Oct","11":"Nov","12":"Dec"};
 // const timeHeaders = ['08:00', '10:00', '12:00', '14:00','16:00','18:00','20:00','22:00'];
@@ -540,7 +540,7 @@ function Quote() {
 
               {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
               <div className={slotSelected ? 'quote-scheduler-red' : undefined}>
-                <TimeSelectionNew
+                <TimeSelection
                   timeSlotToParent={timeSlotToParent}
                   liveBooking={false}
                   slot={customerDetails.booking_start_date}

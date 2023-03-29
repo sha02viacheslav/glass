@@ -35,5 +35,3 @@ export const BeforeAfter: React.FC = () => {
     </div>
   )
 }
-
-export default BeforeAfter

@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { SelectOfferNew } from './SelectOfferNew'
 import '../../css/payment-method.css'
-import SelectOfferNew from './SelectOfferNew'
 
 const previewOffer = [
   {

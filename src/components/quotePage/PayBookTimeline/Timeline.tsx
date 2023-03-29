@@ -3,7 +3,7 @@ import { Box, Stepper, Step, StepLabel, Typography, StepContent } from '@mui/mat
 import before from '@glass/assets/images/test/test_broken.jpg'
 import after from '@glass/assets/images/test/test_fixed.jpg'
 import cameraIcon from '../icons/camera.png'
-import '../../css/timeline.css'
+import './timeline.css'
 
 const steps = ['Order placed', 'ETA', 'On our way', 'Job started', 'Finished']
 

@@ -1,9 +1,9 @@
-import '../../css/location.css'
 import React, { useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
 import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import { Address, LocationSelectionId } from '@glass/models'
+import './location.css'
 
 export type LocationSelectionProps = {
   userBillingAddress: string

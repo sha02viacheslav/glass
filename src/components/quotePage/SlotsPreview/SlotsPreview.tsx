@@ -1,12 +1,12 @@
-import '../../css/time-select-new.css'
 import React, { useEffect, useState } from 'react'
 import { Button, Menu, TextField } from '@mui/material'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
+import arrowIcon from '@glass/assets/icons/down-arrow.png'
+import stripes from '@glass/assets/icons/stripes_s.png'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
-import arrowIcon from '../icons/down-arrow.png'
-import stripes from '../icons/stripes_s.png'
+import '../TimeSelection/time-select-new.css'
 
 const timeHeaders = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
 const passedSlots = [10, 12, 14, 16, 18, 20, 22]

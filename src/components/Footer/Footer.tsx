@@ -1,7 +1,8 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
-import Slider from 'react-slick'
+import Slider, { CustomArrowProps } from 'react-slick'
 
-function SliderNextArrow(props) {
+function SliderNextArrow(props: CustomArrowProps) {
   const { onClick } = props
   return (
     <button className='slide-arrow next-arrow slick-arrow' onClick={onClick}>
@@ -10,7 +11,7 @@ function SliderNextArrow(props) {
   )
 }
 
-function SliderPrevArrow(props) {
+function SliderPrevArrow(props: CustomArrowProps) {
   const { onClick } = props
   return (
     <button className='slide-arrow prev-arrow slick-arrow' onClick={onClick}>
@@ -19,11 +20,9 @@ function SliderPrevArrow(props) {
   )
 }
 
-const Footer = () => {
+export const Footer: React.FC = () => {
   const settings = {
     dots: false,
-    //  prevArrow: '<button class="slide-arrow prev-arrow"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
-    //  nextArrow: '<button class="slide-arrow next-arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',
     speed: 300,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -50,12 +49,8 @@ const Footer = () => {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
-          // mobileFirst: true,
         },
       },
-      // You can unslick at a given breakpoint now by adding:
-      // settings: "unslick"
-      // instead of a settings object
     ],
   }
 
@@ -63,8 +58,6 @@ const Footer = () => {
     dots: false,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
-    //    prevArrow: '<button class="slide-arrow prev-arrow"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
-    //    nextArrow: '<button class="slide-arrow next-arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',
     infinite: true,
     variableWidth: true,
     speed: 300,
@@ -94,11 +87,9 @@ const Footer = () => {
           mobileFirst: true,
         },
       },
-      // You can unslick at a given breakpoint now by adding:
-      // settings: "unslick"
-      // instead of a settings object
     ],
   }
+
   return (
     <div id='footer-main'>
       <section className='sec-case-s section pt-md-0 '>
@@ -111,36 +102,6 @@ const Footer = () => {
           <div className='main-content  pt-4'>
             <div className='regular p-4'>
               <Slider {...settings}>
-                {/* <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/car1.png"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/car2.png"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> */}
                 <div className='item'>
                   <div className='row g-0'>
                     <div className='col-6'>
@@ -171,186 +132,6 @@ const Footer = () => {
                     </div>
                   </div>
                 </div>
-                {/* <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before2.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after2.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before3.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after3.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before4.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after4.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before5.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after5.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before6.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after6.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item">
-                                    <div className="row g-0">
-                                        <div className="col-6">
-                                            <div className="item-img odd animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/before7.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon">
-                                                    <span>BEFORE</span>
-                                                </div>
-                                                <div className="overlay odd fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="item-img even animated wow fadeIn">
-                                                <img src={process.env.PUBLIC_URL +"/img/gallery/after7.jpg"} className="img-fluid" alt="" />
-                                                <div className="ribbon ribbon-cyan">
-                                                    <span>AFTER</span>
-                                                </div>
-                                                <div className="overlay even fade-overlay">
-                                                    <div className="text">
-                                                        <i className="fa fa-search"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> */}
               </Slider>
             </div>
           </div>
@@ -361,7 +142,6 @@ const Footer = () => {
         <div className='container-fluid'>
           <h2 className='text-blue text-center mb-md-5 mb-4'>Testimonials</h2>
           <Slider {...settingsTestimonials}>
-            {/* <div className="testmon p-4 "> */}
             <div className='item '>
               <div className='testmon-box mb-4'>
                 <div className='d-flex justify-content-between'>
@@ -828,5 +608,3 @@ const Footer = () => {
     </div>
   )
 }
-
-export default Footer

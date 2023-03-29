@@ -18,7 +18,6 @@
     width: 100%;
     object-fit: cover;
     z-index: 1;
-    /* transform: scale(0.5); */
 }
 
 /* inactive layer (switching between tinted and normal) is underneath and invisible so it doesnt load when toggled */
@@ -29,7 +28,6 @@
     top: 0;
     z-index: 0;
     opacity: 0.5;
-    /* transform: scale(0.5); */
     object-fit: cover;
 }
 
@@ -40,7 +38,6 @@
     width: 100%;
     z-index: 2;
     object-fit: cover;
-    /* transform: scale(0.5); */
 }
 
 /* used for Coupe */
@@ -57,5 +54,4 @@
     z-index: 3;
     opacity: 0;
     object-fit: cover;
-    /* transform: scale(0.5); */
 }

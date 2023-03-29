@@ -9,7 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom'
 import { Sticky, StickyContainer } from 'react-sticky'
-import { WindowSelector } from '@glass/components/window-selection/window-selector'
+import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 
 const customStyles = {

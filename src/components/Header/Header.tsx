@@ -1,10 +1,12 @@
 import React from 'react'
-import { Link, useMatch, useResolvedPath } from 'react-router-dom'
-const Header = () => {
-  const handleToggleClick = (event) => {
-    // 👇️ toggle class on click
+import { Link } from 'react-router-dom'
+import { CustomLink } from '@glass/components/Header/CustomLink'
+
+export const Header: React.FC = () => {
+  const handleToggleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.currentTarget.classList.toggle('toggle-active')
   }
+
   return (
     <header id='navbar-main'>
       <nav id='navbar_top' className='navbar navbar-expand-lg navbar-light py-0'>
@@ -27,7 +29,6 @@ const Header = () => {
                   id='toggle'
                   onClick={handleToggleClick}
                   className='toggle-button ms-auto'
-                  type='button'
                   data-bs-toggle='collapse'
                   data-bs-target='#navbarSupportedContent'
                   aria-controls='navbarSupportedContent'
@@ -70,19 +71,5 @@ const Header = () => {
         </div>
       </nav>
     </header>
-  )
-}
-
-export default Header
-function CustomLink({ to, children, ...props }) {
-  const resolvedPath = useResolvedPath(to)
-  const isActive = useMatch({ path: resolvedPath.pathname, end: true })
-
-  return (
-    <li className='nav-item'>
-      <Link to={to} {...props} className={isActive ? 'nav-link active' : 'nav-link'}>
-        {children}
-      </Link>
-    </li>
   )
 }
