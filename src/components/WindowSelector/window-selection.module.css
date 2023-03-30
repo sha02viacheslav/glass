@@ -42,7 +42,7 @@
 
 /* used for Coupe */
 .brokenGlassAlt {
-  transform: scale(0.94);
+  transform: translate(30px, 30px);
 }
 
 /* transparent layer for image map */
