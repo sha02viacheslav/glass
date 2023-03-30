@@ -1,1 +1,1 @@
-export { WindowSelector as WindowSelector } from './window-selector'
+export { WindowSelector as WindowSelector } from './WindowSelector'

@@ -226,7 +226,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setTimeout(() => {
         setShowMap(true)
         setTimeout(() => {
-          imageMapResize()
+          imageMapResize('map.window-image-map')
         }, 300)
       })
     }
