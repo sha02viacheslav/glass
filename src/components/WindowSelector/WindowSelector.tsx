@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogTitle, ToggleButton, ToggleButtonGroup } from '@mui/material'
-import imageMapResize from 'image-map-resizer'
-import { CAR_IMAGES, CAR_TINTED_IMAGES, COORDS, WINDOWS } from '@glass/constants'
+import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
+import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
 import { WindowSelection } from '@glass/models'
 import styles from './window-selection.module.css'
@@ -32,7 +32,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     JSON.parse(sessionStorage.getItem('askedVanBody') || 'false'),
   )
   const [bodyPopup, setBodyPopup] = useState(false)
-  const [showMap, setShowMap] = useState<boolean>(false)
 
   // toggle first time popup appears, popup should show just once
   const [popupConfirm, setPopupConfirm] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
@@ -221,14 +220,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   useEffect(() => {
     if (!!carType) {
       setBrokenWindows(WINDOWS[carType])
-      // Should rerender map
-      setShowMap(false)
-      setTimeout(() => {
-        setShowMap(true)
-        setTimeout(() => {
-          imageMapResize('map.window-image-map')
-        }, 300)
-      })
     }
   }, [carType])
 
@@ -289,14 +280,13 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           ))}
 
         {/* transparent layer on top of all car-related images to maintain image map */}
-        {showMap && (
-          <img
-            id='window-image-map'
-            className={styles.selectionLayer}
-            src={CAR_IMAGES[carType]}
-            alt=''
-            useMap='#window-image-map'
-          />
+        {/* You should create instances for all car types so that the image-map-resizer is working */}
+        {CAR_TYPES.map((item, index) =>
+          item == carType ? (
+            <WindowMap key={index} carType={item} selectWindow={selectWindow} />
+          ) : (
+            <div key={index} className='d-none'></div>
+          ),
         )}
       </div>
 
@@ -356,19 +346,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           </a>
         ))}
       </div>
-      {showMap && (
-        <map name='window-image-map'>
-          {Object.entries(COORDS[carType]).map(([key, val]) => (
-            <area
-              key={`${carType}-${key}`}
-              onClick={() => selectWindow(key as WinLoc)}
-              coords={val}
-              shape='poly'
-              alt='window-selector'
-            />
-          ))}
-        </map>
-      )}
     </div>
   )
 }
