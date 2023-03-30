@@ -9,6 +9,7 @@ import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, VehicleData } from '@glass/models'
+import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Customer: React.FC = () => {
   const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
@@ -236,20 +237,7 @@ export const Customer: React.FC = () => {
   }, [])
 
   const handleVehInputChange = (data: string | undefined) => {
-    // format correctly
-    // check if license plate is standard or unique
-    let input = data
-    fetchVehData(input)
-    if (data && data.length >= 3) {
-      if (Number.isInteger(Number(data.charAt(2)))) {
-        // license number is standard
-        // check if plate already includes space
-        if (data.charAt(4) !== ' ' && data.length === 7) {
-          input = data.slice(0, 4) + ' ' + data.slice(4)
-        }
-      }
-    }
-    setLicense(input?.toUpperCase() || '')
+    setLicense(formatLicenseNumber(data))
   }
 
   const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
