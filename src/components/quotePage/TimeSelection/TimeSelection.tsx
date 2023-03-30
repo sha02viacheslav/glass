@@ -6,8 +6,11 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
 import moment from 'moment'
 import arrowIcon from '@glass/assets/icons/down-arrow.png'
 import stripes from '@glass/assets/icons/stripes_s.png'
+import { BOOKING_DATE_FORMAT } from '@glass/constants'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import './time-select-new.css'
+import { TimeSlot } from '@glass/models'
+import { formatSlotId } from '@glass/utils/format-slot-id/format-slot-id.util'
 
 const timeHeaders = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
 const passedSlots = [10, 12, 14, 16, 18, 20, 22]
@@ -27,12 +30,18 @@ const fullMonthValues = [
 ]
 
 export type TimeSelectionProps = {
-  timeSlotToParent: (value: string) => void
+  timeSlotToParent?: (value: TimeSlot) => void
+  onChangeSlotId?: (value: string) => void
   liveBooking: boolean
-  slot: string | undefined
+  bookingStartDate: string | undefined
 }
 
-export const TimeSelection: React.FC<TimeSelectionProps> = ({ timeSlotToParent, liveBooking, slot }) => {
+export const TimeSelection: React.FC<TimeSelectionProps> = ({
+  timeSlotToParent,
+  onChangeSlotId,
+  liveBooking,
+  bookingStartDate,
+}) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedSlot, setSelectedSlot] = useState('')
   const [slotChanged, setSlotChanged] = useState(false)
@@ -91,26 +100,28 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({ timeSlotToParent, 
       odooDay = '0' + odooDay
     }
     // for sending slot info to odoo, slot starting time
-    const odooSlot = moment(`${monthSelected} ${odooDay}, ${currentYear} ${8 + timeSelected * 2}:00:00`).format(
-      'YYYY-MM-DD hh:mm:ss',
+    const startDate = moment(`${monthSelected} ${odooDay}, ${currentYear} ${8 + timeSelected * 2}:00:00`).format(
+      BOOKING_DATE_FORMAT,
     )
     setSelectedSlot(idTag)
     setSlotChanged(true)
     if (!liveBooking) {
       // send data to parent page to enable next btn
-      timeSlotToParent(odooSlot)
+      if (timeSlotToParent) {
+        timeSlotToParent({ start: startDate, end: moment(startDate).add(2, 'hours').format(BOOKING_DATE_FORMAT) })
+      }
     }
   }
 
   // function only runs in live booking tab
-  function confirmSelection() {
+  const confirmSelection = () => {
     // save the slot selection and push to past slots
     sessionStorage.setItem('selectedSlot', JSON.stringify(selectedSlot))
     const pastSlots: string[] = JSON.parse(sessionStorage.getItem('pastSlots') || '[]')
     pastSlots.push(selectedSlot)
     sessionStorage.setItem('pastSlots', JSON.stringify(pastSlots))
     // send data to parent page to enable next btn
-    timeSlotToParent(selectedSlot)
+    if (onChangeSlotId) onChangeSlotId(selectedSlot)
   }
 
   const changePage = (navValue: string) => {
@@ -131,21 +142,18 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({ timeSlotToParent, 
   }, [currentPage, timeData])
 
   useEffect(() => {
-    // decipher odoo data into usable timeslot id
-    // odoo:"2023-01-12 12:00:00"
-    // id:"Jan122"
     let selectionId = ''
-    if (!!slot) {
-      const dateTime = slot.split(' ')
-      const dateSplit = dateTime[0].split('-')
-      const timeSplit = dateTime[1].substring(0, 5)
-      const timeIndex = timeHeaders.indexOf(timeSplit)
-      const timeCheck = Number(dateTime[1].substring(0, 2))
-      if (timeCheck - currentHour > 0 || Number(dateSplit[2]) !== today) {
+    if (!!bookingStartDate) {
+      if (moment(bookingStartDate).isAfter(moment())) {
         // only set prev selected slot if it has not passed
-        selectionId = moment(dateTime[0]).format('MMMDD').concat(timeIndex.toString())
+        selectionId = formatSlotId(bookingStartDate)
         setSelectedSlot(selectionId)
-        timeSlotToParent(selectionId)
+        if (timeSlotToParent) {
+          timeSlotToParent({
+            start: moment(bookingStartDate).format(BOOKING_DATE_FORMAT),
+            end: moment(bookingStartDate).add(2, 'hours').format(BOOKING_DATE_FORMAT),
+          })
+        }
       }
     }
     // find which slots have passed

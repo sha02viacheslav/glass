@@ -13,7 +13,8 @@ import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
 import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
-import { CustomerDetail, Invoice, Offer, PaymentOption } from '@glass/models'
+import { BOOKING_DATE_FORMAT } from '@glass/constants'
+import { CustomerDetail, Invoice, Offer, PaymentOption, TimeSlot } from '@glass/models'
 import '@glass/components/LicensePlate/license-plate.css'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
@@ -24,7 +25,7 @@ export const Quote: React.FC = () => {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
   const [snapValue, setSnapValue] = useState(1)
   const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
-  const [timeSlot, setTimeSlot] = useState('')
+  const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState(false)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
@@ -80,27 +81,27 @@ export const Quote: React.FC = () => {
 
   const handleSnapChange = (option: string) => {
     // navigate scroll snap
-    if (snapValue === 1 && option === 'next' && timeSlot === '') {
+    if (snapValue === 1 && option === 'next' && !timeSlot) {
       // offer to time select if timeslot is not selected
       setSnapValue(2)
       const dom = document.getElementById('2')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 1 && option === 'next' && timeSlot !== '') {
+    } else if (snapValue === 1 && option === 'next' && !!timeSlot) {
       // offer to location if timeslot is selected
       setSnapValue(3)
       const dom = document.getElementById('3')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 2 && option === 'next' && timeSlot !== '') {
+    } else if (snapValue === 2 && option === 'next' && !!timeSlot) {
       // time select to location if timeslot is selected
       setSnapValue(3)
       const dom = document.getElementById('3')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 2 && option === 'next' && timeSlot === '') {
+    } else if (snapValue === 2 && option === 'next' && !!timeSlot) {
       // scroll snap to time select if no slot selected
       const dom = document.getElementById('2')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
       setSlotSelected(true)
-    } else if (snapValue === 3 && option === 'next' && timeSlot !== '') {
+    } else if (snapValue === 3 && option === 'next' && !!timeSlot) {
       if (paymentOption[0].p_option === 4 || paymentOption[0].detail === 'Select payment method') {
         // scroll to PM component if no payment method is selected
         setSnapValue(1)
@@ -162,7 +163,6 @@ export const Quote: React.FC = () => {
 
   function PABegin() {
     // create payment API call
-    // console.log(invoiceData.invoice_number);
     const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
@@ -187,13 +187,13 @@ export const Quote: React.FC = () => {
       .catch(() => {})
   }
 
-  const sendBookingData = (slot_selected: string) => {
+  const sendBookingData = (selectedSlot: TimeSlot) => {
     const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: id,
-        booking_start_date: moment(slot_selected[0]).format('YYYY-DD-MM HH'),
-        booking_end_date: moment(slot_selected[0]).add(2, 'hours').format('YYYY-DD-MM HH'),
+        booking_start_date: moment(selectedSlot.start).format(BOOKING_DATE_FORMAT),
+        booking_end_date: moment(selectedSlot.end).format(BOOKING_DATE_FORMAT),
       },
     })
     const config = {
@@ -240,7 +240,7 @@ export const Quote: React.FC = () => {
     navigate('/customer/' + licenseReg)
   }
 
-  const timeSlotToParent = (data: string) => {
+  const timeSlotToParent = (data: TimeSlot) => {
     sendBookingData(data)
     setTimeSlot(data)
     setSlotSelected(false)
@@ -312,7 +312,7 @@ export const Quote: React.FC = () => {
     } else if (snapValue === 2 && acceptSelector !== null) {
       setAcceptBtn('Next')
       acceptSelector.classList.remove('quote-accept')
-    } else if (snapValue === 3 && acceptSelector !== null && timeSlot !== '') {
+    } else if (snapValue === 3 && acceptSelector !== null && !!timeSlot) {
       if (paymentOption[0].p_option === 1) {
         // detail coming from payment method
         setAcceptBtn(paymentOption[0].detail)
@@ -500,7 +500,7 @@ export const Quote: React.FC = () => {
                 <TimeSelection
                   timeSlotToParent={timeSlotToParent}
                   liveBooking={false}
-                  slot={customerDetails?.booking_start_date}
+                  bookingStartDate={customerDetails?.booking_start_date}
                 />
               </div>
 

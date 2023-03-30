@@ -1,59 +1,63 @@
-import { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import close from './../assets/components/icons/x.png'
-import user from '../../assets/icons/user.png'
-import monthsData from '../../components/data/months.json'
-import timeData from '../../components/data/newTSDummy.json'
-import LocationSelection from '../../components/quotePage/LocationSelection'
-import { PayBookTimeline } from '../../components/quotePage/PayBookTimeline'
-import { PaymentMethod } from '../../components/quotePage/PaymentMethod'
-import { TimeSelection } from '../../components/quotePage/TimeSelection'
+import moment from 'moment'
+import user from '@glass/assets/assets/icons/user.png'
+import close from '@glass/assets/components/icons/x.png'
+import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
+import { PayBookTimeline } from '@glass/components/quotePage/PayBookTimeline'
+import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
+import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import './payment.css'
+import { Invoice } from '@glass/models'
 
-export default function Payment({ clientTime, clientDate, clientAddress, qid }) {
-  const [pastSlots, setPastSlots] = useState(JSON.parse(sessionStorage.getItem('pastSlots')) || [])
-  const [pastLocs] = useState(JSON.parse(sessionStorage.getItem('pastLocs')) || [])
-  const [isOpen, setIsOpen] = useState(false) // control popup
+export type PaymentProps = {
+  clientTime: string
+  clientDate: string
+  clientAddress: string
+  qid: string
+}
+
+export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, clientAddress, qid }) => {
+  const [pastSlots, setPastSlots] = useState<string[]>(JSON.parse(sessionStorage.getItem('pastSlots') || '[]'))
+  const [pastLocs] = useState<string[]>(JSON.parse(sessionStorage.getItem('pastLocs') || '[]'))
+  const [isOpen, setIsOpen] = useState(false)
   const [isRetrieved, setIsRetrieved] = useState(true)
-  let currentDate = new Date()
-  const months = monthsData
   const [today, setToday] = useState('')
   const [componentDisplay, setComponentDisplay] = useState('')
   const [billingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
-  const [invoiceData, setInvoiceData] = useState([])
+  const [, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [payAssistStatus, setPayAssistStatus] = useState('')
 
-  function timeSlotToParent(slotData) {
+  const handleChangeSlotId = (slotData: string) => {
     pastSlots.push(slotData)
     setPastSlots(pastSlots.slice())
   }
 
-  function deliveryAddressToParent(data) {
+  const deliveryAddressToParent = (data: string) => {
     setDeliveryAddress(data)
   }
 
-  function openPopup(compValue) {
+  const openPopup = (compValue: string) => {
     setComponentDisplay(compValue)
     setIsOpen(true)
   }
 
-  function closePopup() {
+  const closePopup = () => {
     setIsOpen(false)
     setComponentDisplay('')
   }
 
-  function payAssistToParent(status) {
+  const payAssistToParent = (status: string) => {
     if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
       setPayAssistStatus(status)
     }
   }
 
-  function pay() {
+  const pay = () => {
     if (payAssistStatus === 'go') {
       // create payment API call
-      let data = JSON.stringify({
+      const data = JSON.stringify({
         jsonrpc: '2.0',
         params: {
           fe_token: 'ff74f4',
@@ -62,7 +66,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
           // "invoice_number": invoiceData.invoice_number
         },
       })
-      let config = {
+      const config = {
         method: 'post',
         url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
         headers: {
@@ -84,20 +88,16 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
   }
 
   useEffect(() => {
-    // for correctly displaying the current date incase Live Booking is in the preview state (!isRetrieved)
-    const currentDay = currentDate.getDate().toString()
-    const currentMonth = months[currentDate.getMonth()]
-    const currentYear = currentDate.getFullYear().toString()
-    const newCurrentDate = currentDay.concat(' ', currentMonth).concat(' ', currentYear)
-    setToday(newCurrentDate)
+    // for correctly displaying the current date in case Live Booking is in the preview state (!isRetrieved)
+    setToday(moment().format('MMM DD YYYY'))
     // get invoice data for payment
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       jsonrpc: '2.0',
       params: {
         fe_token: qid,
       },
     })
-    let config = {
+    const config = {
       method: 'post',
       url: process.env.REACT_APP_GET_INVOICE,
       headers: {
@@ -126,10 +126,9 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
 
             {componentDisplay === 'time' && (
               <TimeSelection
-                timeSlotToParent={timeSlotToParent}
-                timeData={timeData}
+                onChangeSlotId={handleChangeSlotId}
                 liveBooking={false}
-                slot={'2023-01-12 12:00:00'}
+                bookingStartDate={'2023-01-12 12:00:00'}
               />
             )}
 
@@ -217,8 +216,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
           <div
             id='map-container-google-1'
             className='z-depth-1-half map-container mt-4'
-            width='100%'
-            style={{ height: 400 + 'px' }}
+            style={{ height: '400px', width: '100%' }}
           >
             <iframe
               src='https://maps.google.com/maps?q=manhatan&t=&z=13&ie=UTF8&iwloc=&output=embed'
@@ -232,12 +230,7 @@ export default function Payment({ clientTime, clientDate, clientAddress, qid }) 
         </div>
         <button onClick={() => setIsRetrieved(!isRetrieved)}>switch</button>
         <PayBookTimeline />
-        <PaymentMethod
-          selectedPrice={invoiceData.amount_total}
-          qid={qid}
-          payAssist={payAssistToParent}
-          invoiceID={invoiceData.invoice_number}
-        />
+        <PaymentMethod qid={qid} payAssist={payAssistToParent} />
         <br />
         <br />
         <div className='payment-btn-container'>

@@ -13,14 +13,14 @@ import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOption,
 import './payment-method.css'
 
 export type PaymentMethodProps = {
-  offerDetails: Offer[]
-  customerInfo: CustomerDetail[]
+  offerDetails?: Offer[]
+  customerInfo?: CustomerDetail[]
   qid: string | undefined
   payAssist: (value: string) => void
-  invData: (value: Invoice) => void
-  PADataToParent: (value: (string | undefined)[]) => void
-  PAUrl: string
-  method: (value: PaymentOption[]) => void
+  invData?: (value: Invoice) => void
+  PADataToParent?: (value: (string | undefined)[]) => void
+  PAUrl?: string
+  method?: (value: PaymentOption[]) => void
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
@@ -35,8 +35,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 }) => {
   const [selectedMethod, setSelectedMethod] = useState(4)
   const [address, setAddress] = useState('')
-  const userBillingAddress = customerInfo[0].c_address
-  const [postalCode, setPostalCode] = useState(customerInfo[0].c_postalcode)
+  const userBillingAddress = customerInfo?.[0].c_address || ''
+  const [postalCode, setPostalCode] = useState<string>(customerInfo?.[0].c_postalcode || '')
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
   const [singlePay, setSinglePay] = useState<PaymentType>(PaymentType.CARD)
@@ -67,7 +67,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     const secondName = PAs_nameRef?.current?.value
     const email = PAEmailRef?.current?.value
     const data = [firstName, secondName, email, postalCode, address]
-    PADataToParent(data)
+    if (PADataToParent) PADataToParent(data)
   }
 
   const getTotalPrices = (data: PriceTotal[]) => {
@@ -100,7 +100,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     } else if (!startPAProcess) {
       msg = 'Select payment method'
     }
-    method([{ p_option: selectedMethod, detail: msg }])
+    if (method) method([{ p_option: selectedMethod, detail: msg }])
   }, [selectedMethod, startPAProcess, PAUrl])
 
   function retrieveInvoice() {
@@ -158,7 +158,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     }
     axios(config).then((response) => {
       setInvoiceData(response.data.result.data)
-      invData(response.data.result.data)
+      if (invData) invData(response.data.result.data)
     })
   }
 
@@ -235,7 +235,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <div className='PM-invoice-status'>{invoiceMessage}</div>
         <div className='PM-status'>Status: {status}</div>
         {/* show quotation price details */}
-        <SelectOfferNew selectOfferToCustomer={offerDetails} priceToParent={getTotalPrices} />
+        <SelectOfferNew selectOfferToCustomer={offerDetails || []} priceToParent={getTotalPrices} />
         <div className='PM-btn-container'>
           <button
             className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'}
@@ -285,21 +285,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAf_nameRef}
-                      defaultValue={customerInfo[0].customer_f_name}
+                      defaultValue={customerInfo?.[0].customer_f_name}
                       onChange={updatePAInfo}
                     />
                     <input
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAs_nameRef}
-                      defaultValue={customerInfo[0].customer_s_name}
+                      defaultValue={customerInfo?.[0].customer_s_name}
                       onChange={updatePAInfo}
                     />
                   </div>
                   <input
                     type='text'
                     className='form-control PM-email'
-                    defaultValue={customerInfo[0].customer_email}
+                    defaultValue={customerInfo?.[0].customer_email}
                     ref={PAEmailRef}
                     onChange={updatePAInfo}
                   />
@@ -352,7 +352,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   <input
                     type='text'
                     className='form-control PM-top-input'
-                    defaultValue={customerInfo[0].customer_f_name + ' ' + customerInfo[0].customer_s_name}
+                    defaultValue={customerInfo?.[0].customer_f_name + ' ' + customerInfo?.[0].customer_s_name}
                   />
                 </div>
                 <div className='PM-insurance-sub'>

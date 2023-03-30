@@ -19,7 +19,7 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
   deliveryAddressToChild,
 }) => {
   const [address, setAddress] = useState('')
-  const [addressInput, setAddressInput] = useState(false)
+  const [addressInput, setAddressInput] = useState<boolean>(false)
   const customer_id = ids?.[0].customerId
   const address_id = ids?.[0].addressId
   const [deliveryAddress, setDeliveryAddress] = useState('')
@@ -135,7 +135,6 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
         type='text'
         className='address-input'
         onChange={handlePCodeChange}
-        defaultValue={address}
         value={address}
       />
       <div className='option-container'>
@@ -150,7 +149,6 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
                 color: '#9a73dd',
               },
             }}
-            defaultChecked
           />
         </div>
       </div>
