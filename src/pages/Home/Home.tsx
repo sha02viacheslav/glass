@@ -24,7 +24,7 @@ export const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    localStorage.setItem('development version', JSON.stringify('1.1.5'))
+    localStorage.setItem('development version', JSON.stringify('1.1.6'))
   }, [])
 
   return (
