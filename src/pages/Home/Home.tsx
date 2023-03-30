@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import flag from '@glass/assets/icons/uk-flag.png'
+import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Home: React.FC = () => {
   const navigate = useNavigate()
@@ -10,21 +11,7 @@ export const Home: React.FC = () => {
 
   const patternMatch = () => {
     if (licenseRef.current) {
-      licenseRef.current.value = licenseRef.current.value.toUpperCase()
-      // check if license plate is standard or unique
-      if (licenseRef.current.value.length >= 3) {
-        if (Number.isInteger(Number(licenseRef.current.value.charAt(2)))) {
-          // license number is standard
-          // check if plate already includes space
-          if (licenseRef.current.value.charAt(4) === ' ') {
-            return
-          } else if (licenseRef.current.value.length === 7) {
-            let input = licenseRef.current.value
-            input = input.slice(0, 4) + ' ' + input.slice(4)
-            licenseRef.current.value = input
-          }
-        }
-      }
+      licenseRef.current.value = formatLicenseNumber(licenseRef.current.value)
     }
   }
 

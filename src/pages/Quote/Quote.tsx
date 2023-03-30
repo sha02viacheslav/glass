@@ -15,6 +15,7 @@ import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { CustomerDetail, Invoice, Offer, PaymentOption } from '@glass/models'
 import '@glass/components/LicensePlate/license-plate.css'
+import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
 
 export const Quote: React.FC = () => {
@@ -284,27 +285,7 @@ export const Quote: React.FC = () => {
 
   useEffect(() => {
     if (customerDetails) {
-      // format license number correctly
-      setTempLicense(customerDetails.registration_number)
-      if (tempLicenseNum === undefined) {
-        return
-      }
-      if (Number.isInteger(Number(tempLicenseNum.charAt(2)))) {
-        // license number is standard
-        // check if plate already includes space
-        if (tempLicenseNum.charAt(4) === ' ') {
-          return
-        } else if (tempLicenseNum.length === 7) {
-          let input: string
-          if (customerDetails.registration_number !== undefined) {
-            input = customerDetails.registration_number
-          } else {
-            input = tempLicenseNum
-          }
-          input = input.slice(0, 4) + ' ' + input.slice(4)
-          setTempLicense(input)
-        }
-      }
+      setTempLicense(formatLicenseNumber(customerDetails.registration_number))
     }
   }, [customerDetails])
 
