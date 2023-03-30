@@ -237,6 +237,7 @@ export const Customer: React.FC = () => {
   }, [])
 
   const handleVehInputChange = (data: string | undefined) => {
+    fetchVehData(data)
     setLicense(formatLicenseNumber(data))
   }
 
