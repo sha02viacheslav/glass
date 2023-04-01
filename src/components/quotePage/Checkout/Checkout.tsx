@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useParams } from 'react-router-dom'
-import { PaymentType } from '@glass/enums'
+import { PaymentMethodType } from '@glass/enums'
 import { REACT_APP_STRIPE_PUBLIC_KEY } from '@glass/envs'
 import { getInvoice } from '@glass/services/apis/invoice.service'
 import api from '../../../api'
 
 export type CheckoutProps = {
-  method: PaymentType
+  method: PaymentMethodType
   amount: number
 }
 
@@ -173,7 +173,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
 
   return (
     <>
-      {method === PaymentType.CARD && clientSecret && (
+      {method === PaymentMethodType.CARD && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm amount={amount} clientSecret={clientSecret} />
         </Elements>

@@ -14,7 +14,8 @@ import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
 import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
-import { CustomerDetail, Invoice, Offer, PaymentOption, TimeSlot } from '@glass/models'
+import { PaymentOptionEnum } from '@glass/enums'
+import { CustomerDetail, Invoice, Offer, PaymentOptionDto, TimeSlot } from '@glass/models'
 import '@glass/components/LicensePlate/license-plate.css'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
@@ -29,7 +30,9 @@ export const Quote: React.FC = () => {
   const [quoteInfoOpen, setInfoOpen] = useState(false)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
-  const [paymentOption, setPaymentOption] = useState<PaymentOption[]>([{ p_option: 0, detail: '' }])
+  const [paymentOption, setPaymentOption] = useState<PaymentOptionDto[]>([
+    { p_option: PaymentOptionEnum.NONE, detail: '' },
+  ])
   const [slotSelected, setSlotSelected] = useState(false)
   const [declinePopup, setDeclinePopup] = useState(false)
   const [declineReason, setDeclineReason] = useState<number>(0)
@@ -102,12 +105,15 @@ export const Quote: React.FC = () => {
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
       setSlotSelected(true)
     } else if (snapValue === 3 && option === 'next' && !!timeSlot) {
-      if (paymentOption[0].p_option === 4 || paymentOption[0].detail === 'Select payment method') {
+      if (paymentOption[0].p_option === PaymentOptionEnum.NONE || paymentOption[0].detail === 'Select payment method') {
         // scroll to PM component if no payment method is selected
         setSnapValue(1)
         const dom = document.getElementById('1')
         if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-      } else if (paymentOption[0].p_option === 1 && paymentOption[0].detail !== 'Select payment method') {
+      } else if (
+        paymentOption[0].p_option === PaymentOptionEnum.FOUR_MONTH &&
+        paymentOption[0].detail !== 'Select payment method'
+      ) {
         // pay with Payment Assist
         confirmBooking()
       }
@@ -250,7 +256,7 @@ export const Quote: React.FC = () => {
     setDeliveryAddress(data)
   }
 
-  const paymentOptionToParent = (pOption: PaymentOption[]) => {
+  const paymentOptionToParent = (pOption: PaymentOptionDto[]) => {
     setPaymentOption(pOption)
   }
 
@@ -313,7 +319,7 @@ export const Quote: React.FC = () => {
       setAcceptBtn('Next')
       acceptSelector.classList.remove('quote-accept')
     } else if (snapValue === 3 && acceptSelector !== null && !!timeSlot) {
-      if (paymentOption[0].p_option === 1) {
+      if (paymentOption[0].p_option === PaymentOptionEnum.FOUR_MONTH) {
         // detail coming from payment method
         setAcceptBtn(paymentOption[0].detail)
       } else {
