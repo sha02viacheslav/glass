@@ -5,6 +5,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useParams } from 'react-router-dom'
 import { PaymentType } from '@glass/enums'
 import { REACT_APP_STRIPE_PUBLIC_KEY } from '@glass/envs'
+import { getInvoice } from '@glass/services/apis/invoice.service'
 import api from '../../../api'
 
 export type CheckoutProps = {
@@ -140,32 +141,26 @@ const CheckoutForm: React.FC<{ amount: number; clientSecret: string }> = ({ amou
 
 export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
   const { id } = useParams()
-  const [invoice, setInvoice] = useState('')
+  const [invoiceNumber, setInvoiceNumber] = useState<string>('')
   const [clientSecret, setClientSecret] = useState('')
 
   useEffect(() => {
     if (id) {
-      api
-        .post('/invoice/get_invoice', {
-          params: {
-            fe_token: id,
-          },
-        })
-        .then((res: any) => {
-          if (res.data.result.data) {
-            setInvoice(res.data.result.data.invoice_number)
-          }
-        })
+      getInvoice(id).then((res) => {
+        if (res.success) {
+          setInvoiceNumber(res.data.invoice_number)
+        }
+      })
     }
   }, [id])
 
   useEffect(() => {
-    if (invoice) {
+    if (invoiceNumber) {
       api
         .post('/invoice/payment/stripe/create_indent', {
           params: {
             fe_token: id,
-            invoice_number: invoice,
+            invoice_number: invoiceNumber,
           },
         })
         .then((res: any) => {
@@ -174,7 +169,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
           }
         })
     }
-  }, [invoice])
+  }, [invoiceNumber])
 
   return (
     <>

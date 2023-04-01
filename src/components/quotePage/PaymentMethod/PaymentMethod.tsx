@@ -10,6 +10,7 @@ import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
 import { PaymentType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOption, PriceTotal } from '@glass/models'
+import { getInvoice } from '@glass/services/apis/invoice.service'
 import './payment-method.css'
 
 export type PaymentMethodProps = {
@@ -140,26 +141,15 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     setShowInvoice(status)
   }
 
-  function getInvoiceData() {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_GET_INVOICE,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
+  const getInvoiceData = () => {
+    if (qid) {
+      getInvoice(qid).then((res) => {
+        if (res.success) {
+          setInvoiceData(res.data)
+          if (invData) invData(res.data)
+        }
+      })
     }
-    axios(config).then((response) => {
-      setInvoiceData(response.data.result.data)
-      if (invData) invData(response.data.result.data)
-    })
   }
 
   function checkEligibility() {
