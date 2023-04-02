@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Dialog, DialogActions, DialogTitle, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
@@ -18,7 +19,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   brokenWindowsToComponent,
 }) => {
   // display popup
-  const [popup, setPopup] = useState(false)
+  const [showTintedConfirm, setShowTintedConfirm] = useState<boolean>(false)
   // determine if back windows are tinted
   const [tinted, setTinted] = useState(false)
   const [tintedValue, setTintedValue] = useState('no')
@@ -31,10 +32,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [bodyPopupConfirm, setBodyPopupConfirm] = useState(
     JSON.parse(sessionStorage.getItem('askedVanBody') || 'false'),
   )
-  const [bodyPopup, setBodyPopup] = useState(false)
+  const [showBodyPopup, setShowBodyPopup] = useState(false)
 
   // toggle first time popup appears, popup should show just once
-  const [popupConfirm, setPopupConfirm] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
+  const [tintedConfirmed, setTintedConfirmed] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
   // array of possible window selections for Coupe
   const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
@@ -50,8 +51,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       index = brokenWindows.findIndex((element) => element.window === windowClicked)
     }
     // display popup if a window which can be tinted is clicked for the first time
-    if (!popupConfirm && brokenWindows[index].hasTinted) {
-      setPopup(true)
+    if (!tintedConfirmed && brokenWindows[index].hasTinted) {
+      setShowTintedConfirm(true)
       return // don't allow back window selecting if popup is still active
     } else if (
       !bodyPopupConfirm &&
@@ -59,7 +60,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       brokenWindows[index].window === WinLoc.REAR
     ) {
       // Special case for vans
-      setBodyPopup(true)
+      setShowBodyPopup(true)
       return
     }
     // add to array which is sent to customer page
@@ -96,8 +97,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
   const handlePopup = (answer: boolean) => {
     setTinted(answer)
-    setPopup(false)
-    setPopupConfirm(true)
+    setShowTintedConfirm(false)
+    setTintedConfirmed(true)
     if (answer) {
       if (carType == CarType.BARN || carType == CarType.TAILGATER) {
         tintedButtonHandle('yes')
@@ -137,7 +138,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setSelectedWindows(selectedWindows.slice())
     }
     setTintedValue(newValue)
-    setPopupConfirm(true)
+    setTintedConfirmed(true)
     setBrokenWindows(brokenWindows.slice())
   }
 
@@ -196,7 +197,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   // handle popup for bodyType
   const handleBodyPopup = (isBarn: boolean) => {
     setIsBarnDoor(isBarn)
-    setBodyPopup(false)
+    setShowBodyPopup(false)
     setBodyPopupConfirm(true)
     bodyChange(isBarn)
     sessionStorage.setItem('askedVanBody', JSON.stringify(true))
@@ -239,27 +240,22 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   return (
     <div className={styles.container}>
       {/* display popup */}
-      <div>
-        <Dialog open={popup} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
-          <DialogTitle id='alert-dialog-title'>{'Are your back windows tinted?'}</DialogTitle>
-          <DialogActions>
-            <Button onClick={() => handlePopup(true)}>Yes</Button>
-            <Button onClick={() => handlePopup(false)}>No</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+
+      {showTintedConfirm && (
+        <ConfirmDialog
+          title='Are your back windows tinted?'
+          onConfirm={() => handlePopup(true)}
+          onCancel={() => handlePopup(false)}
+        />
+      )}
 
       {/* body type popup for vans */}
-      {(carType == CarType.BARN || carType == CarType.TAILGATER) && (
-        <div>
-          <Dialog open={bodyPopup} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
-            <DialogTitle id='alert-dialog-title'>{'Do you have one or two rear windows?'}</DialogTitle>
-            <DialogActions>
-              <Button onClick={() => handleBodyPopup(false)}>One</Button>
-              <Button onClick={() => handleBodyPopup(true)}>Two</Button>
-            </DialogActions>
-          </Dialog>
-        </div>
+      {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
+        <ConfirmDialog
+          title='Do you have one or two rear windows?'
+          onConfirm={() => handleBodyPopup(false)}
+          onCancel={() => handleBodyPopup(true)}
+        />
       )}
 
       <div className={styles.imgContainer}>

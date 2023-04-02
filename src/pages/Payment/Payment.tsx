@@ -7,8 +7,9 @@ import { LocationSelection } from '@glass/components/quotePage/LocationSelection
 import { PayBookTimeline } from '@glass/components/quotePage/PayBookTimeline'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
-import './payment.css'
 import { Invoice } from '@glass/models'
+import { getInvoice } from '@glass/services/apis/invoice.service'
+import './payment.css'
 
 export type PaymentProps = {
   clientTime: string
@@ -90,29 +91,15 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
   useEffect(() => {
     // for correctly displaying the current date in case Live Booking is in the preview state (!isRetrieved)
     setToday(moment().format('MMM DD YYYY'))
+
     // get invoice data for payment
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_GET_INVOICE,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
+    if (qid) {
+      getInvoice(qid).then((res) => {
+        if (res.success) {
+          setInvoiceData(res.data)
+        }
+      })
     }
-    axios(config)
-      .then(function (response) {
-        setInvoiceData(response.data.result.data)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
   }, [])
 
   return (

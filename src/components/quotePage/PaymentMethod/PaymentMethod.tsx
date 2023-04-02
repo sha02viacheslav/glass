@@ -4,13 +4,16 @@ import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import invoice from '@glass/assets/icons/invoice.png'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentType } from '@glass/enums'
+import { PaymentOptionEnum, PaymentMethodType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOption, PriceTotal } from '@glass/models'
+import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOptionDto, PriceTotal } from '@glass/models'
+import { getInvoice } from '@glass/services/apis/invoice.service'
 import './payment-method.css'
+import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -20,7 +23,7 @@ export type PaymentMethodProps = {
   invData?: (value: Invoice) => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
-  method?: (value: PaymentOption[]) => void
+  method?: (value: PaymentOptionDto[]) => void
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
@@ -33,13 +36,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   PAUrl,
   method,
 }) => {
-  const [selectedMethod, setSelectedMethod] = useState(4)
+  const [selectedMethod, setSelectedMethod] = useState<PaymentOptionEnum>(PaymentOptionEnum.NONE)
   const [address, setAddress] = useState('')
   const userBillingAddress = customerInfo?.[0].c_address || ''
   const [postalCode, setPostalCode] = useState<string>(customerInfo?.[0].c_postalcode || '')
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
-  const [singlePay, setSinglePay] = useState<PaymentType>(PaymentType.CARD)
+  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
+  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
   const [status] = useState('not paid')
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
@@ -53,6 +57,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -74,36 +79,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     setPriceTotals(data)
   }
 
-  useEffect(() => {
-    // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('autocomplete-field', REACT_APP_AUTOCOMPLETE, {
-      delay: 500,
-    })
-    // Preventing Default to show complete address with Postal Code
-    window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
-      e.preventDefault()
-      // @ts-ignore
-      const address: Address = e.address
-      const tempAddress = address.formatted_address.filter(Boolean).join(', ')
-      const postalcode = address.postcode
-      setAddress(tempAddress)
-      setPostalCode(postalcode)
-    })
-    setAddress(userBillingAddress)
-    // update selected payment method in quote page (parent)
-    let msg = ''
-    if (startPAProcess && PAUrl === '') {
-      // if user is in check eligibility phase
-      msg = 'Check Eligibility'
-    } else if (startPAProcess && PAUrl !== '') {
-      msg = 'Continue Payment Assist'
-    } else if (!startPAProcess) {
-      msg = 'Select payment method'
-    }
-    if (method) method([{ p_option: selectedMethod, detail: msg }])
-  }, [selectedMethod, startPAProcess, PAUrl])
-
-  function retrieveInvoice() {
+  const retrieveInvoice = () => {
     // get url of invoice PDF
     const data = JSON.stringify({
       jsonrpc: '2.0',
@@ -121,7 +97,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       data: data,
     }
     axios(config)
-      .then(function (response) {
+      .then((response) => {
         // figure out how to view pdf
         if (response.data.result.data.invoice_pdf_url !== '') {
           setInvoicePDF(response.data.result.data.invoice_pdf_url)
@@ -140,40 +116,44 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     setShowInvoice(status)
   }
 
-  function getInvoiceData() {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_GET_INVOICE,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
+  const getInvoiceData = () => {
+    if (qid) {
+      getInvoice(qid).then((res) => {
+        if (res.success) {
+          setInvoiceData(res.data)
+          if (invData) invData(res.data)
+        }
+      })
     }
-    axios(config).then((response) => {
-      setInvoiceData(response.data.result.data)
-      if (invData) invData(response.data.result.data)
-    })
   }
 
-  function checkEligibility() {
+  const checkEligibility = () => {
     // communicate with Payment (parent)
     payAssist('go')
   }
 
-  useEffect(() => {
-    // get invoice data for payment
-    getInvoiceData()
-  }, [])
+  const handleChangePaymentMethodType = (value: PaymentMethodType) => {
+    if (value == paymentMethodType) return
+    setTempPaymentMethodType(value)
+    setShowPaymentConfirm(true)
+  }
 
-  function retrievePlan() {
-    if (selectedMethod === 1) {
+  const handleConfirmChangePaymentMethodType = () => {
+    if (qid) {
+      setPaymentMethodType(tempPaymentMethodType)
+      setShowPaymentConfirm(false)
+      if (tempPaymentMethodType === PaymentMethodType.CASH) {
+        updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
+          if (res.success) {
+            getInvoiceData()
+          }
+        })
+      }
+    }
+  }
+
+  const retrievePlan = () => {
+    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH) {
       // retrieve payment assist plan data
       const data = JSON.stringify({
         jsonrpc: '2.0',
@@ -197,7 +177,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   useEffect(() => {
-    if (selectedMethod === 1 && !PAProceed) {
+    if (invoiceData?.payment_method_type) {
+      setPaymentMethodType(invoiceData.payment_method_type)
+    }
+  }, [invoiceData])
+
+  useEffect(() => {
+    // get invoice data for payment
+    getInvoiceData()
+  }, [qid])
+
+  useEffect(() => {
+    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH && !PAProceed) {
       // retrieve payment assist plan data
       const data = JSON.stringify({
         jsonrpc: '2.0',
@@ -222,6 +213,35 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     }
   }, [selectedMethod])
 
+  useEffect(() => {
+    // Integration of PostalCode/ Address AutoComplete API
+    autocomplete('autocomplete-field', REACT_APP_AUTOCOMPLETE, {
+      delay: 500,
+    })
+    // Preventing Default to show complete address with Postal Code
+    window.addEventListener('getaddress-autocomplete-address-selected', (e) => {
+      e.preventDefault()
+      // @ts-ignore
+      const address: Address = e.address
+      const tempAddress = address.formatted_address.filter(Boolean).join(', ')
+      const postalcode = address.postcode
+      setAddress(tempAddress)
+      setPostalCode(postalcode)
+    })
+    setAddress(userBillingAddress)
+    // update selected payment method in quote page (parent)
+    let msg = ''
+    if (startPAProcess && PAUrl === '') {
+      // if user is in check eligibility phase
+      msg = 'Check Eligibility'
+    } else if (startPAProcess && PAUrl !== '') {
+      msg = 'Continue Payment Assist'
+    } else if (!startPAProcess) {
+      msg = 'Select payment method'
+    }
+    if (method) method([{ p_option: selectedMethod, detail: msg }])
+  }, [selectedMethod, startPAProcess, PAUrl])
+
   return (
     <div className='center'>
       {showInvoice && !!invoiceData && (
@@ -238,22 +258,22 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <SelectOfferNew selectOfferToCustomer={offerDetails || []} priceToParent={getTotalPrices} />
         <div className='PM-btn-container'>
           <button
-            className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(1)}
+            className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
+            onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
           >
             <small className='fs-14'>4 month</small>
             <div className='PM-price'>£ {(priceTotals[0].total / 4).toFixed(2)}</div>
           </button>
           <button
-            className={selectedMethod === 2 ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(2)}
+            className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
+            onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
           >
             <small className='fs-14'>Insurance</small>
             <div className='PM-price'>£ {priceTotals[0].total}</div>
           </button>
           <button
-            className={selectedMethod === 3 ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(3)}
+            className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
+            onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
           >
             <small className='fs-14'>Single pay</small>
             <div className='PM-price'>£ {priceTotals[0].total}</div>
@@ -261,7 +281,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         </div>
 
         <div className='PM-payment-option'>
-          {selectedMethod === 1 && (
+          {selectedMethod === PaymentOptionEnum.FOUR_MONTH && (
             <div>
               <p className='text-purple mb-2'>4-Month</p>
               {!!monthlyPayments && (
@@ -343,7 +363,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               </div>
             </div>
           )}
-          {selectedMethod === 2 && (
+          {selectedMethod === PaymentOptionEnum.INSURANCE && (
             <div>
               <p className='text-purple mb-2'>Insurance</p>
               <div className='PM-insurance-container'>
@@ -391,8 +411,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               </div>
               <div className='PM-single-pay mt-3'>
                 <button
-                  className={`pm-proceed-btn card-btn ${singlePay === PaymentType.CARD ? 'pm-proceed-selected' : ''}`}
-                  onClick={() => setSinglePay(PaymentType.CARD)}
+                  className={`pm-proceed-btn card-btn ${
+                    paymentMethodType === PaymentMethodType.CARD ? 'pm-proceed-selected' : ''
+                  }`}
+                  onClick={() => handleChangePaymentMethodType(PaymentMethodType.CARD)}
                 >
                   <div className='position-relative w-100'>
                     <svg
@@ -411,8 +433,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   <span>Excess Card</span>
                 </button>
                 <button
-                  className={`pm-proceed-btn ${singlePay === PaymentType.CASH ? 'pm-proceed-selected' : ''}`}
-                  onClick={() => setSinglePay(PaymentType.CASH)}
+                  className={`pm-proceed-btn ${
+                    paymentMethodType === PaymentMethodType.CASH ? 'pm-proceed-selected' : ''
+                  }`}
+                  onClick={() => handleChangePaymentMethodType(PaymentMethodType.CASH)}
                 >
                   <div className='position-relative w-100'>
                     <div className='p-TabIconContainer'>
@@ -450,16 +474,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   <span>Excess Cash</span>
                 </button>
               </div>
-              <Checkout method={singlePay} amount={priceTotals[0].total} />
+              <Checkout method={paymentMethodType} amount={priceTotals[0].total} />
             </div>
           )}
-          {selectedMethod === 3 && (
+          {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
             <div>
               <div className='PM-insurance-container'>
                 <div className='PM-single-pay'>
                   <button
-                    className={`pm-proceed-btn card-btn ${singlePay === PaymentType.CARD ? 'pm-proceed-selected' : ''}`}
-                    onClick={() => setSinglePay(PaymentType.CARD)}
+                    className={`pm-proceed-btn card-btn ${
+                      paymentMethodType === PaymentMethodType.CARD ? 'pm-proceed-selected' : ''
+                    }`}
+                    onClick={() => handleChangePaymentMethodType(PaymentMethodType.CARD)}
                   >
                     <div className='position-relative w-100'>
                       <svg
@@ -478,8 +504,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <span>Card</span>
                   </button>
                   <button
-                    className={`pm-proceed-btn ${singlePay === PaymentType.CASH ? 'pm-proceed-selected' : ''}`}
-                    onClick={() => setSinglePay(PaymentType.CASH)}
+                    className={`pm-proceed-btn ${
+                      paymentMethodType === PaymentMethodType.CASH ? 'pm-proceed-selected' : ''
+                    }`}
+                    onClick={() => handleChangePaymentMethodType(PaymentMethodType.CASH)}
                   >
                     <div className='position-relative w-100'>
                       <div className='p-TabIconContainer'>
@@ -518,12 +546,22 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   </button>
                 </div>
               </div>
-              <Checkout method={singlePay} amount={priceTotals[0].total} />
+              <Checkout method={paymentMethodType} amount={priceTotals[0].total} />
             </div>
           )}
-          {selectedMethod === 4 && <div className='transparent-element'>-</div>}
+          {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
         </div>
       </div>
+
+      {showPaymentConfirm && (
+        <ConfirmDialog
+          title='Are you sure you want to change the payment method type?'
+          onConfirm={handleConfirmChangePaymentMethodType}
+          onCancel={() => {
+            setShowPaymentConfirm(false)
+          }}
+        />
+      )}
     </div>
   )
 }
