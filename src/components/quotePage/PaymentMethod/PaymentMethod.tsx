@@ -142,11 +142,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (qid) {
       setPaymentMethodType(tempPaymentMethodType)
       setShowPaymentConfirm(false)
-      updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
-        if (res.success) {
-          getInvoiceData()
-        }
-      })
+      if (tempPaymentMethodType === PaymentMethodType.CASH) {
+        updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
+          if (res.success) {
+            getInvoiceData()
+          }
+        })
+      }
     }
   }
 
