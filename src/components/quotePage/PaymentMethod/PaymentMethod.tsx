@@ -42,8 +42,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [postalCode, setPostalCode] = useState<string>(customerInfo?.[0].c_postalcode || '')
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
-  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
-  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
+  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
+  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
   const [status] = useState('not paid')
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
@@ -142,13 +142,11 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (qid) {
       setPaymentMethodType(tempPaymentMethodType)
       setShowPaymentConfirm(false)
-      if (tempPaymentMethodType === PaymentMethodType.CASH) {
-        updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
-          if (res.success) {
-            getInvoiceData()
-          }
-        })
-      }
+      updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
+        if (res.success) {
+          getInvoiceData()
+        }
+      })
     }
   }
 
@@ -412,9 +410,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               <div className='PM-single-pay mt-3'>
                 <button
                   className={`pm-proceed-btn card-btn ${
-                    paymentMethodType === PaymentMethodType.CARD ? 'pm-proceed-selected' : ''
+                    paymentMethodType === PaymentMethodType.STRIPE ? 'pm-proceed-selected' : ''
                   }`}
-                  onClick={() => handleChangePaymentMethodType(PaymentMethodType.CARD)}
+                  onClick={() => handleChangePaymentMethodType(PaymentMethodType.STRIPE)}
                 >
                   <div className='position-relative w-100'>
                     <svg
@@ -483,9 +481,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 <div className='PM-single-pay'>
                   <button
                     className={`pm-proceed-btn card-btn ${
-                      paymentMethodType === PaymentMethodType.CARD ? 'pm-proceed-selected' : ''
+                      paymentMethodType === PaymentMethodType.STRIPE ? 'pm-proceed-selected' : ''
                     }`}
-                    onClick={() => handleChangePaymentMethodType(PaymentMethodType.CARD)}
+                    onClick={() => handleChangePaymentMethodType(PaymentMethodType.STRIPE)}
                   >
                     <div className='position-relative w-100'>
                       <svg

@@ -173,7 +173,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
 
   return (
     <>
-      {method === PaymentMethodType.CARD && clientSecret && (
+      {method === PaymentMethodType.STRIPE && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm amount={amount} clientSecret={clientSecret} />
         </Elements>
