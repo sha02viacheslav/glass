@@ -4,6 +4,7 @@ import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import invoice from '@glass/assets/icons/invoice.png'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
@@ -42,6 +43,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
   const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
+  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.CARD)
   const [status] = useState('not paid')
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
@@ -55,6 +57,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -131,9 +134,15 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const handleChangePaymentMethodType = (value: PaymentMethodType) => {
     if (value == paymentMethodType) return
-    setPaymentMethodType(value)
+    setTempPaymentMethodType(value)
+    setShowPaymentConfirm(true)
+  }
+
+  const handleConfirmChangePaymentMethodType = () => {
     if (qid) {
-      updatePaymentMethod(qid, value).then((res) => {
+      setPaymentMethodType(tempPaymentMethodType)
+      setShowPaymentConfirm(false)
+      updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
         if (res.success) {
           getInvoiceData()
         }
@@ -541,6 +550,16 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
         </div>
       </div>
+
+      {showPaymentConfirm && (
+        <ConfirmDialog
+          title='Are you sure you want to change the payment method type?'
+          onConfirm={handleConfirmChangePaymentMethodType}
+          onCancel={() => {
+            setShowPaymentConfirm(false)
+          }}
+        />
+      )}
     </div>
   )
 }
