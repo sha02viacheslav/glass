@@ -15,8 +15,12 @@ import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
 import { PaymentOptionEnum } from '@glass/enums'
-import { CustomerDetail, Invoice, Offer, PaymentOptionDto, TimeSlot } from '@glass/models'
+import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
 import '@glass/components/LicensePlate/license-plate.css'
+import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
+import { getQuoteService } from '@glass/services/apis/get-quote.service'
+import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
+import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
 
@@ -49,6 +53,7 @@ export const Quote: React.FC = () => {
       price_subtotal: 0,
     },
   ])
+  const [optionalOrderLines, setOptionalOrderLines] = useState<OptionalOrderLine[]>([])
   const [payAssistStatus, setPayAssistStatus] = useState('')
   const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
@@ -57,29 +62,14 @@ export const Quote: React.FC = () => {
   // client info
   const { id } = useParams()
   const getQuote = (qid: string) => {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
+    getQuoteService(qid).then((res) => {
+      if (res.success) {
+        setCustomerDetails(res.data)
+        setBillingAddress(res.data.customer_order_postal_code)
+        setOffersDetails(res.data.order_lines || [])
+        setOptionalOrderLines(res.data.optional_order_lines || [])
+      }
     })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_PREVIEW_QUOTE,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    }
-    axios(config)
-      .then(function (response) {
-        setCustomerDetails(response.data.result.data)
-        setBillingAddress(response.data.result.data.customer_order_postal_code)
-        if (response.data.result.data.order_lines.length !== 0) {
-          setOffersDetails(response.data.result.data.order_lines)
-        }
-      })
-      .catch(() => {})
   }
 
   const handleSnapChange = (option: string) => {
@@ -120,7 +110,7 @@ export const Quote: React.FC = () => {
     }
   }
 
-  function confirmBooking() {
+  const confirmBooking = () => {
     let first: string
     let second: string
     let post: string
@@ -138,33 +128,19 @@ export const Quote: React.FC = () => {
       post = PAData[3] || ''
       addr = PAData[4] || ''
     }
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        f_name: first,
-        s_name: second,
-        addr1: addr,
-        postcode: post,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_PAYMENT_ASSIST_PRE,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
-      },
-      data: data,
-    }
-    axios(config)
-      .then(function (response) {
-        if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
+
+    preApprovePaymentService({
+      f_name: first,
+      s_name: second,
+      addr1: addr,
+      postcode: post,
+    }).then((res) => {
+      if (res.success) {
+        if (res.data.approved) {
           PABegin()
-        } else if (response.data.result.message === 'Success' && !response.data.result.result.data.approved) {
-        } else {
         }
-      })
-      .catch(() => {})
+      }
+    })
   }
 
   function PABegin() {
@@ -273,6 +249,23 @@ export const Quote: React.FC = () => {
     setInvoiceData(data)
   }
 
+  const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
+    if (!id) return
+    if (checked) {
+      addOptionalProductService(id, optionalLineId).then((res) => {
+        if (res.success) {
+          getQuote(id)
+        }
+      })
+    } else {
+      removeOptionalProductService(id, orderLineId, optionalLineId).then((res) => {
+        if (res.success) {
+          getQuote(id)
+        }
+      })
+    }
+  }
+
   useEffect(() => {
     // Get Quote Data
     if (id) getQuote(id)
@@ -294,20 +287,6 @@ export const Quote: React.FC = () => {
       setTempLicense(formatLicenseNumber(customerDetails.registration_number))
     }
   }, [customerDetails])
-
-  // useEffect(() => {
-  //     if (timeSlot !== '') {
-  //         // format timeslot data to send to live booking tab
-  //         // data:"2023-01-12 12:00:00"
-  //         const dateTime = timeSlot.split(' ');
-  //         const dateSplit = dateTime[0].split('-');
-  //         const timeSplit = dateTime[1].substring(0, 5);
-  //         const timeSplitNext = timeHeaders[timeHeaders.indexOf(timeSplit) + 1];
-  //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-  //         setDateToPayment(date);
-  //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-  //     }
-  // }, [tabValue]);
 
   useEffect(() => {
     // change between accept and next buttons names and styling
@@ -476,6 +455,7 @@ export const Quote: React.FC = () => {
                 {!!customerDetails && (
                   <PaymentMethod
                     offerDetails={offersDetails}
+                    optionalOrderLines={optionalOrderLines}
                     customerInfo={[
                       {
                         ...customerDetails,
@@ -491,6 +471,7 @@ export const Quote: React.FC = () => {
                     PADataToParent={PADataToParent}
                     PAUrl={PAUrl}
                     method={paymentOptionToParent}
+                    onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
                   />
                 )}
               </div>

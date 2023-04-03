@@ -10,13 +10,23 @@ import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
 import { PaymentOptionEnum, PaymentMethodType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import { Address, CustomerDetail, Invoice, MonthlyPayment, Offer, PaymentOptionDto, PriceTotal } from '@glass/models'
+import {
+  Address,
+  CustomerDetail,
+  Invoice,
+  MonthlyPayment,
+  Offer,
+  OptionalOrderLine,
+  PaymentOptionDto,
+  PriceTotal,
+} from '@glass/models'
 import { getInvoice } from '@glass/services/apis/invoice.service'
 import './payment-method.css'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
+  optionalOrderLines?: OptionalOrderLine[]
   customerInfo?: CustomerDetail[]
   qid: string | undefined
   payAssist: (value: string) => void
@@ -24,10 +34,12 @@ export type PaymentMethodProps = {
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
   method?: (value: PaymentOptionDto[]) => void
+  onCheckOptionalOrderLine?: (orderLineId: number, optionalLineId: number, checked: boolean) => void
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   offerDetails,
+  optionalOrderLines,
   customerInfo,
   qid,
   payAssist,
@@ -35,6 +47,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   PADataToParent,
   PAUrl,
   method,
+  onCheckOptionalOrderLine,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentOptionEnum>(PaymentOptionEnum.NONE)
   const [address, setAddress] = useState('')
@@ -253,7 +266,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <div className='PM-invoice-status'>{invoiceMessage}</div>
         <div className='PM-status'>Status: {status}</div>
         {/* show quotation price details */}
-        <SelectOfferNew selectOfferToCustomer={offerDetails || []} priceToParent={getTotalPrices} />
+        <SelectOfferNew
+          selectOfferToCustomer={offerDetails || []}
+          optionalOrderLines={optionalOrderLines || []}
+          priceToParent={getTotalPrices}
+          onCheckOptionalOrderLine={onCheckOptionalOrderLine}
+        />
         <div className='PM-btn-container'>
           <button
             className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
