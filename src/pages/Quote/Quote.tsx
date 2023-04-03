@@ -19,6 +19,7 @@ import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, Ti
 import '@glass/components/LicensePlate/license-plate.css'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
+import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
@@ -127,33 +128,19 @@ export const Quote: React.FC = () => {
       post = PAData[3] || ''
       addr = PAData[4] || ''
     }
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        f_name: first,
-        s_name: second,
-        addr1: addr,
-        postcode: post,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_PAYMENT_ASSIST_PRE,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
-      },
-      data: data,
-    }
-    axios(config)
-      .then(function (response) {
-        if (response.data.result.message === 'Success' && response.data.result.result.data.approved) {
+
+    preApprovePaymentService({
+      f_name: first,
+      s_name: second,
+      addr1: addr,
+      postcode: post,
+    }).then((res) => {
+      if (res.success) {
+        if (res.data.approved) {
           PABegin()
-        } else if (response.data.result.message === 'Success' && !response.data.result.result.data.approved) {
-        } else {
         }
-      })
-      .catch(() => {})
+      }
+    })
   }
 
   function PABegin() {
