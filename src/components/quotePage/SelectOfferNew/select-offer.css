@@ -11,8 +11,9 @@
 }
 
 .table-container {
-  overflow: auto;
+  overflow: visible;
   white-space: nowrap;
+  margin-bottom: 24px;
 }
 
 .SO-table {
@@ -41,7 +42,7 @@
 }
 
 .so-info {
-  max-width: 200px;
+  max-width: 210px;
   height: fit-content;
   padding: 5px;
   white-space: pre-wrap;
@@ -57,6 +58,7 @@
 
 .first-col {
   justify-content: left;
+  align-items: center;
 }
 
 .first-col-wipers {

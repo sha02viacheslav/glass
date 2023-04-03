@@ -1,4 +1,6 @@
 import { Address } from './address.model'
+import { Offer } from './offer.model'
+import { OptionalOrderLine } from './optional-order-line.model'
 
 export type CustomerDetail = {
   customer_id: number
@@ -14,4 +16,6 @@ export type CustomerDetail = {
   booking_start_date: string
   c_address: string
   c_postalcode: string
+  order_lines?: Offer[]
+  optional_order_lines?: OptionalOrderLine[]
 }

@@ -15,8 +15,11 @@ import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
 import { PaymentOptionEnum } from '@glass/enums'
-import { CustomerDetail, Invoice, Offer, PaymentOptionDto, TimeSlot } from '@glass/models'
+import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
 import '@glass/components/LicensePlate/license-plate.css'
+import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
+import { getQuoteService } from '@glass/services/apis/get-quote.service'
+import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
 
@@ -49,6 +52,7 @@ export const Quote: React.FC = () => {
       price_subtotal: 0,
     },
   ])
+  const [optionalOrderLines, setOptionalOrderLines] = useState<OptionalOrderLine[]>([])
   const [payAssistStatus, setPayAssistStatus] = useState('')
   const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
@@ -72,14 +76,21 @@ export const Quote: React.FC = () => {
       data: data,
     }
     axios(config)
-      .then(function (response) {
-        setCustomerDetails(response.data.result.data)
-        setBillingAddress(response.data.result.data.customer_order_postal_code)
+      .then((response) => {
         if (response.data.result.data.order_lines.length !== 0) {
-          setOffersDetails(response.data.result.data.order_lines)
+          setOptionalOrderLines(response.data.result.data.optional_order_lines || [])
         }
       })
       .catch(() => {})
+
+    getQuoteService(qid).then((res) => {
+      if (res.success) {
+        setCustomerDetails(res.data)
+        setBillingAddress(res.data.customer_order_postal_code)
+        setOffersDetails(res.data.order_lines || [])
+        setOptionalOrderLines(res.data.optional_order_lines || [])
+      }
+    })
   }
 
   const handleSnapChange = (option: string) => {
@@ -271,6 +282,23 @@ export const Quote: React.FC = () => {
 
   const invDataToParent = (data: Invoice) => {
     setInvoiceData(data)
+  }
+
+  const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
+    if (!id) return
+    if (checked) {
+      addOptionalProductService(id, optionalLineId).then((res) => {
+        if (res.success) {
+          getQuote(id)
+        }
+      })
+    } else {
+      removeOptionalProductService(id, orderLineId, optionalLineId).then((res) => {
+        if (res.success) {
+          getQuote(id)
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -476,6 +504,7 @@ export const Quote: React.FC = () => {
                 {!!customerDetails && (
                   <PaymentMethod
                     offerDetails={offersDetails}
+                    optionalOrderLines={optionalOrderLines}
                     customerInfo={[
                       {
                         ...customerDetails,
@@ -491,6 +520,7 @@ export const Quote: React.FC = () => {
                     PADataToParent={PADataToParent}
                     PAUrl={PAUrl}
                     method={paymentOptionToParent}
+                    onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
                   />
                 )}
               </div>
