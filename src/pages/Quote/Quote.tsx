@@ -61,28 +61,6 @@ export const Quote: React.FC = () => {
   // client info
   const { id } = useParams()
   const getQuote = (qid: string) => {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_PREVIEW_QUOTE,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    }
-    axios(config)
-      .then((response) => {
-        if (response.data.result.data.order_lines.length !== 0) {
-          setOptionalOrderLines(response.data.result.data.optional_order_lines || [])
-        }
-      })
-      .catch(() => {})
-
     getQuoteService(qid).then((res) => {
       if (res.success) {
         setCustomerDetails(res.data)
@@ -131,7 +109,7 @@ export const Quote: React.FC = () => {
     }
   }
 
-  function confirmBooking() {
+  const confirmBooking = () => {
     let first: string
     let second: string
     let post: string
@@ -322,20 +300,6 @@ export const Quote: React.FC = () => {
       setTempLicense(formatLicenseNumber(customerDetails.registration_number))
     }
   }, [customerDetails])
-
-  // useEffect(() => {
-  //     if (timeSlot !== '') {
-  //         // format timeslot data to send to live booking tab
-  //         // data:"2023-01-12 12:00:00"
-  //         const dateTime = timeSlot.split(' ');
-  //         const dateSplit = dateTime[0].split('-');
-  //         const timeSplit = dateTime[1].substring(0, 5);
-  //         const timeSplitNext = timeHeaders[timeHeaders.indexOf(timeSplit) + 1];
-  //         const date = monthValuesRev[dateSplit[1]].concat(' ', dateSplit[2]).concat(' ', dateSplit[0]);
-  //         setDateToPayment(date);
-  //         setTimeToPayment(timeSplit.concat('-', timeSplitNext));
-  //     }
-  // }, [tabValue]);
 
   useEffect(() => {
     // change between accept and next buttons names and styling
