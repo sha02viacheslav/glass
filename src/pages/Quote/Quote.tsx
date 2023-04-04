@@ -21,6 +21,7 @@ import { addOptionalProductService } from '@glass/services/apis/add-optional-pro
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
+import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
 
@@ -172,28 +173,15 @@ export const Quote: React.FC = () => {
   }
 
   const sendBookingData = (selectedSlot: TimeSlot) => {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: id,
-        booking_start_date: moment(selectedSlot.start).format(BOOKING_DATE_FORMAT),
-        booking_end_date: moment(selectedSlot.end).format(BOOKING_DATE_FORMAT),
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_SEND_BOOKING,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_ODOO_STAGING_KEY,
-      },
-      data: data,
-    }
-    axios(config)
-      .then(() => {
+    if (id) {
+      sendBookingService(
+        id,
+        moment(selectedSlot.start).format(BOOKING_DATE_FORMAT),
+        moment(selectedSlot.end).format(BOOKING_DATE_FORMAT),
+      ).then(() => {
         setIsBlink(true)
       })
-      .catch(() => {})
+    }
   }
 
   function handleDecline() {

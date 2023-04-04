@@ -21,10 +21,11 @@ import {
   PriceTotal,
 } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
+import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getInvoice } from '@glass/services/apis/invoice.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
-import './payment-method.css'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
+import './payment-method.css'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -96,31 +97,17 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const retrieveInvoice = () => {
-    // get url of invoice PDF
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_GET_INVOICE_PDF,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
-    }
-    axios(config)
-      .then((response) => {
-        // figure out how to view pdf
-        if (response.data.result.data.invoice_pdf_url !== '') {
-          setInvoicePDF(response.data.result.data.invoice_pdf_url)
-          setShowInvoice(true)
-          setInvoiceMessage('')
-        } else {
-          setInvoiceMessage('Invoice can be created after booking is confirmed')
+    if (!qid) return
+    getInvoicePdfService(qid)
+      .then((res) => {
+        if (res.success) {
+          if (res.data.invoice_pdf_url !== '') {
+            setInvoicePDF(res.data.invoice_pdf_url)
+            setShowInvoice(true)
+            setInvoiceMessage('')
+          } else {
+            setInvoiceMessage('Invoice can be created after booking is confirmed')
+          }
         }
       })
       .catch(() => {

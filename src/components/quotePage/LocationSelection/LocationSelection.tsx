@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
 import { autocomplete } from 'getaddress-autocomplete'
 import { Address, LocationSelectionId } from '@glass/models'
-import { updateDeliveryAddressService } from '@glass/services/apis/updateDeliveryAddress.service'
+import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
 import './location.css'
 
 export type LocationSelectionProps = {
