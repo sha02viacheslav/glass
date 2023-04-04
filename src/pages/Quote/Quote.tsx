@@ -25,7 +25,11 @@ import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import './quote.css'
 
-export const Quote: React.FC = () => {
+export type QuoteProps = {
+  quoteCount?: boolean
+}
+
+export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
   const [tabValue] = useState(0)
   const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
@@ -61,7 +65,7 @@ export const Quote: React.FC = () => {
   // client info
   const { id } = useParams()
   const getQuote = (qid: string) => {
-    getQuoteService(qid).then((res) => {
+    getQuoteService(qid, quoteCount).then((res) => {
       if (res.success) {
         setCustomerDetails(res.data)
         setBillingAddress(res.data.customer_order_postal_code)
