@@ -5,7 +5,7 @@ export const paymentStatusText = (status: PaymentStatus | undefined) => {
     case PaymentStatus.NOT_PAID:
       return 'Not Paid'
     case PaymentStatus.PAID:
-      return 'Paid'
+      return 'PAID'
     default:
       return ''
   }
