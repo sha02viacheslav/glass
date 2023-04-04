@@ -213,7 +213,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [qid])
 
   useEffect(() => {
-    console.error(selectedMethod)
     if (selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
       if (invoiceData?.invoice_number) {
         retrievePlan()
