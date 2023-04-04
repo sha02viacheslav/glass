@@ -34,9 +34,7 @@ export const Quote: React.FC = () => {
   const [quoteInfoOpen, setInfoOpen] = useState(false)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
-  const [paymentOption, setPaymentOption] = useState<PaymentOptionDto[]>([
-    { p_option: PaymentOptionEnum.NONE, detail: '' },
-  ])
+  const [paymentOption, setPaymentOption] = useState<PaymentOptionDto>({ p_option: PaymentOptionEnum.NONE, detail: '' })
   const [slotSelected, setSlotSelected] = useState(false)
   const [declinePopup, setDeclinePopup] = useState(false)
   const [declineReason, setDeclineReason] = useState<number>(0)
@@ -97,15 +95,15 @@ export const Quote: React.FC = () => {
     } else if (snapValue === 3 && option === 'next' && !!timeSlot) {
       if (
         invoiceData?.payment_state !== PaymentStatus.PAID &&
-        (paymentOption[0].p_option === PaymentOptionEnum.NONE || paymentOption[0].detail === 'Select payment method')
+        (paymentOption.p_option === PaymentOptionEnum.NONE || paymentOption.detail === 'Select payment method')
       ) {
         // scroll to PM component if no payment method is selected
         setSnapValue(1)
         const dom = document.getElementById('1')
         if (dom) dom.scrollIntoView({ behavior: 'smooth' })
       } else if (
-        paymentOption[0].p_option === PaymentOptionEnum.FOUR_MONTH &&
-        paymentOption[0].detail !== 'Select payment method'
+        paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH &&
+        paymentOption.detail !== 'Select payment method'
       ) {
         // pay with Payment Assist
         confirmBooking()
@@ -235,7 +233,7 @@ export const Quote: React.FC = () => {
     setDeliveryAddress(data)
   }
 
-  const paymentOptionToParent = (pOption: PaymentOptionDto[]) => {
+  const paymentOptionToParent = (pOption: PaymentOptionDto) => {
     setPaymentOption(pOption)
   }
 
@@ -302,9 +300,9 @@ export const Quote: React.FC = () => {
       acceptSelector.classList.remove('quote-accept')
     } else if (snapValue === 3 && acceptSelector !== null && !!timeSlot) {
       if (invoiceData?.payment_state !== PaymentStatus.PAID) {
-        if (paymentOption[0].p_option === PaymentOptionEnum.FOUR_MONTH) {
+        if (paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH) {
           // detail coming from payment method
-          setAcceptBtn(paymentOption[0].detail)
+          setAcceptBtn(paymentOption.detail)
         } else {
           setAcceptBtn('Select payment method')
         }

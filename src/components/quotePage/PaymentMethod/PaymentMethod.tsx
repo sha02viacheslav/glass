@@ -35,7 +35,7 @@ export type PaymentMethodProps = {
   invData?: (value: Invoice) => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
-  method?: (value: PaymentOptionDto[]) => void
+  method?: (value: PaymentOptionDto) => void
   onCheckOptionalOrderLine?: (orderLineId: number, optionalLineId: number, checked: boolean) => void
 }
 
@@ -250,7 +250,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     } else if (!startPAProcess) {
       msg = 'Select payment method'
     }
-    if (method) method([{ p_option: selectedMethod, detail: msg }])
+    if (method) method({ p_option: selectedMethod, detail: msg })
   }, [selectedMethod, startPAProcess, PAUrl])
 
   return (
