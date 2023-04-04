@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Button } from '@mui/material'
-import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -9,6 +8,7 @@ import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, VehicleData } from '@glass/models'
+import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Customer: React.FC = () => {
@@ -17,7 +17,7 @@ export const Customer: React.FC = () => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [vehImgData, setVehImgData] = useState([])
+  const [, setVehImgData] = useState([])
   const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
   const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
@@ -34,6 +34,8 @@ export const Customer: React.FC = () => {
   const emailRef = useRef<HTMLInputElement>(null)
   const phoneRef = useRef<HTMLInputElement>(null)
   const billingRef = useRef<HTMLInputElement>(null)
+
+  const [comment, setComment] = useState<string>('')
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -102,56 +104,46 @@ export const Customer: React.FC = () => {
     } else {
       // post data
       setSubmitClicked(true)
-      const name = firstNameRef?.current?.value.concat(' ', lastNameRef?.current?.value || '')
+      const name = (firstNameRef?.current?.value || '').concat(' ', lastNameRef?.current?.value || '')
       const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
-      const data = JSON.stringify({
-        jsonrpc: '2.0',
-        params: {
-          customer_name: name,
-          customer_f_name: firstNameRef?.current?.value,
-          customer_s_name: lastNameRef?.current?.value,
-          customer_phone: phoneRef?.current?.value,
-          customer_email: emailRef?.current?.value,
-          customer_order_postal_code: formattedAddress, // full address
-          customer_address: {
-            // more detailed address info
-            postcode: fullAddress?.postcode,
-            latitude: fullAddress?.latitude,
-            longitude: fullAddress?.longitude,
-            line_1: fullAddress?.line_1,
-            line_2: fullAddress?.line_2,
-            line_3: fullAddress?.line_3,
-            line_4: fullAddress?.line_4,
-            locality: fullAddress?.locality,
-            town_or_city: fullAddress?.town_or_city,
-            county: fullAddress?.county,
-            district: fullAddress?.district,
-            country: fullAddress?.country,
-          },
-          registration_number: licenseSearchVal,
-          registration_year: vehData?.YearMonthFirstRegistered,
-          make: vehData?.Make,
-          model: vehData?.Model,
-          body_type: vehDataToCustomer,
-          model_year: vehData?.YearOfManufacture,
-          glass_location: selectedBrokenWindows,
-          VehicleData: vehData,
-          VehicleImageData: vehImgData,
+      createQuoteService({
+        customer_name: name,
+        customer_f_name: firstNameRef?.current?.value || '',
+        customer_s_name: lastNameRef?.current?.value || '',
+        customer_phone: phoneRef?.current?.value || '',
+        customer_email: emailRef?.current?.value || '',
+        customer_order_postal_code: formattedAddress,
+        customer_address: {
+          // more detailed address info
+          postcode: fullAddress?.postcode || '',
+          latitude: fullAddress?.latitude || '',
+          longitude: fullAddress?.longitude || '',
+          line_1: fullAddress?.line_1 || '',
+          line_2: fullAddress?.line_2 || '',
+          line_3: fullAddress?.line_3 || '',
+          line_4: fullAddress?.line_4 || '',
+          locality: fullAddress?.locality || '',
+          town_or_city: fullAddress?.town_or_city || '',
+          county: fullAddress?.county || '',
+          district: fullAddress?.district || '',
+          country: fullAddress?.country || '',
         },
-      })
-
-      axios({
-        method: 'post',
-        url: process.env.REACT_APP_CREATE_QUOTE,
-        headers: {
-          'Content-Type': 'application/json',
+        registration_number: licenseSearchVal,
+        registration_year: vehData?.YearMonthFirstRegistered || '',
+        make: vehData?.Make || '',
+        model: vehData?.Model || '',
+        body_type: vehDataToCustomer || '',
+        model_year: vehData?.YearOfManufacture || '',
+        glass_location: selectedBrokenWindows || [],
+        customer_comments: {
+          comment: comment,
+          attachments: [],
         },
-        data: data,
+      }).then((res) => {
+        if (res.success) {
+          navigate('/quote/' + res.data.fe_token)
+        }
       })
-        .then((response) => {
-          navigate('/quote/' + response.data.result.fe_token)
-        })
-        .catch(() => {})
     }
   }
 
@@ -178,7 +170,6 @@ export const Customer: React.FC = () => {
       fetch(process.env.REACT_APP_VEH_IMG_DATA + license)
         .then((res) => res.json())
         .then((data) => {
-          // console.log(data);
           if (
             data.Response.StatusCode === 'KeyInvalid' ||
             data.Response.StatusCode === 'ItemNotFound' ||
@@ -287,6 +278,8 @@ export const Customer: React.FC = () => {
                           rows={4}
                           className='form-control h-auto'
                           placeholder='Details for glass or any other comment.'
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
                         ></textarea>
                       </div>
 
