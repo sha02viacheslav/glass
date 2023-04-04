@@ -112,6 +112,7 @@ export const Quote: React.FC = () => {
   }
 
   const confirmBooking = () => {
+    if (!invoiceData?.invoice_number) return
     let first: string
     let second: string
     let post: string

@@ -8,7 +8,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentOptionEnum, PaymentMethodType, PaymentStatus } from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import {
   Address,
@@ -59,7 +59,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [excess, setExcess] = useState<number>(115)
   const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
   const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
-  const [status, setStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
@@ -137,7 +137,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       getInvoice(qid).then((res) => {
         if (res.success) {
           setInvoiceData(res.data)
-          setStatus(res.data.payment_state)
+          setPaymentStatus(res.data.payment_state || PaymentStatus.NOT_PAID)
           if (invData) invData(res.data)
         }
       })
@@ -215,7 +215,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [qid])
 
   useEffect(() => {
-    if (status !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
+    if (paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
       if (invoiceData?.invoice_number) {
         retrievePlan()
       } else {
@@ -264,7 +264,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         </Tooltip>
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
         <div className='PM-invoice-status'>{invoiceMessage}</div>
-        <div className='PM-status'>Status: {paymentStatusText(status)}</div>
+        <div className='PM-status'>Status: {paymentStatusText(paymentStatus)}</div>
         {/* show quotation price details */}
         <SelectOfferNew
           selectOfferToCustomer={offerDetails || []}
@@ -273,7 +273,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
 
-        {status !== PaymentStatus.PAID && (
+        {paymentStatus !== PaymentStatus.PAID && (
           <div className='PM-btn-container'>
             <button
               className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
@@ -299,7 +299,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           </div>
         )}
 
-        {status !== PaymentStatus.PAID && (
+        {paymentStatus !== PaymentStatus.PAID && (
           <div className='PM-payment-option'>
             {selectedMethod === PaymentOptionEnum.FOUR_MONTH && (
               <div>
