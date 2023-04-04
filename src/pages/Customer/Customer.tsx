@@ -151,9 +151,7 @@ export const Customer: React.FC = () => {
         .then((response) => {
           navigate('/quote/' + response.data.result.fe_token)
         })
-        .catch((error) => {
-          console.error(error)
-        })
+        .catch(() => {})
     }
   }
 
