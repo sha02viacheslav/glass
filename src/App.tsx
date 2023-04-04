@@ -70,6 +70,7 @@ export const App: React.FC = () => {
           <Route path='/paid' element={<Paid />} />
           <Route path='/quote/:id' element={<Quote />} />
           <Route path='/quote/in/:id' element={<Quote />} />
+          <Route path='/quote/be/:id' element={<Quote quoteCount={false} />} />
         </Routes>
         <Footer />
       </div>
