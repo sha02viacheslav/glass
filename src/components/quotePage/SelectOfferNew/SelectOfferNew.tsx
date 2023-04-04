@@ -6,7 +6,7 @@ import './select-offer.css'
 export type SelectOfferNewProps = {
   selectOfferToCustomer: Offer[]
   optionalOrderLines?: OptionalOrderLine[]
-  priceToParent: (value: PriceTotal[]) => void
+  priceToParent: (value: PriceTotal) => void
   onCheckOptionalOrderLine?: (orderLineId: number, optionalLineId: number, checked: boolean) => void
 }
 
@@ -30,17 +30,15 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
     }
     setTotalPrice(total)
     setTotalUnitPrice(unit_total)
-    priceToParent([
-      {
-        total: +total.toFixed(2),
-        subtotal: +unit_total.toFixed(2),
-      },
-    ])
+    priceToParent({
+      total: +total.toFixed(2),
+      subtotal: +unit_total.toFixed(2),
+    })
   }
 
   useEffect(() => {
     calculateTotalPrice()
-  }, [])
+  }, [selectOfferToCustomer])
 
   return (
     <div className='select-offer'>

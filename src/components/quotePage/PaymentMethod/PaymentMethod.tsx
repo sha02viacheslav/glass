@@ -20,9 +20,10 @@ import {
   PaymentOptionDto,
   PriceTotal,
 } from '@glass/models'
+import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoice } from '@glass/services/apis/invoice.service'
-import './payment-method.css'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
+import './payment-method.css'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -66,11 +67,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const PAf_nameRef = useRef<HTMLInputElement>(null)
   const PAs_nameRef = useRef<HTMLInputElement>(null)
   const PAEmailRef = useRef<HTMLInputElement>(null)
-  const [priceTotals, setPriceTotals] = useState<PriceTotal[]>([{ total: 0, subtotal: 0 }])
+  const [priceTotals, setPriceTotals] = useState<PriceTotal>({ total: 0, subtotal: 0 })
   const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
+  const [showOrdersConfirm, setShowOrdersConfirm] = useState<boolean>(false)
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -88,7 +90,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (PADataToParent) PADataToParent(data)
   }
 
-  const getTotalPrices = (data: PriceTotal[]) => {
+  const getTotalPrices = (data: PriceTotal) => {
     setPriceTotals(data)
   }
 
@@ -187,6 +189,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     }
   }
 
+  const handleConfirmOrder = () => {
+    if (qid) {
+      confirmInvoiceService(qid).then((res) => {
+        if (res.success) {
+          setPAProceed(true)
+          retrievePlan()
+          getInvoiceData()
+        }
+      })
+    }
+  }
+
   useEffect(() => {
     if (invoiceData?.payment_method_type) {
       setPaymentMethodType(invoiceData.payment_method_type)
@@ -199,28 +213,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [qid])
 
   useEffect(() => {
-    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH && !PAProceed) {
-      // retrieve payment assist plan data
-      const data = JSON.stringify({
-        jsonrpc: '2.0',
-        params: {
-          fe_token: qid,
-        },
-      })
-      const config = {
-        method: 'post',
-        url: process.env.REACT_APP_INVOICE_CONFIRM,
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.REACT_APP_API_KEY,
-        },
-        data: data,
-      }
-      axios(config).then(() => {
-        setPAProceed(true)
+    console.error(selectedMethod)
+    if (selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
+      if (invoiceData?.invoice_number) {
         retrievePlan()
-        getInvoiceData()
-      })
+      } else {
+        setShowOrdersConfirm(true)
+      }
     }
   }, [selectedMethod])
 
@@ -268,7 +267,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         {/* show quotation price details */}
         <SelectOfferNew
           selectOfferToCustomer={offerDetails || []}
-          optionalOrderLines={optionalOrderLines || []}
+          optionalOrderLines={!invoiceData?.invoice_number ? optionalOrderLines : []}
           priceToParent={getTotalPrices}
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
@@ -278,21 +277,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
           >
             <small className='fs-14'>4 month</small>
-            <div className='PM-price'>£ {(priceTotals[0].total / 4).toFixed(2)}</div>
+            <div className='PM-price'>£ {(priceTotals.total / 4).toFixed(2)}</div>
           </button>
           <button
             className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
             onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
           >
             <small className='fs-14'>Insurance</small>
-            <div className='PM-price'>£ {priceTotals[0].total}</div>
+            <div className='PM-price'>£ {priceTotals.total}</div>
           </button>
           <button
             className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
             onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
           >
             <small className='fs-14'>Single pay</small>
-            <div className='PM-price'>£ {priceTotals[0].total}</div>
+            <div className='PM-price'>£ {priceTotals.total}</div>
           </button>
         </div>
 
@@ -321,21 +320,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAf_nameRef}
-                      defaultValue={customerInfo?.[0].customer_f_name}
+                      value={customerInfo?.[0].customer_f_name}
                       onChange={updatePAInfo}
                     />
                     <input
                       type='text'
                       className='form-control PM-top-input'
                       ref={PAs_nameRef}
-                      defaultValue={customerInfo?.[0].customer_s_name}
+                      value={customerInfo?.[0].customer_s_name}
                       onChange={updatePAInfo}
                     />
                   </div>
                   <input
                     type='text'
                     className='form-control PM-email'
-                    defaultValue={customerInfo?.[0].customer_email}
+                    value={customerInfo?.[0].customer_email}
                     ref={PAEmailRef}
                     onChange={updatePAInfo}
                   />
@@ -343,14 +342,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     id='autocomplete-field'
                     type='text'
                     className='form-control PM-address'
-                    onChange={handlePCodeChange}
-                    defaultValue={address}
                     value={address}
+                    onChange={handlePCodeChange}
                   />
                   <input
                     type='text'
                     className='form-control PM-postalcode'
-                    defaultValue={postalCode}
+                    value={postalCode}
                     onChange={updatePAInfo}
                   />
                 </div>
@@ -389,6 +387,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     type='text'
                     className='form-control PM-top-input'
                     defaultValue={customerInfo?.[0].customer_f_name + ' ' + customerInfo?.[0].customer_s_name}
+                    disabled
                   />
                 </div>
                 <div className='PM-insurance-sub'>
@@ -403,9 +402,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   id='autocomplete-field'
                   type='text'
                   className='form-control PM-address'
-                  onChange={handlePCodeChange}
-                  defaultValue={address}
                   value={address}
+                  onChange={handlePCodeChange}
                 />
                 <div className='PM-insurance-sub'>
                   <div className='PM-excess-cont'>
@@ -415,7 +413,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                       ref={excessRef}
                       type='text'
                       className='form-control'
-                      defaultValue={excess}
+                      value={excess}
                       onChange={updateExcess}
                     />
                   </div>
@@ -490,7 +488,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   <span>Excess Cash</span>
                 </button>
               </div>
-              <Checkout method={paymentMethodType} amount={priceTotals[0].total} />
+              <Checkout method={paymentMethodType} amount={priceTotals.total} />
             </div>
           )}
           {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
@@ -562,12 +560,22 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                   </button>
                 </div>
               </div>
-              <Checkout method={paymentMethodType} amount={priceTotals[0].total} />
+              <Checkout method={paymentMethodType} amount={priceTotals.total} />
             </div>
           )}
           {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
         </div>
       </div>
+
+      {showOrdersConfirm && (
+        <ConfirmDialog
+          title='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
+          onConfirm={handleConfirmOrder}
+          onCancel={() => {
+            setShowOrdersConfirm(false)
+          }}
+        />
+      )}
 
       {showPaymentConfirm && (
         <ConfirmDialog
