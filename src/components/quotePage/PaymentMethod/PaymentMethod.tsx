@@ -272,29 +272,32 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           priceToParent={getTotalPrices}
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
-        <div className='PM-btn-container'>
-          <button
-            className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
-          >
-            <small className='fs-14'>4 month</small>
-            <div className='PM-price'>£ {(priceTotals.total / 4).toFixed(2)}</div>
-          </button>
-          <button
-            className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
-          >
-            <small className='fs-14'>Insurance</small>
-            <div className='PM-price'>£ {priceTotals.total}</div>
-          </button>
-          <button
-            className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
-            onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
-          >
-            <small className='fs-14'>Single pay</small>
-            <div className='PM-price'>£ {priceTotals.total}</div>
-          </button>
-        </div>
+
+        {status !== PaymentStatus.PAID && (
+          <div className='PM-btn-container'>
+            <button
+              className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
+              onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
+            >
+              <small className='fs-14'>4 month</small>
+              <div className='PM-price'>£ {(priceTotals.total / 4).toFixed(2)}</div>
+            </button>
+            <button
+              className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
+              onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
+            >
+              <small className='fs-14'>Insurance</small>
+              <div className='PM-price'>£ {priceTotals.total}</div>
+            </button>
+            <button
+              className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
+              onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
+            >
+              <small className='fs-14'>Single pay</small>
+              <div className='PM-price'>£ {priceTotals.total}</div>
+            </button>
+          </div>
+        )}
 
         {status !== PaymentStatus.PAID && (
           <div className='PM-payment-option'>
