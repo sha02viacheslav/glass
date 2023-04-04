@@ -61,9 +61,7 @@ export const CustomerLocal: React.FC = () => {
     axios
       .post('https://estglass.co.uk/form_latest/odoo_api_estglass.php', body)
       .then(() => {})
-      .catch((error) => {
-        console.error(error)
-      })
+      .catch(() => {})
   }
 
   useEffect(() => {

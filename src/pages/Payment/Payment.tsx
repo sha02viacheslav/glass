@@ -80,9 +80,7 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
         .then(function (response) {
           window.open(response.data.result.result.data.url, '_blank', 'noreferrer')
         })
-        .catch((error) => {
-          console.error(error)
-        })
+        .catch(() => {})
     } else {
       return
     }

@@ -36,7 +36,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
     if (id && invoiceNumber) {
       createIndentService(id, invoiceNumber).then((res) => {
         if (res.success) {
-          console.error(res)
           setClientSecret(res.data.clientSecret)
         }
       })

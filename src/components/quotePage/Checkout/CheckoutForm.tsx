@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { StripePaymentElementChangeEvent } from '@stripe/stripe-js'
-import { updatePaymentMethod } from '@glass/services/apis/succeed-payment.service'
+import { updatePaymentStatusService } from '@glass/services/apis/update-payment-status.service'
 import './checkout.css'
 
 export type CheckoutFormProps = {
@@ -61,10 +61,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
         setSuccess(true)
         status = true
       }
-      // payment success
-      if (status) {
-        updatePaymentMethod(result.paymentIntent.id, result.paymentIntent.client_secret).then(() => {})
-      }
+
+      updatePaymentStatusService(
+        result.paymentIntent.id,
+        result.paymentIntent.client_secret,
+        status ? 'success' : 'Failed',
+      ).then(() => {})
     }
   }
 
