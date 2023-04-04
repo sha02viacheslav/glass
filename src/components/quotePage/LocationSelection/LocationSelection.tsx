@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
-import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import { Address, LocationSelectionId } from '@glass/models'
+import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
 import './location.css'
 
 export type LocationSelectionProps = {
@@ -56,9 +56,8 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
   }
 
   const updateDeliveryAddress = (fullAddress: Address) => {
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
+    if (customer_id) {
+      updateDeliveryAddressService({
         customer_id: customer_id,
         address_id: address_id,
         line_1: fullAddress.line_1,
@@ -69,20 +68,8 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
         town_or_city: fullAddress.town_or_city,
         county: fullAddress.county,
         country: fullAddress.country,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_UPDATE_DELIVERY,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
+      }).then(() => {})
     }
-    axios(config)
-      .then(() => {})
-      .catch(() => {})
   }
 
   useEffect(() => {

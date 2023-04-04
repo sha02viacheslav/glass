@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import moment from 'moment'
 import user from '@glass/assets/assets/icons/user.png'
 import close from '@glass/assets/components/icons/x.png'
@@ -8,7 +7,8 @@ import { PayBookTimeline } from '@glass/components/quotePage/PayBookTimeline'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { Invoice } from '@glass/models'
-import { getInvoice } from '@glass/services/apis/invoice.service'
+import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
+import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 import './payment.css'
 
 export type PaymentProps = {
@@ -27,7 +27,7 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
   const [componentDisplay, setComponentDisplay] = useState('')
   const [billingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
-  const [, setInvoiceData] = useState<Invoice | undefined>(undefined)
+  const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [payAssistStatus, setPayAssistStatus] = useState('')
 
   const handleChangeSlotId = (slotData: string) => {
@@ -56,33 +56,13 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
   }
 
   const pay = () => {
-    if (payAssistStatus === 'go') {
+    if (payAssistStatus === 'go' && invoiceData?.invoice_number) {
       // create payment API call
-      const data = JSON.stringify({
-        jsonrpc: '2.0',
-        params: {
-          fe_token: 'ff74f4',
-          invoice_number: 'STAGINV/2023/02043',
-          // "fe_token": qid,
-          // "invoice_number": invoiceData.invoice_number
-        },
+      beginPaymentAssistService(qid, invoiceData.invoice_number).then((res) => {
+        if (res.success) {
+          window.open(res.data.url, '_blank', 'noreferrer')
+        }
       })
-      const config = {
-        method: 'post',
-        url: process.env.REACT_APP_PAYMENT_ASSIST_BEGIN,
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.REACT_APP_API_KEY,
-        },
-        data: data,
-      }
-      axios(config)
-        .then(function (response) {
-          window.open(response.data.result.result.data.url, '_blank', 'noreferrer')
-        })
-        .catch(() => {})
-    } else {
-      return
     }
   }
 
@@ -92,7 +72,7 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
 
     // get invoice data for payment
     if (qid) {
-      getInvoice(qid).then((res) => {
+      getInvoiceService(qid).then((res) => {
         if (res.success) {
           setInvoiceData(res.data)
         }

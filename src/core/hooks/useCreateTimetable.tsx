@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import moment from 'moment'
 import { BookingDate, TimeRow } from '@glass/models'
-import { getCalendar } from '@glass/services/apis/calendar.service'
+import { getCalendarService } from '@glass/services/apis/get-calendar.service'
 
 export const useCreateTimetable = (timetableToClient: (value: string[][]) => void) => {
   const createTimetable = () => {
@@ -27,7 +27,7 @@ export const useCreateTimetable = (timetableToClient: (value: string[][]) => voi
 
   const retrieveBookings = (nextDate: Date, timetable: TimeRow[]) => {
     // get past bookings
-    getCalendar(new Date(), nextDate).then((res) => {
+    getCalendarService(new Date(), nextDate).then((res) => {
       if (res.success) {
         fillTimeslots(timetable, res.data)
       }

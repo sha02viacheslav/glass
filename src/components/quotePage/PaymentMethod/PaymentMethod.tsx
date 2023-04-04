@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
-import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import invoice from '@glass/assets/icons/invoice.png'
@@ -8,7 +7,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentOptionEnum, PaymentMethodType, PaymentStatus } from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import {
   Address,
@@ -21,10 +20,12 @@ import {
   PriceTotal,
 } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
-import { getInvoice } from '@glass/services/apis/invoice.service'
+import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
+import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
+import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
-import './payment-method.css'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
+import './payment-method.css'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -59,7 +60,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [excess, setExcess] = useState<number>(115)
   const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
   const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
-  const [status, setStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
@@ -96,31 +97,17 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const retrieveInvoice = () => {
-    // get url of invoice PDF
-    const data = JSON.stringify({
-      jsonrpc: '2.0',
-      params: {
-        fe_token: qid,
-      },
-    })
-    const config = {
-      method: 'post',
-      url: process.env.REACT_APP_GET_INVOICE_PDF,
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': process.env.REACT_APP_API_KEY,
-      },
-      data: data,
-    }
-    axios(config)
-      .then((response) => {
-        // figure out how to view pdf
-        if (response.data.result.data.invoice_pdf_url !== '') {
-          setInvoicePDF(response.data.result.data.invoice_pdf_url)
-          setShowInvoice(true)
-          setInvoiceMessage('')
-        } else {
-          setInvoiceMessage('Invoice can be created after booking is confirmed')
+    if (!qid) return
+    getInvoicePdfService(qid)
+      .then((res) => {
+        if (res.success) {
+          if (res.data.invoice_pdf_url !== '') {
+            setInvoicePDF(res.data.invoice_pdf_url)
+            setShowInvoice(true)
+            setInvoiceMessage('')
+          } else {
+            setInvoiceMessage('Invoice can be created after booking is confirmed')
+          }
         }
       })
       .catch(() => {
@@ -134,10 +121,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const getInvoiceData = () => {
     if (qid) {
-      getInvoice(qid).then((res) => {
+      getInvoiceService(qid).then((res) => {
         if (res.success) {
           setInvoiceData(res.data)
-          setStatus(res.data.payment_state)
+          setPaymentStatus(res.data.payment_state || PaymentStatus.NOT_PAID)
           if (invData) invData(res.data)
         }
       })
@@ -168,25 +155,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const retrievePlan = () => {
-    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH) {
+    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH && qid) {
       // retrieve payment assist plan data
-      const data = JSON.stringify({
-        jsonrpc: '2.0',
-        params: {
-          fe_token: qid,
-        },
-      })
-      const config = {
-        method: 'post',
-        url: process.env.REACT_APP_PAYMENT_ASSIST_PLAN,
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.REACT_APP_API_KEY,
-        },
-        data: data,
-      }
-      axios(config).then((response) => {
-        setMonthlyPayments(response.data.result.result.data)
+      getPaymentAssistPlanService(qid).then((res) => {
+        if (res.success) {
+          setMonthlyPayments(res.data)
+        }
       })
     }
   }
@@ -215,7 +189,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [qid])
 
   useEffect(() => {
-    if (status !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
+    if (paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
       if (invoiceData?.invoice_number) {
         retrievePlan()
       } else {
@@ -264,7 +238,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         </Tooltip>
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
         <div className='PM-invoice-status'>{invoiceMessage}</div>
-        <div className='PM-status'>Status: {paymentStatusText(status)}</div>
+        <div className='PM-status'>Status: {paymentStatusText(paymentStatus)}</div>
         {/* show quotation price details */}
         <SelectOfferNew
           selectOfferToCustomer={offerDetails || []}
@@ -273,7 +247,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
 
-        {status !== PaymentStatus.PAID && (
+        {paymentStatus !== PaymentStatus.PAID && (
           <div className='PM-btn-container'>
             <button
               className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
@@ -299,7 +273,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           </div>
         )}
 
-        {status !== PaymentStatus.PAID && (
+        {paymentStatus !== PaymentStatus.PAID && (
           <div className='PM-payment-option'>
             {selectedMethod === PaymentOptionEnum.FOUR_MONTH && (
               <div>
