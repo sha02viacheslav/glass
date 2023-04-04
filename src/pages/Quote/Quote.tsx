@@ -64,7 +64,7 @@ export const Quote: React.FC = () => {
       if (res.success) {
         setCustomerDetails(res.data)
         setBillingAddress(res.data.customer_order_postal_code)
-        setOffersDetails(res.data.order_lines || [])
+        if (res.data.order_lines?.length) setOffersDetails(res.data.order_lines)
         setOptionalOrderLines(res.data.optional_order_lines || [])
       }
     })
