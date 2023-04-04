@@ -6,7 +6,7 @@ import { CheckoutForm } from '@glass/components/quotePage/Checkout/CheckoutForm'
 import { PaymentMethodType } from '@glass/enums'
 import { REACT_APP_STRIPE_PUBLIC_KEY } from '@glass/envs'
 import { createIndentService } from '@glass/services/apis/create-indent.service'
-import { getInvoice } from '@glass/services/apis/invoice.service'
+import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 
 export type CheckoutProps = {
   method: PaymentMethodType
@@ -24,7 +24,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
 
   useEffect(() => {
     if (id) {
-      getInvoice(id).then((res) => {
+      getInvoiceService(id).then((res) => {
         if (res.success) {
           setInvoiceNumber(res.data.invoice_number)
         }

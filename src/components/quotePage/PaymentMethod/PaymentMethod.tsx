@@ -21,8 +21,8 @@ import {
 } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
+import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
-import { getInvoice } from '@glass/services/apis/invoice.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
 import './payment-method.css'
@@ -121,7 +121,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const getInvoiceData = () => {
     if (qid) {
-      getInvoice(qid).then((res) => {
+      getInvoiceService(qid).then((res) => {
         if (res.success) {
           setInvoiceData(res.data)
           setPaymentStatus(res.data.payment_state || PaymentStatus.NOT_PAID)

@@ -19,6 +19,15 @@ export const postApi = async (url: string, params: object) => {
     }
 
     const response = await axios(config)
+    if (response?.data?.result?.status === 'error') {
+      console.warn(response.data.result.msg)
+      return {
+        success: false,
+        data: null,
+        message: response.data.result.msg,
+      }
+    }
+
     return {
       success: true,
       data: response.data.result.data,

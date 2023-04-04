@@ -2,7 +2,7 @@ import moment from 'moment'
 import { ApiResponse, BookingDate } from '@glass/models'
 import { postApi } from '@glass/services/apis/api.service'
 
-export const getCalendar = async (
+export const getCalendarService = async (
   startDate: Date,
   endDate: Date,
   limit = 'all',
