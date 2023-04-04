@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
-import axios from 'axios'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import invoice from '@glass/assets/icons/invoice.png'
@@ -22,6 +21,7 @@ import {
 } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
+import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { getInvoice } from '@glass/services/apis/invoice.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
@@ -155,25 +155,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const retrievePlan = () => {
-    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH) {
+    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH && qid) {
       // retrieve payment assist plan data
-      const data = JSON.stringify({
-        jsonrpc: '2.0',
-        params: {
-          fe_token: qid,
-        },
-      })
-      const config = {
-        method: 'post',
-        url: process.env.REACT_APP_PAYMENT_ASSIST_PLAN,
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.REACT_APP_API_KEY,
-        },
-        data: data,
-      }
-      axios(config).then((response) => {
-        setMonthlyPayments(response.data.result.result.data)
+      getPaymentAssistPlanService(qid).then((res) => {
+        if (res.success) {
+          setMonthlyPayments(res.data)
+        }
       })
     }
   }
