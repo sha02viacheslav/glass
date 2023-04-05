@@ -155,6 +155,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (qid) {
       confirmInvoiceService(qid).then((res) => {
         if (res.success) {
+          setShowOrdersConfirm(false)
           setPAProceed(true)
           retrievePlan()
           if (refetchInvoice) refetchInvoice()
@@ -534,7 +535,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showOrdersConfirm && (
         <ConfirmDialog
-          title='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
+          title='Warning'
+          description='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
           onConfirm={handleConfirmOrder}
           onCancel={() => {
             setShowOrdersConfirm(false)
@@ -544,7 +546,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Are you sure you want to change the payment method type?'
+          title='Warning'
+          description='Are you sure you want to change the payment method type?'
           onConfirm={handleConfirmChangePaymentMethodType}
           onCancel={() => {
             setShowPaymentConfirm(false)

@@ -63,10 +63,10 @@ export const Header: React.FC = () => {
               <CustomLink to='/pricing'>Pricing</CustomLink>
               <CustomLink to='/contact'>Contact us</CustomLink>
             </ul>
-            <Link to='/customer' className='btn btn-purple ms-auto d-none d-sm-none d-lg-flex d-md-flex'>
+            <Link to='/customer' className='btn-raised ms-auto d-none d-md-flex'>
               Get a Quote
             </Link>
-            <button className='lost-quote-btn'>Lost my quote</button>
+            <button className='btn-stroked ms-4'>Lost my quote</button>
           </div>
         </div>
       </nav>

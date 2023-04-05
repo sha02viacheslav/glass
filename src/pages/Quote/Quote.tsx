@@ -7,6 +7,7 @@ import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
 import { BeforeAfter } from '@glass/components/BeforeAfter'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
@@ -63,6 +64,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
+  const [warningMsg, setWarningMsg] = useState<string>('')
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(customerDetails)
 
@@ -163,12 +165,14 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const PABegin = () => {
     // create payment API call
     if (id && invoiceData?.invoice_number) {
-      beginPaymentAssistService(id, invoiceData.invoice_number).then((res) => {
+      beginPaymentAssistService(id, invoiceData?.invoice_number).then((res) => {
         if (res.success) {
           window.open(res.data.url, '_blank', 'noreferrer')
           setPAUrl(res.data.url)
         }
       })
+    } else {
+      setWarningMsg('Please wait until confirm your quote!')
     }
   }
 
@@ -550,6 +554,16 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <div className='quote-before-after'>
           <BeforeAfter />
         </div>
+      )}
+
+      {!!warningMsg && (
+        <ConfirmDialog
+          title='Error'
+          description={warningMsg}
+          showCancel={false}
+          confirmStr='Ok'
+          onConfirm={() => setWarningMsg('')}
+        />
       )}
 
       {/* ---------------- Pay & Book page ---------------- */}

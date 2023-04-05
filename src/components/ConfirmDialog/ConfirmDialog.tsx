@@ -1,42 +1,85 @@
-import React from 'react'
-import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
+import React, { ReactNode } from 'react'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { Box, Modal, Typography } from '@mui/material'
 
 export type ConfirmDialogProps = {
   title: string
-  confirmBtn?: string
-  cancelBtn?: string
-  onConfirm?: () => void
+  description: string
+  subDescription?: string | ReactNode
+  confirmStr?: string
+  cancelStr?: string
+  backgroundColor?: string
+  showIcon?: boolean
+  showCancel?: boolean
+  onConfirm: () => void
   onCancel?: () => void
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   title,
-  confirmBtn = 'Yes',
-  cancelBtn = 'No',
-  onCancel,
+  description,
+  subDescription,
+  confirmStr = 'Yes',
+  cancelStr = 'No',
+  showIcon = true,
+  showCancel = true,
   onConfirm,
+  onCancel,
 }) => {
   return (
-    <div>
-      <Dialog open={true} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
-        <DialogTitle id='alert-dialog-title'>{title}</DialogTitle>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              if (onConfirm) onConfirm()
+    <Modal
+      open={true}
+      aria-labelledby='child-modal-title'
+      disableAutoFocus={true}
+      aria-describedby='child-modal-description'
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          height: 'auto',
+          backgroundColor: '#EEF4F8',
+          borderRadius: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          maxWidth: subDescription ? '550px' : '450px',
+          p: 4,
+        }}
+      >
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant='h5' fontWeight={'bold'}>
+            {title}
+          </Typography>
+          {showIcon && <ErrorOutlineIcon sx={{ fontSize: 50, margin: '20px 0px' }} />}
+          <Typography
+            marginTop={showIcon ? 0 : 4}
+            component={'p'}
+            dangerouslySetInnerHTML={{ __html: description || '' }}
+          />
+          {subDescription && <Typography>{subDescription}</Typography>}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '30px',
+              gap: '40px',
             }}
           >
-            {confirmBtn}
-          </Button>
-          <Button
-            onClick={() => {
-              if (onCancel) onCancel()
-            }}
-          >
-            {cancelBtn}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+            {showCancel && (
+              <button className='btn-stroked round' onClick={onCancel}>
+                {cancelStr}
+              </button>
+            )}
+            <button className='btn-raised round' onClick={onConfirm}>
+              {confirmStr}
+            </button>
+          </Box>
+        </Box>
+      </Box>
+    </Modal>
   )
 }

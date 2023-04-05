@@ -294,7 +294,6 @@ export const CustomerLocal: React.FC = () => {
                           placeholder='Lorem ipsum dolor sit..'
                         ></textarea>
                       </div>
-                      {/* <a href="#" className="btn btn-purple">Add Pictures</a> */}
                       <Button variant='contained' color='secondary'>
                         Add Pictures
                       </Button>
