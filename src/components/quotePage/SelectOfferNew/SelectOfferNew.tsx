@@ -59,7 +59,8 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
                 </td>
                 <td className='so-info'>
                   <div className='info-div top-right'>
-                    <span>£ {element.price_unit.toFixed(2)}</span>
+                    {element.discount > 0 && <span className='original-price'>£ {element.price_unit.toFixed(2)}</span>}
+                    <span>£ {((element.price_unit * (100 - element.discount)) / 100).toFixed(2)}</span>
                   </div>
                 </td>
               </tr>
