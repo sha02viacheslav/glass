@@ -16,6 +16,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
   const [success, setSuccess] = useState(false)
   const [err, setErr] = useState('')
   const [valid, setValid] = useState(false)
+  const [submitted, setSubmitted] = useState<boolean>(false)
 
   const handleCardChange = (event: StripePaymentElementChangeEvent) => {
     if (event.complete) setValid(true)
@@ -34,67 +35,72 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     }
 
     setErr('')
-    const result = await stripe.confirmPayment({
+
+    setSubmitted(true)
+    const confirmPaymentResult = await stripe.confirmPayment({
       //`Elements` instance that was used to create the Payment Element
       elements,
       redirect: 'if_required',
     })
 
-    if (result.error) {
+    if (confirmPaymentResult.error) {
       // Show error to your customer (for example, payment details incomplete)
-      setErr(result.error.message || '')
-    } else {
-      let status = false
-      // 3D secure authentication
-      if (result.paymentIntent.status == 'requires_action') {
-        const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret)
-        if (error) {
-          setErr('Error in payment, please try again later')
-          return
-        }
-        if (paymentIntent.status === 'succeeded') {
-          setSuccess(true)
-          status = true
-        }
+      setErr(confirmPaymentResult.error.message || '')
+      setSubmitted(false)
+      return
+    }
+
+    let status = false
+    // 3D secure authentication
+    if (confirmPaymentResult.paymentIntent.status == 'requires_action') {
+      const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret)
+      if (error) {
+        setErr('Error in payment, please try again later')
+        setSubmitted(false)
+        return
       }
-      if (result.paymentIntent.status == 'succeeded') {
+      if (paymentIntent.status === 'succeeded') {
         setSuccess(true)
         status = true
       }
-
-      updatePaymentStatusService(
-        result.paymentIntent.id,
-        result.paymentIntent.client_secret,
-        status ? 'success' : 'Failed',
-      ).then(() => {})
     }
+
+    if (confirmPaymentResult.paymentIntent.status == 'succeeded') {
+      setSuccess(true)
+      status = true
+    }
+
+    await updatePaymentStatusService(
+      confirmPaymentResult.paymentIntent.id,
+      confirmPaymentResult.paymentIntent.client_secret,
+      status ? 'success' : 'Failed',
+    )
+      .then(() => {})
+      .catch(() => {})
   }
 
-  if (success)
-    return (
-      <div className='mt-2 h5 py-4 success-msg'>
-        <svg
-          className='sn-1mj7mtw sn-1njhk9w pay-success'
-          aria-hidden='true'
-          height='16'
-          viewBox='0 0 16 16'
-          width='16'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path
-            d='M5.297 13.213.293 8.255c-.39-.394-.39-1.033 0-1.426s1.024-.394 1.414 0l4.294 4.224 8.288-8.258c.39-.393 1.024-.393 1.414 0s.39 1.033 0 1.426L6.7 13.208a.994.994 0 0 1-1.402.005z'
-            fillRule='evenodd'
-          ></path>
-        </svg>
-        <div>Payment success</div>
-      </div>
-    )
-
-  return (
+  return success ? (
+    <div className='mt-2 h5 py-4 success-msg'>
+      <svg
+        className='sn-1mj7mtw sn-1njhk9w pay-success'
+        aria-hidden='true'
+        height='16'
+        viewBox='0 0 16 16'
+        width='16'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path
+          d='M5.297 13.213.293 8.255c-.39-.394-.39-1.033 0-1.426s1.024-.394 1.414 0l4.294 4.224 8.288-8.258c.39-.393 1.024-.393 1.414 0s.39 1.033 0 1.426L6.7 13.208a.994.994 0 0 1-1.402.005z'
+          fillRule='evenodd'
+        ></path>
+      </svg>
+      <div>Payment success</div>
+    </div>
+  ) : (
     <form className='mt-2' onSubmit={handleSubmit}>
       {err && <div className='h6 text-left text-danger'>{err}</div>}
       <PaymentElement onChange={handleCardChange} />
-      <button type='submit' disabled={!valid} className={`pay-now mt-2 ${!valid ? 'invalid' : ''}`}>
+      <button type='submit' className={`pay-now mt-2 ${!valid ? 'invalid' : ''}`} disabled={submitted}>
         <div className='pay-text'>Pay £{amount}</div>
         {!valid && (
           <svg
