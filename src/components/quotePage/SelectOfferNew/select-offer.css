@@ -42,7 +42,7 @@
 }
 
 .so-info {
-  max-width: 210px;
+  max-width: 240px;
   height: fit-content;
   padding: 5px;
   white-space: pre-wrap;
@@ -53,7 +53,7 @@
   line-height: 18px;
   height: 100%;
   display: flex;
-  margin-top: 6px;
+  margin: 6px 8px;
 }
 
 .first-col {
@@ -70,7 +70,6 @@
   flex-direction: column;
   align-items: end;
   justify-content: left;
-  padding-right: 5px;
 }
 
 .wipers {
@@ -98,7 +97,7 @@
 
 .total-container-in {
   width: 50%;
-  padding-right: 7px;
+  padding: 8px 12px;
 }
 
 .total-row {
