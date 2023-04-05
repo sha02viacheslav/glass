@@ -246,7 +246,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
             >
               <small className='fs-14'>Insurance</small>
-              <div className='PM-price'>£ {totalPrice}</div>
+              <div className='PM-price'>£ {excess}</div>
             </button>
             <button
               className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
