@@ -155,6 +155,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (qid) {
       confirmInvoiceService(qid).then((res) => {
         if (res.success) {
+          setShowOrdersConfirm(false)
           setPAProceed(true)
           retrievePlan()
           if (refetchInvoice) refetchInvoice()
@@ -317,24 +318,24 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     />
                   </div>
                 )}
-                <div className='PM-proceed-btn-cont'>
+                <div className='d-flex justify-content-end align-items-center mt-4'>
                   {startPAProcess && PAUrl === '' && (
-                    <button className='PM-proceed-btn' onClick={checkEligibility}>
+                    <button className='btn-stroked' onClick={checkEligibility}>
                       Check Eligibility
                     </button>
                   )}
                   {startPAProcess && PAUrl !== '' && (
-                    <a className='PA-link' href={PAUrl}>
-                      {PAUrl}
-                    </a>
-                  )}
-                  {startPAProcess && PAUrl !== '' && (
-                    <button className='PM-proceed-btn' onClick={checkEligibility}>
-                      Continue
-                    </button>
+                    <>
+                      <a className='PA-link' href={PAUrl} rel='noopener noreferrer' target='_blank'>
+                        {PAUrl}
+                      </a>
+                      <button className='btn-stroked' onClick={checkEligibility}>
+                        Continue
+                      </button>
+                    </>
                   )}
                   {!startPAProcess && (
-                    <button className='PM-proceed-btn' onClick={() => setStartPAProcess(true)}>
+                    <button className='btn-stroked' onClick={() => setStartPAProcess(true)}>
                       Pay with Payment Assist
                     </button>
                   )}
@@ -534,7 +535,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showOrdersConfirm && (
         <ConfirmDialog
-          title='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
+          title='Warning'
+          description='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
           onConfirm={handleConfirmOrder}
           onCancel={() => {
             setShowOrdersConfirm(false)
@@ -544,7 +546,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Are you sure you want to change the payment method type?'
+          title='Warning'
+          description='Are you sure you want to change the payment method type?'
           onConfirm={handleConfirmChangePaymentMethodType}
           onCancel={() => {
             setShowPaymentConfirm(false)

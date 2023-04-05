@@ -24,7 +24,7 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
         <table className='SO-table'>
           <tbody>
             {selectOfferToCustomer.map((element, rowIndex) => (
-              <tr key={`order-line-${rowIndex}`}>
+              <tr key={`order-line-${rowIndex}`} className='bg-light'>
                 <td className='so-info'>
                   <div className='info-div first-col'>{element.product}</div>
                 </td>
@@ -69,7 +69,7 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
         </table>
       </div>
       <div className='total-container-out'>
-        <div className='total-container-in'>
+        <div className='total-container-in bg-light'>
           <div className='total-row'>
             <span className='total-bold'>Untaxed amount</span>
             <span>£ {totalUnitPrice.toFixed(2)}</span>

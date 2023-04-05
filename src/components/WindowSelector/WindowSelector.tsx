@@ -243,7 +243,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
       {showTintedConfirm && (
         <ConfirmDialog
-          title='Are your back windows tinted?'
+          title='Tinted Back Window'
+          description='Are your back windows tinted?'
           onConfirm={() => handlePopup(true)}
           onCancel={() => handlePopup(false)}
         />
@@ -252,7 +253,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       {/* body type popup for vans */}
       {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
         <ConfirmDialog
-          title='Do you have one or two rear windows?'
+          title='Rear Windows'
+          description='Do you have one or two rear windows?'
           onConfirm={() => handleBodyPopup(false)}
           onCancel={() => handleBodyPopup(true)}
         />
