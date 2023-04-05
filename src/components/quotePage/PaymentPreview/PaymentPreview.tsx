@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import '../PaymentMethod/payment-method.css'
 import { Offer } from '@glass/models'
+import '../PaymentMethod/payment-method.css'
 
 const previewOffer: Offer[] = [
   {
@@ -17,14 +17,12 @@ export const PaymentPreview: React.FC = () => {
   const [singlePay, setSinglePay] = useState('card')
   const [selectedMethod, setSelectedMethod] = useState(4)
 
-  function updateTotalPrice() {}
-
   return (
     <div className='payment-method'>
       <h3 className='text-24 text-blue PM-header'>Quotation</h3>
       <div className='PM-status'>Status: processing</div>
       {/* show quotation price details */}
-      <SelectOfferNew selectOfferToCustomer={previewOffer} priceToParent={updateTotalPrice} />
+      <SelectOfferNew selectOfferToCustomer={previewOffer} totalPrice={0} totalUnitPrice={0} />
       <div className='PM-btn-container'>
         <button
           className={selectedMethod === 1 ? 'PM-button-active' : 'PM-button'}

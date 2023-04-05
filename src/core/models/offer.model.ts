@@ -4,5 +4,7 @@ export type Offer = {
   price_unit: number
   price_subtotal: number
   price_total: number
-  order_line_added?: boolean
+  order_line_id?: number
+  // Temp field
+  hidden?: boolean
 }

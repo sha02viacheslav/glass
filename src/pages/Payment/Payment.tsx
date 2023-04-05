@@ -195,7 +195,7 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
         </div>
         <button onClick={() => setIsRetrieved(!isRetrieved)}>switch</button>
         <PayBookTimeline />
-        <PaymentMethod qid={qid} payAssist={payAssistToParent} />
+        <PaymentMethod qid={qid} payAssist={payAssistToParent} totalPrice={0} totalUnitPrice={0} />
         <br />
         <br />
         <div className='payment-btn-container'>

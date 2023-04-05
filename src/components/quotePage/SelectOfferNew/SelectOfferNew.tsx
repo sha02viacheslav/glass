@@ -1,45 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Checkbox } from '@mui/material'
-import { Offer, OptionalOrderLine, PriceTotal } from '@glass/models'
+import { Offer, OptionalOrderLine } from '@glass/models'
 import './select-offer.css'
 
 export type SelectOfferNewProps = {
   selectOfferToCustomer: Offer[]
   optionalOrderLines?: OptionalOrderLine[]
-  priceToParent: (value: PriceTotal) => void
+  totalPrice: number
+  totalUnitPrice: number
   onCheckOptionalOrderLine?: (orderLineId: number, optionalLineId: number, checked: boolean) => void
 }
 
 export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
   selectOfferToCustomer,
   optionalOrderLines = [],
-  priceToParent,
+  totalPrice,
+  totalUnitPrice,
   onCheckOptionalOrderLine,
 }) => {
-  const [totalPrice, setTotalPrice] = useState<number>(0)
-  const [totalUnitPrice, setTotalUnitPrice] = useState<number>(0)
-
-  const calculateTotalPrice = () => {
-    let total = 0
-    let unit_total = 0
-    for (let i = 0; i < selectOfferToCustomer.length; i++) {
-      const price = selectOfferToCustomer[i].price_total
-      const unit = selectOfferToCustomer[i].price_subtotal
-      total += price
-      unit_total += unit
-    }
-    setTotalPrice(total)
-    setTotalUnitPrice(unit_total)
-    priceToParent({
-      total: +total.toFixed(2),
-      subtotal: +unit_total.toFixed(2),
-    })
-  }
-
-  useEffect(() => {
-    calculateTotalPrice()
-  }, [selectOfferToCustomer])
-
   return (
     <div className='select-offer'>
       <div className='table-container'>
@@ -63,7 +41,7 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
                 <td className='so-info'>
                   <div className='info-div first-col'>
                     <Checkbox
-                      checked={!!element.order_line_added}
+                      checked={element.order_line_added}
                       onChange={(_event, value) => {
                         if (onCheckOptionalOrderLine)
                           onCheckOptionalOrderLine(element.order_line_id, element.optional_line_id, value)
@@ -81,7 +59,8 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
                 </td>
                 <td className='so-info'>
                   <div className='info-div top-right'>
-                    <span>£ {element.price_unit.toFixed(2)}</span>
+                    {element.discount > 0 && <span className='original-price'>£ {element.price_unit.toFixed(2)}</span>}
+                    <span>£ {((element.price_unit * (100 - element.discount)) / 100).toFixed(2)}</span>
                   </div>
                 </td>
               </tr>

@@ -17,23 +17,24 @@ import {
   Offer,
   OptionalOrderLine,
   PaymentOptionDto,
-  PriceTotal,
 } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
-import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
 import './payment-method.css'
 
 export type PaymentMethodProps = {
+  invoiceData?: Invoice
   offerDetails?: Offer[]
   optionalOrderLines?: OptionalOrderLine[]
   customerInfo?: CustomerDetail[]
   qid: string | undefined
+  totalPrice: number
+  totalUnitPrice: number
   payAssist: (value: string) => void
-  invData?: (value: Invoice) => void
+  refetchInvoice?: () => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
   method?: (value: PaymentOptionDto) => void
@@ -41,12 +42,15 @@ export type PaymentMethodProps = {
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
+  invoiceData,
   offerDetails,
   optionalOrderLines,
   customerInfo,
   qid,
+  totalPrice,
+  totalUnitPrice,
   payAssist,
-  invData,
+  refetchInvoice,
   PADataToParent,
   PAUrl,
   method,
@@ -65,11 +69,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [showInvoice, setShowInvoice] = useState(false)
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
   const [PAErrorMsg] = useState('')
-  const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const PAf_nameRef = useRef<HTMLInputElement>(null)
   const PAs_nameRef = useRef<HTMLInputElement>(null)
   const PAEmailRef = useRef<HTMLInputElement>(null)
-  const [priceTotals, setPriceTotals] = useState<PriceTotal>({ total: 0, subtotal: 0 })
   const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
@@ -90,10 +92,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     const email = PAEmailRef?.current?.value
     const data = [firstName, secondName, email, postalCode, address]
     if (PADataToParent) PADataToParent(data)
-  }
-
-  const getTotalPrices = (data: PriceTotal) => {
-    setPriceTotals(data)
   }
 
   const retrieveInvoice = () => {
@@ -119,18 +117,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     setShowInvoice(status)
   }
 
-  const getInvoiceData = () => {
-    if (qid) {
-      getInvoiceService(qid).then((res) => {
-        if (res.success) {
-          setInvoiceData(res.data)
-          setPaymentStatus(res.data.payment_state || PaymentStatus.NOT_PAID)
-          if (invData) invData(res.data)
-        }
-      })
-    }
-  }
-
   const checkEligibility = () => {
     // communicate with Payment (parent)
     payAssist('go')
@@ -148,7 +134,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       setShowPaymentConfirm(false)
       updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
         if (res.success) {
-          getInvoiceData()
+          if (refetchInvoice) refetchInvoice()
         }
       })
     }
@@ -171,7 +157,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         if (res.success) {
           setPAProceed(true)
           retrievePlan()
-          getInvoiceData()
+          if (refetchInvoice) refetchInvoice()
         }
       })
     }
@@ -181,12 +167,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (invoiceData?.payment_method_type) {
       setPaymentMethodType(invoiceData.payment_method_type)
     }
+    setPaymentStatus(invoiceData?.payment_state || PaymentStatus.NOT_PAID)
   }, [invoiceData])
-
-  useEffect(() => {
-    // get invoice data for payment
-    getInvoiceData()
-  }, [qid])
 
   useEffect(() => {
     if (paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
@@ -244,8 +226,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         {/* show quotation price details */}
         <SelectOfferNew
           selectOfferToCustomer={offerDetails || []}
-          optionalOrderLines={!invoiceData?.invoice_number ? optionalOrderLines : []}
-          priceToParent={getTotalPrices}
+          optionalOrderLines={optionalOrderLines}
+          totalPrice={totalPrice}
+          totalUnitPrice={totalUnitPrice}
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
 
@@ -256,21 +239,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
             >
               <small className='fs-14'>4 month</small>
-              <div className='PM-price'>£ {(priceTotals.total / 4).toFixed(2)}</div>
+              <div className='PM-price'>£ {(totalPrice / 4).toFixed(2)}</div>
             </button>
             <button
               className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
               onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
             >
               <small className='fs-14'>Insurance</small>
-              <div className='PM-price'>£ {priceTotals.total}</div>
+              <div className='PM-price'>£ {totalPrice}</div>
             </button>
             <button
               className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
               onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
             >
               <small className='fs-14'>Single pay</small>
-              <div className='PM-price'>£ {priceTotals.total}</div>
+              <div className='PM-price'>£ {totalPrice}</div>
             </button>
           </div>
         )}
@@ -469,7 +452,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <span>Excess Cash</span>
                   </button>
                 </div>
-                <Checkout method={paymentMethodType} amount={priceTotals.total} />
+                <Checkout method={paymentMethodType} amount={totalPrice} />
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
@@ -541,7 +524,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </button>
                   </div>
                 </div>
-                <Checkout method={paymentMethodType} amount={priceTotals.total} />
+                <Checkout method={paymentMethodType} amount={totalPrice} />
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}

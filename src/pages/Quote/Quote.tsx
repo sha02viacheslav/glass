@@ -14,10 +14,11 @@ import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
 import { PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
-import '@glass/components/LicensePlate/license-plate.css'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
+import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
@@ -31,6 +32,7 @@ export type QuoteProps = {
 
 export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
+  const { id } = useParams()
   const [tabValue] = useState(0)
   const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
   const [snapValue, setSnapValue] = useState(1)
@@ -62,17 +64,25 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
 
-  // client info
-  const { id } = useParams()
+  const { totalPrice, totalUnitPrice } = useCalcPriceSummary(customerDetails)
+
   const getQuote = (qid: string) => {
     getQuoteService(qid, quoteCount).then((res) => {
       if (res.success) {
         setCustomerDetails(res.data)
         setBillingAddress(res.data.customer_order_postal_code)
-        if (res.data.order_lines?.length) setOffersDetails(res.data.order_lines)
-        setOptionalOrderLines(res.data.optional_order_lines || [])
       }
     })
+  }
+
+  const getInvoiceData = () => {
+    if (id) {
+      getInvoiceService(id).then((res) => {
+        if (res.success) {
+          setInvoiceData(res.data)
+        }
+      })
+    }
   }
 
   const handleSnapChange = (option: string) => {
@@ -225,10 +235,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
-  const invDataToParent = (data: Invoice) => {
-    setInvoiceData(data)
-  }
-
   const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
     if (!id) return
     if (checked) {
@@ -248,7 +254,10 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   useEffect(() => {
     // Get Quote Data
-    if (id) getQuote(id)
+    if (id) {
+      getQuote(id)
+      getInvoiceData()
+    }
 
     // hide navbar and footer
     const navbarMain = document.getElementById('navbar-main')
@@ -261,6 +270,24 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       topSelector.scrollIntoView({ behavior: 'smooth' })
     }
   }, [])
+
+  useEffect(() => {
+    if (customerDetails && invoiceData) {
+      const optionalOrderLines = customerDetails.optional_order_lines || []
+      if (!invoiceData?.invoice_number) {
+        if (customerDetails.order_lines?.length)
+          setOffersDetails(
+            customerDetails.order_lines.filter(
+              (item) => optionalOrderLines.findIndex((x) => x.order_line_id === item.order_line_id) < 0,
+            ),
+          )
+        setOptionalOrderLines(optionalOrderLines)
+      } else {
+        if (customerDetails.order_lines?.length) setOffersDetails(customerDetails.order_lines)
+        setOptionalOrderLines([])
+      }
+    }
+  }, [customerDetails, invoiceData])
 
   useEffect(() => {
     if (customerDetails) {
@@ -436,6 +463,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               <div id='offer'>
                 {!!customerDetails && (
                   <PaymentMethod
+                    invoiceData={invoiceData}
                     offerDetails={offersDetails}
                     optionalOrderLines={optionalOrderLines}
                     customerInfo={[
@@ -448,8 +476,10 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                       },
                     ]}
                     qid={id}
+                    totalPrice={totalPrice}
+                    totalUnitPrice={totalUnitPrice}
                     payAssist={payAssistToParent}
-                    invData={invDataToParent}
+                    refetchInvoice={getInvoiceData}
                     PADataToParent={PADataToParent}
                     PAUrl={PAUrl}
                     method={paymentOptionToParent}
@@ -525,14 +555,12 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       {/* ---------------- Pay & Book page ---------------- */}
 
       {/* {tabValue === 1 && <div className='tab-content center'>
-                <Payment 
+                <Payment
                     clientTime={timeToPayment}
                     clientDate={dateToPayment}
                     clientAddress={billingAddress}
-                    qid={id}/>                    
+                    qid={id}/>
             </div>} */}
     </div>
   )
 }
-
-export default Quote
