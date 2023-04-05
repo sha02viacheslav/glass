@@ -318,24 +318,24 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     />
                   </div>
                 )}
-                <div className='PM-proceed-btn-cont'>
+                <div className='d-flex justify-content-end align-items-center mt-4'>
                   {startPAProcess && PAUrl === '' && (
-                    <button className='PM-proceed-btn' onClick={checkEligibility}>
+                    <button className='btn-stroked' onClick={checkEligibility}>
                       Check Eligibility
                     </button>
                   )}
                   {startPAProcess && PAUrl !== '' && (
-                    <a className='PA-link' href={PAUrl}>
-                      {PAUrl}
-                    </a>
-                  )}
-                  {startPAProcess && PAUrl !== '' && (
-                    <button className='PM-proceed-btn' onClick={checkEligibility}>
-                      Continue
-                    </button>
+                    <>
+                      <a className='PA-link' href={PAUrl} rel='noopener noreferrer' target='_blank'>
+                        {PAUrl}
+                      </a>
+                      <button className='btn-stroked' onClick={checkEligibility}>
+                        Continue
+                      </button>
+                    </>
                   )}
                   {!startPAProcess && (
-                    <button className='PM-proceed-btn' onClick={() => setStartPAProcess(true)}>
+                    <button className='btn-stroked' onClick={() => setStartPAProcess(true)}>
                       Pay with Payment Assist
                     </button>
                   )}
