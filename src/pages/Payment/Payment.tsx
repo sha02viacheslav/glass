@@ -6,6 +6,7 @@ import { LocationSelection } from '@glass/components/quotePage/LocationSelection
 import { PayBookTimeline } from '@glass/components/quotePage/PayBookTimeline'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
+import { OrderState } from '@glass/enums'
 import { Invoice } from '@glass/models'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
 import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
@@ -195,7 +196,13 @@ export const Payment: React.FC<PaymentProps> = ({ clientTime, clientDate, client
         </div>
         <button onClick={() => setIsRetrieved(!isRetrieved)}>switch</button>
         <PayBookTimeline />
-        <PaymentMethod qid={qid} payAssist={payAssistToParent} totalPrice={0} totalUnitPrice={0} />
+        <PaymentMethod
+          orderState={OrderState.NEW}
+          qid={qid}
+          payAssist={payAssistToParent}
+          totalPrice={0}
+          totalUnitPrice={0}
+        />
         <br />
         <br />
         <div className='payment-btn-container'>

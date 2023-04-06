@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { OrderState, PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import {
   Address,
@@ -26,6 +26,7 @@ import { paymentStatusText } from '@glass/utils/payment-status/payment-status-te
 import './payment-method.css'
 
 export type PaymentMethodProps = {
+  orderState: OrderState
   invoiceData?: Invoice
   offerDetails?: Offer[]
   optionalOrderLines?: OptionalOrderLine[]
@@ -42,6 +43,7 @@ export type PaymentMethodProps = {
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
+  orderState,
   invoiceData,
   offerDetails,
   optionalOrderLines,
@@ -77,6 +79,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
   const [showOrdersConfirm, setShowOrdersConfirm] = useState<boolean>(false)
+  const [warningMsg, setWarningMsg] = useState<string>('')
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -164,6 +167,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     }
   }
 
+  const handleChangePaymentOption = (method: PaymentOptionEnum) => {
+    if (orderState === OrderState.NEW || orderState === OrderState.OPEN) {
+      setWarningMsg('Please wait until the quotation is confirmed by admin!')
+    } else {
+      setSelectedMethod(method)
+    }
+  }
+
   useEffect(() => {
     if (invoiceData?.payment_method_type) {
       setPaymentMethodType(invoiceData.payment_method_type)
@@ -237,21 +248,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           <div className='PM-btn-container'>
             <button
               className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
-              onClick={() => setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)}
+              onClick={() => handleChangePaymentOption(PaymentOptionEnum.FOUR_MONTH)}
             >
               <small className='fs-14'>4 month</small>
               <div className='PM-price'>£ {(totalPrice / 4).toFixed(2)}</div>
             </button>
             <button
               className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
-              onClick={() => setSelectedMethod(PaymentOptionEnum.INSURANCE)}
+              onClick={() => handleChangePaymentOption(PaymentOptionEnum.INSURANCE)}
             >
               <small className='fs-14'>Insurance</small>
               <div className='PM-price'>£ {excess}</div>
             </button>
             <button
               className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
-              onClick={() => setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)}
+              onClick={() => handleChangePaymentOption(PaymentOptionEnum.SINGLE_PAY)}
             >
               <small className='fs-14'>Single pay</small>
               <div className='PM-price'>£ {totalPrice}</div>
@@ -552,6 +563,16 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           onCancel={() => {
             setShowPaymentConfirm(false)
           }}
+        />
+      )}
+
+      {!!warningMsg && (
+        <ConfirmDialog
+          title='Error'
+          description={warningMsg}
+          showCancel={false}
+          confirmStr='Ok'
+          onConfirm={() => setWarningMsg('')}
         />
       )}
     </div>
