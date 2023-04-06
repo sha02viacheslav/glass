@@ -104,7 +104,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             setShowInvoice(true)
             setInvoiceMessage('')
           } else {
-            setInvoiceMessage('Invoice can be created after booking is confirmed')
+            setInvoiceMessage('Receipt can be created after booking is confirmed')
           }
         }
       })
@@ -216,7 +216,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} invoiceID={invoiceData.invoice_number} />
       )}
       <div className='payment-method'>
-        <Tooltip disableFocusListener title='Invoice'>
+        <Tooltip disableFocusListener title='Receipt'>
           <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt='' />
         </Tooltip>
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>

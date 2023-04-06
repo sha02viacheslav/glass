@@ -16,19 +16,12 @@
 }
 
 .PDF-button-container {
+  scale: 1.25;
   position: fixed;
   display: flex;
   justify-content: center;
   bottom: -15%;
   width: 100%;
-}
-
-.PDF-download {
-  width: 200px;
-  height: 55px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .PDF-close {
