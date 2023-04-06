@@ -78,7 +78,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
-  const [showOrdersConfirm, setShowOrdersConfirm] = useState<boolean>(false)
   const [warningMsg, setWarningMsg] = useState<string>('')
 
   const updateExcess = () => {
@@ -154,19 +153,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     }
   }
 
-  const handleConfirmOrder = () => {
-    if (qid) {
-      confirmInvoiceService(qid).then((res) => {
-        if (res.success) {
-          setShowOrdersConfirm(false)
-          setPAProceed(true)
-          retrievePlan()
-          if (refetchInvoice) refetchInvoice()
-        }
-      })
-    }
-  }
-
   const handleChangePaymentOption = (method: PaymentOptionEnum) => {
     if (orderState === OrderState.NEW || orderState === OrderState.OPEN) {
       setWarningMsg('Please wait until the quotation is confirmed by admin!')
@@ -183,11 +169,17 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [invoiceData])
 
   useEffect(() => {
-    if (paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
+    if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
       if (invoiceData?.invoice_number) {
         retrievePlan()
       } else {
-        setShowOrdersConfirm(true)
+        confirmInvoiceService(qid).then((res) => {
+          if (res.success) {
+            setPAProceed(true)
+            retrievePlan()
+            if (refetchInvoice) refetchInvoice()
+          }
+        })
       }
     }
   }, [selectedMethod])
@@ -543,17 +535,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           </div>
         )}
       </div>
-
-      {showOrdersConfirm && (
-        <ConfirmDialog
-          title='Warning'
-          description='Are you sure you want to go with this order? Once invoice is created, you can not change the payment amount.'
-          onConfirm={handleConfirmOrder}
-          onCancel={() => {
-            setShowOrdersConfirm(false)
-          }}
-        />
-      )}
 
       {showPaymentConfirm && (
         <ConfirmDialog

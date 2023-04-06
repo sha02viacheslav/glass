@@ -1,5 +1,6 @@
 export * from './address.model'
 export * from './api-response.model'
+export * from './attachment.model'
 export * from './booking-date.model'
 export * from './customer-detail.model'
 export * from './delivery-address-dto.model'
