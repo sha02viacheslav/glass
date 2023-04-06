@@ -462,7 +462,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               <div id='offer'>
                 {!!customerDetails && (
                   <PaymentMethod
-                    orderState={customerDetails?.order_state}
+                    orderState={customerDetails.order_state}
                     invoiceData={invoiceData}
                     offerDetails={offersDetails}
                     optionalOrderLines={optionalOrderLines}
