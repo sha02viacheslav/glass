@@ -90,7 +90,13 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       const dom = document.getElementById('2')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
     } else if (snapValue === QuoteStep.TIMESLOT && !timeSlot) {
-      setWarningMsg('Select a time for the repair!')
+      if (invoiceData?.payment_state === PaymentStatus.PAID) {
+        setWarningMsg('Select a time for the repair!')
+      } else {
+        setSnapValue(QuoteStep.PAYMENT)
+        const dom = document.getElementById('1')
+        if (dom) dom.scrollIntoView({ behavior: 'smooth' })
+      }
     } else if (snapValue === QuoteStep.TIMESLOT && !!timeSlot) {
       if (
         invoiceData?.payment_state !== PaymentStatus.PAID &&
