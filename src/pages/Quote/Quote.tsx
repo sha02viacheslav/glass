@@ -13,7 +13,7 @@ import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
 import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
-import { PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { OrderState, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
@@ -274,7 +274,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   useEffect(() => {
     if (customerDetails && invoiceData) {
       const optionalOrderLines = customerDetails.optional_order_lines || []
-      if (!invoiceData?.invoice_number) {
+      if (customerDetails.order_state === OrderState.OPEN) {
         if (customerDetails.order_lines?.length)
           setOffersDetails(
             customerDetails.order_lines.filter(
