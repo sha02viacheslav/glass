@@ -434,6 +434,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <div className='center'>
           <h2 className='thank-you-header'>Thank you!</h2>
           <h1 className='extra-info'>We are preparing the quote...</h1>
+          <img className='working-gif' src='https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif' alt='' />
         </div>
       )}
 
