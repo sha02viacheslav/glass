@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { CarType } from '@glass/enums'
 import { VehicleRegistration } from '@glass/models'
+import { getVanBodyType } from '@glass/utils/session/session.util'
 
 const vehTypes = [
   ['CAR DERIVED VAN', 'HATCHBACK', '3 DOOR HATCHBACK'],
@@ -66,7 +67,9 @@ export const useRetrieveVehData = (
           body = mapBodyType[i]
         }
       }
-      if (body) dataToCustomer(body)
+      if (body) {
+        dataToCustomer(body === CarType.BARN ? getVanBodyType() : body)
+      }
     }
   }, [vehData])
 }

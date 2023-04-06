@@ -5,16 +5,26 @@ import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
 import { WindowSelection } from '@glass/models'
+import {
+  getAskedTint,
+  getAskedVan,
+  getVanBodyType,
+  setAskedTint,
+  setAskedVan,
+  setVanBodyType,
+} from '@glass/utils/session/session.util'
 import styles from './window-selection.module.css'
 
 export type WindowSelectorProps = {
   carType: CarType
+  setCarType: (value: CarType) => void
   brokenWindowsToCustomer?: (value: string[]) => void
   brokenWindowsToComponent?: string[]
 }
 
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
   carType,
+  setCarType,
   brokenWindowsToCustomer,
   brokenWindowsToComponent,
 }) => {
@@ -25,17 +35,13 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [tintedValue, setTintedValue] = useState('no')
 
   // determine if body is tailgater or barn door for the vans
-  const [bodyValue, setBodyValue] = useState(
-    JSON.parse(sessionStorage.getItem('vanBodyType') || `"${CarType.TAILGATER}"`),
-  )
+  const [bodyValue, setBodyValue] = useState(getVanBodyType())
   const [isBarnDoor, setIsBarnDoor] = useState(false)
-  const [bodyPopupConfirm, setBodyPopupConfirm] = useState(
-    JSON.parse(sessionStorage.getItem('askedVanBody') || 'false'),
-  )
+  const [bodyPopupConfirm, setBodyPopupConfirm] = useState(getAskedVan())
   const [showBodyPopup, setShowBodyPopup] = useState(false)
 
   // toggle first time popup appears, popup should show just once
-  const [tintedConfirmed, setTintedConfirmed] = useState(JSON.parse(sessionStorage.getItem('askedTinted') || 'false'))
+  const [tintedConfirmed, setTintedConfirmed] = useState(getAskedTint())
   // array of possible window selections for Coupe
   const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
@@ -112,7 +118,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         setTintedValue('no')
       }
     }
-    sessionStorage.setItem('askedTinted', JSON.stringify(true))
+    setAskedTint()
   }
 
   // handle tinted toggle button
@@ -147,6 +153,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     setIsBarnDoor(isBarn)
     if (isBarn) {
       setBodyValue(CarType.BARN)
+      setVanBodyType(CarType.BARN)
+      setCarType(CarType.BARN)
       if (brokenWindows[3].broken) {
         // disable tailgater back window
         brokenWindows[3].broken = false
@@ -160,9 +168,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           selectedWindows.splice(index3, 1)
         }
       }
-      sessionStorage.setItem('vanBodyType', JSON.stringify(CarType.BARN))
     } else {
       setBodyValue(CarType.TAILGATER)
+      setVanBodyType(CarType.TAILGATER)
+      setCarType(CarType.TAILGATER)
       if (brokenWindows[1].broken) {
         brokenWindows[1].broken = false
         // find if any of the back windows are selected and remove them from array sent to customer if so
@@ -187,7 +196,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           selectedWindows.splice(index3, 1)
         }
       }
-      sessionStorage.setItem('vanBodyType', JSON.stringify(CarType.TAILGATER))
     }
     setSelectedWindows((windows) => {
       return windows.slice()
@@ -200,7 +208,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     setShowBodyPopup(false)
     setBodyPopupConfirm(true)
     bodyChange(isBarn)
-    sessionStorage.setItem('askedVanBody', JSON.stringify(true))
+    setAskedVan()
   }
 
   const isVan = useMemo(() => {
