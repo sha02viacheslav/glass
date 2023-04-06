@@ -7,7 +7,6 @@ import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
 import { BeforeAfter } from '@glass/components/BeforeAfter'
-import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
@@ -64,7 +63,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
-  const [warningMsg, setWarningMsg] = useState<string>('')
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(customerDetails)
 
@@ -171,8 +169,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           setPAUrl(res.data.url)
         }
       })
-    } else {
-      setWarningMsg('Please wait until confirm your quote!')
     }
   }
 
@@ -453,7 +449,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <div className='center'>
           <h2 className='thank-you-header'>Thank you!</h2>
           <h1 className='extra-info'>We are preparing the quote...</h1>
-          {/* <img className='working-gif' src="https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif" alt="" /> */}
           {!!customerDetails && <PaymentPreview />}
           <SlotsPreview />
         </div>
@@ -467,6 +462,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               <div id='offer'>
                 {!!customerDetails && (
                   <PaymentMethod
+                    orderState={customerDetails?.order_state}
                     invoiceData={invoiceData}
                     offerDetails={offersDetails}
                     optionalOrderLines={optionalOrderLines}
@@ -554,16 +550,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <div className='quote-before-after'>
           <BeforeAfter />
         </div>
-      )}
-
-      {!!warningMsg && (
-        <ConfirmDialog
-          title='Error'
-          description={warningMsg}
-          showCancel={false}
-          confirmStr='Ok'
-          onConfirm={() => setWarningMsg('')}
-        />
       )}
 
       {/* ---------------- Pay & Book page ---------------- */}
