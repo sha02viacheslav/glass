@@ -49,8 +49,8 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen, invoic
           <Page pageNumber={1} />
           <img className='PDF-close' src={close} alt='' onClick={() => isOpen(false)} />
           <div className='PDF-button-container'>
-            <button className='btn btn-purple-radius mb-3 PDF-download' onClick={downloadInvoice}>
-              Download
+            <button className='btn-raised round mb-3' onClick={downloadInvoice}>
+              Download Receipt
             </button>
           </div>
         </Document>
