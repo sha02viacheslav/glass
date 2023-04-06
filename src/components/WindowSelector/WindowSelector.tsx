@@ -263,8 +263,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         <ConfirmDialog
           title='Rear Windows'
           description='Do you have one or two rear windows?'
-          onConfirm={() => handleBodyPopup(false)}
-          onCancel={() => handleBodyPopup(true)}
+          confirmStr='Two'
+          cancelStr='One'
+          onConfirm={() => handleBodyPopup(true)}
+          onCancel={() => handleBodyPopup(false)}
         />
       )}
 
