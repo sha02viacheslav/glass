@@ -1,3 +1,4 @@
+import { OrderState } from '@glass/enums'
 import { Address } from './address.model'
 import { Offer } from './offer.model'
 import { OptionalOrderLine } from './optional-order-line.model'
@@ -18,4 +19,5 @@ export type CustomerDetail = {
   c_postalcode: string
   order_lines?: Offer[]
   optional_order_lines?: OptionalOrderLine[]
+  order_state: OrderState
 }
