@@ -1,6 +1,5 @@
 /* everything using display flex */
 .time-select-main,
-.time-select-preview,
 .date-pick-container,
 .time-select-month,
 .date-nav-container,
@@ -36,24 +35,13 @@
   max-width: 550px;
 }
 
-.time-select-main,
-.time-select-preview {
+.time-select-main {
   flex-direction: column;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
-  border-radius: 15px;
   width: 100%;
-  max-width: 550px;
-  padding: 10px;
-  display: table;
-  text-align: center;
+  padding: 24px;
 }
 
-.time-select-preview {
-  margin-top: 80px;
-}
-
-.time-select-main h1,
-.time-select-preview h1 {
+.time-select-main h1 {
   line-height: 40px;
   font-weight: 500;
   font-size: 20px;
@@ -182,7 +170,6 @@
 .ts-table tr:nth-child(n + 2) > td:nth-child(n + 2):hover {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.315);
   cursor: pointer;
-  /* border: 4px solid red; */
 }
 
 .ts-table tr:nth-child(1) {
@@ -199,16 +186,13 @@
 
 .ts-td-active {
   outline: 4px solid rgb(255, 48, 48);
-  /* box-shadow:inset 0px 0px 0px 10px #f00; */
 }
 
 .ts-legend-container {
   display: flex;
   justify-content: left;
   align-items: center;
-  /* width: 90%; */
   margin-top: 25px;
-  margin-bottom: 20px;
 }
 
 .ts-legend-icon {

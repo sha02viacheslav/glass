@@ -1,14 +1,9 @@
 .location-container {
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
-  border-radius: 15px;
-  width: 100%;
-  max-width: 550px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 50px;
-  padding: 20px;
+  padding: 24px;
 }
 
 .LS-header {
