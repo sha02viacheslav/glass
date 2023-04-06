@@ -34,8 +34,8 @@ export type PaymentMethodProps = {
   qid: string | undefined
   totalPrice: number
   totalUnitPrice: number
-  payAssist: (value: string) => void
-  refetchInvoice?: () => void
+  payAssist: () => void
+  refetchInvoice: () => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
   method?: (value: PaymentOptionDto) => void
@@ -121,7 +121,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const checkEligibility = () => {
     // communicate with Payment (parent)
-    payAssist('go')
+    payAssist()
   }
 
   const handleChangePaymentMethodType = (value: PaymentMethodType) => {
@@ -218,7 +218,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       {showInvoice && !!invoiceData && (
         <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} invoiceID={invoiceData.invoice_number} />
       )}
-      <div className='payment-method'>
+      <div className='quote-card'>
         <Tooltip disableFocusListener title='Receipt'>
           <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt='' />
         </Tooltip>
@@ -456,7 +456,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <span>Excess Cash</span>
                   </button>
                 </div>
-                <Checkout method={paymentMethodType} amount={totalPrice} />
+                <Checkout method={paymentMethodType} amount={totalPrice} succeedPayment={refetchInvoice} />
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
@@ -528,7 +528,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </button>
                   </div>
                 </div>
-                <Checkout method={paymentMethodType} amount={totalPrice} />
+                <Checkout method={paymentMethodType} amount={totalPrice} succeedPayment={refetchInvoice} />
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}

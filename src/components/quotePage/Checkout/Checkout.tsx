@@ -11,13 +11,14 @@ import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 export type CheckoutProps = {
   method: PaymentMethodType
   amount: number
+  succeedPayment: () => void
 }
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe(REACT_APP_STRIPE_PUBLIC_KEY)
 
-export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
+export const Checkout: React.FC<CheckoutProps> = ({ method, amount, succeedPayment }) => {
   const { id } = useParams()
   const [invoiceNumber, setInvoiceNumber] = useState<string>('')
   const [clientSecret, setClientSecret] = useState('')
@@ -46,7 +47,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ method, amount }) => {
     <>
       {method === PaymentMethodType.STRIPE && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <CheckoutForm amount={amount} clientSecret={clientSecret} />
+          <CheckoutForm amount={amount} clientSecret={clientSecret} succeedPayment={succeedPayment} />
         </Elements>
       )}
     </>

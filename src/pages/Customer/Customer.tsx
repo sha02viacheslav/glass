@@ -1,13 +1,13 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { Button } from '@mui/material'
 import { autocomplete } from 'getaddress-autocomplete'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { AddPictures } from '@glass/components/AddPictures'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, VehicleData } from '@glass/models'
+import { Address, Attachment, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -36,6 +36,7 @@ export const Customer: React.FC = () => {
   const billingRef = useRef<HTMLInputElement>(null)
 
   const [comment, setComment] = useState<string>('')
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -137,7 +138,7 @@ export const Customer: React.FC = () => {
         glass_location: selectedBrokenWindows || [],
         customer_comments: {
           comment: comment,
-          attachments: [],
+          attachments: attachments,
         },
       }).then((res) => {
         if (res.success) {
@@ -184,6 +185,10 @@ export const Customer: React.FC = () => {
           setVehicleData('No Data Found! Error in API.')
         })
     }
+  }
+
+  const handleChangeFiles = (files: Attachment[]) => {
+    setAttachments(files)
   }
 
   useEffect(() => {
@@ -284,9 +289,7 @@ export const Customer: React.FC = () => {
                         ></textarea>
                       </div>
 
-                      <Button variant='contained' color='secondary'>
-                        Add Pictures
-                      </Button>
+                      <AddPictures onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
                       <form action='' className='form-car my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>

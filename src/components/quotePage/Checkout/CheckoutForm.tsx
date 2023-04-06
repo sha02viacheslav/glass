@@ -7,9 +7,10 @@ import './checkout.css'
 export type CheckoutFormProps = {
   amount: number
   clientSecret: string
+  succeedPayment: () => void
 }
 
-export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret }) => {
+export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret, succeedPayment }) => {
   const stripe = useStripe()
   const elements = useElements()
 
@@ -75,7 +76,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
       confirmPaymentResult.paymentIntent.client_secret,
       status ? 'success' : 'Failed',
     )
-      .then(() => {})
+      .then(() => {
+        succeedPayment()
+      })
       .catch(() => {})
   }
 

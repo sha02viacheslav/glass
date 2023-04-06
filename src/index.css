@@ -64,3 +64,31 @@ code {
   border-radius: 40px;
   min-width: 140px;
 }
+
+.btn-icon {
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: white;
+  color: #9557e8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-icon:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.quote-card {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
+  border-radius: 15px;
+  width: 100%;
+  max-width: 550px;
+  overflow: hidden;
+  position: relative;
+}

@@ -1,3 +1,4 @@
+import './quote.css'
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
@@ -7,13 +8,12 @@ import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
 import { BeforeAfter } from '@glass/components/BeforeAfter'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
-import { PaymentPreview } from '@glass/components/quotePage/PaymentPreview'
-import { SlotsPreview } from '@glass/components/quotePage/SlotsPreview'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
-import { OrderState, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteStep } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
@@ -24,7 +24,6 @@ import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payme
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
-import './quote.css'
 
 export type QuoteProps = {
   quoteCount?: boolean
@@ -35,14 +34,13 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const [tabValue] = useState(0)
   const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
-  const [snapValue, setSnapValue] = useState(1)
+  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState(false)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
   const [paymentOption, setPaymentOption] = useState<PaymentOptionDto>({ p_option: PaymentOptionEnum.NONE, detail: '' })
-  const [slotSelected, setSlotSelected] = useState(false)
   const [declinePopup, setDeclinePopup] = useState(false)
   const [declineReason, setDeclineReason] = useState<number>(0)
   const [isBlink, setIsBlink] = useState(false)
@@ -59,10 +57,10 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     },
   ])
   const [optionalOrderLines, setOptionalOrderLines] = useState<OptionalOrderLine[]>([])
-  const [payAssistStatus, setPayAssistStatus] = useState('')
   const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
+  const [warningMsg, setWarningMsg] = useState<string>('')
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(customerDetails)
 
@@ -85,37 +83,24 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
-  const handleSnapChange = (option: string) => {
+  const handleSnapChange = () => {
     // navigate scroll snap
-    if (snapValue === 1 && option === 'next' && !timeSlot) {
-      // offer to time select if timeslot is not selected
-      setSnapValue(2)
+    if (snapValue === QuoteStep.PAYMENT) {
+      setSnapValue(QuoteStep.TIMESLOT)
       const dom = document.getElementById('2')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 1 && option === 'next' && !!timeSlot) {
-      // offer to location if timeslot is selected
-      setSnapValue(3)
-      const dom = document.getElementById('3')
-      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 2 && option === 'next' && !!timeSlot) {
-      // time select to location if timeslot is selected
-      setSnapValue(3)
-      const dom = document.getElementById('3')
-      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-    } else if (snapValue === 2 && option === 'next' && !!timeSlot) {
-      // scroll snap to time select if no slot selected
-      const dom = document.getElementById('2')
-      if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-      setSlotSelected(true)
-    } else if (snapValue === 3 && option === 'next' && !!timeSlot) {
+    } else if (snapValue === QuoteStep.TIMESLOT && !timeSlot) {
+      setWarningMsg('Select a time for the repair!')
+    } else if (snapValue === QuoteStep.TIMESLOT && !!timeSlot) {
       if (
         invoiceData?.payment_state !== PaymentStatus.PAID &&
         (paymentOption.p_option === PaymentOptionEnum.NONE || paymentOption.detail === 'Select payment method')
       ) {
         // scroll to PM component if no payment method is selected
-        setSnapValue(1)
+        setSnapValue(QuoteStep.PAYMENT)
         const dom = document.getElementById('1')
         if (dom) dom.scrollIntoView({ behavior: 'smooth' })
+        setWarningMsg('Please select payment method and pay!')
       } else if (
         paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH &&
         paymentOption.detail !== 'Select payment method'
@@ -215,7 +200,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const timeSlotToParent = (data: TimeSlot) => {
     sendBookingData(data)
     setTimeSlot(data)
-    setSlotSelected(false)
+    setWarningMsg('')
   }
 
   const deliveryAddressToParent = (data: string) => {
@@ -226,13 +211,8 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     setPaymentOption(pOption)
   }
 
-  const payAssistToParent = (status: string) => {
-    if (payAssistStatus === '' || payAssistStatus === 'opened-nogo') {
-      setPayAssistStatus(status)
-    }
-    if (status === 'go') {
-      PABegin()
-    }
+  const payAssistToParent = () => {
+    PABegin()
   }
 
   const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
@@ -298,21 +278,21 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   useEffect(() => {
     // change between accept and next buttons names and styling
     const acceptSelector = document.getElementById('accept-btn')
-    if (snapValue === 1 && acceptSelector != null) {
+    if (!acceptSelector) return
+    if (snapValue === QuoteStep.PAYMENT) {
       setAcceptBtn('Next')
       acceptSelector.classList.remove('quote-accept')
-    } else if (snapValue === 2 && acceptSelector !== null) {
-      setAcceptBtn('Next')
-      acceptSelector.classList.remove('quote-accept')
-    } else if (snapValue === 3 && acceptSelector !== null && !!timeSlot) {
+    } else if (snapValue === QuoteStep.TIMESLOT) {
       if (invoiceData?.payment_state !== PaymentStatus.PAID) {
         if (paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH) {
-          // detail coming from payment method
           setAcceptBtn(paymentOption.detail)
         } else {
           setAcceptBtn('Select payment method')
         }
+      } else {
+        setAcceptBtn('Book Online')
       }
+
       acceptSelector.classList.add('quote-accept')
     }
   }, [snapValue, timeSlot, paymentOption])
@@ -449,8 +429,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <div className='center'>
           <h2 className='thank-you-header'>Thank you!</h2>
           <h1 className='extra-info'>We are preparing the quote...</h1>
-          {!!customerDetails && <PaymentPreview />}
-          <SlotsPreview />
         </div>
       )}
 
@@ -459,7 +437,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           {tabValue === 0 && (
             <div className='scroll-container'>
               {/* select offer / payment method */}
-              <div id='offer'>
+              <div id='offer' className='mt-5'>
                 {!!customerDetails && (
                   <PaymentMethod
                     orderState={customerDetails.order_state}
@@ -487,28 +465,18 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   />
                 )}
               </div>
-              <br />
-              <br />
 
               <div className='quote-scroll-target' id='2'>
                 -
               </div>
 
-              {slotSelected && <div className='quote-scheduler-msg'>Select a time for the repair</div>}
-              <div className={slotSelected ? 'quote-scheduler-red' : undefined}>
-                <TimeSelection
-                  timeSlotToParent={timeSlotToParent}
-                  liveBooking={false}
-                  bookingStartDate={customerDetails?.booking_start_date}
-                />
-              </div>
-
-              <div className='quote-scroll-target-2' id='3'>
-                -
-              </div>
-
-              <div className='quote-component-last'>
-                {!!customerDetails && (
+              {!!customerDetails && (
+                <div className='quote-card'>
+                  <TimeSelection
+                    timeSlotToParent={timeSlotToParent}
+                    liveBooking={false}
+                    bookingStartDate={customerDetails?.booking_start_date}
+                  />
                   <LocationSelection
                     key={billingAddress}
                     userBillingAddress={billingAddress}
@@ -521,7 +489,11 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     ]}
                     deliveryAddressToChild={customerDetails.delivery_address}
                   />
-                )}
+                </div>
+              )}
+
+              <div className='quote-scroll-target-2' id='3'>
+                -
               </div>
             </div>
           )}
@@ -537,11 +509,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           >
             Decline
           </button>
-          <button
-            className='btn btn-purple-radius mb-3 quote-btn'
-            onClick={() => handleSnapChange('next')}
-            id='accept-btn'
-          >
+          <button className='btn btn-purple-radius mb-3 quote-btn' onClick={() => handleSnapChange()} id='accept-btn'>
             {acceptBtn}
           </button>
         </div>
@@ -552,15 +520,15 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         </div>
       )}
 
-      {/* ---------------- Pay & Book page ---------------- */}
-
-      {/* {tabValue === 1 && <div className='tab-content center'>
-                <Payment
-                    clientTime={timeToPayment}
-                    clientDate={dateToPayment}
-                    clientAddress={billingAddress}
-                    qid={id}/>
-            </div>} */}
+      {!!warningMsg && (
+        <ConfirmDialog
+          title='Error'
+          description={warningMsg}
+          showCancel={false}
+          confirmStr='Ok'
+          onConfirm={() => setWarningMsg('')}
+        />
+      )}
     </div>
   )
 }
