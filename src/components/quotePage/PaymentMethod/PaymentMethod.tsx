@@ -245,13 +245,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               <small className='fs-14'>4 month</small>
               <div className='PM-price'>£ {(totalPrice / 4).toFixed(2)}</div>
             </button>
-            <button
-              className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}
-              onClick={() => handleChangePaymentOption(PaymentOptionEnum.INSURANCE)}
-            >
-              <small className='fs-14'>Insurance</small>
-              <div className='PM-price'>£ {excess}</div>
-            </button>
+            {/*<button*/}
+            {/*  className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}*/}
+            {/*  onClick={() => handleChangePaymentOption(PaymentOptionEnum.INSURANCE)}*/}
+            {/*>*/}
+            {/*  <small className='fs-14'>Insurance</small>*/}
+            {/*  <div className='PM-price'>£ {excess}</div>*/}
+            {/*</button>*/}
             <button
               className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
               onClick={() => handleChangePaymentOption(PaymentOptionEnum.SINGLE_PAY)}

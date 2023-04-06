@@ -106,7 +106,6 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         setSnapValue(QuoteStep.PAYMENT)
         const dom = document.getElementById('1')
         if (dom) dom.scrollIntoView({ behavior: 'smooth' })
-        setWarningMsg('Please select payment method and pay!')
       } else if (
         paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH &&
         paymentOption.detail !== 'Select payment method'
@@ -301,7 +300,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
       acceptSelector.classList.add('quote-accept')
     }
-  }, [snapValue, timeSlot, paymentOption])
+  }, [snapValue, timeSlot, paymentOption, invoiceData])
 
   return (
     <div>
