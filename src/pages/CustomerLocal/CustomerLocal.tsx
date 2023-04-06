@@ -283,7 +283,7 @@ export const CustomerLocal: React.FC = () => {
                     </div>
                     <div className='parent'>
                       {/* car image display */}
-                      <WindowSelector carType={selectedCarType} />
+                      <WindowSelector carType={selectedCarType} setCarType={setSelectedCarType} />
                       <p className='fs-18 text-blue'>Your comments (optional)</p>
                       <div className='form-group mb-4'>
                         <textarea

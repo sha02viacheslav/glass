@@ -265,6 +265,7 @@ export const Customer: React.FC = () => {
                       {/* car image display */}
                       <WindowSelector
                         carType={selectedCarType}
+                        setCarType={setSelectedCarType}
                         brokenWindowsToCustomer={brokenWindowsToCustomer}
                         brokenWindowsToComponent={brokenWindowsToComponent}
                       />
