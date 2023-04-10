@@ -52,8 +52,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [postalCode, setPostalCode] = useState<string>(quoteDetails?.c_postalcode || '')
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
-  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
-  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
+  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
+  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
@@ -119,7 +119,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const handleConfirmChangePaymentMethodType = () => {
-    if (qid) {
+    if (qid && tempPaymentMethodType) {
       setPaymentMethodType(tempPaymentMethodType)
       setShowPaymentConfirm(false)
       updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
@@ -447,7 +447,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <span>Excess Cash</span>
                   </button>
                 </div>
-                <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                {!!paymentMethodType && (
+                  <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
@@ -519,7 +521,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </button>
                   </div>
                 </div>
-                <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                {!!paymentMethodType && (
+                  <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
