@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { CustomerDetail } from '@glass/models'
+import { Quote } from '@glass/models'
 
 export const useCalcPriceSummary = (
-  quote: CustomerDetail | undefined,
+  quote: Quote | undefined,
 ): {
   totalPrice: number
   totalUnitPrice: number

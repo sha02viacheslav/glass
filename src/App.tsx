@@ -10,7 +10,7 @@ import { Customer } from '@glass/pages/Customer'
 import { Home } from '@glass/pages/Home'
 import { Paid } from '@glass/pages/Paid'
 import { Pricing } from '@glass/pages/Pricing'
-import { Quote } from '@glass/pages/Quote'
+import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
 import './App.css'
 
@@ -68,9 +68,9 @@ export const App: React.FC = () => {
           <Route path='/payment/assist/:status' element={<PaymentAssist />} />
           <Route path='/payment/:status' element={<PaymentAssist />} />
           <Route path='/paid' element={<Paid />} />
-          <Route path='/quote/:id' element={<Quote />} />
-          <Route path='/quote/in/:id' element={<Quote />} />
-          <Route path='/quote/be/:id' element={<Quote quoteCount={false} />} />
+          <Route path='/quote/:id' element={<QuotePage />} />
+          <Route path='/quote/in/:id' element={<QuotePage />} />
+          <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
         </Routes>
         <Footer />
       </div>
