@@ -4,7 +4,7 @@ import { Box, Modal, Typography } from '@mui/material'
 
 export type ConfirmDialogProps = {
   title: string
-  description: string
+  description?: string
   subDescription?: string | ReactNode
   confirmStr?: string
   cancelStr?: string
@@ -51,15 +51,19 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
-          <Typography variant='h5' fontWeight={'bold'}>
+          <Typography marginTop={description ? 0 : 4} variant='h5' fontWeight={'bold'}>
             {title}
           </Typography>
           {showIcon && <ErrorOutlineIcon sx={{ fontSize: 50, margin: '20px 0px' }} />}
-          <Typography
-            marginTop={showIcon ? 0 : 4}
-            component={'p'}
-            dangerouslySetInnerHTML={{ __html: description || '' }}
-          />
+          {description ? (
+            <Typography
+              marginTop={showIcon ? 0 : 4}
+              component={'p'}
+              dangerouslySetInnerHTML={{ __html: description || '' }}
+            />
+          ) : (
+            <Box marginTop={showIcon ? 0 : 7}></Box>
+          )}
           {subDescription && <Typography>{subDescription}</Typography>}
           <Box
             sx={{

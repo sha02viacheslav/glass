@@ -538,8 +538,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Warning'
-          description='Are you sure you want to change the payment method type?'
+          title='Confirm payment method'
+          showIcon={false}
           onConfirm={handleConfirmChangePaymentMethodType}
           onCancel={() => {
             setShowPaymentConfirm(false)
