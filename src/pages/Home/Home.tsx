@@ -32,15 +32,13 @@ export const Home: React.FC = () => {
       <section className='sec-banner-s1 my-4 my-md-5'>
         <div className='container'>
           <div className='banner-s1 position-relative'>
-            <img src={process.env.PUBLIC_URL + '/img/bg-s1.png'} className='img-fluid hp-quote-bg-img' alt='' />
+            <img src={process.env.PUBLIC_URL + '/img/bg-home.jpg'} className='img-fluid hp-quote-bg-img' alt='' />
             <div className='license-input-container'>
-              {/* <input ref={licenseRef} type="text" className="form-control" placeholder="Reg. Number" aria-label="Recipient's username" aria-describedby="basic-addon2" onChange={handleVehInputChange}/> */}
               <div className='yellow-box-home'>
                 <div className='blue-box'>
                   <img className='flag' src={flag} alt='' />
                   <div className='gb'>UK</div>
                 </div>
-                {/* <input className='license-input' type="text" value={quoteDetails.registration_number} placeholder='Reg. Number'/> */}
                 <input
                   ref={licenseRef}
                   className='license-input'

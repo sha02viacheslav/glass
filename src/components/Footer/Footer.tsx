@@ -1,6 +1,9 @@
-import React from 'react'
+import './style.css'
+import React, { useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Slider, { CustomArrowProps } from 'react-slick'
+import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 function SliderNextArrow(props: CustomArrowProps) {
   const { onClick } = props
@@ -90,14 +93,30 @@ export const Footer: React.FC = () => {
     ],
   }
 
+  const navigate = useNavigate()
+  const licenseRef = useRef<HTMLInputElement>(null)
+
+  const patternMatch = () => {
+    if (licenseRef.current) {
+      licenseRef.current.value = formatLicenseNumber(licenseRef.current.value)
+    }
+  }
+
+  const directToCustomer = () => {
+    if (licenseRef.current?.value) {
+      navigate('/customer/' + licenseRef.current?.value)
+      licenseRef.current.value = ''
+    }
+  }
+
   return (
     <div id='footer-main'>
       <section className='sec-case-s section pt-md-0 '>
         <div className='container'>
           <h2 className='text-center text-blue mb-3 pt-md-5'>Before & after</h2>
           <p className='mb-0 slider-content'>
-            Here you can describe what was the service about,
-            <span className='d-lg-block'> what was the car brand and the model.</span>
+            The quality of our work, check before&after pictures. We can come to your home or work and replace the glass
+            in 1-2 hours.
           </p>
           <div className='main-content  pt-4'>
             <div className='regular p-4'>
@@ -530,17 +549,26 @@ export const Footer: React.FC = () => {
             <div className='content-box'>
               <div className='row'>
                 <div className='col-lg-6 offset-lg-6'>
-                  <h3 className='text-white mb-4'>Lorem ipsum dolor sit amet adicipling elit ullamco euismod</h3>
-                  <div className='row'>
+                  <h3 className='text-white mb-4'>
+                    Call us 07400 400469 or ask a quote online. We accept all cards, cash and installments.
+                  </h3>
+                  <div className='row align-items-center'>
                     <div className='col-md-6'>
                       <div className='form-group'>
-                        <input type='text' className='form-control' placeholder='Vehicle Registration Number...' />
+                        <input
+                          ref={licenseRef}
+                          type='text'
+                          className='form-control'
+                          placeholder='Vehicle Registration Number...'
+                          onChange={patternMatch}
+                          maxLength={8}
+                        />
                       </div>
                     </div>
                     <div className='col-md-6'>
-                      <Link to='/customer' className='btn btn-et w-100'>
+                      <button onClick={directToCustomer} className='btn btn-et w-100'>
                         Get a Quote
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -562,18 +590,15 @@ export const Footer: React.FC = () => {
                 <div className='col-md-5'>
                   <h4 className='text-white'>About us</h4>
                   <p className='text-white mb-0'>
-                    Wherever you are, whichever model you drive, we got you covered. We offer nationwide windscreen
-                    repairs and replacements for passenger vehicles and vans. All jobs are done by professionals at your
-                    home or work.
+                    Wherever you are, whichever model you drive, we got you covered. We offer windscreen repairs and
+                    replacements for passenger vehicles and vans. All jobs are done by professionals at your home or
+                    work.
                   </p>
                 </div>
                 <div className='col-md-2 ps-lg-4'>
                   <ul className='list-f'>
                     <li>
                       <Link to='/services'>Services</Link>
-                    </li>
-                    <li>
-                      <Link to='/pricing'>Pricing</Link>
                     </li>
                     <li>
                       <Link to='/contact'>Contact us</Link>
@@ -584,14 +609,8 @@ export const Footer: React.FC = () => {
                   <h4 className='text-white pd-top mb-3'>Quick Contact</h4>
                   <p className='mb-2'>
                     <img src={process.env.PUBLIC_URL + '/img/ph.svg'} className='img-fluid me-2' alt='' />{' '}
-                    <a href='#' className='text-white'>
-                      contact@estglass.com
-                    </a>
-                  </p>
-                  <p>
-                    <img src={process.env.PUBLIC_URL + '/img/em.svg'} className='img-fluid me-2' alt='' />{' '}
                     <a href='#' className='text-white text-decoration-none'>
-                      0776 6374 005
+                      07400 400469
                     </a>
                   </p>
                 </div>
@@ -601,7 +620,7 @@ export const Footer: React.FC = () => {
         </section>
         <section className='footer-btm py-3'>
           <div className='container'>
-            <p className='mb-0'>Copyright by © Est Glass. All rights reserved.</p>
+            <p className='mb-0'>Copyright by © FixGlass (Estglass Limited) Company No.11808031. All rights reserved.</p>
           </div>
         </section>
       </footer>
