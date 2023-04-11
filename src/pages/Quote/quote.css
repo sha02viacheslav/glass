@@ -1,0 +1,268 @@
+.thank-you-header {
+  margin: 50px 0 30px 0;
+  color: #9a73dd;
+}
+
+.extra-info {
+  margin-bottom: 60px;
+}
+
+.quote-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.quote-info-main {
+  border: 1px solid #9a73dd;
+  background-color: white;
+  width: 100%;
+  max-width: 550px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.client-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 1s;
+  position: relative;
+  padding: 5px;
+}
+
+.client-info {
+  font-size: 14px;
+  line-height: 25px;
+}
+
+.client-windows {
+  border: 1px solid #9a73dd71;
+  border-radius: 12px;
+  padding: 8px 8px;
+  margin: 5px 5px 2px 0;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  background-color: rgb(255, 255, 255);
+}
+
+.edit-btn-container {
+  height: 100%;
+  width: 120px;
+  display: flex;
+  justify-content: center;
+}
+
+.quote-info-bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  line-height: 22px;
+  padding: 5px;
+}
+
+.working-gif {
+  width: 280px;
+}
+
+.switch-data-temp {
+  margin-bottom: 30px;
+}
+
+.accept-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: sticky;
+  bottom: 10px;
+  left: 50%;
+}
+
+.quote-btn {
+  width: 200px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 20px;
+  line-height: 25px;
+}
+
+.quote-accept {
+  background-color: rgb(17, 218, 17);
+}
+
+.quote-decline {
+  border: 1px solid red;
+  color: red;
+}
+
+.quote-decline:hover {
+  color: red;
+}
+
+.scroll-container {
+  animation: fadeIn 1s;
+  height: 100%;
+  width: 100%;
+  max-width: 550px;
+}
+
+.quote-component {
+  margin-bottom: 10vh;
+}
+
+.quote-component-last {
+  margin-bottom: 10vh;
+}
+
+.quote-scroll-target {
+  opacity: 0;
+  height: 7vh;
+}
+.quote-scroll-target-2 {
+  opacity: 0;
+  height: 7vh;
+  margin-bottom: 60px;
+}
+
+.true-top {
+  opacity: 0;
+  height: 8px;
+}
+
+.quote-info-compact {
+  height: fit-content;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #9a73dd;
+  background-color: white;
+  border-radius: 10px;
+  padding: 5px;
+  width: 100%;
+  max-width: 550px;
+  transition: 1s;
+  position: relative;
+}
+
+.client-info-compact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 95%;
+}
+
+.compact-bottom-row {
+  height: 50px;
+  width: 105%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.quote-selected-windows {
+  font-size: 14px;
+  line-height: 25px;
+  margin-right: 5px;
+}
+
+.client-info-icon {
+  width: 22px;
+  margin-right: 10px;
+  transform: rotate(90deg);
+}
+
+.client-info-icon:hover {
+  cursor: pointer;
+}
+
+.client-up-icon {
+  width: 22px;
+  margin: 0 5px 0 10px;
+}
+
+.client-up-icon:hover {
+  cursor: pointer;
+}
+
+.quote-before-after {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 50px 0;
+}
+
+.quote-before-after div {
+  max-width: 550px;
+}
+
+.quote-scheduler-red {
+  outline: 3px solid rgb(255, 55, 10);
+  border-radius: 15px;
+}
+
+.quote-scheduler-msg {
+  color: rgb(255, 55, 10);
+  font-size: 15px;
+  text-align: center;
+}
+
+.client-info-blink {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgb(4, 224, 4);
+  box-shadow: 0 0 5px 1px #fff, 0 0 8px 1px rgb(55, 255, 48);
+  color: transparent;
+  position: absolute;
+  right: 18px;
+  top: 15px;
+  animation: blink-animation 3s infinite;
+}
+@keyframes blink-animation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.client-info-blink:hover {
+  cursor: default;
+}
+
+.booking-info h1 {
+  line-height: 40px;
+  font-weight: 500;
+  font-size: 20px;
+  color: #2e006c;
+  text-align: center;
+}
+
+.booking-address {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}

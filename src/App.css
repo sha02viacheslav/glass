@@ -63,7 +63,8 @@ area:hover {
   margin-top: 10px;
 }
 
-.tab-button, .tab-button-active {
+.tab-button,
+.tab-button-active {
   background: none;
   border: none;
   border-bottom: 1px solid #bdbdbd;
@@ -88,8 +89,12 @@ area:hover {
 }
 
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* error message on submit request on customer page */
@@ -106,37 +111,18 @@ area:hover {
 /* -------- Home page ---------- */
 .hp-quote-bg-img {
   width: 100%;
-  max-height: 550px;
   object-fit: cover;
   border-radius: 15px;
 }
-
 
 .hp-reg-form-container {
   flex: 0 0 auto;
   width: 50%;
 }
 
-.lost-quote-btn {
-  margin-left: 20px;
-  background: none;
-  border: 2px solid #9557E8;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5; 
-  padding: 9px 20px;
-  color: #9557E8;
-}
-
-.lost-quote-btn:hover {
-  background-color: #9557E8;
-  color: white;
-}
-
 .license-input-container {
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 500px;
@@ -150,4 +136,69 @@ area:hover {
   font-family: 'UKNumberPlate';
   visibility: hidden;
   height: 1px;
+}
+
+.transparent-element {
+  display: none;
+}
+
+.pay-now {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  background-color: #0a2540;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  line-height: 1.5;
+  cursor: pointer;
+  font-weight: 700;
+  background: #0a2540;
+  align-items: center;
+  position: relative;
+}
+
+.pay-now .pay-text {
+  margin: auto;
+}
+
+.pay-now .pay-icon {
+  position: absolute;
+  right: 10px;
+}
+
+.pay-now.invalid .pay-text {
+  color: #ffffff99;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.terms {
+  font-size: 14px;
+}
+
+.terms a {
+  color: #484848;
+}
+
+.pay-success {
+  fill: #2ab784;
+  border: 2px solid #2ab784;
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+}
+
+.success-msg {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 24px;
 }

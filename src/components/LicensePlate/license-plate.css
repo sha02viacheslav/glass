@@ -1,0 +1,100 @@
+.license-plate {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.09);
+  border-radius: 15px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+  padding: 20px;
+}
+
+.left-container {
+  display: relative;
+  justify-content: left;
+  align-items: left;
+  margin-right: 10px;
+}
+
+.yellow-box,
+.yellow-box-home {
+  display: flex;
+  overflow: hidden;
+  background-color: #fdd835;
+  width: 280px;
+  height: 50px;
+  border-radius: 4px;
+  text-align: center;
+  vertical-align: middle;
+  margin-bottom: 6px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 0.6);
+}
+
+.yellow-box-home {
+  height: 54px;
+  margin-bottom: 0;
+  margin-right: 20px;
+}
+
+.license-number {
+  padding: 6px;
+}
+
+.blue-box {
+  background-color: #1165b3;
+  width: 28px;
+  margin-right: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 7px;
+}
+
+.flag {
+  width: 18px;
+  margin-top: 19px;
+}
+
+.gb {
+  display: inline-block;
+  margin-top: 10px;
+  height: 17px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: white;
+  line-height: 0;
+}
+
+.license-input {
+  background: none;
+  border: none;
+  width: 100%;
+  font-weight: 400;
+  font-size: 50px;
+  font-family: 'UKNumberPlate';
+  margin-left: 5px;
+}
+
+.right-container {
+  display: relative;
+  width: 150px;
+  text-align: right;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  color: #9a73dd;
+  font-size: 18px;
+  font-weight: 600;
+  width: 55px;
+  border-radius: 5px;
+}
+
+.edit-btn:hover {
+  background-color: #9a73dd1c;
+}

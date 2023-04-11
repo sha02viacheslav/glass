@@ -1,4 +1,5 @@
 FROM node:19.7.0-alpine AS base
+
 WORKDIR /src
 
 COPY package* ./
@@ -7,17 +8,29 @@ RUN npm install
 
 FROM base AS build
 
+RUN apk add --no-cache git
+
 WORKDIR /src
 
 COPY . .
 
-RUN npm run build  
+ARG GH_TOKEN \
+    GH_USERNAME \
+    GH_REPO
 
-FROM nginx:1.23.3-alpine 
+RUN git clone https://$GH_TOKEN@github.com/$GH_USERNAME/$GH_REPO.git tmp_env
+
+RUN mv tmp_env/.env.staging .env
+
+RUN rm -rf tmp_env
+
+RUN npm run build
+
+FROM nginx:1.23.3-alpine
 
 COPY --from=build /src/build /usr/share/nginx/html
-COPY --from=build /src/build /usr/share/nginx/html/react
 
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 
 
