@@ -252,3 +252,17 @@
 .client-info-blink:hover {
   cursor: default;
 }
+
+.booking-info h1 {
+  line-height: 40px;
+  font-weight: 500;
+  font-size: 20px;
+  color: #2e006c;
+  text-align: center;
+}
+
+.booking-address {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}

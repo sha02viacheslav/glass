@@ -461,23 +461,46 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
             {!!quoteDetails && (
               <div className='quote-card'>
-                <TimeSelection
-                  timeSlotToParent={timeSlotToParent}
-                  liveBooking={false}
-                  bookingStartDate={quoteDetails?.booking_start_date}
-                />
-                <LocationSelection
-                  key={billingAddress}
-                  userBillingAddress={billingAddress}
-                  deliveryAddressToParent={deliveryAddressToParent}
-                  ids={[
-                    {
-                      customerId: quoteDetails.customer_id,
-                      addressId: quoteDetails.delivery_address.address_id,
-                    },
-                  ]}
-                  deliveryAddressToChild={quoteDetails.delivery_address}
-                />
+                {quoteDetails?.order_state === OrderState.WON ? (
+                  <div className='booking-info p-4'>
+                    <h1 className='mb-4'>Booking Confirmed</h1>
+                    <div className='booking-address mb-4'>
+                      <div>{moment(quoteDetails?.booking_start_date).format('DD MMMM')}</div>
+                      <div>
+                        Arrival window between {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
+                        {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
+                      </div>
+                    </div>
+
+                    <div className='booking-address'>
+                      {quoteDetails.delivery_address?.line_1}, {quoteDetails.delivery_address?.town_or_city}
+                      <br />
+                      {quoteDetails.delivery_address?.county}
+                      <br />
+                      {quoteDetails.delivery_address?.postcode}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <TimeSelection
+                      timeSlotToParent={timeSlotToParent}
+                      liveBooking={false}
+                      bookingStartDate={quoteDetails?.booking_start_date}
+                    />
+                    <LocationSelection
+                      key={billingAddress}
+                      userBillingAddress={billingAddress}
+                      deliveryAddressToParent={deliveryAddressToParent}
+                      ids={[
+                        {
+                          customerId: quoteDetails.customer_id,
+                          addressId: quoteDetails.delivery_address.address_id,
+                        },
+                      ]}
+                      deliveryAddressToChild={quoteDetails.delivery_address}
+                    />
+                  </>
+                )}
               </div>
             )}
 
@@ -497,9 +520,11 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           >
             Decline
           </button>
-          <button className='btn btn-purple-radius mb-3 quote-btn' onClick={() => handleSnapChange()} id='accept-btn'>
-            {acceptBtn}
-          </button>
+          {quoteDetails.order_state !== OrderState.WON && (
+            <button className='btn btn-purple-radius mb-3 quote-btn' onClick={() => handleSnapChange()} id='accept-btn'>
+              {acceptBtn}
+            </button>
+          )}
         </div>
       )}
 
