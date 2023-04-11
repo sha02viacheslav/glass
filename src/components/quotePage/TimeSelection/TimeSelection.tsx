@@ -144,7 +144,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   useEffect(() => {
     let selectionId = ''
     if (!!bookingStartDate) {
-      if (moment(bookingStartDate).isAfter(moment())) {
+      if (moment(bookingStartDate).add(2, 'hours').isAfter(moment())) {
         // only set prev selected slot if it has not passed
         selectionId = formatSlotId(bookingStartDate)
         setSelectedSlot(selectionId)

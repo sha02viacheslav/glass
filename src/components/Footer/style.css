@@ -1,0 +1,20 @@
+.slick-track {
+  display: flex;
+}
+.slick-track .slick-slide {
+  display: flex;
+  height: auto;
+}
+
+.testmon-box {
+  height: calc(100% - 16px);
+}
+
+.slider-content {
+  max-width: 480px;
+  margin: auto;
+}
+
+.review-author-img {
+  width: 60px;
+}

@@ -7,17 +7,9 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { OrderState, PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import {
-  Address,
-  CustomerDetail,
-  Invoice,
-  MonthlyPayment,
-  Offer,
-  OptionalOrderLine,
-  PaymentOptionDto,
-} from '@glass/models'
+import { Address, MonthlyPayment, Offer, OptionalOrderLine, PaymentOptionDto, Quote } from '@glass/models'
 import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
@@ -26,16 +18,14 @@ import { paymentStatusText } from '@glass/utils/payment-status/payment-status-te
 import './payment-method.css'
 
 export type PaymentMethodProps = {
-  orderState: OrderState
-  invoiceData?: Invoice
   offerDetails?: Offer[]
   optionalOrderLines?: OptionalOrderLine[]
-  customerInfo?: CustomerDetail[]
+  quoteDetails?: Quote
   qid: string | undefined
   totalPrice: number
   totalUnitPrice: number
   payAssist: () => void
-  refetchInvoice: () => void
+  refetchQuote: () => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
   method?: (value: PaymentOptionDto) => void
@@ -43,16 +33,14 @@ export type PaymentMethodProps = {
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
-  orderState,
-  invoiceData,
   offerDetails,
   optionalOrderLines,
-  customerInfo,
+  quoteDetails,
   qid,
   totalPrice,
   totalUnitPrice,
   payAssist,
-  refetchInvoice,
+  refetchQuote,
   PADataToParent,
   PAUrl,
   method,
@@ -60,12 +48,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentOptionEnum>(PaymentOptionEnum.NONE)
   const [address, setAddress] = useState('')
-  const userBillingAddress = customerInfo?.[0].c_address || ''
-  const [postalCode, setPostalCode] = useState<string>(customerInfo?.[0].c_postalcode || '')
+  const userBillingAddress = quoteDetails?.c_address || ''
+  const [postalCode, setPostalCode] = useState<string>(quoteDetails?.c_postalcode || '')
   const excessRef = useRef<HTMLInputElement>(null)
   const [excess, setExcess] = useState<number>(115)
-  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
-  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType>(PaymentMethodType.STRIPE)
+  const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
+  const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
   const [invoicePDF, setInvoicePDF] = useState('')
   const [showInvoice, setShowInvoice] = useState(false)
@@ -131,12 +119,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const handleConfirmChangePaymentMethodType = () => {
-    if (qid) {
+    if (qid && tempPaymentMethodType) {
       setPaymentMethodType(tempPaymentMethodType)
       setShowPaymentConfirm(false)
       updatePaymentMethod(qid, tempPaymentMethodType).then((res) => {
         if (res.success) {
-          if (refetchInvoice) refetchInvoice()
+          if (refetchQuote) refetchQuote()
         }
       })
     }
@@ -154,30 +142,29 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   const handleChangePaymentOption = (method: PaymentOptionEnum) => {
-    if (orderState === OrderState.NEW || orderState === OrderState.OPEN) {
-      setWarningMsg('Please wait until the quotation is confirmed by admin!')
-    } else {
-      setSelectedMethod(method)
+    setSelectedMethod(method)
+    if (method === PaymentOptionEnum.FOUR_MONTH) {
+      handleChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)
     }
   }
 
   useEffect(() => {
-    if (invoiceData?.payment_method_type) {
-      setPaymentMethodType(invoiceData.payment_method_type)
+    if (quoteDetails?.payment_method_type) {
+      setPaymentMethodType(quoteDetails.payment_method_type)
     }
-    setPaymentStatus(invoiceData?.payment_state || PaymentStatus.NOT_PAID)
-  }, [invoiceData])
+    setPaymentStatus(quoteDetails?.invoice_data?.payment_state || PaymentStatus.NOT_PAID)
+  }, [quoteDetails])
 
   useEffect(() => {
     if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
-      if (invoiceData?.invoice_number) {
+      if (quoteDetails?.invoice_data?.invoice_number) {
         retrievePlan()
       } else {
         confirmInvoiceService(qid).then((res) => {
           if (res.success) {
             setPAProceed(true)
             retrievePlan()
-            if (refetchInvoice) refetchInvoice()
+            if (refetchQuote) refetchQuote()
           }
         })
       }
@@ -215,8 +202,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   return (
     <div className='center'>
-      {showInvoice && !!invoiceData && (
-        <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} invoiceID={invoiceData.invoice_number} />
+      {showInvoice && !!quoteDetails?.invoice_data?.invoice_number && (
+        <PdfViewer
+          invoicePDF={invoicePDF}
+          isOpen={handleInvoicePopup}
+          invoiceID={quoteDetails.invoice_data.invoice_number}
+        />
       )}
       <div className='quote-card'>
         <Tooltip disableFocusListener title='Receipt'>
@@ -288,21 +279,21 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                         type='text'
                         className='form-control PM-top-input'
                         ref={PAf_nameRef}
-                        value={customerInfo?.[0].customer_f_name}
+                        value={quoteDetails?.customer_f_name}
                         onChange={updatePAInfo}
                       />
                       <input
                         type='text'
                         className='form-control PM-top-input'
                         ref={PAs_nameRef}
-                        value={customerInfo?.[0].customer_s_name}
+                        value={quoteDetails?.customer_s_name}
                         onChange={updatePAInfo}
                       />
                     </div>
                     <input
                       type='text'
                       className='form-control PM-email'
-                      value={customerInfo?.[0].customer_email}
+                      value={quoteDetails?.customer_email}
                       ref={PAEmailRef}
                       onChange={updatePAInfo}
                     />
@@ -354,7 +345,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <input
                       type='text'
                       className='form-control PM-top-input'
-                      defaultValue={customerInfo?.[0].customer_f_name + ' ' + customerInfo?.[0].customer_s_name}
+                      defaultValue={quoteDetails?.customer_f_name + ' ' + quoteDetails?.customer_s_name}
                       disabled
                     />
                   </div>
@@ -456,7 +447,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     <span>Excess Cash</span>
                   </button>
                 </div>
-                <Checkout method={paymentMethodType} amount={totalPrice} succeedPayment={refetchInvoice} />
+                {!!paymentMethodType && (
+                  <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.SINGLE_PAY && (
@@ -528,7 +521,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </button>
                   </div>
                 </div>
-                <Checkout method={paymentMethodType} amount={totalPrice} succeedPayment={refetchInvoice} />
+                {!!paymentMethodType && (
+                  <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
@@ -538,8 +533,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Warning'
-          description='Are you sure you want to change the payment method type?'
+          title='Confirm payment method'
+          showIcon={false}
           onConfirm={handleConfirmChangePaymentMethodType}
           onCancel={() => {
             setShowPaymentConfirm(false)

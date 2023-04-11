@@ -1,1 +1,1 @@
-export { Quote as Quote } from './Quote'
+export { QuotePage as QuotePage } from './Quote'

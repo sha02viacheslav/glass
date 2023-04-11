@@ -41,3 +41,21 @@ export const postApi = async (url: string, params: object) => {
     }
   }
 }
+
+export const fetchApi = async (url: string) => {
+  try {
+    const response = await fetch(url).then((res) => res.json())
+
+    return {
+      success: true,
+      data: response.result,
+      message: response.status,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: 'Error',
+    }
+  }
+}

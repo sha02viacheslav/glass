@@ -1,3 +1,4 @@
+import './style.css'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
@@ -16,7 +17,11 @@ export const Header: React.FC = () => {
             <div className='row align-items-center w-100 g-0'>
               <div className='col-4'>
                 <Link className=' py-2' to='/'>
-                  <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='img-fluid d-block mx-auto' alt='' />
+                  <img
+                    src={process.env.PUBLIC_URL + '/img/logo.png'}
+                    className='logo-img img-fluid d-block mx-auto'
+                    alt=''
+                  />
                 </Link>
               </div>
               <div className='col-5 text-end ms-auto'>
@@ -44,29 +49,17 @@ export const Header: React.FC = () => {
           </div>
 
           <Link className='navbar-brand d-none d-lg-flex d-md-none d-sm-none' to='/'>
-            <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='img-fluid' alt='' />
+            <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid' alt='' />
           </Link>
 
           <div className='collapse navbar-collapse' id='navbarSupportedContent'>
             <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav'>
-              {/* <li className="nav-item ">
-                                <Link className="nav-link" to="/services">Services</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/pricing">Pricing</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/contact">Contact us</Link>
-                            </li> */}
-
               <CustomLink to='/services'>Services</CustomLink>
-              <CustomLink to='/pricing'>Pricing</CustomLink>
               <CustomLink to='/contact'>Contact us</CustomLink>
             </ul>
             <Link to='/customer' className='btn-raised ms-auto d-none d-md-flex'>
               Get a Quote
             </Link>
-            <button className='btn-stroked ms-4'>Lost my quote</button>
           </div>
         </div>
       </nav>

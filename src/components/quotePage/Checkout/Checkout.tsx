@@ -6,10 +6,9 @@ import { CheckoutForm } from '@glass/components/quotePage/Checkout/CheckoutForm'
 import { PaymentMethodType } from '@glass/enums'
 import { REACT_APP_STRIPE_PUBLIC_KEY } from '@glass/envs'
 import { createIndentService } from '@glass/services/apis/create-indent.service'
-import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 
 export type CheckoutProps = {
-  method: PaymentMethodType
+  paymentMethodType: PaymentMethodType
   amount: number
   succeedPayment: () => void
 }
@@ -18,34 +17,23 @@ export type CheckoutProps = {
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe(REACT_APP_STRIPE_PUBLIC_KEY)
 
-export const Checkout: React.FC<CheckoutProps> = ({ method, amount, succeedPayment }) => {
+export const Checkout: React.FC<CheckoutProps> = ({ paymentMethodType, amount, succeedPayment }) => {
   const { id } = useParams()
-  const [invoiceNumber, setInvoiceNumber] = useState<string>('')
   const [clientSecret, setClientSecret] = useState('')
 
   useEffect(() => {
-    if (id) {
-      getInvoiceService(id).then((res) => {
-        if (res.success) {
-          setInvoiceNumber(res.data.invoice_number)
-        }
-      })
-    }
-  }, [id])
-
-  useEffect(() => {
-    if (id && invoiceNumber) {
-      createIndentService(id, invoiceNumber).then((res) => {
+    if (id && paymentMethodType === PaymentMethodType.STRIPE) {
+      createIndentService(id).then((res) => {
         if (res.success) {
           setClientSecret(res.data.clientSecret)
         }
       })
     }
-  }, [invoiceNumber])
+  }, [paymentMethodType])
 
   return (
     <>
-      {method === PaymentMethodType.STRIPE && clientSecret && (
+      {paymentMethodType === PaymentMethodType.STRIPE && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm amount={amount} clientSecret={clientSecret} succeedPayment={succeedPayment} />
         </Elements>

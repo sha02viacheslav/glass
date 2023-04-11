@@ -15,10 +15,9 @@ import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT } from '@glass/constants'
 import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteStep } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
-import { CustomerDetail, Invoice, Offer, OptionalOrderLine, PaymentOptionDto, TimeSlot } from '@glass/models'
+import { Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
-import { getInvoiceService } from '@glass/services/apis/get-invoice.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
@@ -29,11 +28,10 @@ export type QuoteProps = {
   quoteCount?: boolean
 }
 
-export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
+export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
   const { id } = useParams()
-  const [tabValue] = useState(0)
-  const [customerDetails, setCustomerDetails] = useState<CustomerDetail | undefined>(undefined)
+  const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
@@ -57,27 +55,18 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     },
   ])
   const [optionalOrderLines, setOptionalOrderLines] = useState<OptionalOrderLine[]>([])
-  const [invoiceData, setInvoiceData] = useState<Invoice | undefined>(undefined)
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
   const [warningMsg, setWarningMsg] = useState<string>('')
 
-  const { totalPrice, totalUnitPrice } = useCalcPriceSummary(customerDetails)
+  const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
-  const getQuote = (qid: string) => {
-    getQuoteService(qid, quoteCount).then((res) => {
-      if (res.success) {
-        setCustomerDetails(res.data)
-        setBillingAddress(res.data.customer_order_postal_code)
-      }
-    })
-  }
-
-  const getInvoiceData = () => {
+  const getQuote = () => {
     if (id) {
-      getInvoiceService(id).then((res) => {
+      getQuoteService(id, quoteCount).then((res) => {
         if (res.success) {
-          setInvoiceData(res.data)
+          setQuoteDetails(res.data)
+          setBillingAddress(res.data.customer_order_postal_code)
         }
       })
     }
@@ -90,7 +79,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       const dom = document.getElementById('2')
       if (dom) dom.scrollIntoView({ behavior: 'smooth' })
     } else if (snapValue === QuoteStep.TIMESLOT && !timeSlot) {
-      if (invoiceData?.payment_state === PaymentStatus.PAID) {
+      if (quoteDetails?.invoice_data?.payment_state === PaymentStatus.PAID) {
         setWarningMsg('Select a time for the repair!')
       } else {
         setSnapValue(QuoteStep.PAYMENT)
@@ -99,7 +88,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       }
     } else if (snapValue === QuoteStep.TIMESLOT && !!timeSlot) {
       if (
-        invoiceData?.payment_state !== PaymentStatus.PAID &&
+        quoteDetails?.invoice_data?.payment_state !== PaymentStatus.PAID &&
         (paymentOption.p_option === PaymentOptionEnum.NONE || paymentOption.detail === 'Select payment method')
       ) {
         // scroll to PM component if no payment method is selected
@@ -111,24 +100,25 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         paymentOption.detail !== 'Select payment method'
       ) {
         // pay with Payment Assist
-        confirmBooking()
+        sendBookingData(timeSlot)
+        confirmPA()
+      } else {
+        sendBookingData(timeSlot)
       }
     }
   }
 
-  const confirmBooking = () => {
-    if (!invoiceData?.invoice_number) return
+  const confirmPA = () => {
     let first: string
     let second: string
     let post: string
     let addr: string
     if (PAData.length === 0) {
-      first = customerDetails?.customer_f_name || ''
-      second = customerDetails?.customer_s_name || ''
+      first = quoteDetails?.customer_f_name || ''
+      second = quoteDetails?.customer_s_name || ''
       post =
-        customerDetails?.customer_order_postal_code.substring(customerDetails.customer_order_postal_code.length - 8) ||
-        ''
-      addr = customerDetails?.customer_order_postal_code.slice(0, -8) || ''
+        quoteDetails?.customer_order_postal_code.substring(quoteDetails.customer_order_postal_code.length - 8) || ''
+      addr = quoteDetails?.customer_order_postal_code.slice(0, -8) || ''
     } else {
       first = PAData[0] || ''
       second = PAData[1] || ''
@@ -152,8 +142,8 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const PABegin = () => {
     // create payment API call
-    if (id && invoiceData?.invoice_number) {
-      beginPaymentAssistService(id, invoiceData?.invoice_number).then((res) => {
+    if (id) {
+      beginPaymentAssistService(id).then((res) => {
         if (res.success) {
           window.open(res.data.url, '_blank', 'noreferrer')
           setPAUrl(res.data.url)
@@ -187,23 +177,22 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }
 
   const backToCustomer = () => {
-    const licenseReg = customerDetails?.registration_number
-    const i = customerDetails?.customer_name.indexOf(' ') || 0
-    const names = [customerDetails?.customer_name.slice(0, i), customerDetails?.customer_name.slice(i + 1)]
+    const licenseReg = quoteDetails?.registration_number
+    const i = quoteDetails?.customer_name.indexOf(' ') || 0
+    const names = [quoteDetails?.customer_name.slice(0, i), quoteDetails?.customer_name.slice(i + 1)]
     const quoteData = JSON.stringify({
-      address: customerDetails?.customer_order_postal_code,
+      address: quoteDetails?.customer_order_postal_code,
       firstName: names[0],
       lastName: names[1],
-      email: customerDetails?.customer_email,
-      phone: customerDetails?.customer_phone,
-      selected: customerDetails?.glass_location,
+      email: quoteDetails?.customer_email,
+      phone: quoteDetails?.customer_phone,
+      selected: quoteDetails?.glass_location,
     })
     sessionStorage.setItem('quoteInfo', quoteData)
     navigate('/customer/' + licenseReg)
   }
 
   const timeSlotToParent = (data: TimeSlot) => {
-    sendBookingData(data)
     setTimeSlot(data)
     setWarningMsg('')
   }
@@ -217,7 +206,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }
 
   const payAssistToParent = () => {
-    PABegin()
+    confirmPA()
   }
 
   const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
@@ -225,13 +214,13 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     if (checked) {
       addOptionalProductService(id, optionalLineId).then((res) => {
         if (res.success) {
-          getQuote(id)
+          getQuote()
         }
       })
     } else {
       removeOptionalProductService(id, orderLineId, optionalLineId).then((res) => {
         if (res.success) {
-          getQuote(id)
+          getQuote()
         }
       })
     }
@@ -240,8 +229,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   useEffect(() => {
     // Get Quote Data
     if (id) {
-      getQuote(id)
-      getInvoiceData()
+      getQuote()
     }
 
     // hide navbar and footer
@@ -257,28 +245,28 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }, [])
 
   useEffect(() => {
-    if (customerDetails && invoiceData) {
-      const optionalOrderLines = customerDetails.optional_order_lines || []
-      if (customerDetails.order_state === OrderState.OPEN) {
-        if (customerDetails.order_lines?.length)
+    if (quoteDetails) {
+      const optionalOrderLines = quoteDetails.optional_order_lines || []
+      if (quoteDetails.order_state === OrderState.OPEN) {
+        if (quoteDetails.order_lines?.length)
           setOffersDetails(
-            customerDetails.order_lines.filter(
+            quoteDetails.order_lines.filter(
               (item) => optionalOrderLines.findIndex((x) => x.order_line_id === item.order_line_id) < 0,
             ),
           )
         setOptionalOrderLines(optionalOrderLines)
       } else {
-        if (customerDetails.order_lines?.length) setOffersDetails(customerDetails.order_lines)
+        if (quoteDetails.order_lines?.length) setOffersDetails(quoteDetails.order_lines)
         setOptionalOrderLines([])
       }
     }
-  }, [customerDetails, invoiceData])
+  }, [quoteDetails])
 
   useEffect(() => {
-    if (customerDetails) {
-      setTempLicense(formatLicenseNumber(customerDetails.registration_number))
+    if (quoteDetails) {
+      setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
     }
-  }, [customerDetails])
+  }, [quoteDetails])
 
   useEffect(() => {
     // change between accept and next buttons names and styling
@@ -288,7 +276,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       setAcceptBtn('Next')
       acceptSelector.classList.remove('quote-accept')
     } else if (snapValue === QuoteStep.TIMESLOT) {
-      if (invoiceData?.payment_state !== PaymentStatus.PAID) {
+      if (quoteDetails?.invoice_data?.payment_state !== PaymentStatus.PAID) {
         if (paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH) {
           setAcceptBtn(paymentOption.detail)
         } else {
@@ -300,7 +288,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
       acceptSelector.classList.add('quote-accept')
     }
-  }, [snapValue, timeSlot, paymentOption, invoiceData])
+  }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
   return (
     <div>
@@ -360,16 +348,16 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </div>
                     <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
                   </div>
-                  <div className='client-info'>{customerDetails?.customer_name}</div>
+                  <div className='client-info'>{quoteDetails?.customer_name}</div>
                   <div className='client-info'>
-                    <b>Billing address:</b> {customerDetails?.customer_order_postal_code}
+                    <b>Billing address:</b> {quoteDetails?.customer_order_postal_code}
                   </div>
                   <div className='client-info'>
-                    <b>Email:</b> {customerDetails?.customer_email}
+                    <b>Email:</b> {quoteDetails?.customer_email}
                   </div>
                   <div className='client-info'>
                     <b>Phone number:</b>
-                    {customerDetails?.customer_phone}
+                    {quoteDetails?.customer_phone}
                   </div>
                 </div>
               </div>
@@ -384,8 +372,8 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 <span className='quote-selected-windows'>
                   <b>Selected windows:</b>{' '}
                 </span>
-                {!!customerDetails &&
-                  customerDetails.glass_location.map((element) => (
+                {!!quoteDetails &&
+                  quoteDetails.glass_location.map((element) => (
                     <span key={element} className='client-windows'>
                       {element}
                     </span>
@@ -416,10 +404,10 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 </div>
                 <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
               </div>
-              <div className='client-info'>{customerDetails?.customer_name}</div>
+              <div className='client-info'>{quoteDetails?.customer_name}</div>
               <div className='compact-bottom-row'>
-                {!!customerDetails &&
-                  customerDetails.glass_location.map((element) => (
+                {!!quoteDetails &&
+                  quoteDetails.glass_location.map((element) => (
                     <span key={element} className='client-windows'>
                       {element}
                     </span>
@@ -430,7 +418,7 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           </div>
         )}
       </div>
-      {offersDetails[0].price_total === 0 && (
+      {!quoteDetails?.is_published && (
         <div className='center'>
           <h2 className='thank-you-header'>Thank you!</h2>
           <h1 className='extra-info'>We are preparing the quote...</h1>
@@ -438,75 +426,69 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         </div>
       )}
 
-      {offersDetails[0].price_total > 1 && (
+      {quoteDetails?.is_published && (
         <div className='center'>
-          {tabValue === 0 && (
-            <div className='scroll-container'>
-              {/* select offer / payment method */}
-              <div id='offer' className='mt-5'>
-                {!!customerDetails && (
-                  <PaymentMethod
-                    orderState={customerDetails.order_state}
-                    invoiceData={invoiceData}
-                    offerDetails={offersDetails}
-                    optionalOrderLines={optionalOrderLines}
-                    customerInfo={[
-                      {
-                        ...customerDetails,
-                        c_address: customerDetails.customer_order_postal_code.slice(0, -8),
-                        c_postalcode: customerDetails.customer_order_postal_code.substring(
-                          customerDetails.customer_order_postal_code.length - 8,
-                        ),
-                      },
-                    ]}
-                    qid={id}
-                    totalPrice={totalPrice}
-                    totalUnitPrice={totalUnitPrice}
-                    payAssist={payAssistToParent}
-                    refetchInvoice={getInvoiceData}
-                    PADataToParent={PADataToParent}
-                    PAUrl={PAUrl}
-                    method={paymentOptionToParent}
-                    onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
-                  />
-                )}
-              </div>
-
-              <div className='quote-scroll-target' id='2'>
-                -
-              </div>
-
-              {!!customerDetails && (
-                <div className='quote-card'>
-                  <TimeSelection
-                    timeSlotToParent={timeSlotToParent}
-                    liveBooking={false}
-                    bookingStartDate={customerDetails?.booking_start_date}
-                  />
-                  <LocationSelection
-                    key={billingAddress}
-                    userBillingAddress={billingAddress}
-                    deliveryAddressToParent={deliveryAddressToParent}
-                    ids={[
-                      {
-                        customerId: customerDetails.customer_id,
-                        addressId: customerDetails.delivery_address.address_id,
-                      },
-                    ]}
-                    deliveryAddressToChild={customerDetails.delivery_address}
-                  />
-                </div>
+          <div className='scroll-container'>
+            {/* select offer / payment method */}
+            <div id='offer' className='mt-5'>
+              {!!quoteDetails && (
+                <PaymentMethod
+                  offerDetails={offersDetails}
+                  optionalOrderLines={optionalOrderLines}
+                  quoteDetails={{
+                    ...quoteDetails,
+                    c_address: quoteDetails.customer_order_postal_code.slice(0, -8),
+                    c_postalcode: quoteDetails.customer_order_postal_code.substring(
+                      quoteDetails.customer_order_postal_code.length - 8,
+                    ),
+                  }}
+                  qid={id}
+                  totalPrice={totalPrice}
+                  totalUnitPrice={totalUnitPrice}
+                  payAssist={payAssistToParent}
+                  refetchQuote={getQuote}
+                  PADataToParent={PADataToParent}
+                  PAUrl={PAUrl}
+                  method={paymentOptionToParent}
+                  onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
+                />
               )}
-
-              <div className='quote-scroll-target-2' id='3'>
-                -
-              </div>
             </div>
-          )}
+
+            <div className='quote-scroll-target' id='2'>
+              -
+            </div>
+
+            {!!quoteDetails && (
+              <div className='quote-card'>
+                <TimeSelection
+                  timeSlotToParent={timeSlotToParent}
+                  liveBooking={false}
+                  bookingStartDate={quoteDetails?.booking_start_date}
+                />
+                <LocationSelection
+                  key={billingAddress}
+                  userBillingAddress={billingAddress}
+                  deliveryAddressToParent={deliveryAddressToParent}
+                  ids={[
+                    {
+                      customerId: quoteDetails.customer_id,
+                      addressId: quoteDetails.delivery_address.address_id,
+                    },
+                  ]}
+                  deliveryAddressToChild={quoteDetails.delivery_address}
+                />
+              </div>
+            )}
+
+            <div className='quote-scroll-target-2' id='3'>
+              -
+            </div>
+          </div>
         </div>
       )}
       {/* accept / decline buttons */}
-      {offersDetails[0].price_total > 1 && tabValue === 0 && (
+      {quoteDetails?.is_published && (
         <div className='accept-btn-container' id='accept-cont'>
           <button
             className='btn btn-purple-outline mb-3 quote-btn quote-decline'
@@ -520,11 +502,10 @@ export const Quote: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           </button>
         </div>
       )}
-      {tabValue === 0 && (
-        <div className='quote-before-after'>
-          <BeforeAfter />
-        </div>
-      )}
+
+      <div className='quote-before-after'>
+        <BeforeAfter />
+      </div>
 
       {!!warningMsg && (
         <ConfirmDialog

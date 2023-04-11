@@ -1,8 +1,10 @@
-import { PaymentMethodType, PaymentStatus } from '@glass/enums'
+import { PaymentStatus } from '@glass/enums'
 
 export type Invoice = {
+  invoice_date: string
   invoice_number: string
-  amount_total: number
-  payment_method_type: PaymentMethodType
+  payment_date: string
+  payment_gateway: string
+  payment_ref: string
   payment_state: PaymentStatus
 }
