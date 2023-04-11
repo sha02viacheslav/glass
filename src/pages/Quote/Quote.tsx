@@ -178,12 +178,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const backToCustomer = () => {
     const licenseReg = quoteDetails?.registration_number
-    const i = quoteDetails?.customer_name.indexOf(' ') || 0
-    const names = [quoteDetails?.customer_name.slice(0, i), quoteDetails?.customer_name.slice(i + 1)]
     const quoteData = JSON.stringify({
       address: quoteDetails?.customer_order_postal_code,
-      firstName: names[0],
-      lastName: names[1],
+      firstName: quoteDetails?.customer_f_name,
+      lastName: quoteDetails?.customer_s_name,
       email: quoteDetails?.customer_email,
       phone: quoteDetails?.customer_phone,
       selected: quoteDetails?.glass_location,
@@ -348,7 +346,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </div>
                     <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
                   </div>
-                  <div className='client-info'>{quoteDetails?.customer_name}</div>
+                  <div className='client-info'>
+                    {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
+                  </div>
                   <div className='client-info'>
                     <b>Billing address:</b> {quoteDetails?.customer_order_postal_code}
                   </div>
@@ -404,7 +404,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 </div>
                 <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
               </div>
-              <div className='client-info'>{quoteDetails?.customer_name}</div>
+              <div className='client-info'>
+                {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
+              </div>
               <div className='compact-bottom-row'>
                 {!!quoteDetails &&
                   quoteDetails.glass_location.map((element) => (

@@ -105,12 +105,14 @@ export const Customer: React.FC = () => {
     } else {
       // post data
       setSubmitClicked(true)
-      const name = (firstNameRef?.current?.value || '').concat(' ', lastNameRef?.current?.value || '')
+      const firstName = firstNameRef?.current?.value || ''
+      const lastName = lastNameRef?.current?.value || ''
+      const fullName = `${firstName} ${lastName}`
       const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
       createQuoteService({
-        customer_name: name,
-        customer_f_name: firstNameRef?.current?.value || '',
-        customer_s_name: lastNameRef?.current?.value || '',
+        customer_name: fullName,
+        customer_f_name: firstName,
+        customer_s_name: lastName,
         customer_phone: phoneRef?.current?.value || '',
         customer_email: emailRef?.current?.value || '',
         customer_order_postal_code: formattedAddress,
