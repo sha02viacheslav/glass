@@ -24,4 +24,6 @@ export type Quote = {
   is_published: boolean
   invoice_data: Invoice
   payment_method_type: PaymentMethodType
+  make: string
+  model: string
 }
