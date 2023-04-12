@@ -356,8 +356,13 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     <b>Email:</b> {quoteDetails?.customer_email}
                   </div>
                   <div className='client-info'>
-                    <b>Phone number:</b>
-                    {quoteDetails?.customer_phone}
+                    <b>Phone number:</b> {quoteDetails?.customer_phone}
+                  </div>
+                  <div className='client-info'>
+                    <b>Make:</b> {quoteDetails?.make}
+                  </div>
+                  <div className='client-info'>
+                    <b>Model:</b> {quoteDetails?.model}
                   </div>
                 </div>
               </div>

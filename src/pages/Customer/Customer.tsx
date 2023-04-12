@@ -7,7 +7,7 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, VehicleData, VehicleImageDataItems } from '@glass/models'
+import { Address, Attachment, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -17,8 +17,6 @@ export const Customer: React.FC = () => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [vehImgData, setVehImgData] = useState<VehicleImageDataItems | undefined>(undefined)
-  const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
   const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
   const firstName = quoteInfo.firstName || ''
@@ -76,7 +74,6 @@ export const Customer: React.FC = () => {
   }
 
   const retrieveVehData = (data: CarType) => {
-    setVehDataToCustomer(data)
     setSelectedCarType(data)
   }
 
@@ -132,14 +129,7 @@ export const Customer: React.FC = () => {
           country: fullAddress?.country || '',
         },
         registration_number: licenseSearchVal,
-        registration_year: vehData?.YearMonthFirstRegistered || '',
-        make: vehData?.Make || '',
-        model: vehData?.Model || '',
-        body_type: vehDataToCustomer || '',
-        model_year: vehData?.YearOfManufacture || '',
         glass_location: selectedBrokenWindows || [],
-        VehicleData: { DataItems: vehData },
-        VehicleImageData: { DataItems: vehImgData },
         customer_comments: {
           comment: comment,
           attachments: attachments,
@@ -166,23 +156,6 @@ export const Customer: React.FC = () => {
             return
           } else {
             setVehData(data.Response.DataItems)
-          }
-        })
-        .catch(() => {
-          setVehicleData('No Data Found! Error in API.')
-        })
-      // fetch vehicle image data
-      fetch(process.env.REACT_APP_VEH_IMG_DATA + license)
-        .then((res) => res.json())
-        .then((data) => {
-          if (
-            data.Response.StatusCode === 'KeyInvalid' ||
-            data.Response.StatusCode === 'ItemNotFound' ||
-            data.Response.StatusCode === 'SandboxLimitation'
-          ) {
-            return
-          } else {
-            setVehImgData(data.Response.DataItems)
           }
         })
         .catch(() => {
