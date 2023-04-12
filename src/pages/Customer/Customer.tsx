@@ -7,7 +7,7 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, VehicleData } from '@glass/models'
+import { Address, Attachment, VehicleData, VehicleImageDataItems } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -17,7 +17,7 @@ export const Customer: React.FC = () => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [, setVehImgData] = useState([])
+  const [vehImgData, setVehImgData] = useState<VehicleImageDataItems | undefined>(undefined)
   const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
   const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
@@ -138,6 +138,8 @@ export const Customer: React.FC = () => {
         body_type: vehDataToCustomer || '',
         model_year: vehData?.YearOfManufacture || '',
         glass_location: selectedBrokenWindows || [],
+        VehicleData: { DataItems: vehData },
+        VehicleImageData: { DataItems: vehImgData },
         customer_comments: {
           comment: comment,
           attachments: attachments,
