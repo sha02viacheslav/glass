@@ -35,7 +35,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
-  const [quoteInfoOpen, setInfoOpen] = useState(false)
+  const [quoteInfoOpen, setInfoOpen] = useState<boolean>(true)
   const [billingAddress, setBillingAddress] = useState('')
   const [, setDeliveryAddress] = useState('')
   const [paymentOption, setPaymentOption] = useState<PaymentOptionDto>({ p_option: PaymentOptionEnum.NONE, detail: '' })
