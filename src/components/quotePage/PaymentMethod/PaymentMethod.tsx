@@ -10,7 +10,7 @@ import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
 import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address, MonthlyPayment, Offer, OptionalOrderLine, PaymentOptionDto, Quote } from '@glass/models'
-import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
+// import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
@@ -157,17 +157,17 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   useEffect(() => {
     if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
-      if (quoteDetails?.invoice_data?.invoice_number) {
-        retrievePlan()
-      } else {
-        confirmInvoiceService(qid).then((res) => {
-          if (res.success) {
-            setPAProceed(true)
-            retrievePlan()
-            if (refetchQuote) refetchQuote()
-          }
-        })
-      }
+      // if (quoteDetails?.invoice_data?.invoice_number) {
+      //   retrievePlan()
+      // } else {
+      //   confirmInvoiceService(qid).then((res) => {
+      //     if (res.success) {
+      setPAProceed(true)
+      retrievePlan()
+      if (refetchQuote) refetchQuote()
+      //   }
+      // })
+      // }
     }
   }, [selectedMethod])
 
