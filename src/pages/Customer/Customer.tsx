@@ -7,7 +7,7 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, VehicleData } from '@glass/models'
+import { Address, Attachment, VehicleData, VehicleImageDataItems } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -17,7 +17,7 @@ export const Customer: React.FC = () => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [, setVehImgData] = useState([])
+  const [vehImgData, setVehImgData] = useState<VehicleImageDataItems | undefined>(undefined)
   const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
   const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
@@ -105,12 +105,14 @@ export const Customer: React.FC = () => {
     } else {
       // post data
       setSubmitClicked(true)
-      const name = (firstNameRef?.current?.value || '').concat(' ', lastNameRef?.current?.value || '')
+      const firstName = firstNameRef?.current?.value || ''
+      const lastName = lastNameRef?.current?.value || ''
+      const fullName = `${firstName} ${lastName}`
       const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
       createQuoteService({
-        customer_name: name,
-        customer_f_name: firstNameRef?.current?.value || '',
-        customer_s_name: lastNameRef?.current?.value || '',
+        customer_name: fullName,
+        customer_f_name: firstName,
+        customer_s_name: lastName,
         customer_phone: phoneRef?.current?.value || '',
         customer_email: emailRef?.current?.value || '',
         customer_order_postal_code: formattedAddress,
@@ -136,6 +138,8 @@ export const Customer: React.FC = () => {
         body_type: vehDataToCustomer || '',
         model_year: vehData?.YearOfManufacture || '',
         glass_location: selectedBrokenWindows || [],
+        VehicleData: { DataItems: vehData },
+        VehicleImageData: { DataItems: vehImgData },
         customer_comments: {
           comment: comment,
           attachments: attachments,

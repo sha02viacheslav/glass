@@ -1,3 +1,5 @@
+import { VehicleData, VehicleImageDataItems } from './vehicle-data.model'
+
 export type CommentAttachment = {
   name: string
   datas: string
@@ -31,6 +33,8 @@ export type QuoteDto = {
   body_type: string
   model_year: string
   glass_location: string[]
+  VehicleData: { DataItems: VehicleData | undefined }
+  VehicleImageData: { DataItems: VehicleImageDataItems | undefined }
   customer_comments: {
     comment: string
     attachments: CommentAttachment[]
