@@ -58,6 +58,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
   const [warningMsg, setWarningMsg] = useState<string>('')
+  const [showBookingMsg, setShowBookingMsg] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -159,7 +160,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         moment(selectedSlot.start).format(BOOKING_DATE_FORMAT),
         moment(selectedSlot.end).format(BOOKING_DATE_FORMAT),
       ).then(() => {
-        setIsBlink(true)
+        getQuote()
+        setShowBookingMsg(true)
       })
     }
   }
@@ -256,6 +258,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       } else {
         if (quoteDetails.order_lines?.length) setOffersDetails(quoteDetails.order_lines)
         setOptionalOrderLines([])
+      }
+
+      if (quoteDetails.order_state == OrderState.CONFIRM && quoteDetails.booking_start_date) {
+        setIsBlink(true)
       }
     }
   }, [quoteDetails])
@@ -546,6 +552,42 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           showCancel={false}
           confirmStr='Ok'
           onConfirm={() => setWarningMsg('')}
+        />
+      )}
+
+      {showBookingMsg && (
+        <ConfirmDialog
+          title='Your are booked in!'
+          showIcon={false}
+          description={
+            <div className='text-left'>
+              Arriving {moment(quoteDetails?.booking_start_date).format('DD MMMM')} between{' '}
+              {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
+              {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
+              <br />
+              {quoteDetails?.delivery_address?.line_1}, {quoteDetails?.delivery_address?.town_or_city},{' '}
+              {quoteDetails?.delivery_address?.postcode}
+            </div>
+          }
+          subDescription={
+            <div className='text-left'>
+              <br />
+              Job will take 1-2 hours to complete. <br />
+              We need to test wipers and/or door glass movement.
+              <br />
+              <br />
+              How can you help our work process and quality: <br />
+              Make sure we have enough space to fully open your vehicle doors and we can park our mid-sized van next. If
+              not enough space we have to move to different location. If needed, remove dashcam, empty dashboard and/or
+              door pockets. It will help us vacuum the shattered glass. <br />
+              Then just let us do the rest and we will notify you when all is done. <br />
+              <br />
+              Any question, call 07400 400469
+            </div>
+          }
+          showCancel={false}
+          confirmStr='Ok'
+          onConfirm={() => setShowBookingMsg(false)}
         />
       )}
     </div>
