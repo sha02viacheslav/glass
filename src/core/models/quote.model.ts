@@ -16,6 +16,7 @@ export type Quote = {
   glass_location: string[]
   delivery_address: Address
   booking_start_date: string
+  booking_end_date: string
   c_address: string
   c_postalcode: string
   order_lines?: Offer[]

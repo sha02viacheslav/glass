@@ -33,7 +33,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
-  const [acceptBtn, setAcceptBtn] = useState('Next') // can change to Next
+  const [acceptBtn, setAcceptBtn] = useState<string>('Next')
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(true)
   const [billingAddress, setBillingAddress] = useState('')
@@ -59,6 +59,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [PAUrl, setPAUrl] = useState<string>('')
   const [warningMsg, setWarningMsg] = useState<string>('')
   const [showBookingMsg, setShowBookingMsg] = useState<boolean>(false)
+  const [showConfirmBooking, setShowConfirmBooking] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -101,10 +102,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         paymentOption.detail !== 'Select payment method'
       ) {
         // pay with Payment Assist
-        sendBookingData(timeSlot)
+        sendBookingData()
         confirmPA()
       } else {
-        sendBookingData(timeSlot)
+        sendBookingData()
       }
     }
   }
@@ -153,12 +154,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
-  const sendBookingData = (selectedSlot: TimeSlot) => {
-    if (id) {
+  const sendBookingData = () => {
+    if (id && timeSlot) {
       sendBookingService(
         id,
-        moment(selectedSlot.start).format(BOOKING_DATE_FORMAT),
-        moment(selectedSlot.end).format(BOOKING_DATE_FORMAT),
+        moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
+        moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
       ).then(() => {
         getQuote()
         setShowBookingMsg(true)
@@ -263,23 +264,26 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       if (quoteDetails.order_state == OrderState.CONFIRM && quoteDetails.booking_start_date) {
         setIsBlink(true)
       }
-    }
-  }, [quoteDetails])
-
-  useEffect(() => {
-    if (quoteDetails) {
       setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
+      setTimeSlot({
+        start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
+        end: moment(quoteDetails.booking_end_date).add(2, 'hours').format(BOOKING_DATE_FORMAT),
+      })
     }
   }, [quoteDetails])
 
   useEffect(() => {
     // change between accept and next buttons names and styling
     const acceptSelector = document.getElementById('accept-btn')
-    if (!acceptSelector) return
-    if (snapValue === QuoteStep.PAYMENT) {
+    if (!!timeSlot && timeSlot.start !== quoteDetails?.booking_start_date) {
+      setAcceptBtn('Confirm Booking')
+      acceptSelector?.classList.add('quote-accept')
+    } else if (snapValue === QuoteStep.PAYMENT) {
+      console.warn('PAYMENT')
       setAcceptBtn('Next')
-      acceptSelector.classList.remove('quote-accept')
+      acceptSelector?.classList.remove('quote-accept')
     } else if (snapValue === QuoteStep.TIMESLOT) {
+      console.warn('TIMESLOT')
       if (quoteDetails?.invoice_data?.payment_state !== PaymentStatus.PAID) {
         if (paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH) {
           setAcceptBtn(paymentOption.detail)
@@ -287,10 +291,14 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           setAcceptBtn('Select payment method')
         }
       } else {
-        setAcceptBtn('Book Online')
+        if (quoteDetails?.booking_start_date !== timeSlot?.start) {
+          setAcceptBtn('Confirm Booking')
+        } else {
+          setAcceptBtn('')
+        }
       }
 
-      acceptSelector.classList.add('quote-accept')
+      acceptSelector?.classList.add('quote-accept')
     }
   }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
@@ -474,9 +482,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
             {!!quoteDetails && (
               <div className='quote-card'>
-                {quoteDetails?.order_state === OrderState.WON ? (
+                {!!quoteDetails?.booking_start_date ? (
                   <div className='booking-info p-4'>
-                    <h1 className='mb-4'>Booking Confirmed</h1>
+                    <h1 className='mb-4'>Your are booked in!</h1>
                     <div className='booking-address mb-4'>
                       <div>{moment(quoteDetails?.booking_start_date).format('DD MMMM')}</div>
                       <div>
@@ -512,6 +520,13 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                       ]}
                       deliveryAddressToChild={quoteDetails.delivery_address}
                     />
+                    {!!timeSlot && timeSlot.start !== quoteDetails.booking_start_date && (
+                      <div className='d-flex justify-content-center mb-4'>
+                        <button className='btn-raised' onClick={() => setShowConfirmBooking(true)}>
+                          Confirm Booking
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -533,7 +548,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           >
             Decline
           </button>
-          {quoteDetails.order_state !== OrderState.WON && (
+          {quoteDetails.order_state !== OrderState.WON && !!acceptBtn && (
             <button className='btn btn-purple-radius mb-3 quote-btn' onClick={() => handleSnapChange()} id='accept-btn'>
               {acceptBtn}
             </button>
@@ -555,22 +570,43 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         />
       )}
 
+      {showConfirmBooking && (
+        <ConfirmDialog
+          title='Confirm Booking'
+          description={
+            <span className='text-left d-block'>
+              Are you certain you want to make a booking for{' '}
+              <strong>
+                {moment(timeSlot?.start).format('MMMM Do')}, between {moment(timeSlot?.start).format('hh:mm A')} and{' '}
+                {moment(timeSlot?.end).format('hh:mm A')}
+              </strong>
+              ?
+            </span>
+          }
+          onConfirm={() => {
+            sendBookingData()
+            setShowConfirmBooking(false)
+          }}
+          onCancel={() => setShowConfirmBooking(false)}
+        />
+      )}
+
       {showBookingMsg && (
         <ConfirmDialog
           title='Your are booked in!'
           showIcon={false}
           description={
-            <div className='text-left'>
+            <span className='text-left d-block'>
               Arriving {moment(quoteDetails?.booking_start_date).format('DD MMMM')} between{' '}
               {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
               {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
               <br />
               {quoteDetails?.delivery_address?.line_1}, {quoteDetails?.delivery_address?.town_or_city},{' '}
               {quoteDetails?.delivery_address?.postcode}
-            </div>
+            </span>
           }
           subDescription={
-            <div className='text-left'>
+            <span className='text-left d-block'>
               <br />
               Job will take 1-2 hours to complete. <br />
               We need to test wipers and/or door glass movement.
@@ -583,7 +619,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               Then just let us do the rest and we will notify you when all is done. <br />
               <br />
               Any question, call 07400 400469
-            </div>
+            </span>
           }
           showCancel={false}
           confirmStr='Ok'
