@@ -2,6 +2,7 @@ import './quote.css'
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
+import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import expand from '@glass/assets/icons/expand.png'
 import flag from '@glass/assets/icons/uk-flag.png'
@@ -69,12 +70,14 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const getQuote = () => {
     if (id) {
-      getQuoteService(id, quoteCount).then((res) => {
-        if (res.success) {
-          setQuoteDetails(res.data)
-          setBillingAddress(formatAddress(res.data.delivery_address))
-        }
-      })
+      trackPromise(
+        getQuoteService(id, quoteCount).then((res) => {
+          if (res.success) {
+            setQuoteDetails(res.data)
+            setBillingAddress(formatAddress(res.data.delivery_address))
+          }
+        }),
+      )
     }
   }
 
@@ -152,14 +155,16 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const sendBookingData = () => {
     if (id && timeSlot) {
-      sendBookingService(
-        id,
-        moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
-        moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
-      ).then(() => {
-        getQuote()
-        setShowBookingMsg(true)
-      })
+      trackPromise(
+        sendBookingService(
+          id,
+          moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
+          moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
+        ).then(() => {
+          getQuote()
+          setShowBookingMsg(true)
+        }),
+      )
     }
   }
 

@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { autocomplete } from 'getaddress-autocomplete'
+import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -106,60 +107,64 @@ export const Customer: React.FC = () => {
       const lastName = lastNameRef?.current?.value || ''
       const fullName = `${firstName} ${lastName}`
       // const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
-      createQuoteService({
-        customer_name: fullName,
-        customer_f_name: firstName,
-        customer_s_name: lastName,
-        customer_phone: phoneRef?.current?.value || '',
-        customer_email: emailRef?.current?.value || '',
-        customer_address: {
-          // more detailed address info
-          postcode: fullAddress?.postcode || '',
-          latitude: fullAddress?.latitude || '',
-          longitude: fullAddress?.longitude || '',
-          line_1: fullAddress?.line_1 || '',
-          line_2: fullAddress?.line_2 || '',
-          line_3: fullAddress?.line_3 || '',
-          line_4: fullAddress?.line_4 || '',
-          locality: fullAddress?.locality || '',
-          town_or_city: fullAddress?.town_or_city || '',
-          county: fullAddress?.county || '',
-          district: fullAddress?.district || '',
-          country: fullAddress?.country || '',
-        },
-        registration_number: licenseSearchVal,
-        glass_location: selectedBrokenWindows || [],
-        customer_comments: {
-          comment: comment,
-          attachments: attachments,
-        },
-      }).then((res) => {
-        if (res.success) {
-          navigate('/quote/' + res.data.fe_token)
-        }
-      })
+      trackPromise(
+        createQuoteService({
+          customer_name: fullName,
+          customer_f_name: firstName,
+          customer_s_name: lastName,
+          customer_phone: phoneRef?.current?.value || '',
+          customer_email: emailRef?.current?.value || '',
+          customer_address: {
+            // more detailed address info
+            postcode: fullAddress?.postcode || '',
+            latitude: fullAddress?.latitude || '',
+            longitude: fullAddress?.longitude || '',
+            line_1: fullAddress?.line_1 || '',
+            line_2: fullAddress?.line_2 || '',
+            line_3: fullAddress?.line_3 || '',
+            line_4: fullAddress?.line_4 || '',
+            locality: fullAddress?.locality || '',
+            town_or_city: fullAddress?.town_or_city || '',
+            county: fullAddress?.county || '',
+            district: fullAddress?.district || '',
+            country: fullAddress?.country || '',
+          },
+          registration_number: licenseSearchVal,
+          glass_location: selectedBrokenWindows || [],
+          customer_comments: {
+            comment: comment,
+            attachments: attachments,
+          },
+        }).then((res) => {
+          if (res.success) {
+            navigate('/quote/' + res.data.fe_token)
+          }
+        }),
+      )
     }
   }
 
   const fetchVehData = (license: string | undefined) => {
     if (license !== undefined) {
       // fetch vehicle data
-      fetch(process.env.REACT_APP_VEH_DATA + license)
-        .then((res) => res.json())
-        .then((data) => {
-          if (
-            data.Response.StatusCode === 'KeyInvalid' ||
-            data.Response.StatusCode === 'ItemNotFound' ||
-            data.Response.StatusCode === 'SandboxLimitation'
-          ) {
-            return
-          } else {
-            setVehData(data.Response.DataItems)
-          }
-        })
-        .catch(() => {
-          setVehicleData('No Data Found! Error in API.')
-        })
+      trackPromise(
+        fetch(process.env.REACT_APP_VEH_DATA + license)
+          .then((res) => res.json())
+          .then((data) => {
+            if (
+              data.Response.StatusCode === 'KeyInvalid' ||
+              data.Response.StatusCode === 'ItemNotFound' ||
+              data.Response.StatusCode === 'SandboxLimitation'
+            ) {
+              return
+            } else {
+              setVehData(data.Response.DataItems)
+            }
+          })
+          .catch(() => {
+            setVehicleData('No Data Found! Error in API.')
+          }),
+      )
     }
   }
 
