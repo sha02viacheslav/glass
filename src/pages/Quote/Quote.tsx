@@ -628,6 +628,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         <BeforeAfter />
       </div>
 
+      <div className='center mb-5'>
+        <h2 className='contact-message'>If you have questions please call {PHONE_NUMBER}</h2>
+      </div>
+
       {!!warningMsg && (
         <ConfirmDialog
           title='Error'
