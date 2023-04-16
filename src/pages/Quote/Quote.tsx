@@ -543,7 +543,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 <div className='booking-info p-4'>
                   <h1 className='mb-4'>Your are booked in!</h1>
                   <div className='booking-address mb-4'>
-                    <div>{moment(quoteDetails?.booking_start_date).format('DD MMMM')}</div>
+                    <div>{moment(quoteDetails?.booking_start_date).format('dddd, DD MMMM')}</div>
                     <div>
                       Arrival window between {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
                       {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
@@ -639,8 +639,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             <span className='text-left d-block'>
               Are you certain you want to make a booking for{' '}
               <strong>
-                {moment(timeSlot?.start).format('MMMM Do')}, between {moment(timeSlot?.start).format('hh:mm A')} and{' '}
-                {moment(timeSlot?.end).format('hh:mm A')}
+                {moment(timeSlot?.start).format('dddd, MMMM Do')}, between {moment(timeSlot?.start).format('hh:mm A')}{' '}
+                and {moment(timeSlot?.end).format('hh:mm A')}
               </strong>
               ?
             </span>
@@ -659,7 +659,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           showIcon={false}
           description={
             <span className='text-left d-block'>
-              Arriving {moment(quoteDetails?.booking_start_date).format('DD MMMM')} between{' '}
+              Arriving {moment(quoteDetails?.booking_start_date).format('dddd, DD MMMM')} between{' '}
               {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
               {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
               <br />
