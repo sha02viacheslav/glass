@@ -20,7 +20,7 @@ ARG GH_TOKEN \
 
 RUN git clone https://$GH_TOKEN@github.com/$GH_USERNAME/$GH_REPO.git tmp_env
 
-RUN mv tmp_env/.env.staging .env
+RUN mv tmp_env/.env.production .env
 
 RUN rm -rf tmp_env
 
