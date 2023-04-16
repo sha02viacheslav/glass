@@ -1,28 +1,24 @@
+import './location.css'
 import React, { useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
 import { autocomplete } from 'getaddress-autocomplete'
-import { Address, LocationSelectionId } from '@glass/models'
-import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
-import './location.css'
+import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
+import { Address } from '@glass/models'
+import { formatAddress } from '@glass/utils/format-address/format-address.util'
 
 export type LocationSelectionProps = {
-  userBillingAddress: string
-  deliveryAddressToParent: (value: string) => void
-  ids?: LocationSelectionId[]
+  userBillingAddress: Address
   deliveryAddressToChild?: Address
+  deliveryAddressToParent: (value: Address | undefined) => void
 }
 
 export const LocationSelection: React.FC<LocationSelectionProps> = ({
   userBillingAddress,
-  deliveryAddressToParent,
-  ids,
   deliveryAddressToChild,
+  deliveryAddressToParent,
 }) => {
-  const [address, setAddress] = useState('')
+  const [address, setAddress] = useState<string>(formatAddress(deliveryAddressToChild))
   const [addressInput, setAddressInput] = useState<boolean>(false)
-  const customer_id = ids?.[0].customerId
-  const address_id = ids?.[0].addressId
-  const [deliveryAddress, setDeliveryAddress] = useState('')
 
   const handleAddressCheck = () => {
     if (addressInput) {
@@ -34,12 +30,12 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
       setAddressInput(true)
       const field = document.getElementById('autocomplete-field')
       if (field) {
-        if (deliveryAddress === address) {
-          newDeliveryAddress('')
+        if (formatAddress(deliveryAddressToChild) === address) {
+          newDeliveryAddress(undefined)
           field.removeAttribute('readonly')
           field.focus()
         } else {
-          newDeliveryAddress(deliveryAddress)
+          newDeliveryAddress(deliveryAddressToChild)
           field.removeAttribute('readonly')
         }
       }
@@ -47,34 +43,17 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
   }
 
   const handlePCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    newDeliveryAddress(event.target.value)
+    setAddress(event.target.value)
   }
 
-  const newDeliveryAddress = (address: string) => {
+  const newDeliveryAddress = (address: Address | undefined) => {
     deliveryAddressToParent(address)
-    setAddress(address)
-  }
-
-  const updateDeliveryAddress = (fullAddress: Address) => {
-    if (customer_id) {
-      updateDeliveryAddressService({
-        customer_id: customer_id,
-        address_id: address_id,
-        line_1: fullAddress.line_1,
-        line_2: fullAddress.line_2,
-        postcode: fullAddress.postcode,
-        latitude: fullAddress.latitude,
-        longitude: fullAddress.longitude,
-        town_or_city: fullAddress.town_or_city,
-        county: fullAddress.county,
-        country: fullAddress.country,
-      }).then(() => {})
-    }
+    setAddress(formatAddress(address))
   }
 
   useEffect(() => {
     // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('autocomplete-field', 'SFB4ZD1fO0ONndTgHnmUmg26020', {
+    autocomplete('autocomplete-field', REACT_APP_AUTOCOMPLETE, {
       delay: 500,
     })
 
@@ -83,9 +62,7 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
       e.preventDefault()
       // @ts-ignore
       const address: Address = e.address
-      const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
-      newDeliveryAddress(tempAddress)
-      updateDeliveryAddress(address)
+      newDeliveryAddress(address)
     })
 
     // get the width of the main container and set the input bar's width accordingly (the width needs to be hard set in pixels)
@@ -96,21 +73,6 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
     }
 
     newDeliveryAddress(userBillingAddress)
-
-    // format delivery address
-    if (deliveryAddressToChild) {
-      const deliveryFromAPI =
-        deliveryAddressToChild.line_1 +
-        ', ' +
-        deliveryAddressToChild.line_2 +
-        ', ' +
-        deliveryAddressToChild.town_or_city +
-        ', ' +
-        deliveryAddressToChild.county +
-        ' ' +
-        deliveryAddressToChild.postcode
-      setDeliveryAddress(deliveryFromAPI)
-    }
   }, [])
 
   return (
