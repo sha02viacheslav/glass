@@ -332,7 +332,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     const acceptSelector = document.getElementById('accept-btn')
     if (
       (!!timeSlot && timeSlot.start !== quoteDetails?.booking_start_date) ||
-      formatAddress(deliveryAddress) !== formatAddress(quoteDetails?.delivery_address)
+      (!!deliveryAddress && formatAddress(deliveryAddress) !== formatAddress(quoteDetails?.delivery_address))
     ) {
       setAcceptBtn(QuoteAction.CONFIRM_BOOKING)
       acceptSelector?.classList.add('quote-accept')
