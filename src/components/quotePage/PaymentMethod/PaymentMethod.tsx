@@ -149,11 +149,25 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   useEffect(() => {
+    setPaymentStatus(quoteDetails?.invoice_data?.payment_state || PaymentStatus.NOT_PAID)
+  }, [quoteDetails?.invoice_data?.payment_state])
+
+  useEffect(() => {
     if (quoteDetails?.payment_method_type) {
       setPaymentMethodType(quoteDetails.payment_method_type)
+      switch (quoteDetails.payment_method_type) {
+        case PaymentMethodType.ASSIST_FOUR_PAYMENT: {
+          setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)
+          break
+        }
+        case PaymentMethodType.STRIPE:
+        case PaymentMethodType.CASH: {
+          setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)
+          break
+        }
+      }
     }
-    setPaymentStatus(quoteDetails?.invoice_data?.payment_state || PaymentStatus.NOT_PAID)
-  }, [quoteDetails])
+  }, [quoteDetails?.payment_method_type])
 
   useEffect(() => {
     if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
