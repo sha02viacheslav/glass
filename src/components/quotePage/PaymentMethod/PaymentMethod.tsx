@@ -216,7 +216,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
         <div className='PM-invoice-status'>{invoiceMessage}</div>
         <div className='PM-status'>
-          Status: <span className={paymentStatus}>{paymentStatusText(paymentStatus)}</span>
+          Status: <span className={paymentStatus}>{paymentStatusText(quoteDetails)}</span>
         </div>
         {/* show quotation price details */}
         <SelectOfferNew

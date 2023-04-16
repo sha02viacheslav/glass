@@ -16,13 +16,14 @@ import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT, PHONE_NUMBER } from '@glass/constants'
 import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
-import { Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
+import { Address, Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
+import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -31,15 +32,13 @@ export type QuoteProps = {
 }
 
 export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
-  // Tabs - controls the different views of the quote page: 0 -> customer, 1 -> pay&book, 3 -> thank you
   const { id } = useParams()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIMESLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(true)
-  const [billingAddress, setBillingAddress] = useState('')
-  const [, setDeliveryAddress] = useState('')
+  const [deliveryAddress, setDeliveryAddress] = useState<Address | undefined>(undefined)
   const [paymentOption, setPaymentOption] = useState<PaymentOptionDto>({
     p_option: PaymentOptionEnum.NONE,
     detail: QuoteAction.NONE,
@@ -65,6 +64,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [warningMsg, setWarningMsg] = useState<string>('')
   const [showBookingMsg, setShowBookingMsg] = useState<boolean>(false)
   const [showConfirmBooking, setShowConfirmBooking] = useState<boolean>(false)
+  const [editBooking, setEditBooing] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -74,7 +74,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         getQuoteService(id, quoteCount).then((res) => {
           if (res.success) {
             setQuoteDetails(res.data)
-            setBillingAddress(formatAddress(res.data.delivery_address))
           }
         }),
       )
@@ -96,11 +95,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         return
       }
       case QuoteAction.CONFIRM_BOOKING: {
-        if (!!timeSlot) {
-          setShowConfirmBooking(true)
-        } else {
-          setWarningMsg('Select a time for the repair!')
-        }
+        handleConfirmBookingChange()
         return
       }
       case QuoteAction.CONTINUE_PA:
@@ -154,18 +149,75 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }
 
   const sendBookingData = () => {
-    if (id && timeSlot) {
+    if (id && quoteDetails) {
+      const promises: Promise<void>[] = []
+
+      if (timeSlot) {
+        promises.push(
+          new Promise((resolve) =>
+            sendBookingService(
+              id,
+              moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
+              moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
+            ).then(() => {
+              resolve()
+            }),
+          ),
+        )
+      }
+      if (deliveryAddress && formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)) {
+        promises.push(
+          new Promise((resolve) =>
+            updateDeliveryAddressService({
+              customer_id: quoteDetails.customer_id,
+              address_id: quoteDetails.delivery_address.address_id,
+              line_1: deliveryAddress.line_1,
+              line_2: deliveryAddress.line_2,
+              postcode: deliveryAddress.postcode,
+              latitude: deliveryAddress.latitude,
+              longitude: deliveryAddress.longitude,
+              town_or_city: deliveryAddress.town_or_city,
+              county: deliveryAddress.county,
+              country: deliveryAddress.country,
+            }).then(() => {
+              resolve()
+            }),
+          ),
+        )
+      }
+
       trackPromise(
-        sendBookingService(
-          id,
-          moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
-          moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
-        ).then(() => {
+        Promise.all(promises).finally(() => {
           getQuote()
           setShowBookingMsg(true)
+          setEditBooing(false)
         }),
       )
     }
+  }
+
+  const handleConfirmBookingChange = () => {
+    if (!timeSlot) {
+      setWarningMsg('Select a time for the repair!')
+      return
+    }
+    if (!deliveryAddress) {
+      setWarningMsg('Select a delivery address for the repair!')
+      return
+    }
+    setShowConfirmBooking(true)
+  }
+
+  const handleCancelBookingChange = () => {
+    if (quoteDetails) {
+      setTimeSlot({
+        start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
+        end: moment(quoteDetails.booking_end_date).add(2, 'hours').format(BOOKING_DATE_FORMAT),
+      })
+    } else {
+      setTimeSlot(undefined)
+    }
+    setEditBooing(false)
   }
 
   function handleDecline() {
@@ -199,7 +251,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     setWarningMsg('')
   }
 
-  const deliveryAddressToParent = (data: string) => {
+  const deliveryAddressToParent = (data: Address | undefined) => {
     setDeliveryAddress(data)
   }
 
@@ -278,7 +330,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   useEffect(() => {
     // change between accept and next buttons names and styling
     const acceptSelector = document.getElementById('accept-btn')
-    if (!!timeSlot && timeSlot.start !== quoteDetails?.booking_start_date) {
+    if (
+      (!!timeSlot && timeSlot.start !== quoteDetails?.booking_start_date) ||
+      formatAddress(deliveryAddress) !== formatAddress(quoteDetails?.delivery_address)
+    ) {
       setAcceptBtn(QuoteAction.CONFIRM_BOOKING)
       acceptSelector?.classList.add('quote-accept')
     } else if (snapValue === QuoteStep.PAYMENT) {
@@ -292,7 +347,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           setAcceptBtn(QuoteAction.GO_PAYMENT)
         }
       } else {
-        if (quoteDetails?.booking_start_date !== timeSlot?.start) {
+        if (
+          quoteDetails?.booking_start_date !== timeSlot?.start ||
+          formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)
+        ) {
           setAcceptBtn(QuoteAction.CONFIRM_BOOKING)
         } else {
           setAcceptBtn(QuoteAction.NONE)
@@ -341,9 +399,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       )}
 
       <div className='center'>
-        <div className='true-top' id='1'>
-          -
-        </div>
         {quoteInfoOpen && (
           <div className='quote-info-main'>
             <div className='client-info-container'>
@@ -448,116 +503,120 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         </div>
       )}
 
-      {quoteDetails?.is_published && (
-        <div className='center'>
-          <div className='scroll-container'>
-            {/* select offer / payment method */}
-            <div id='offer' className='mt-5'>
-              {!!quoteDetails && (
-                <PaymentMethod
-                  offerDetails={offersDetails}
-                  optionalOrderLines={optionalOrderLines}
-                  quoteDetails={{
-                    ...quoteDetails,
-                    c_address: formatAddress(quoteDetails?.delivery_address, false),
-                    c_postalcode: quoteDetails?.delivery_address?.postcode || '',
-                  }}
-                  qid={id}
-                  totalPrice={totalPrice}
-                  totalUnitPrice={totalUnitPrice}
-                  payAssist={payAssistToParent}
-                  refetchQuote={getQuote}
-                  PADataToParent={PADataToParent}
-                  PAUrl={PAUrl}
-                  method={paymentOptionToParent}
-                  onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
-                />
-              )}
-            </div>
+      <div className='true-top' id='1'>
+        -
+      </div>
 
-            <div className='quote-scroll-target' id='2'>
-              -
-            </div>
-
+      <div className='center'>
+        <div className='scroll-container'>
+          {/* select offer / payment method */}
+          <div id='offer' className='mt-5'>
             {!!quoteDetails && (
-              <div className='quote-card'>
-                {!!quoteDetails?.booking_start_date ? (
-                  <div className='booking-info p-4'>
-                    <h1 className='mb-4'>Your are booked in!</h1>
-                    <div className='booking-address mb-4'>
-                      <div>{moment(quoteDetails?.booking_start_date).format('DD MMMM')}</div>
-                      <div>
-                        Arrival window between {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
-                        {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
-                      </div>
-                    </div>
+              <PaymentMethod
+                offerDetails={offersDetails}
+                optionalOrderLines={optionalOrderLines}
+                quoteDetails={{
+                  ...quoteDetails,
+                  c_address: formatAddress(quoteDetails?.delivery_address, false),
+                  c_postalcode: quoteDetails?.delivery_address?.postcode || '',
+                }}
+                qid={id}
+                totalPrice={totalPrice}
+                totalUnitPrice={totalUnitPrice}
+                payAssist={payAssistToParent}
+                refetchQuote={getQuote}
+                PADataToParent={PADataToParent}
+                PAUrl={PAUrl}
+                method={paymentOptionToParent}
+                onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
+              />
+            )}
+          </div>
 
-                    <div className='booking-address'>
-                      {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2},{' '}
-                      {quoteDetails.delivery_address?.town_or_city}
-                      <br />
-                      {quoteDetails.delivery_address?.county}
-                      <br />
-                      {quoteDetails.delivery_address?.postcode}
+          <div className='quote-scroll-target' id='2'>
+            -
+          </div>
+
+          {!!quoteDetails && (
+            <div className='quote-card'>
+              {!!quoteDetails?.booking_start_date && !editBooking ? (
+                <div className='booking-info p-4'>
+                  <h1 className='mb-4'>Your are booked in!</h1>
+                  <div className='booking-address mb-4'>
+                    <div>{moment(quoteDetails?.booking_start_date).format('DD MMMM')}</div>
+                    <div>
+                      Arrival window between {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
+                      {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <TimeSelection
-                      timeSlotToParent={timeSlotToParent}
-                      liveBooking={false}
-                      bookingStartDate={quoteDetails?.booking_start_date}
-                    />
-                    <LocationSelection
-                      userBillingAddress={billingAddress}
-                      deliveryAddressToParent={deliveryAddressToParent}
-                      ids={[
-                        {
-                          customerId: quoteDetails.customer_id,
-                          addressId: quoteDetails.delivery_address.address_id,
-                        },
-                      ]}
-                      deliveryAddressToChild={quoteDetails.delivery_address}
-                    />
-                    {!!timeSlot && timeSlot.start !== quoteDetails.booking_start_date && (
-                      <div className='d-flex justify-content-center mb-4'>
-                        <button className='btn-raised' onClick={() => setShowConfirmBooking(true)}>
-                          Confirm Booking
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
 
-            <div className='quote-scroll-target-2' id='3'>
-              -
+                  <div className='booking-address'>
+                    {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2},{' '}
+                    {quoteDetails.delivery_address?.town_or_city}
+                    <br />
+                    {quoteDetails.delivery_address?.county}
+                    <br />
+                    {quoteDetails.delivery_address?.postcode}
+                  </div>
+                  <div className='d-flex justify-content-end'>
+                    <button className='edit-btn' onClick={() => setEditBooing(true)}>
+                      EDIT
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <TimeSelection
+                    timeSlotToParent={timeSlotToParent}
+                    liveBooking={false}
+                    bookingStartDate={quoteDetails?.booking_start_date}
+                  />
+                  <LocationSelection
+                    userBillingAddress={quoteDetails.delivery_address}
+                    deliveryAddressToChild={quoteDetails.delivery_address}
+                    deliveryAddressToParent={deliveryAddressToParent}
+                  />
+                  {(editBooking ||
+                    (!!timeSlot && timeSlot.start !== quoteDetails.booking_start_date) ||
+                    formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)) && (
+                    <div className='d-flex justify-content-center gap-4 mb-4'>
+                      <button className='btn-stroked' onClick={() => handleCancelBookingChange()}>
+                        Cancel
+                      </button>
+                      <button className='btn-raised' onClick={() => handleConfirmBookingChange()}>
+                        Confirm Booking
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
+          )}
+
+          <div className='quote-scroll-target-2' id='3'>
+            -
           </div>
         </div>
-      )}
-      {/* accept / decline buttons */}
-      {quoteDetails?.is_published && (
-        <div className='accept-btn-container' id='accept-cont'>
+      </div>
+
+      <div className='accept-btn-container' id='accept-cont'>
+        <button
+          className='btn btn-purple-outline mb-3 quote-btn quote-decline'
+          onClick={handleDecline}
+          id='decline-btn'
+        >
+          Decline
+        </button>
+        {quoteDetails?.order_state !== OrderState.WON && !!acceptBtn && (
           <button
-            className='btn btn-purple-outline mb-3 quote-btn quote-decline'
-            onClick={handleDecline}
-            id='decline-btn'
+            className='btn btn-purple-radius mb-3 quote-btn'
+            onClick={() => handleSnapChange(acceptBtn)}
+            id='accept-btn'
           >
-            Decline
+            {acceptBtn}
           </button>
-          {quoteDetails.order_state !== OrderState.WON && !!acceptBtn && (
-            <button
-              className='btn btn-purple-radius mb-3 quote-btn'
-              onClick={() => handleSnapChange(acceptBtn)}
-              id='accept-btn'
-            >
-              {acceptBtn}
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       <div className='quote-before-after'>
         <BeforeAfter />
