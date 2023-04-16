@@ -33,6 +33,7 @@ export type QuoteProps = {
 
 export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
+  const showButtons = false
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIMESLOT)
@@ -593,30 +594,35 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             </div>
           )}
 
-          <div className='quote-scroll-target-2' id='3'>
-            -
-          </div>
+          {showButtons && (
+            <div className='quote-scroll-target-2' id='3'>
+              -
+            </div>
+          )}
         </div>
       </div>
 
-      <div className='accept-btn-container' id='accept-cont'>
-        <button
-          className='btn btn-purple-outline mb-3 quote-btn quote-decline'
-          onClick={handleDecline}
-          id='decline-btn'
-        >
-          Decline
-        </button>
-        {quoteDetails?.order_state !== OrderState.WON && !!acceptBtn && (
+      {/* Hide for now */}
+      {showButtons && (
+        <div className='accept-btn-container' id='accept-cont'>
           <button
-            className='btn btn-purple-radius mb-3 quote-btn'
-            onClick={() => handleSnapChange(acceptBtn)}
-            id='accept-btn'
+            className='btn btn-purple-outline mb-3 quote-btn quote-decline'
+            onClick={handleDecline}
+            id='decline-btn'
           >
-            {acceptBtn}
+            Decline
           </button>
-        )}
-      </div>
+          {quoteDetails?.order_state !== OrderState.WON && !!acceptBtn && (
+            <button
+              className='btn btn-purple-radius mb-3 quote-btn'
+              onClick={() => handleSnapChange(acceptBtn)}
+              id='accept-btn'
+            >
+              {acceptBtn}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className='quote-before-after'>
         <BeforeAfter />
