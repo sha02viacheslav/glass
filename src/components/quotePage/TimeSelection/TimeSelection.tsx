@@ -148,12 +148,6 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
         // only set prev selected slot if it has not passed
         selectionId = formatSlotId(bookingStartDate)
         setSelectedSlot(selectionId)
-        if (timeSlotToParent) {
-          timeSlotToParent({
-            start: moment(bookingStartDate).format(BOOKING_DATE_FORMAT),
-            end: moment(bookingStartDate).add(2, 'hours').format(BOOKING_DATE_FORMAT),
-          })
-        }
       }
     }
     // find which slots have passed

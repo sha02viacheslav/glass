@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address, MonthlyPayment, Offer, OptionalOrderLine, PaymentOptionDto, Quote } from '@glass/models'
 // import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
@@ -188,14 +188,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     })
     setAddress(userBillingAddress)
     // update selected payment method in quote page (parent)
-    let msg = ''
+    let msg = QuoteAction.NONE
     if (startPAProcess && PAUrl === '') {
       // if user is in check eligibility phase
-      msg = 'Check Eligibility'
+      msg = QuoteAction.CHECK_ELIGIBILITY
     } else if (startPAProcess && PAUrl !== '') {
-      msg = 'Continue Payment Assist'
+      msg = QuoteAction.CONTINUE_PA
     } else if (!startPAProcess) {
-      msg = 'Select payment method'
+      msg = QuoteAction.GO_PAYMENT
     }
     if (method) method({ p_option: selectedMethod, detail: msg })
   }, [selectedMethod, startPAProcess, PAUrl])

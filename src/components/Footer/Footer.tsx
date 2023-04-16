@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { GoogleReviews } from '@glass/components/Footer/GoogleReviews'
+import { PHONE_NUMBER } from '@glass/constants'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 function SliderNextArrow(props: CustomArrowProps) {
@@ -185,7 +186,7 @@ export const Footer: React.FC = () => {
               <div className='row'>
                 <div className='col-lg-6 offset-lg-6'>
                   <h3 className='text-white mb-4'>
-                    Call us 07400 400469 or ask a quote online. We accept all cards, cash and installments.
+                    Call us {PHONE_NUMBER} or ask a quote online. We accept all cards, cash and installments.
                   </h3>
                   <div className='row align-items-center'>
                     <div className='col-md-6'>
@@ -245,7 +246,7 @@ export const Footer: React.FC = () => {
                   <p className='mb-2'>
                     <img src={process.env.PUBLIC_URL + '/img/ph.svg'} className='img-fluid me-2' alt='' />{' '}
                     <a href='#' className='text-white text-decoration-none'>
-                      07400 400469
+                      {PHONE_NUMBER}
                     </a>
                   </p>
                 </div>
