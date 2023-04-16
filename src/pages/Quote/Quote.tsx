@@ -12,7 +12,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
-import { BOOKING_DATE_FORMAT } from '@glass/constants'
+import { BOOKING_DATE_FORMAT, PHONE_NUMBER } from '@glass/constants'
 import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
@@ -22,6 +22,7 @@ import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
+import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type QuoteProps = {
@@ -71,7 +72,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       getQuoteService(id, quoteCount).then((res) => {
         if (res.success) {
           setQuoteDetails(res.data)
-          setBillingAddress(res.data.customer_order_postal_code)
+          setBillingAddress(formatAddress(res.data.delivery_address))
         }
       })
     }
@@ -114,9 +115,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     if (PAData.length === 0) {
       first = quoteDetails?.customer_f_name || ''
       second = quoteDetails?.customer_s_name || ''
-      post =
-        quoteDetails?.customer_order_postal_code.substring(quoteDetails.customer_order_postal_code.length - 8) || ''
-      addr = quoteDetails?.customer_order_postal_code.slice(0, -8) || ''
+      post = quoteDetails?.delivery_address?.postcode || ''
+      addr = formatAddress(quoteDetails?.delivery_address, false)
     } else {
       first = PAData[0] || ''
       second = PAData[1] || ''
@@ -178,7 +178,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const backToCustomer = () => {
     const licenseReg = quoteDetails?.registration_number
     const quoteData = JSON.stringify({
-      address: quoteDetails?.customer_order_postal_code,
+      address: formatAddress(quoteDetails?.delivery_address),
       firstName: quoteDetails?.customer_f_name,
       lastName: quoteDetails?.customer_s_name,
       email: quoteDetails?.customer_email,
@@ -360,7 +360,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
                   </div>
                   <div className='client-info'>
-                    <b>Billing address:</b> {quoteDetails?.customer_order_postal_code}
+                    <b>Billing address:</b> {formatAddress(quoteDetails?.delivery_address)}
                   </div>
                   <div className='client-info'>
                     <b>Email:</b> {quoteDetails?.customer_email}
@@ -454,10 +454,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   optionalOrderLines={optionalOrderLines}
                   quoteDetails={{
                     ...quoteDetails,
-                    c_address: quoteDetails.customer_order_postal_code.slice(0, -8),
-                    c_postalcode: quoteDetails.customer_order_postal_code.substring(
-                      quoteDetails.customer_order_postal_code.length - 8,
-                    ),
+                    c_address: formatAddress(quoteDetails?.delivery_address, false),
+                    c_postalcode: quoteDetails?.delivery_address?.postcode || '',
                   }}
                   qid={id}
                   totalPrice={totalPrice}
@@ -490,7 +488,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </div>
 
                     <div className='booking-address'>
-                      {quoteDetails.delivery_address?.line_1}, {quoteDetails.delivery_address?.town_or_city}
+                      {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2},{' '}
+                      {quoteDetails.delivery_address?.town_or_city}
                       <br />
                       {quoteDetails.delivery_address?.county}
                       <br />
@@ -505,7 +504,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                       bookingStartDate={quoteDetails?.booking_start_date}
                     />
                     <LocationSelection
-                      key={billingAddress}
                       userBillingAddress={billingAddress}
                       deliveryAddressToParent={deliveryAddressToParent}
                       ids={[
@@ -618,7 +616,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               door pockets. It will help us vacuum the shattered glass. <br />
               Then just let us do the rest and we will notify you when all is done. <br />
               <br />
-              Any question, call 07400 400469
+              Any question, call {PHONE_NUMBER}
             </span>
           }
           showCancel={false}
