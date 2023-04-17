@@ -244,7 +244,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       selected: quoteDetails?.glass_location,
     })
     sessionStorage.setItem('quoteInfo', quoteData)
-    navigate('/customer/' + licenseReg)
+    navigate('/customer/edit/' + licenseReg)
   }
 
   const timeSlotToParent = (data: TimeSlot) => {
@@ -287,11 +287,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       getQuote()
     }
 
-    // hide navbar and footer
-    const navbarMain = document.getElementById('navbar-main')
-    const footerMain = document.getElementById('footer-main')
-    if (navbarMain) navbarMain.style.display = 'none'
-    if (footerMain) footerMain.style.display = 'none'
     // scroll to top on page load
     const topSelector = document.getElementById('1')
     if (topSelector !== null) {
@@ -363,7 +358,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
   return (
-    <div>
+    <div className='my-4 my-md-5'>
       {declinePopup && (
         <div className='popup-background'>
           <div className='popup-container'>

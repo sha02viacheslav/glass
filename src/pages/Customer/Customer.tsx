@@ -12,7 +12,11 @@ import { Address, Attachment, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
-export const Customer: React.FC = () => {
+export type CustomerProps = {
+  editMode?: boolean
+}
+
+export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
   const [, setVehicleData] = useState('')
   const { licenseNum } = useParams()
@@ -179,11 +183,6 @@ export const Customer: React.FC = () => {
     //     const windowSelector = document.getElementById("scroll-focus");
     //     windowSelector.scrollIntoView();
     // }
-    // necessary in case returning from quote page navbar would not load unless the page is refreshed
-    const navbarMain = document.getElementById('navbar-main')
-    const footerMain = document.getElementById('footer-main')
-    if (navbarMain) navbarMain.style.display = 'inline'
-    if (footerMain) footerMain.style.display = 'inline'
 
     // Integration of PostalCode/ Address AutoComplete API
     autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
@@ -351,25 +350,34 @@ export const Customer: React.FC = () => {
                     </div>
                   </div>
                 )}
-                <br />
-                <div className='position-relative pt-md-4'>
-                  <img src={process.env.PUBLIC_URL + '/img/hand-pic.png'} className='img-fluid w-100 mob-h' alt='' />
-                  <div className='recycle-content text-start phn-content'>
-                    <div className='d-flex justify-content-between'>
-                      <div className='content-left'>
-                        <h2 className='text-white mb-2'>Mobile Service </h2>
-                        <p className='fw-light fs-14 mb-0 text-white'>We come to your home or work.</p>
-                        <p className='mb-2 text-white'>Replacement 1-2 h</p>
-                        <Link to='/react/customer' className='btn  text-purple bg-white'>
-                          Get a Quote
-                        </Link>
-                      </div>
-                      <div className='re-img mt-auto'>
-                        <img src={process.env.PUBLIC_URL + '/img/phn.png'} className='img-fluid' alt='' />
+
+                {!editMode && (
+                  <>
+                    <br />
+                    <div className='position-relative pt-md-4'>
+                      <img
+                        src={process.env.PUBLIC_URL + '/img/hand-pic.png'}
+                        className='img-fluid w-100 mob-h'
+                        alt=''
+                      />
+                      <div className='recycle-content text-start phn-content'>
+                        <div className='d-flex justify-content-between'>
+                          <div className='content-left'>
+                            <h2 className='text-white mb-2'>Mobile Service </h2>
+                            <p className='fw-light fs-14 mb-0 text-white'>We come to your home or work.</p>
+                            <p className='mb-2 text-white'>Replacement 1-2 h</p>
+                            <Link to='/react/customer' className='btn  text-purple bg-white'>
+                              Get a Quote
+                            </Link>
+                          </div>
+                          <div className='re-img mt-auto'>
+                            <img src={process.env.PUBLIC_URL + '/img/phn.png'} className='img-fluid' alt='' />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
