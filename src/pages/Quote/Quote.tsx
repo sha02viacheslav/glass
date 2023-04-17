@@ -542,7 +542,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             <div className='quote-card'>
               {!!quoteDetails?.booking_start_date && !editBooking ? (
                 <div className='booking-info p-4'>
-                  <h1 className='mb-4'>Your are booked in!</h1>
+                  <h1 className='mb-4'>You are booked in!</h1>
                   <div className='booking-address mb-4'>
                     <div>{moment(quoteDetails?.booking_start_date).format('dddd, DD MMMM')}</div>
                     <div>
@@ -667,7 +667,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
       {showBookingMsg && (
         <ConfirmDialog
-          title='Your are booked in!'
+          title='You are booked in!'
           showIcon={false}
           description={
             <span className='text-left d-block'>
