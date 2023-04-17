@@ -8,8 +8,10 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, VehicleData } from '@glass/models'
+import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
+import { updateQuoteService } from '@glass/services/apis/update-quote.service'
+import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type CustomerProps = {
@@ -17,18 +19,18 @@ export type CustomerProps = {
 }
 
 export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
-  const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
+  const [quoteInfo] = useState<Quote | undefined>(JSON.parse(sessionStorage.getItem('quoteInfo') || 'null'))
   const [, setVehicleData] = useState('')
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
-  const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
-  const firstName = quoteInfo.firstName || ''
-  const lastName = quoteInfo.lastName || ''
-  const email = quoteInfo.email || ''
-  const phone = quoteInfo.phone || ''
-  const selected = quoteInfo.selected || []
+  const [vehData, setVehData] = useState<VehicleData | undefined>()
+  const [billingAddressVal, setBillingAddress] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
+  const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
+  const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
+  const email = editMode ? quoteInfo?.customer_email || '' : ''
+  const phone = editMode ? quoteInfo?.customer_phone || '' : ''
+  const selected = editMode ? quoteInfo?.glass_location || [] : []
   const navigate = useNavigate()
 
   // keep track if request can be submitted
@@ -38,8 +40,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const phoneRef = useRef<HTMLInputElement>(null)
   const billingRef = useRef<HTMLInputElement>(null)
 
-  const [comment, setComment] = useState<string>('')
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [comment, setComment] = useState<string>(editMode ? quoteInfo?.customer_comments?.[0]?.comment || '' : '')
+  const [attachments, setAttachments] = useState<Attachment[]>(
+    editMode ? quoteInfo?.customer_comments?.[0]?.attachments || [] : [],
+  )
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -110,41 +114,53 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       const firstName = firstNameRef?.current?.value || ''
       const lastName = lastNameRef?.current?.value || ''
       const fullName = `${firstName} ${lastName}`
-      // const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
-      trackPromise(
-        createQuoteService({
-          customer_name: fullName,
-          customer_f_name: firstName,
-          customer_s_name: lastName,
-          customer_phone: phoneRef?.current?.value || '',
-          customer_email: emailRef?.current?.value || '',
-          customer_address: {
-            // more detailed address info
-            postcode: fullAddress?.postcode || '',
-            latitude: fullAddress?.latitude || '',
-            longitude: fullAddress?.longitude || '',
-            line_1: fullAddress?.line_1 || '',
-            line_2: fullAddress?.line_2 || '',
-            line_3: fullAddress?.line_3 || '',
-            line_4: fullAddress?.line_4 || '',
-            locality: fullAddress?.locality || '',
-            town_or_city: fullAddress?.town_or_city || '',
-            county: fullAddress?.county || '',
-            district: fullAddress?.district || '',
-            country: fullAddress?.country || '',
-          },
-          registration_number: licenseSearchVal,
-          glass_location: selectedBrokenWindows || [],
-          customer_comments: {
-            comment: comment,
-            attachments: attachments,
-          },
-        }).then((res) => {
-          if (res.success) {
-            navigate('/quote/' + res.data.fe_token)
-          }
-        }),
-      )
+
+      const postData: QuoteDto = {
+        customer_name: fullName,
+        customer_f_name: firstName,
+        customer_s_name: lastName,
+        customer_phone: phoneRef?.current?.value || '',
+        customer_email: emailRef?.current?.value || '',
+        customer_address: {
+          postcode: fullAddress?.postcode || '',
+          latitude: fullAddress?.latitude || '',
+          longitude: fullAddress?.longitude || '',
+          line_1: fullAddress?.line_1 || '',
+          line_2: fullAddress?.line_2 || '',
+          line_3: fullAddress?.line_3 || '',
+          line_4: fullAddress?.line_4 || '',
+          locality: fullAddress?.locality || '',
+          town_or_city: fullAddress?.town_or_city || '',
+          county: fullAddress?.county || '',
+          district: fullAddress?.district || '',
+          country: fullAddress?.country || '',
+        },
+        registration_number: licenseSearchVal,
+        glass_location: selectedBrokenWindows || [],
+        customer_comments: {
+          comment: comment,
+          attachments: attachments,
+        },
+      }
+
+      if (editMode) {
+        delete postData.customer_comments
+        trackPromise(
+          updateQuoteService({ fe_token: quoteInfo?.fe_token, ...postData }).then((res) => {
+            if (res.success) {
+              navigate('/quote/' + quoteInfo?.fe_token)
+            }
+          }),
+        )
+      } else {
+        trackPromise(
+          createQuoteService(postData).then((res) => {
+            if (res.success) {
+              navigate('/quote/' + res.data.fe_token)
+            }
+          }),
+        )
+      }
     }
   }
 
@@ -178,11 +194,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useEffect(() => {
     fetchVehData(licenseNum)
-    // scroll car into view on page load
-    // if (!submitClicked) {
-    //     const windowSelector = document.getElementById("scroll-focus");
-    //     windowSelector.scrollIntoView();
-    // }
 
     // Integration of PostalCode/ Address AutoComplete API
     autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
@@ -266,15 +277,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           placeholder='Details for glass or any other comment.'
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
+                          disabled={editMode}
                         ></textarea>
                       </div>
 
-                      <AddPictures onChangeFiles={handleChangeFiles} />
+                      <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
                       <form action='' className='form-car my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>
                         <br />
-                        <div className='row' key={quoteInfo}>
+                        <div className='row'>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
                               <input
@@ -316,6 +328,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Phone'
                                 defaultValue={phone}
+                                disabled={editMode}
                               />
                             </div>
                           </div>
@@ -343,7 +356,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                             onClick={handleSubmitClick}
                             id='submitBtn'
                           >
-                            Submit request
+                            {editMode ? 'Save Quote' : 'Submit request'}
                           </button>
                         </div>
                       </div>
