@@ -559,11 +559,13 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     <br />
                     {quoteDetails.delivery_address?.postcode}
                   </div>
-                  <div className='d-flex justify-content-end'>
-                    <button className='edit-btn' onClick={() => setEditBooing(true)}>
-                      EDIT
-                    </button>
-                  </div>
+                  {quoteDetails?.order_state !== OrderState.WON && (
+                    <div className='d-flex justify-content-end'>
+                      <button className='edit-btn' onClick={() => setEditBooing(true)}>
+                        EDIT
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
