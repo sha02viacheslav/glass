@@ -9,6 +9,6 @@ export const paymentStatusText = (quote: Quote | undefined) => {
     case PaymentStatus.PAID:
       return 'PAID'
     default:
-      return ''
+      return 'Not Paid'
   }
 }
