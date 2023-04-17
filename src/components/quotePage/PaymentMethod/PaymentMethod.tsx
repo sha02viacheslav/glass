@@ -1,7 +1,9 @@
+import './payment-method.css'
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
+import { trackPromise } from 'react-promise-tracker'
 import invoice from '@glass/assets/icons/invoice.png'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
@@ -15,7 +17,6 @@ import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.servi
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
-import './payment-method.css'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -86,21 +87,23 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const retrieveInvoice = () => {
     if (!qid) return
-    getInvoicePdfService(qid)
-      .then((res) => {
-        if (res.success) {
-          if (res.data.invoice_pdf_url !== '') {
-            setInvoicePDF(res.data.invoice_pdf_url)
-            setShowInvoice(true)
-            setInvoiceMessage('')
-          } else {
-            setInvoiceMessage('Receipt can be created after booking is confirmed')
+    trackPromise(
+      getInvoicePdfService(qid)
+        .then((res) => {
+          if (res.success) {
+            if (res.data.invoice_pdf_url !== '') {
+              setInvoicePDF(res.data.invoice_pdf_url)
+              setShowInvoice(true)
+              setInvoiceMessage('')
+            } else {
+              setInvoiceMessage('Receipt can be created after booking is confirmed')
+            }
           }
-        }
-      })
-      .catch(() => {
-        setShowInvoice(false)
-      })
+        })
+        .catch(() => {
+          setShowInvoice(false)
+        }),
+    )
   }
 
   const handleInvoicePopup = (status: boolean) => {

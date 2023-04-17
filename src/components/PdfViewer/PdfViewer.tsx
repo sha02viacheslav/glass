@@ -1,10 +1,11 @@
-import React from 'react'
-import { Document, Page, pdfjs } from 'react-pdf'
-import close from '../../assets/icons/x.png'
 import './pdf-viewer.css'
+import React, { useState } from 'react'
+import { Document, Page, pdfjs } from 'react-pdf'
+import { trackPromise } from 'react-promise-tracker'
+import close from '@glass/assets/icons/x.png'
+import { Loader } from '@glass/components/Loader'
 
-const url = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
-pdfjs.GlobalWorkerOptions.workerSrc = url
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 
 export type PdfViewerProps = {
   invoicePDF: string
@@ -13,23 +14,27 @@ export type PdfViewerProps = {
 }
 
 export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen, invoiceID }) => {
+  const [loading, setLoading] = useState<boolean>(true)
+
   const downloadInvoice = () => {
-    fetch(invoicePDF)
-      .then((res) => res.blob())
-      .then((blob) => {
-        // Create blob link to download
-        const url = window.URL.createObjectURL(new Blob([blob]))
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', invoiceID + '.pdf')
-        // Append to html link element page
-        document.body.appendChild(link)
-        // Start download
-        link.click()
-        // Clean up and remove the link
-        link?.parentNode?.removeChild(link)
-      })
-      .catch(() => {})
+    trackPromise(
+      fetch(invoicePDF)
+        .then((res) => res.blob())
+        .then((blob) => {
+          // Create blob link to download
+          const url = window.URL.createObjectURL(new Blob([blob]))
+          const link = document.createElement('a')
+          link.href = url
+          link.setAttribute('download', invoiceID + '.pdf')
+          // Append to html link element page
+          document.body.appendChild(link)
+          // Start download
+          link.click()
+          // Clean up and remove the link
+          link?.parentNode?.removeChild(link)
+        })
+        .catch(() => {}),
+    )
   }
 
   return (
@@ -45,7 +50,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen, invoic
           event.preventDefault()
         }}
       >
-        <Document className='pdf-invoice' file={invoicePDF}>
+        <Document className='pdf-invoice' file={invoicePDF} onLoadSuccess={() => setLoading(false)}>
           <Page pageNumber={1} />
           <img className='PDF-close' src={close} alt='' onClick={() => isOpen(false)} />
           <div className='PDF-button-container'>
@@ -54,6 +59,8 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen, invoic
             </button>
           </div>
         </Document>
+
+        <Loader loading={loading} />
       </div>
     </div>
   )
