@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import moment from 'moment'
+import { OrderState } from '@glass/enums'
 import { BookingDate, TimeRow } from '@glass/models'
 import { getCalendarService } from '@glass/services/apis/get-calendar.service'
 
@@ -35,36 +36,23 @@ export const useCreateTimetable = (timetableToClient: (value: string[][]) => voi
   }
 
   const fillTimeslots = (times: TimeRow[], bookingData: BookingDate[]) => {
-    // format bookings data into usable form
-    const bookings: string[][] = []
-    for (let i = 0; i < bookingData.length; i++) {
-      const booking = bookingData[i].booking_start_date
-      const bookingYear = booking.slice(0, 4)
-      const bookingMonth = booking.slice(5, 7)
-      const bookingDay = booking.slice(8, 10)
-      const bookingStart = booking.slice(11, 13)
-      bookings.push([bookingYear, bookingMonth, bookingDay, bookingStart])
-    }
     // find indexes of booked slots
-    for (let i = 0; i < times.length; i++) {
-      const row = times[i]
-      for (let j = 0; j < bookings.length; j++) {
-        const booking = bookings[j]
-        const bookingMonth = booking[1]
-        const bookingDay = booking[2]
-        const bookingTime = Number(booking[3])
-        if (moment(row.date).format('MMM') === bookingMonth) {
-          if (moment(row.date).format('DD') === bookingDay) {
-            // find what time the booking is and mark
-            for (let k = 0; k < 7; k++) {
-              if (k != 6 && bookingTime > 10 + k * 2) continue
-              if (k != 0 && bookingTime <= 10 + (k - 1) * 2) continue
-              row.schedules[k] += 1
-            }
+    times.forEach((row) => {
+      bookingData.forEach((booking) => {
+        const bookingTime = Number(moment(booking.booking_start_date).format('HH'))
+        if (moment(row.date).format('YYYY-MM-DD') === moment(booking.booking_start_date).format('YYYY-MM-DD')) {
+          // find what time the booking is and mark
+          for (let k = 0; k < 7; k++) {
+            if (k != 6 && bookingTime > 10 + k * 2) continue
+            if (k != 0 && bookingTime <= 10 + (k - 1) * 2) continue
+            // - if status = won -> it's Fully booked
+            // - if status = open/confirm -> it's Half booked
+            row.schedules[k] = Math.max(booking.order_state === OrderState.WON ? 2 : 1, row.schedules[k])
           }
         }
-      }
-    }
+      })
+    })
+
     // set timeslot status based on number of slots filled: 0 -> empty, 1-2 -> half, 3+ -> full
     const newTimeTable: string[][] = []
     for (let i = 0; i < times.length; i++) {
@@ -72,11 +60,11 @@ export const useCreateTimetable = (timetableToClient: (value: string[][]) => voi
       const data: string[] = [moment(row.date).format('MMM'), moment(row.date).format('DD')]
       for (let j = 0; j < row.schedules.length; j++) {
         const element = row.schedules[j]
-        if (element === 0 || element === 1) {
+        if (element === 0) {
           data.push('Empty')
-        } else if (element == 2) {
+        } else if (element == 1) {
           data.push('Half')
-        } else if (element >= 3) {
+        } else if (element >= 2) {
           data.push('Full')
         }
       }
