@@ -1,10 +1,12 @@
 import { OrderState, PaymentMethodType } from '@glass/enums'
 import { Address } from './address.model'
+import { Comment } from './comment.model'
 import { Invoice } from './invoice.model'
 import { Offer } from './offer.model'
 import { OptionalOrderLine } from './optional-order-line.model'
 
 export type Quote = {
+  fe_token?: string
   customer_id: number
   registration_number: string
   customer_f_name: string
@@ -26,4 +28,5 @@ export type Quote = {
   payment_method_type: PaymentMethodType
   make: string
   model: string
+  customer_comments: Comment[]
 }

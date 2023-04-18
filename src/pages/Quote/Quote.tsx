@@ -234,16 +234,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }
 
   const backToCustomer = () => {
-    const licenseReg = quoteDetails?.registration_number
-    const quoteData = JSON.stringify({
-      address: formatAddress(quoteDetails?.delivery_address),
-      firstName: quoteDetails?.customer_f_name,
-      lastName: quoteDetails?.customer_s_name,
-      email: quoteDetails?.customer_email,
-      phone: quoteDetails?.customer_phone,
-      selected: quoteDetails?.glass_location,
-    })
-    sessionStorage.setItem('quoteInfo', quoteData)
+    const licenseReg = quoteDetails?.registration_number.replace(' ', '')
+    sessionStorage.setItem('quoteInfo', JSON.stringify({ fe_token: id, ...quoteDetails }))
     navigate('/customer/edit/' + licenseReg)
   }
 

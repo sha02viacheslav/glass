@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
@@ -96,10 +97,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       return windows.slice()
     })
   }
-
-  useEffect(() => {
-    if (brokenWindowsToCustomer) brokenWindowsToCustomer(selectedWindows)
-  }, [selectedWindows])
 
   const handlePopup = (answer: boolean) => {
     setTinted(answer)
@@ -227,10 +224,20 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   useEffect(() => {
-    if (!!carType) {
-      setBrokenWindows(WINDOWS[carType])
+    if (brokenWindowsToCustomer) brokenWindowsToCustomer(selectedWindows)
+  }, [selectedWindows, brokenWindows])
+
+  useEffect(() => {
+    if (carType) {
+      const tempWindows = cloneDeep(WINDOWS[carType])
+      tempWindows.map((item) => {
+        if (selectedWindows.findIndex((x) => x.replace(' privacy', '') === item.name) > -1) {
+          item.broken = true
+        }
+      })
+      setBrokenWindows(tempWindows)
     }
-  }, [carType])
+  }, [selectedWindows, carType])
 
   useEffect(() => {
     // preselect windows if previously selected

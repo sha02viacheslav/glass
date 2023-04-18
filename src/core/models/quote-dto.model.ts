@@ -4,6 +4,7 @@ export type CommentAttachment = {
 }
 
 export type QuoteDto = {
+  fe_token?: string
   customer_name: string
   customer_f_name: string
   customer_s_name: string
@@ -25,7 +26,7 @@ export type QuoteDto = {
   }
   registration_number: string
   glass_location: string[]
-  customer_comments: {
+  customer_comments?: {
     comment: string
     attachments: CommentAttachment[]
   }
