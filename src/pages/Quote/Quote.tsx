@@ -13,7 +13,7 @@ import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
-import { BOOKING_DATE_FORMAT, PHONE_NUMBER } from '@glass/constants'
+import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
 import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { Address, Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
@@ -50,15 +50,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const declineRef = useRef<HTMLInputElement>(null)
   const [tempLicenseNum, setTempLicense] = useState('')
   const navigate = useNavigate()
-  const [offersDetails, setOffersDetails] = useState<Offer[]>([
-    {
-      product: '',
-      discount: 0,
-      price_unit: 0,
-      price_total: 0,
-      price_subtotal: 0,
-    },
-  ])
+  const [offersDetails, setOffersDetails] = useState<Offer[]>([EMPTY_OFFER])
   const [optionalOrderLines, setOptionalOrderLines] = useState<OptionalOrderLine[]>([])
   const [PAData, setPAData] = useState<(string | undefined)[]>([])
   const [PAUrl, setPAUrl] = useState<string>('')
@@ -501,16 +493,16 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           <div id='offer' className='mt-5'>
             {!!quoteDetails && (
               <PaymentMethod
-                offerDetails={offersDetails}
-                optionalOrderLines={optionalOrderLines}
+                offerDetails={quoteDetails.is_published ? offersDetails : [EMPTY_OFFER]}
+                optionalOrderLines={quoteDetails.is_published ? optionalOrderLines : []}
                 quoteDetails={{
                   ...quoteDetails,
                   c_address: formatAddress(quoteDetails?.delivery_address, false),
                   c_postalcode: quoteDetails?.delivery_address?.postcode || '',
                 }}
                 qid={id}
-                totalPrice={totalPrice}
-                totalUnitPrice={totalUnitPrice}
+                totalPrice={quoteDetails.is_published ? totalPrice : 0}
+                totalUnitPrice={quoteDetails.is_published ? totalUnitPrice : 0}
                 payAssist={payAssistToParent}
                 refetchQuote={getQuote}
                 PADataToParent={PADataToParent}
