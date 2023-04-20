@@ -4,6 +4,7 @@ import { Comment } from './comment.model'
 import { Invoice } from './invoice.model'
 import { Offer } from './offer.model'
 import { OptionalOrderLine } from './optional-order-line.model'
+import { PaTransaction } from './pa-transaction.model'
 
 export type Quote = {
   fe_token?: string
@@ -29,4 +30,8 @@ export type Quote = {
   make: string
   model: string
   customer_comments: Comment[]
+  payment_transaction: {
+    assist_4_payment: PaTransaction[]
+    stripe: PaTransaction[]
+  }
 }
