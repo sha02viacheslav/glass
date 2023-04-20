@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { autocomplete } from 'getaddress-autocomplete'
+import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -7,25 +8,29 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, VehicleData } from '@glass/models'
+import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
+import { updateQuoteService } from '@glass/services/apis/update-quote.service'
+import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
-export const Customer: React.FC = () => {
-  const [quoteInfo] = useState(JSON.parse(sessionStorage.getItem('quoteInfo') || '[]'))
+export type CustomerProps = {
+  editMode?: boolean
+}
+
+export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
+  const [quoteInfo] = useState<Quote | undefined>(JSON.parse(sessionStorage.getItem('quoteInfo') || 'null'))
   const [, setVehicleData] = useState('')
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
-  const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [, setVehImgData] = useState([])
-  const [vehDataToCustomer, setVehDataToCustomer] = useState<CarType | undefined>(undefined)
-  const [billingAddressVal, setBillingAddress] = useState(quoteInfo.address || '')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
-  const firstName = quoteInfo.firstName || ''
-  const lastName = quoteInfo.lastName || ''
-  const email = quoteInfo.email || ''
-  const phone = quoteInfo.phone || ''
-  const selected = quoteInfo.selected || []
+  const [vehData, setVehData] = useState<VehicleData | undefined>()
+  const [billingAddressVal, setBillingAddress] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
+  const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
+  const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
+  const email = editMode ? quoteInfo?.customer_email || '' : ''
+  const phone = editMode ? quoteInfo?.customer_phone || '' : ''
+  const selected = editMode ? quoteInfo?.glass_location || [] : []
   const navigate = useNavigate()
 
   // keep track if request can be submitted
@@ -35,8 +40,10 @@ export const Customer: React.FC = () => {
   const phoneRef = useRef<HTMLInputElement>(null)
   const billingRef = useRef<HTMLInputElement>(null)
 
-  const [comment, setComment] = useState<string>('')
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [comment, setComment] = useState<string>(editMode ? quoteInfo?.customer_comments?.[0]?.comment || '' : '')
+  const [attachments, setAttachments] = useState<Attachment[]>(
+    editMode ? quoteInfo?.customer_comments?.[0]?.attachments || [] : [],
+  )
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -76,7 +83,6 @@ export const Customer: React.FC = () => {
   }
 
   const retrieveVehData = (data: CarType) => {
-    setVehDataToCustomer(data)
     setSelectedCarType(data)
   }
 
@@ -105,17 +111,17 @@ export const Customer: React.FC = () => {
     } else {
       // post data
       setSubmitClicked(true)
-      const name = (firstNameRef?.current?.value || '').concat(' ', lastNameRef?.current?.value || '')
-      const formattedAddress = fullAddress?.formatted_address.filter(Boolean).join(', ') + ' ' + fullAddress?.postcode
-      createQuoteService({
-        customer_name: name,
-        customer_f_name: firstNameRef?.current?.value || '',
-        customer_s_name: lastNameRef?.current?.value || '',
+      const firstName = firstNameRef?.current?.value || ''
+      const lastName = lastNameRef?.current?.value || ''
+      const fullName = `${firstName} ${lastName}`
+
+      const postData: QuoteDto = {
+        customer_name: fullName,
+        customer_f_name: firstName,
+        customer_s_name: lastName,
         customer_phone: phoneRef?.current?.value || '',
         customer_email: emailRef?.current?.value || '',
-        customer_order_postal_code: formattedAddress,
         customer_address: {
-          // more detailed address info
           postcode: fullAddress?.postcode || '',
           latitude: fullAddress?.latitude || '',
           longitude: fullAddress?.longitude || '',
@@ -130,60 +136,55 @@ export const Customer: React.FC = () => {
           country: fullAddress?.country || '',
         },
         registration_number: licenseSearchVal,
-        registration_year: vehData?.YearMonthFirstRegistered || '',
-        make: vehData?.Make || '',
-        model: vehData?.Model || '',
-        body_type: vehDataToCustomer || '',
-        model_year: vehData?.YearOfManufacture || '',
         glass_location: selectedBrokenWindows || [],
         customer_comments: {
           comment: comment,
           attachments: attachments,
         },
-      }).then((res) => {
-        if (res.success) {
-          navigate('/quote/' + res.data.fe_token)
-        }
-      })
+      }
+
+      if (editMode) {
+        delete postData.customer_comments
+        trackPromise(
+          updateQuoteService({ fe_token: quoteInfo?.fe_token, ...postData }).then((res) => {
+            if (res.success) {
+              navigate('/quote/' + quoteInfo?.fe_token)
+            }
+          }),
+        )
+      } else {
+        trackPromise(
+          createQuoteService(postData).then((res) => {
+            if (res.success) {
+              navigate('/quote/' + res.data.fe_token)
+            }
+          }),
+        )
+      }
     }
   }
 
   const fetchVehData = (license: string | undefined) => {
     if (license !== undefined) {
       // fetch vehicle data
-      fetch(process.env.REACT_APP_VEH_DATA + license)
-        .then((res) => res.json())
-        .then((data) => {
-          if (
-            data.Response.StatusCode === 'KeyInvalid' ||
-            data.Response.StatusCode === 'ItemNotFound' ||
-            data.Response.StatusCode === 'SandboxLimitation'
-          ) {
-            return
-          } else {
-            setVehData(data.Response.DataItems)
-          }
-        })
-        .catch(() => {
-          setVehicleData('No Data Found! Error in API.')
-        })
-      // fetch vehicle image data
-      fetch(process.env.REACT_APP_VEH_IMG_DATA + license)
-        .then((res) => res.json())
-        .then((data) => {
-          if (
-            data.Response.StatusCode === 'KeyInvalid' ||
-            data.Response.StatusCode === 'ItemNotFound' ||
-            data.Response.StatusCode === 'SandboxLimitation'
-          ) {
-            return
-          } else {
-            setVehImgData(data.Response.DataItems)
-          }
-        })
-        .catch(() => {
-          setVehicleData('No Data Found! Error in API.')
-        })
+      trackPromise(
+        fetch(process.env.REACT_APP_VEH_DATA + license)
+          .then((res) => res.json())
+          .then((data) => {
+            if (
+              data.Response.StatusCode === 'KeyInvalid' ||
+              data.Response.StatusCode === 'ItemNotFound' ||
+              data.Response.StatusCode === 'SandboxLimitation'
+            ) {
+              return
+            } else {
+              setVehData(data.Response.DataItems)
+            }
+          })
+          .catch(() => {
+            setVehicleData('No Data Found! Error in API.')
+          }),
+      )
     }
   }
 
@@ -193,16 +194,6 @@ export const Customer: React.FC = () => {
 
   useEffect(() => {
     fetchVehData(licenseNum)
-    // scroll car into view on page load
-    // if (!submitClicked) {
-    //     const windowSelector = document.getElementById("scroll-focus");
-    //     windowSelector.scrollIntoView();
-    // }
-    // necessary in case returning from quote page navbar would not load unless the page is refreshed
-    const navbarMain = document.getElementById('navbar-main')
-    const footerMain = document.getElementById('footer-main')
-    if (navbarMain) navbarMain.style.display = 'inline'
-    if (footerMain) footerMain.style.display = 'inline'
 
     // Integration of PostalCode/ Address AutoComplete API
     autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
@@ -286,15 +277,16 @@ export const Customer: React.FC = () => {
                           placeholder='Details for glass or any other comment.'
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
+                          disabled={editMode}
                         ></textarea>
                       </div>
 
-                      <AddPictures onChangeFiles={handleChangeFiles} />
+                      <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
                       <form action='' className='form-car my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>
                         <br />
-                        <div className='row' key={quoteInfo}>
+                        <div className='row'>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
                               <input
@@ -336,6 +328,7 @@ export const Customer: React.FC = () => {
                                 className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Phone'
                                 defaultValue={phone}
+                                disabled={editMode}
                               />
                             </div>
                           </div>
@@ -363,32 +356,41 @@ export const Customer: React.FC = () => {
                             onClick={handleSubmitClick}
                             id='submitBtn'
                           >
-                            Submit request
+                            {editMode ? 'Save Quote' : 'Submit request'}
                           </button>
                         </div>
                       </div>
                     </div>
                   </div>
                 )}
-                <br />
-                <div className='position-relative pt-md-4'>
-                  <img src={process.env.PUBLIC_URL + '/img/hand-pic.png'} className='img-fluid w-100 mob-h' alt='' />
-                  <div className='recycle-content text-start phn-content'>
-                    <div className='d-flex justify-content-between'>
-                      <div className='content-left'>
-                        <h2 className='text-white mb-2'>Mobile Service </h2>
-                        <p className='fw-light fs-14 mb-0 text-white'>We come to your home or work.</p>
-                        <p className='mb-2 text-white'>Replacement 1-2 h</p>
-                        <Link to='/react/customer' className='btn  text-purple bg-white'>
-                          Get a Quote
-                        </Link>
-                      </div>
-                      <div className='re-img mt-auto'>
-                        <img src={process.env.PUBLIC_URL + '/img/phn.png'} className='img-fluid' alt='' />
+
+                {!editMode && (
+                  <>
+                    <br />
+                    <div className='position-relative pt-md-4'>
+                      <img
+                        src={process.env.PUBLIC_URL + '/img/hand-pic.png'}
+                        className='img-fluid w-100 mob-h'
+                        alt=''
+                      />
+                      <div className='recycle-content text-start phn-content'>
+                        <div className='d-flex justify-content-between'>
+                          <div className='content-left'>
+                            <h2 className='text-white mb-2'>Mobile Service </h2>
+                            <p className='fw-light fs-14 mb-0 text-white'>We come to your home or work.</p>
+                            <p className='mb-2 text-white'>Replacement 1-2 h</p>
+                            <Link to='/react/customer' className='btn  text-purple bg-white'>
+                              Get a Quote
+                            </Link>
+                          </div>
+                          <div className='re-img mt-auto'>
+                            <img src={process.env.PUBLIC_URL + '/img/phn.png'} className='img-fluid' alt='' />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

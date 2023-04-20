@@ -84,6 +84,12 @@ code {
   cursor: not-allowed;
 }
 
+.btn-raised:disabled,
+.btn-stroked:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
 .quote-card {
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.8);
   border-radius: 15px;

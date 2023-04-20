@@ -1,3 +1,13 @@
+#navbar_top {
+  min-height: 64px;
+}
+
+@media (min-width: 768px) {
+  #navbar_top {
+    min-height: 111px;
+  }
+}
+
 .logo-img {
   width: 200px;
 }

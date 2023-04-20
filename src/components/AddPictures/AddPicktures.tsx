@@ -4,6 +4,8 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import { Attachment } from '@glass/models'
 
 type AddPicturesProps = {
+  disabled: boolean
+  attachments: Attachment[]
   limit?: number
   onChangeFiles: (files: Attachment[]) => void
 }
@@ -13,9 +15,9 @@ type ValidateFileResponse = {
   message?: string
 }
 
-export const AddPictures: React.FC<AddPicturesProps> = ({ limit, onChangeFiles }) => {
+export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments, limit, onChangeFiles }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [validFiles, setValidFiles] = useState<Attachment[]>([])
+  const [validFiles, setValidFiles] = useState<Attachment[]>(attachments || [])
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const btnOnClick = (e: MouseEvent<HTMLElement>) => {
@@ -101,9 +103,11 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ limit, onChangeFiles }
             <div>
               <img src={file.datas} alt='Broken Image' />
               <div className='title'>{file.name}</div>
-              <button className='btn-icon' onClick={() => deleteFile(idx)}>
-                <DeleteForeverOutlinedIcon />
-              </button>
+              {!disabled && (
+                <button className='btn-icon' onClick={() => deleteFile(idx)}>
+                  <DeleteForeverOutlinedIcon />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -114,8 +118,8 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ limit, onChangeFiles }
   return (
     <div>
       {renderFiles()}
-      <button className='btn-raised' onClick={btnOnClick}>
-        <label style={{ cursor: 'pointer' }}>
+      <button className='btn-raised' onClick={btnOnClick} disabled={disabled}>
+        <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
           <input
             ref={inputRef}
             type='file'
@@ -124,6 +128,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ limit, onChangeFiles }
             multiple
             accept='image/png, image/jpeg, image/gif, image/bmp'
             onClick={(event) => event.stopPropagation()}
+            disabled={disabled}
           />
           Add Pictures
         </label>

@@ -1,5 +1,8 @@
+import { AddressType } from '@glass/enums'
+
 export type Address = {
   address_id: number
+  address_type: AddressType
   line_1: string
   line_2: string
   line_3: string

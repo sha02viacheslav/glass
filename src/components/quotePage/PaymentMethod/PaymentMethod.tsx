@@ -1,21 +1,22 @@
+import './payment-method.css'
 import React, { useEffect, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
+import { trackPromise } from 'react-promise-tracker'
 import invoice from '@glass/assets/icons/invoice.png'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { PdfViewer } from '@glass/components/PdfViewer'
 import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
-import { PaymentMethodType, PaymentOptionEnum, PaymentStatus } from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address, MonthlyPayment, Offer, OptionalOrderLine, PaymentOptionDto, Quote } from '@glass/models'
-import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
+// import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
-import './payment-method.css'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -86,21 +87,23 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const retrieveInvoice = () => {
     if (!qid) return
-    getInvoicePdfService(qid)
-      .then((res) => {
-        if (res.success) {
-          if (res.data.invoice_pdf_url !== '') {
-            setInvoicePDF(res.data.invoice_pdf_url)
-            setShowInvoice(true)
-            setInvoiceMessage('')
-          } else {
-            setInvoiceMessage('Receipt can be created after booking is confirmed')
+    trackPromise(
+      getInvoicePdfService(qid)
+        .then((res) => {
+          if (res.success) {
+            if (res.data.invoice_pdf_url !== '') {
+              setInvoicePDF(res.data.invoice_pdf_url)
+              setShowInvoice(true)
+              setInvoiceMessage('')
+            } else {
+              setInvoiceMessage('Receipt can be created after booking is confirmed')
+            }
           }
-        }
-      })
-      .catch(() => {
-        setShowInvoice(false)
-      })
+        })
+        .catch(() => {
+          setShowInvoice(false)
+        }),
+    )
   }
 
   const handleInvoicePopup = (status: boolean) => {
@@ -149,25 +152,39 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }
 
   useEffect(() => {
+    setPaymentStatus(quoteDetails?.invoice_data?.payment_state || PaymentStatus.NOT_PAID)
+  }, [quoteDetails?.invoice_data?.payment_state])
+
+  useEffect(() => {
     if (quoteDetails?.payment_method_type) {
       setPaymentMethodType(quoteDetails.payment_method_type)
+      switch (quoteDetails.payment_method_type) {
+        case PaymentMethodType.ASSIST_FOUR_PAYMENT: {
+          setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)
+          break
+        }
+        case PaymentMethodType.STRIPE:
+        case PaymentMethodType.CASH: {
+          setSelectedMethod(PaymentOptionEnum.SINGLE_PAY)
+          break
+        }
+      }
     }
-    setPaymentStatus(quoteDetails?.invoice_data?.payment_state || PaymentStatus.NOT_PAID)
-  }, [quoteDetails])
+  }, [quoteDetails?.payment_method_type])
 
   useEffect(() => {
     if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
-      if (quoteDetails?.invoice_data?.invoice_number) {
-        retrievePlan()
-      } else {
-        confirmInvoiceService(qid).then((res) => {
-          if (res.success) {
-            setPAProceed(true)
-            retrievePlan()
-            if (refetchQuote) refetchQuote()
-          }
-        })
-      }
+      // if (quoteDetails?.invoice_data?.invoice_number) {
+      //   retrievePlan()
+      // } else {
+      //   confirmInvoiceService(qid).then((res) => {
+      //     if (res.success) {
+      setPAProceed(true)
+      retrievePlan()
+      if (refetchQuote) refetchQuote()
+      //   }
+      // })
+      // }
     }
   }, [selectedMethod])
 
@@ -188,14 +205,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     })
     setAddress(userBillingAddress)
     // update selected payment method in quote page (parent)
-    let msg = ''
+    let msg = QuoteAction.NONE
     if (startPAProcess && PAUrl === '') {
       // if user is in check eligibility phase
-      msg = 'Check Eligibility'
+      msg = QuoteAction.CHECK_ELIGIBILITY
     } else if (startPAProcess && PAUrl !== '') {
-      msg = 'Continue Payment Assist'
+      msg = QuoteAction.CONTINUE_PA
     } else if (!startPAProcess) {
-      msg = 'Select payment method'
+      msg = QuoteAction.GO_PAYMENT
     }
     if (method) method({ p_option: selectedMethod, detail: msg })
   }, [selectedMethod, startPAProcess, PAUrl])
@@ -216,7 +233,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
         <div className='PM-invoice-status'>{invoiceMessage}</div>
         <div className='PM-status'>
-          Status: <span className={paymentStatus}>{paymentStatusText(paymentStatus)}</span>
+          Status: <span className={paymentStatus}>{paymentStatusText(quoteDetails)}</span>
         </div>
         {/* show quotation price details */}
         <SelectOfferNew
@@ -260,12 +277,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 <p className='text-purple mb-2'>4-Month</p>
                 {!!monthlyPayments && (
                   <div>
-                    <p>{monthlyPayments.summary}</p>
+                    <p>
+                      {quoteDetails?.is_published
+                        ? monthlyPayments.summary
+                        : 'This instalment plan comprises of 4 monthly payments, with the first taken immediately on setup.'}
+                    </p>
                     <div className='PA-plan-container'>
                       {monthlyPayments.schedule.map((element) => (
                         <div className='PA-plan-element' key={element.date}>
-                          <div className='PA-plan-date'>{moment(element.date).format('MMM dd YYYY')}</div>
-                          <div className='PA-plan-price'>£ {(element.amount / 100).toFixed(2)}</div>
+                          <div className='PA-plan-date'>{moment(element.date).format('DD MMM YYYY')}</div>
+                          <div className='PA-plan-price'>
+                            £ {((quoteDetails?.is_published ? element.amount : 0) / 100).toFixed(2)}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -329,7 +352,11 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </>
                   )}
                   {!startPAProcess && (
-                    <button className='btn-stroked' onClick={() => setStartPAProcess(true)}>
+                    <button
+                      className='btn-stroked'
+                      onClick={() => setStartPAProcess(true)}
+                      disabled={!quoteDetails?.is_published}
+                    >
                       Pay with Payment Assist
                     </button>
                   )}

@@ -3,7 +3,11 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
 
-export const Header: React.FC = () => {
+export type HeaderProps = {
+  showMenu: boolean
+}
+
+export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const handleToggleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.currentTarget.classList.toggle('toggle-active')
   }
@@ -24,27 +28,31 @@ export const Header: React.FC = () => {
                   />
                 </Link>
               </div>
-              <div className='col-5 text-end ms-auto'>
-                <Link to='/customer' className='btn btn-purple ms-auto'>
-                  Get a Quote
-                </Link>
-              </div>
-              <div className='col-2 text-end'>
-                <div
-                  id='toggle'
-                  onClick={handleToggleClick}
-                  className='toggle-button ms-auto'
-                  data-bs-toggle='collapse'
-                  data-bs-target='#navbarSupportedContent'
-                  aria-controls='navbarSupportedContent'
-                  aria-expanded='false'
-                  aria-label='Toggle navigation'
-                >
-                  <span className='bar top'></span>
-                  <span className='bar middle'></span>
-                  <span className='bar bottom'></span>
-                </div>
-              </div>
+              {showMenu && (
+                <>
+                  <div className='col-5 text-end ms-auto'>
+                    <Link to='/customer' className='btn btn-purple ms-auto'>
+                      Get a Quote
+                    </Link>
+                  </div>
+                  <div className='col-2 text-end'>
+                    <div
+                      id='toggle'
+                      onClick={handleToggleClick}
+                      className='toggle-button ms-auto'
+                      data-bs-toggle='collapse'
+                      data-bs-target='#navbarSupportedContent'
+                      aria-controls='navbarSupportedContent'
+                      aria-expanded='false'
+                      aria-label='Toggle navigation'
+                    >
+                      <span className='bar top'></span>
+                      <span className='bar middle'></span>
+                      <span className='bar bottom'></span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -52,15 +60,17 @@ export const Header: React.FC = () => {
             <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid' alt='' />
           </Link>
 
-          <div className='collapse navbar-collapse' id='navbarSupportedContent'>
-            <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav'>
-              <CustomLink to='/services'>Services</CustomLink>
-              <CustomLink to='/contact'>Contact us</CustomLink>
-            </ul>
-            <Link to='/customer' className='btn-raised ms-auto d-none d-md-flex'>
-              Get a Quote
-            </Link>
-          </div>
+          {showMenu && (
+            <div className='collapse navbar-collapse' id='navbarSupportedContent'>
+              <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav'>
+                <CustomLink to='/services'>Services</CustomLink>
+                <CustomLink to='/contact'>Contact us</CustomLink>
+              </ul>
+              <Link to='/customer' className='btn-raised ms-auto d-none d-md-flex'>
+                Get a Quote
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
     </header>
