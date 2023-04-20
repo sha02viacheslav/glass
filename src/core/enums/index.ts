@@ -1,3 +1,4 @@
+export * from './address-type.enum'
 export * from './car-type.enum'
 export * from './order-state.enum'
 export * from './payment-method-type.enum'
