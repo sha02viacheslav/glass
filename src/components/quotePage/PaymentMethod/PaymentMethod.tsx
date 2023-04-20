@@ -294,6 +294,25 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </div>
                   </div>
                 )}
+
+                {!!quoteDetails?.payment_transaction?.assist_4_payment?.length && (
+                  <div className='pt-4 pb-4'>
+                    {quoteDetails?.payment_transaction?.assist_4_payment?.map((transaction) => (
+                      <div key={transaction.id} className='d-flex justify-content-between align-items-center mt-2'>
+                        <a
+                          className='transaction-name'
+                          href={transaction.url}
+                          rel='noopener noreferrer'
+                          target='_blank'
+                        >
+                          {transaction.token}
+                        </a>
+                        <span className={`transaction-state-${transaction.state}`}>{transaction.state}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className='PA-status-failed'>{PAErrorMsg}</div>
                 {startPAProcess && (
                   <div className='PM-insurance-container'>
