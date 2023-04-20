@@ -277,12 +277,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 <p className='text-purple mb-2'>4-Month</p>
                 {!!monthlyPayments && (
                   <div>
-                    <p>{monthlyPayments.summary}</p>
+                    <p>
+                      {quoteDetails?.is_published
+                        ? monthlyPayments.summary
+                        : 'This instalment plan comprises of 4 monthly payments, with the first taken immediately on setup.'}
+                    </p>
                     <div className='PA-plan-container'>
                       {monthlyPayments.schedule.map((element) => (
                         <div className='PA-plan-element' key={element.date}>
-                          <div className='PA-plan-date'>{moment(element.date).format('MMM dd YYYY')}</div>
-                          <div className='PA-plan-price'>£ {(element.amount / 100).toFixed(2)}</div>
+                          <div className='PA-plan-date'>{moment(element.date).format('DD MMM YYYY')}</div>
+                          <div className='PA-plan-price'>
+                            £ {((quoteDetails?.is_published ? element.amount : 0) / 100).toFixed(2)}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -346,7 +352,11 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                     </>
                   )}
                   {!startPAProcess && (
-                    <button className='btn-stroked' onClick={() => setStartPAProcess(true)}>
+                    <button
+                      className='btn-stroked'
+                      onClick={() => setStartPAProcess(true)}
+                      disabled={!quoteDetails?.is_published}
+                    >
                       Pay with Payment Assist
                     </button>
                   )}
