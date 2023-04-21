@@ -174,17 +174,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   useEffect(() => {
     if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
-      // if (quoteDetails?.invoice_data?.invoice_number) {
-      //   retrievePlan()
-      // } else {
-      //   confirmInvoiceService(qid).then((res) => {
-      //     if (res.success) {
       setPAProceed(true)
       retrievePlan()
       if (refetchQuote) refetchQuote()
-      //   }
-      // })
-      // }
     }
   }, [selectedMethod])
 
@@ -219,13 +211,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   return (
     <div className='center'>
-      {showInvoice && !!quoteDetails?.invoice_data?.invoice_number && (
-        <PdfViewer
-          invoicePDF={invoicePDF}
-          isOpen={handleInvoicePopup}
-          invoiceID={quoteDetails.invoice_data.invoice_number}
-        />
-      )}
+      {showInvoice && !!invoicePDF && <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} />}
       <div className='quote-card'>
         <Tooltip disableFocusListener title='Receipt'>
           <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt='' />
