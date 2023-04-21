@@ -19,6 +19,7 @@ export type Quote = {
   delivery_address: Address
   booking_start_date: string
   booking_end_date: string
+  date_order: string
   c_address: string
   c_postalcode: string
   order_lines?: Offer[]
