@@ -1,5 +1,5 @@
 import './payment-method.css'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
@@ -11,8 +11,15 @@ import { Checkout } from '@glass/components/quotePage/Checkout'
 import { SelectOfferNew } from '@glass/components/quotePage/SelectOfferNew'
 import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import { Address, MonthlyPayment, Offer, OptionalOrderLine, PaymentOptionDto, Quote } from '@glass/models'
-// import { confirmInvoiceService } from '@glass/services/apis/confirm-invoice.service'
+import {
+  Address,
+  MonthlyPayment,
+  Offer,
+  OptionalOrderLine,
+  PaymentOptionDto,
+  PaymentSchedule,
+  Quote,
+} from '@glass/models'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
@@ -63,11 +70,28 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const PAf_nameRef = useRef<HTMLInputElement>(null)
   const PAs_nameRef = useRef<HTMLInputElement>(null)
   const PAEmailRef = useRef<HTMLInputElement>(null)
-  const [PAProceed, setPAProceed] = useState(false)
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
   const [warningMsg, setWarningMsg] = useState<string>('')
+
+  const emptyMonthlyPayments = useMemo<MonthlyPayment | undefined>(() => {
+    if (quoteDetails?.date_order) {
+      const schedules: PaymentSchedule[] = []
+      for (let i = 0; i < 4; i++) {
+        schedules.push({ date: moment(quoteDetails?.date_order).add(i, 'months').format('YYYY-MM-DD'), amount: 0 })
+      }
+      return {
+        amount: 0,
+        interest: 0,
+        plan: '',
+        repayable: 0,
+        summary: 'This instalment plan comprises of 4 monthly payments, with the first taken immediately on setup.',
+        schedule: schedules,
+      }
+    }
+    return undefined
+  }, [quoteDetails?.date_order])
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -129,12 +153,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         if (res.success) {
           if (refetchQuote) refetchQuote()
         }
+        if (refetchQuote) refetchQuote()
       })
     }
   }
 
   const retrievePlan = () => {
-    if (selectedMethod === PaymentOptionEnum.FOUR_MONTH && qid) {
+    if (
+      qid &&
+      paymentStatus !== PaymentStatus.PAID &&
+      selectedMethod === PaymentOptionEnum.FOUR_MONTH &&
+      !monthlyPayments
+    ) {
       // retrieve payment assist plan data
       getPaymentAssistPlanService(qid).then((res) => {
         if (res.success) {
@@ -173,12 +203,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   }, [quoteDetails?.payment_method_type])
 
   useEffect(() => {
-    if (qid && paymentStatus !== PaymentStatus.PAID && selectedMethod !== PaymentOptionEnum.NONE && !PAProceed) {
-      setPAProceed(true)
-      retrievePlan()
-      if (refetchQuote) refetchQuote()
-    }
-  }, [selectedMethod])
+    retrievePlan()
+  }, [selectedMethod, quoteDetails])
 
   useEffect(() => {
     // Integration of PostalCode/ Address AutoComplete API
@@ -261,25 +287,19 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             {selectedMethod === PaymentOptionEnum.FOUR_MONTH && (
               <div>
                 <p className='text-purple mb-2'>4-Month</p>
-                {!!monthlyPayments && (
-                  <div>
-                    <p>
-                      {quoteDetails?.is_published
-                        ? monthlyPayments.summary
-                        : 'This instalment plan comprises of 4 monthly payments, with the first taken immediately on setup.'}
-                    </p>
-                    <div className='PA-plan-container'>
-                      {monthlyPayments.schedule.map((element) => (
-                        <div className='PA-plan-element' key={element.date}>
-                          <div className='PA-plan-date'>{moment(element.date).format('DD MMM YYYY')}</div>
-                          <div className='PA-plan-price'>
-                            £ {((quoteDetails?.is_published ? element.amount : 0) / 100).toFixed(2)}
-                          </div>
+                <div>
+                  <p>{(monthlyPayments || emptyMonthlyPayments)?.summary}</p>
+                  <div className='PA-plan-container'>
+                    {(monthlyPayments || emptyMonthlyPayments)?.schedule.map((element) => (
+                      <div className='PA-plan-element' key={element.date}>
+                        <div className='PA-plan-date'>{moment(element.date).format('DD MMM YYYY')}</div>
+                        <div className='PA-plan-price'>
+                          £ {((quoteDetails?.is_published ? element.amount : 0) / 100).toFixed(2)}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
 
                 {!!quoteDetails?.payment_transaction?.assist_4_payment?.length && (
                   <div className='pt-4 pb-4'>
