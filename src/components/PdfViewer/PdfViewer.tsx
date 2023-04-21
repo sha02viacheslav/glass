@@ -1,5 +1,5 @@
 import './pdf-viewer.css'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { trackPromise } from 'react-promise-tracker'
 import close from '@glass/assets/icons/x.png'
@@ -10,11 +10,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs
 export type PdfViewerProps = {
   invoicePDF: string
   isOpen: (value: boolean) => void
-  invoiceID: string
 }
 
-export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen, invoiceID }) => {
+export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen }) => {
   const [loading, setLoading] = useState<boolean>(true)
+  const invoiceID = useMemo(() => {
+    return invoicePDF.split('?')?.[0]?.split('/')?.at(-1) || ''
+  }, [invoicePDF])
 
   const downloadInvoice = () => {
     trackPromise(

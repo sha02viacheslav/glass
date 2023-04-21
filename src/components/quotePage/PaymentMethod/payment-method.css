@@ -273,7 +273,7 @@
 .PA-plan-container {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   width: 100%;
   margin-bottom: 15px;
 }
@@ -313,4 +313,27 @@
 
 .PA-status-failed {
   color: red;
+}
+
+.transaction-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.transaction-state-pending,
+.transaction-state-success {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+.transaction-state-pending {
+  background: #f19634;
+}
+
+.transaction-state-success {
+  background: #649a2b;
 }
