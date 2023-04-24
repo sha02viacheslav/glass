@@ -18,7 +18,9 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
   deliveryAddressToParent,
 }) => {
   const [address, setAddress] = useState<string>(formatAddress(deliveryAddressToChild))
-  const [addressInput, setAddressInput] = useState<boolean>(false)
+  const [addressInput, setAddressInput] = useState<boolean>(
+    formatAddress(userBillingAddress) !== formatAddress(deliveryAddressToChild),
+  )
 
   const handleAddressCheck = () => {
     if (addressInput) {
@@ -71,8 +73,6 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
     if (mainContainer != null && inputField) {
       inputField.style.width = (mainContainer.offsetWidth - 60).toString().concat('px')
     }
-
-    newDeliveryAddress(userBillingAddress)
   }, [])
 
   return (
@@ -85,6 +85,7 @@ export const LocationSelection: React.FC<LocationSelectionProps> = ({
         className='address-input'
         onChange={handlePCodeChange}
         value={address}
+        disabled={!addressInput}
       />
       <div className='option-container'>
         <div>
