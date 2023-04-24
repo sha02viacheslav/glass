@@ -400,7 +400,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
                   </div>
                   <div className='client-info'>
-                    <b>Billing address:</b> {formatAddress(quoteDetails?.delivery_address)}
+                    <b>Billing address:</b> {formatAddress(quoteDetails?.invoice_address)}
                   </div>
                   <div className='client-info'>
                     <b>Email:</b> {quoteDetails?.customer_email}
