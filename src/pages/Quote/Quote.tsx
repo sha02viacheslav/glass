@@ -554,7 +554,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     bookingStartDate={quoteDetails?.booking_start_date}
                   />
                   <LocationSelection
-                    userBillingAddress={quoteDetails.delivery_address}
+                    userBillingAddress={quoteDetails.invoice_address}
                     deliveryAddressToChild={quoteDetails.delivery_address}
                     deliveryAddressToParent={deliveryAddressToParent}
                   />
