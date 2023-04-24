@@ -1,0 +1,6 @@
+.closeBtn {
+  background: black;
+  borderradius: 4px;
+  color: white;
+  cursor: pointer;
+}

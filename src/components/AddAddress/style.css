@@ -1,0 +1,15 @@
+.closeBtn {
+  background: black;
+  borderradius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.formError {
+  color: red;
+  fontsize: 12px;
+  fontweight: 600;
+  lineheight: '20px';
+  marginleft: '12px';
+  margintop: '4px';
+}
