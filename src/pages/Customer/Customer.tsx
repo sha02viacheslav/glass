@@ -1,4 +1,3 @@
-import './style.css'
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { autocomplete } from 'getaddress-autocomplete'
 import { trackPromise } from 'react-promise-tracker'
