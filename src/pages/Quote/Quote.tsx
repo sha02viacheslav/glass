@@ -150,8 +150,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           new Promise((resolve) =>
             sendBookingService(
               id,
-              moment(timeSlot.start).format(BOOKING_DATE_FORMAT),
-              moment(timeSlot.end).format(BOOKING_DATE_FORMAT),
+              moment(timeSlot.start).format('YYYY-MM-DD'),
+              `${moment(timeSlot.start).format('HH')}_${moment(timeSlot.end).format('HH')}`,
             ).then(() => {
               resolve()
             }),
@@ -194,7 +194,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       setWarningMsg('Select a time for the repair!')
       return
     }
-    if (!deliveryAddress) {
+    if (!deliveryAddress && !quoteDetails?.delivery_address) {
       setWarningMsg('Select a delivery address for the repair!')
       return
     }
@@ -205,7 +205,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     if (quoteDetails) {
       setTimeSlot({
         start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
-        end: moment(quoteDetails.booking_end_date).add(2, 'hours').format(BOOKING_DATE_FORMAT),
+        end: moment(quoteDetails.booking_end_date).format(BOOKING_DATE_FORMAT),
       })
     } else {
       setTimeSlot(undefined)
@@ -301,7 +301,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       if (quoteDetails.booking_start_date) {
         setTimeSlot({
           start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
-          end: moment(quoteDetails.booking_end_date).add(2, 'hours').format(BOOKING_DATE_FORMAT),
+          end: moment(quoteDetails.booking_end_date).format(BOOKING_DATE_FORMAT),
         })
       }
     }
