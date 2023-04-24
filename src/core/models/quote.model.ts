@@ -18,8 +18,8 @@ export type Quote = {
   glass_location: string[]
   invoice_address: Address
   delivery_address: Address
-  booking_start_date: string
-  booking_end_date: string
+  booking_date: string
+  time_slot: string
   date_order: string
   c_address: string
   c_postalcode: string
