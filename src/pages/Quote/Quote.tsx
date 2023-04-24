@@ -148,11 +148,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       if (timeSlot) {
         promises.push(
           new Promise((resolve) =>
-            sendBookingService(
-              id,
-              moment(timeSlot.start).format('YYYY-MM-DD'),
-              `${moment(timeSlot.start).format('HH')}_${moment(timeSlot.end).format('HH')}`,
-            ).then(() => {
+            sendBookingService(id, timeSlot.booking_date, timeSlot.time_slot).then(() => {
               resolve()
             }),
           ),
@@ -204,8 +200,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const handleCancelBookingChange = () => {
     if (quoteDetails) {
       setTimeSlot({
-        start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
-        end: moment(quoteDetails.booking_end_date).format(BOOKING_DATE_FORMAT),
+        booking_date: quoteDetails.booking_date,
+        time_slot: quoteDetails.time_slot,
       })
     } else {
       setTimeSlot(undefined)
@@ -294,14 +290,14 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         setOptionalOrderLines([])
       }
 
-      if (quoteDetails.order_state == OrderState.CONFIRM && quoteDetails.booking_start_date) {
+      if (quoteDetails.order_state == OrderState.CONFIRM && quoteDetails.booking_date) {
         setIsBlink(true)
       }
       setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
-      if (quoteDetails.booking_start_date) {
+      if (quoteDetails.booking_date) {
         setTimeSlot({
-          start: moment(quoteDetails.booking_start_date).format(BOOKING_DATE_FORMAT),
-          end: moment(quoteDetails.booking_end_date).format(BOOKING_DATE_FORMAT),
+          booking_date: quoteDetails.booking_date,
+          time_slot: quoteDetails.time_slot,
         })
       }
     }
@@ -311,7 +307,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     // change between accept and next buttons names and styling
     const acceptSelector = document.getElementById('accept-btn')
     if (
-      (!!timeSlot && timeSlot.start !== quoteDetails?.booking_start_date) ||
+      (!!timeSlot &&
+        (timeSlot.booking_date !== quoteDetails?.booking_date || timeSlot.time_slot !== quoteDetails?.time_slot)) ||
       (!!deliveryAddress && formatAddress(deliveryAddress) !== formatAddress(quoteDetails?.delivery_address))
     ) {
       setAcceptBtn(QuoteAction.CONFIRM_BOOKING)
@@ -328,7 +325,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         }
       } else {
         if (
-          quoteDetails?.booking_start_date !== timeSlot?.start ||
+          timeSlot?.booking_date !== quoteDetails?.booking_date ||
+          timeSlot?.time_slot !== quoteDetails?.time_slot ||
           formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)
         ) {
           setAcceptBtn(QuoteAction.CONFIRM_BOOKING)
@@ -519,14 +517,24 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
           {!!quoteDetails && (
             <div className='quote-card'>
-              {!!quoteDetails?.booking_start_date && !editBooking ? (
+              {!!quoteDetails?.booking_date && !editBooking ? (
                 <div className='booking-info p-4'>
                   <h1 className='mb-4'>You are booked in!</h1>
                   <div className='booking-address mb-4'>
-                    <div>{moment(quoteDetails?.booking_start_date).format('dddd, DD MMMM')}</div>
                     <div>
-                      Arrival window between {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
-                      {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
+                      {moment(quoteDetails?.booking_date)
+                        .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                        .format('dddd, DD MMMM')}
+                    </div>
+                    <div>
+                      Arrival window between{' '}
+                      {moment(quoteDetails?.booking_date)
+                        .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                        .format('HH')}{' '}
+                      -{' '}
+                      {moment(quoteDetails?.booking_date)
+                        .add(quoteDetails.time_slot.split('_')?.[1], 'hours')
+                        .format('HH')}
                     </div>
                   </div>
 
@@ -551,7 +559,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   <TimeSelection
                     timeSlotToParent={timeSlotToParent}
                     liveBooking={false}
-                    bookingStartDate={quoteDetails?.booking_start_date}
+                    bookingStartDate={moment(quoteDetails?.booking_date)
+                      .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                      .format(BOOKING_DATE_FORMAT)}
                   />
                   <LocationSelection
                     userBillingAddress={quoteDetails.invoice_address}
@@ -559,7 +569,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     deliveryAddressToParent={deliveryAddressToParent}
                   />
                   {(editBooking ||
-                    (!!timeSlot && timeSlot.start !== quoteDetails.booking_start_date) ||
+                    (!!timeSlot &&
+                      timeSlot.booking_date !== quoteDetails.booking_date &&
+                      timeSlot.time_slot !== quoteDetails.time_slot) ||
                     formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)) && (
                     <div className='d-flex justify-content-center gap-4 mb-4'>
                       <button className='btn-stroked' onClick={() => handleCancelBookingChange()}>
@@ -630,8 +642,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             <span className='text-left d-block'>
               Are you certain you want to make a booking for{' '}
               <strong>
-                {moment(timeSlot?.start).format('dddd, MMMM Do')}, between {moment(timeSlot?.start).format('hh:mm A')}{' '}
-                and {moment(timeSlot?.end).format('hh:mm A')}
+                {moment(timeSlot?.booking_date).format('dddd, MMMM Do')}, between{' '}
+                {moment(timeSlot?.booking_date).add(timeSlot?.time_slot.split('_')?.[0], 'hours').format('hh:mm A')} and{' '}
+                {moment(timeSlot?.booking_date).add(timeSlot?.time_slot.split('_')?.[1], 'hours').format('hh:mm A')}
               </strong>
               ?
             </span>
@@ -650,9 +663,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           showIcon={false}
           description={
             <span className='text-left d-block'>
-              Arriving {moment(quoteDetails?.booking_start_date).format('dddd, DD MMMM')} between{' '}
-              {moment(quoteDetails?.booking_start_date).format('HH')} -{' '}
-              {moment(quoteDetails?.booking_start_date).add(2, 'hours').format('HH')}
+              Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM')} between{' '}
+              {timeSlot?.time_slot.split('_')?.[0]} - {timeSlot?.time_slot.split('_')?.[1]}
               <br />
               {quoteDetails?.delivery_address?.line_1}, {quoteDetails?.delivery_address?.town_or_city},{' '}
               {quoteDetails?.delivery_address?.postcode}

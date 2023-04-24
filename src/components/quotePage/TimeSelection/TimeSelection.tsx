@@ -108,7 +108,10 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     if (!liveBooking) {
       // send data to parent page to enable next btn
       if (timeSlotToParent) {
-        timeSlotToParent({ start: startDate, end: moment(startDate).add(2, 'hours').format(BOOKING_DATE_FORMAT) })
+        timeSlotToParent({
+          booking_date: moment(startDate).format('YYYY-MM-DD'),
+          time_slot: `${moment(startDate).format('HH')}_${moment(startDate).add(2, 'hours').format('HH')}`,
+        })
       }
     }
   }
