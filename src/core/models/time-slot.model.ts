@@ -1,4 +1,4 @@
 export type TimeSlot = {
-  start: string
-  end: string
+  booking_date: string
+  time_slot: string
 }
