@@ -3,9 +3,10 @@ import { autocomplete } from 'getaddress-autocomplete'
 import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
+import { ChangeAddress } from '@glass/components/ChangeAddress'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { CarType } from '@glass/enums'
+import { AddressType, CarType } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
@@ -23,9 +24,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [, setVehicleData] = useState('')
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
-  const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [billingAddressVal, setBillingAddress] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
+  const [billingAddressText, setBillingAddressText] = useState(
+    editMode ? formatAddress(quoteInfo?.invoice_address) : '',
+  )
+  const [fixingAddressText, setFixingAddressText] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
   const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
   const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
   const email = editMode ? quoteInfo?.customer_email || '' : ''
@@ -122,18 +126,18 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         customer_phone: phoneRef?.current?.value || '',
         customer_email: emailRef?.current?.value || '',
         customer_address: {
-          postcode: fullAddress?.postcode || '',
-          latitude: fullAddress?.latitude || '',
-          longitude: fullAddress?.longitude || '',
-          line_1: fullAddress?.line_1 || '',
-          line_2: fullAddress?.line_2 || '',
-          line_3: fullAddress?.line_3 || '',
-          line_4: fullAddress?.line_4 || '',
-          locality: fullAddress?.locality || '',
-          town_or_city: fullAddress?.town_or_city || '',
-          county: fullAddress?.county || '',
-          district: fullAddress?.district || '',
-          country: fullAddress?.country || '',
+          postcode: billingAddress?.postcode || '',
+          latitude: billingAddress?.latitude || '',
+          longitude: billingAddress?.longitude || '',
+          line_1: billingAddress?.line_1 || '',
+          line_2: billingAddress?.line_2 || '',
+          line_3: billingAddress?.line_3 || '',
+          line_4: billingAddress?.line_4 || '',
+          locality: billingAddress?.locality || '',
+          town_or_city: billingAddress?.town_or_city || '',
+          county: billingAddress?.county || '',
+          district: billingAddress?.district || '',
+          country: billingAddress?.country || '',
         },
         registration_number: licenseSearchVal,
         glass_location: selectedBrokenWindows || [],
@@ -145,6 +149,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
       if (editMode) {
         delete postData.customer_comments
+        delete postData.customer_address
         trackPromise(
           updateQuoteService({ fe_token: quoteInfo?.fe_token, ...postData }).then((res) => {
             if (res.success) {
@@ -195,20 +200,22 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   useEffect(() => {
     fetchVehData(licenseNum)
 
-    // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
-      delay: 500,
-    })
+    if (!editMode) {
+      // Integration of PostalCode/ Address AutoComplete API
+      autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
+        delay: 500,
+      })
 
-    // Preventing Default to show complete address with Postal Code
-    window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
-      e.preventDefault()
-      // @ts-ignore
-      const address: Address = e.address
-      setFullAddress(address)
-      const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
-      setBillingAddress(tempAddress)
-    })
+      // Preventing Default to show complete address with Postal Code
+      window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
+        e.preventDefault()
+        // @ts-ignore
+        const address: Address = e.address
+        setBillingAddress(address)
+        const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
+        setBillingAddressText(tempAddress)
+      })
+    }
 
     // send previously selected windows to window selection component
     const selectedWindows: string[] = []
@@ -227,7 +234,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }
 
   const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setBillingAddress(event.target.value)
+    setBillingAddressText(event.target.value)
   }
 
   return (
@@ -283,12 +290,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
                       <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
-                      <form action='' className='form-car my-md-5 my-4'>
+                      <form className='form-car my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>
                         <br />
                         <div className='row'>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
+                              <div className='h6 text-left text-black-50'>First name</div>
                               <input
                                 ref={firstNameRef}
                                 type='text'
@@ -300,6 +308,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           </div>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
+                              <div className='h6 text-left text-black-50'>Last name</div>
                               <input
                                 ref={lastNameRef}
                                 type='text'
@@ -311,6 +320,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           </div>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
+                              <div className='h6 text-left text-black-50'>Email</div>
                               <input
                                 ref={emailRef}
                                 type='text'
@@ -322,6 +332,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           </div>
                           <div className='col-md-6'>
                             <div className='form-group mb-4'>
+                              <div className='h6 text-left text-black-50'>Phone</div>
                               <input
                                 ref={phoneRef}
                                 type='text'
@@ -334,6 +345,21 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           </div>
                           <div className='col-md-12'>
                             <div className='form-group mb-4'>
+                              <div className='d-flex justify-content-between'>
+                                <div className='h6 text-left text-black-50'>Billing address</div>
+                                {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && (
+                                  <ChangeAddress
+                                    qid={quoteInfo.fe_token}
+                                    customerId={quoteInfo.customer_id}
+                                    addressType={AddressType.INVOICE}
+                                    initialAddress={quoteInfo.invoice_address}
+                                    onChangeAddress={(event) => {
+                                      setBillingAddress(event)
+                                      setBillingAddressText(formatAddress(event))
+                                    }}
+                                  />
+                                )}
+                              </div>
                               <input
                                 id='billingAddress'
                                 ref={billingRef}
@@ -341,10 +367,39 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 className={incorrectFormIndex === 4 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Billing address'
                                 onChange={handlePCodeChange}
-                                value={billingAddressVal}
+                                value={billingAddressText}
+                                disabled={editMode}
                               />
                             </div>
                           </div>
+                          {editMode && (
+                            <div className='col-md-12'>
+                              <div className='form-group mb-4'>
+                                <div className='d-flex justify-content-between'>
+                                  <div className='h6 text-left text-black-50'>Fixing address</div>
+                                  {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && (
+                                    <ChangeAddress
+                                      qid={quoteInfo.fe_token}
+                                      customerId={quoteInfo.customer_id}
+                                      addressType={AddressType.DELIVERY}
+                                      initialAddress={quoteInfo.delivery_address}
+                                      onChangeAddress={(event) => {
+                                        setFixingAddressText(formatAddress(event))
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                                <input
+                                  id='deliveryAddress'
+                                  type='text'
+                                  className='form-control'
+                                  placeholder='Fixing address'
+                                  value={fixingAddressText || ''}
+                                  disabled={true}
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </form>
                       {/* submit request button */}
