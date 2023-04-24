@@ -16,6 +16,7 @@ export type Quote = {
   customer_email: string
   customer_phone: string
   glass_location: string[]
+  invoice_address: Address
   delivery_address: Address
   booking_start_date: string
   booking_end_date: string
