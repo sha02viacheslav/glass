@@ -10,7 +10,7 @@ export type QuoteDto = {
   customer_s_name: string
   customer_phone: string
   customer_email: string
-  customer_address: {
+  customer_address?: {
     postcode: string
     latitude: string
     longitude: string

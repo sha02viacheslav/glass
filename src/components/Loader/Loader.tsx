@@ -17,7 +17,7 @@ export const Loader: React.FC<LoaderProps> = ({ loading }) => {
         right: 0,
         bottom: 0,
         background: 'rgba(0,0,0,0.2)',
-        zIndex: 299,
+        zIndex: 1400,
         cursor: 'pointer',
       }}
     >

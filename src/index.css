@@ -79,11 +79,18 @@ code {
   justify-content: center;
   cursor: pointer;
 }
-.btn-icon:disabled {
-  opacity: 0.8;
-  cursor: not-allowed;
+
+.text-btn {
+  background: none;
+  border: none;
+  color: #9557e8;
+  font-size: 1rem;
+  font-weight: 400;
+  padding: 0;
+  line-height: 1;
 }
 
+.btn-icon:disabled,
 .btn-raised:disabled,
 .btn-stroked:disabled {
   opacity: 0.8;
