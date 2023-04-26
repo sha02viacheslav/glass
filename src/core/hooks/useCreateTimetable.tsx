@@ -39,8 +39,8 @@ export const useCreateTimetable = (timetableToClient: (value: string[][]) => voi
     // find indexes of booked slots
     times.forEach((row) => {
       bookingData.forEach((booking) => {
-        const bookingTime = Number(moment(booking.booking_start_date).format('HH'))
-        if (moment(row.date).format('YYYY-MM-DD') === moment(booking.booking_start_date).format('YYYY-MM-DD')) {
+        const bookingTime = Number(booking.time_slot.split('_')[0])
+        if (moment(row.date).format('YYYY-MM-DD') === moment(booking.booking_date).format('YYYY-MM-DD')) {
           // find what time the booking is and mark
           for (let k = 0; k < 7; k++) {
             if (k != 6 && bookingTime > 10 + k * 2) continue
