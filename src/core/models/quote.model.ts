@@ -20,6 +20,8 @@ export type Quote = {
   delivery_address: Address
   booking_date: string
   time_slot: string
+  request_booking_date: string
+  request_time_slot: string
   date_order: string
   c_address: string
   c_postalcode: string

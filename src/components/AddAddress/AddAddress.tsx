@@ -41,7 +41,6 @@ export const AddAddress: React.FC<ChangeAddressProps> = ({ customerId, addressTy
   }
 
   useEffect(() => {
-    console.warn(document.querySelector('#addressModalInput'))
     setTimeout(() => {
       autocomplete('addressModalInput', REACT_APP_AUTOCOMPLETE, {
         delay: 500,
