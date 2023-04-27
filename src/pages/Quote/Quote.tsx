@@ -1,5 +1,5 @@
 import './quote.css'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import { trackPromise } from 'react-promise-tracker'
@@ -22,6 +22,7 @@ import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-as
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { preApprovePaymentService } from '@glass/services/apis/pre-approve-payment.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
+import { requestAvailabilityService } from '@glass/services/apis/request-availability.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
@@ -56,10 +57,27 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [PAUrl, setPAUrl] = useState<string>('')
   const [warningMsg, setWarningMsg] = useState<string>('')
   const [showBookingMsg, setShowBookingMsg] = useState<boolean>(false)
+  const [showRequestAvailabilityMsg, setShowRequestAvailabilityMsg] = useState<boolean>(false)
   const [showConfirmBooking, setShowConfirmBooking] = useState<boolean>(false)
   const [editBooking, setEditBooing] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
+
+  const timeSlotIsChanged = useMemo<boolean>(() => {
+    if (!timeSlot) return false
+    if (!timeSlot.isFull) {
+      return timeSlot.booking_date !== quoteDetails?.booking_date && timeSlot.time_slot !== quoteDetails?.time_slot
+    } else {
+      return (
+        timeSlot.booking_date !== quoteDetails?.request_booking_date &&
+        timeSlot.time_slot !== quoteDetails?.request_time_slot
+      )
+    }
+  }, [timeSlot, quoteDetails])
+
+  const deliveryAddressIsChanged = useMemo<boolean>(() => {
+    return !!deliveryAddress && formatAddress(deliveryAddress) !== formatAddress(quoteDetails?.delivery_address)
+  }, [deliveryAddress, quoteDetails])
 
   const getQuote = () => {
     if (id) {
@@ -198,15 +216,64 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }
 
   const handleCancelBookingChange = () => {
-    if (quoteDetails) {
-      setTimeSlot({
-        booking_date: quoteDetails.booking_date,
-        time_slot: quoteDetails.time_slot,
-      })
-    } else {
-      setTimeSlot(undefined)
-    }
+    initTimeSlot()
     setEditBooing(false)
+  }
+
+  const sendRequestAvailability = () => {
+    if (id && quoteDetails) {
+      const promises: Promise<void>[] = []
+
+      if (timeSlot) {
+        promises.push(
+          new Promise((resolve) =>
+            requestAvailabilityService(id, timeSlot.booking_date, timeSlot.time_slot).then(() => {
+              resolve()
+            }),
+          ),
+        )
+      }
+      if (deliveryAddress && formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)) {
+        promises.push(
+          new Promise((resolve) =>
+            updateDeliveryAddressService({
+              customer_id: quoteDetails.customer_id,
+              address_id: quoteDetails.delivery_address.address_id,
+              line_1: deliveryAddress.line_1,
+              line_2: deliveryAddress.line_2,
+              postcode: deliveryAddress.postcode,
+              latitude: deliveryAddress.latitude,
+              longitude: deliveryAddress.longitude,
+              town_or_city: deliveryAddress.town_or_city,
+              county: deliveryAddress.county,
+              country: deliveryAddress.country,
+            }).then(() => {
+              resolve()
+            }),
+          ),
+        )
+      }
+
+      trackPromise(
+        Promise.all(promises).finally(() => {
+          getQuote()
+          setShowRequestAvailabilityMsg(true)
+          setEditBooing(false)
+        }),
+      )
+    }
+  }
+
+  const handleRequestAvailability = () => {
+    if (!timeSlot) {
+      setWarningMsg('Select a time for the repair!')
+      return
+    }
+    if (!deliveryAddress && !quoteDetails?.delivery_address) {
+      setWarningMsg('Select a delivery address for the repair!')
+      return
+    }
+    sendRequestAvailability()
   }
 
   function handleDecline() {
@@ -261,6 +328,24 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
+  const initTimeSlot = () => {
+    if (quoteDetails?.booking_date) {
+      setTimeSlot({
+        booking_date: quoteDetails.booking_date,
+        time_slot: quoteDetails.time_slot,
+        isFull: false,
+      })
+    } else if (quoteDetails?.request_booking_date) {
+      setTimeSlot({
+        booking_date: quoteDetails.request_booking_date,
+        time_slot: quoteDetails.request_time_slot,
+        isFull: true,
+      })
+    } else {
+      setTimeSlot(undefined)
+    }
+  }
+
   useEffect(() => {
     // Get Quote Data
     if (id) {
@@ -294,12 +379,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         setIsBlink(true)
       }
       setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
-      if (quoteDetails.booking_date) {
-        setTimeSlot({
-          booking_date: quoteDetails.booking_date,
-          time_slot: quoteDetails.time_slot,
-        })
-      }
+      initTimeSlot()
     }
   }, [quoteDetails])
 
@@ -517,26 +597,36 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
           {!!quoteDetails && (
             <div className='quote-card'>
-              {!!quoteDetails?.booking_date && !editBooking ? (
+              {(!!quoteDetails?.booking_date || !!quoteDetails?.request_booking_date) && !editBooking ? (
                 <div className='booking-info p-4'>
-                  <h1 className='mb-4'>You are booked in!</h1>
-                  <div className='booking-address mb-4'>
-                    <div>
-                      {moment(quoteDetails?.booking_date)
-                        .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                        .format('dddd, DD MMMM')}
-                    </div>
-                    <div>
-                      Arrival window between{' '}
-                      {moment(quoteDetails?.booking_date)
-                        .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                        .format('HH')}{' '}
-                      -{' '}
-                      {moment(quoteDetails?.booking_date)
-                        .add(quoteDetails.time_slot.split('_')?.[1], 'hours')
-                        .format('HH')}
-                    </div>
-                  </div>
+                  {!!quoteDetails?.booking_date && (
+                    <>
+                      <h1 className='mb-4'>You are booked in!</h1>
+                      <div className='booking-address mb-4'>
+                        <div>
+                          {moment(quoteDetails?.booking_date)
+                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                            .format('dddd, DD MMMM')}
+                        </div>
+                        <div>
+                          Arrival window between{' '}
+                          {moment(quoteDetails?.booking_date)
+                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                            .format('HH')}{' '}
+                          -{' '}
+                          {moment(quoteDetails?.booking_date)
+                            .add(quoteDetails.time_slot.split('_')?.[1], 'hours')
+                            .format('HH')}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {!!quoteDetails?.request_booking_date && (
+                    <>
+                      <h1 className='mb-4'>Request sent, we are now reviewing it!</h1>
+                    </>
+                  )}
 
                   <div className='booking-address'>
                     {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2},{' '}
@@ -559,27 +649,35 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   <TimeSelection
                     timeSlotToParent={timeSlotToParent}
                     liveBooking={false}
-                    bookingStartDate={moment(quoteDetails?.booking_date)
-                      .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                      .format(BOOKING_DATE_FORMAT)}
+                    bookingStartDate={
+                      quoteDetails?.booking_date
+                        ? moment(quoteDetails?.booking_date)
+                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                            .format(BOOKING_DATE_FORMAT)
+                        : moment(quoteDetails?.request_booking_date)
+                            .add(quoteDetails.request_time_slot.split('_')?.[0], 'hours')
+                            .format(BOOKING_DATE_FORMAT)
+                    }
                   />
                   <LocationSelection
                     userBillingAddress={quoteDetails.invoice_address}
                     deliveryAddressToChild={quoteDetails.delivery_address}
                     deliveryAddressToParent={deliveryAddressToParent}
                   />
-                  {(editBooking ||
-                    (!!timeSlot &&
-                      timeSlot.booking_date !== quoteDetails.booking_date &&
-                      timeSlot.time_slot !== quoteDetails.time_slot) ||
-                    formatAddress(deliveryAddress) !== formatAddress(quoteDetails.delivery_address)) && (
+                  {(editBooking || timeSlotIsChanged || deliveryAddressIsChanged) && (
                     <div className='d-flex justify-content-center gap-4 mb-4'>
                       <button className='btn-stroked' onClick={() => handleCancelBookingChange()}>
                         Cancel
                       </button>
-                      <button className='btn-raised' onClick={() => handleConfirmBookingChange()}>
-                        Confirm Booking
-                      </button>
+                      {timeSlot?.isFull ? (
+                        <button className='btn-raised' onClick={() => handleRequestAvailability()}>
+                          Request Availability
+                        </button>
+                      ) : (
+                        <button className='btn-raised' onClick={() => handleConfirmBookingChange()}>
+                          Confirm Booking
+                        </button>
+                      )}
                     </div>
                   )}
                 </>
@@ -689,6 +787,17 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           showCancel={false}
           confirmStr='Ok'
           onConfirm={() => setShowBookingMsg(false)}
+        />
+      )}
+
+      {showRequestAvailabilityMsg && (
+        <ConfirmDialog
+          title='Request sent!'
+          showIcon={false}
+          description={<span className='text-left d-block'>We are now reviewing it</span>}
+          showCancel={false}
+          confirmStr='Ok'
+          onConfirm={() => setShowRequestAvailabilityMsg(false)}
         />
       )}
     </div>

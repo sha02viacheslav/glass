@@ -347,7 +347,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                             <div className='form-group mb-4'>
                               <div className='d-flex justify-content-between'>
                                 <div className='h6 text-left text-black-50'>Billing address</div>
-                                {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && (
+                                {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && editMode && (
                                   <ChangeAddress
                                     qid={quoteInfo.fe_token}
                                     customerId={quoteInfo.customer_id}
