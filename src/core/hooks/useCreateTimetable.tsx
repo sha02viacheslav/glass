@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import moment from 'moment'
-import { CALENDAR_START_TIME, CALENDAR_TIME_INTERVAL, CALENDAR_TIME_SLOTS } from '@glass/constants'
+import { CALENDAR_LENGTH, CALENDAR_START_TIME, CALENDAR_TIME_INTERVAL, CALENDAR_TIME_SLOTS } from '@glass/constants'
 import { BookingOccupy, OrderState } from '@glass/enums'
 import { BookingDate, TimeRow } from '@glass/models'
 import { getCalendarService } from '@glass/services/apis/get-calendar.service'
@@ -15,9 +15,9 @@ export const useCreateTimetable = (timetableToClient: (value: string[][]) => voi
       },
     ]
 
-    // set correct dates for following 21 days from current date
+    // set correct dates for following CALENDAR_LENGTH days from current date
     const tomorrow = new Date()
-    for (let i = 1; i < 21; i++) {
+    for (let i = 1; i < CALENDAR_LENGTH; i++) {
       tomorrow.setDate(tomorrow.getDate() + 1)
       newTimetable.push({
         date: moment(tomorrow).format('YYYY-MM-DD'),

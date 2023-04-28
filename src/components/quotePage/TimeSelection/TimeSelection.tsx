@@ -9,6 +9,7 @@ import stripes from '@glass/assets/icons/stripes_s.png'
 import {
   BOOKING_DATE_FORMAT,
   CALENDAR_DAYS,
+  CALENDAR_LENGTH,
   CALENDAR_TIME_INTERVAL,
   CALENDAR_TIME_SLOTS,
   SLOT_LABELS,
@@ -59,7 +60,6 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const [pastIds, setPastIds] = useState<string[]>([])
   const today = selectedDate.getDate()
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
-  // const today = 9; // dummy data version
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -95,7 +95,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     if (newSelection != null) {
       // check if timeslot has passed
       const timeCheck = passedSlots[Number(timeSelected)] - currentHour
-      if (timeCheck <= 0 && slots[0].includes(daySelected)) {
+      if (timeCheck <= 0 && moment().format('DD') == daySelected) {
         return
       }
       newSelection.classList.add('ts-td-active')
@@ -139,10 +139,16 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const changePage = (navValue: string) => {
     if (navValue === 'next' && pages.includes(currentPage + 1)) {
       setCurrentPage(currentPage + 1)
+      setSelectedDate((prev) => moment(prev).add(3, 'days').toDate())
     } else if (navValue === 'prev' && pages.includes(currentPage - 1)) {
       setCurrentPage(currentPage - 1)
+      setSelectedDate((prev) => moment(prev).subtract(3, 'days').toDate())
     }
   }
+
+  useEffect(() => {
+    setCurrentPage(Math.floor(moment(selectedDate).startOf('date').diff(moment().startOf('date'), 'days') / 3 + 1))
+  }, [selectedDate])
 
   // navigating calendar pages and disable passed slots
   useEffect(() => {
@@ -227,6 +233,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
               displayStaticWrapperAs='desktop'
               openTo='day'
               minDate={new Date()}
+              maxDate={moment()
+                .add(CALENDAR_LENGTH - 1, 'days')
+                .toDate()}
               value={selectedDate}
               onChange={(newValue) => {
                 if (newValue) handleMenuClose(newValue)
