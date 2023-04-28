@@ -59,7 +59,6 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const [pastIds, setPastIds] = useState<string[]>([])
   const today = selectedDate.getDate()
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
-  // const today = 9; // dummy data version
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -95,7 +94,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     if (newSelection != null) {
       // check if timeslot has passed
       const timeCheck = passedSlots[Number(timeSelected)] - currentHour
-      if (timeCheck <= 0 && slots[0].includes(daySelected)) {
+      if (timeCheck <= 0 && moment().format('DD') == daySelected) {
         return
       }
       newSelection.classList.add('ts-td-active')
