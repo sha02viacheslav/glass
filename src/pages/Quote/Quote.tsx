@@ -622,7 +622,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </>
                   )}
 
-                  {!!quoteDetails?.request_booking_date && (
+                  {!quoteDetails?.booking_date && !!quoteDetails?.request_booking_date && (
                     <>
                       <h1 className='mb-4'>Request sent, we are now reviewing it!</h1>
                     </>
