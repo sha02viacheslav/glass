@@ -6,7 +6,13 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
 import moment from 'moment'
 import arrowIcon from '@glass/assets/icons/down-arrow.png'
 import stripes from '@glass/assets/icons/stripes_s.png'
-import { BOOKING_DATE_FORMAT, CALENDAR_DAYS, CALENDAR_TIME_INTERVAL } from '@glass/constants'
+import {
+  BOOKING_DATE_FORMAT,
+  CALENDAR_DAYS,
+  CALENDAR_TIME_INTERVAL,
+  CALENDAR_TIME_SLOTS,
+  SLOT_LABELS,
+} from '@glass/constants'
 import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import './time-select-new.css'
@@ -155,7 +161,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     // find which slots have passed
     const past: string[] = []
     if (timeData.length > 0) {
-      for (let i = 0; i < timeData[0].slice(CALENDAR_TIME_INTERVAL).length; i++) {
+      for (let i = 0; i < CALENDAR_TIME_SLOTS; i++) {
         const idTag = timeData[0][0].concat(timeData[0][1]).concat(i.toString())
         const timeCheck = passedSlots[i] - currentHour
         if (timeCheck <= 0) {
@@ -255,18 +261,12 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                       onClick={() => selectSlot(element[0], element[1], time, occupy as BookingOccupy)}
                       key={time}
                       className={
-                        element[0] + element[1] + time.toString() === selectedSlot
-                          ? 'ts-' + occupy + ' ts-td-active'
-                          : 'ts-' + occupy
+                        `ts-${occupy}` +
+                        (element[0] + element[1] + time.toString() === selectedSlot ? ' ts-td-active' : '') +
+                        (pastIds.includes(element[0] + element[1] + time.toString()) ? ' ts-passed' : '')
                       }
                     >
-                      {pastIds.includes(element[0] + element[1] + time.toString()) ? (
-                        <div className='ts-passed'>Aaaaa</div>
-                      ) : occupy != 'Half' ? (
-                        occupy
-                      ) : (
-                        <img src={stripes} alt='' />
-                      )}
+                      {SLOT_LABELS[time]}
                     </td>
                   ))}
                 </tr>
@@ -281,7 +281,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
           <div className='ts-legend-icon ts-full'>-</div>
           <span className='ts-legend-text'>Fully booked</span>
           <img className='ts-legend-icon' src={stripes} alt='' />
-          <span className='ts-legend-text'>Half booked</span>
+          <span className='ts-legend-text'>Almost Full</span>
           <div className='ts-legend-icon ts-free'>-</div>
           <span className='ts-legend-text'>Free</span>
           {liveBooking && (
