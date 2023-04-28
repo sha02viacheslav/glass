@@ -6,14 +6,22 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
 import moment from 'moment'
 import arrowIcon from '@glass/assets/icons/down-arrow.png'
 import stripes from '@glass/assets/icons/stripes_s.png'
-import { BOOKING_DATE_FORMAT } from '@glass/constants'
+import {
+  BOOKING_DATE_FORMAT,
+  CALENDAR_DAYS,
+  CALENDAR_LENGTH,
+  CALENDAR_TIME_INTERVAL,
+  CALENDAR_TIME_SLOTS,
+  SLOT_LABELS,
+} from '@glass/constants'
+import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import './time-select-new.css'
 import { TimeSlot } from '@glass/models'
 import { formatSlotId } from '@glass/utils/format-slot-id/format-slot-id.util'
 
-const timeHeaders = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
-const passedSlots = [10, 12, 14, 16, 18, 20, 22]
+const timeHeaders = ['08:00', '12:00', '16:00', '20:00']
+const passedSlots = [12, 16, 20]
 const fullMonthValues = [
   'January',
   'February',
@@ -52,10 +60,8 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const [pastIds, setPastIds] = useState<string[]>([])
   const today = selectedDate.getDate()
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
-  // const today = 9; // dummy data version
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
-  const [isMobile, setIsMobile] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -77,7 +83,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }
 
   // function to select a given time slot
-  const selectSlot = (monthSelected: string, daySelected: string, timeSelected: number) => {
+  const selectSlot = (monthSelected: string, daySelected: string, timeSelected: number, occupy: BookingOccupy) => {
     const currentSelection = document.getElementById(selectedSlot)
     const idTag = monthSelected.concat(daySelected).concat(timeSelected.toString())
     const newSelection = document.getElementById(idTag)
@@ -89,7 +95,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     if (newSelection != null) {
       // check if timeslot has passed
       const timeCheck = passedSlots[Number(timeSelected)] - currentHour
-      if (timeCheck <= 0 && slots[0].includes(daySelected)) {
+      if (timeCheck <= 0 && moment().format('DD') == daySelected) {
         return
       }
       newSelection.classList.add('ts-td-active')
@@ -110,7 +116,10 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
       if (timeSlotToParent) {
         timeSlotToParent({
           booking_date: moment(startDate).format('YYYY-MM-DD'),
-          time_slot: `${moment(startDate).format('HH')}_${moment(startDate).add(2, 'hours').format('HH')}`,
+          time_slot: `${moment(startDate).format('HH')}_${moment(startDate)
+            .add(CALENDAR_TIME_INTERVAL, 'hours')
+            .format('HH')}`,
+          isFull: occupy === BookingOccupy.FULL,
         })
       }
     }
@@ -130,24 +139,26 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const changePage = (navValue: string) => {
     if (navValue === 'next' && pages.includes(currentPage + 1)) {
       setCurrentPage(currentPage + 1)
+      setSelectedDate((prev) => moment(prev).add(3, 'days').toDate())
     } else if (navValue === 'prev' && pages.includes(currentPage - 1)) {
       setCurrentPage(currentPage - 1)
+      setSelectedDate((prev) => moment(prev).subtract(3, 'days').toDate())
     }
   }
 
+  useEffect(() => {
+    setCurrentPage(Math.floor(moment(selectedDate).startOf('date').diff(moment().startOf('date'), 'days') / 3 + 1))
+  }, [selectedDate])
+
   // navigating calendar pages and disable passed slots
   useEffect(() => {
-    if (isMobile) {
-      setSlots(timeData.slice(3 * currentPage - 3, 3 * currentPage))
-    } else {
-      setSlots(timeData.slice(7 * currentPage - 7, 7 * currentPage))
-    }
+    setSlots(timeData.slice(CALENDAR_DAYS * currentPage - CALENDAR_DAYS, CALENDAR_DAYS * currentPage))
   }, [currentPage, timeData])
 
   useEffect(() => {
     let selectionId = ''
     if (!!bookingStartDate) {
-      if (moment(bookingStartDate).add(2, 'hours').isAfter(moment())) {
+      if (moment(bookingStartDate).add(CALENDAR_TIME_INTERVAL, 'hours').isAfter(moment())) {
         // only set prev selected slot if it has not passed
         selectionId = formatSlotId(bookingStartDate)
         setSelectedSlot(selectionId)
@@ -156,7 +167,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     // find which slots have passed
     const past: string[] = []
     if (timeData.length > 0) {
-      for (let i = 0; i < timeData[0].slice(2).length; i++) {
+      for (let i = 0; i < CALENDAR_TIME_SLOTS; i++) {
         const idTag = timeData[0][0].concat(timeData[0][1]).concat(i.toString())
         const timeCheck = passedSlots[i] - currentHour
         if (timeCheck <= 0) {
@@ -167,18 +178,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     setPastIds(past)
     // determine if table is viewed in mobile view and set cols in display accordingly
     const pageCount = []
-    if (window.innerWidth <= 800) {
-      setIsMobile(true)
-      setSlots(timeData.slice(0, 3))
-      // determine the total number of pages possible to display
-      for (let i = 0; i < timeData.length / 3; i++) {
-        pageCount.push(i + 1)
-      }
-    } else {
-      setSlots(timeData.slice(0, 7))
-      for (let i = 0; i < timeData.length / 7; i++) {
-        pageCount.push(i + 1)
-      }
+    setSlots(timeData.slice(0, CALENDAR_DAYS))
+    for (let i = 0; i < timeData.length / CALENDAR_DAYS; i++) {
+      pageCount.push(i + 1)
     }
     setPages([...new Set(pageCount)])
   }, [timeData])
@@ -231,6 +233,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
               displayStaticWrapperAs='desktop'
               openTo='day'
               minDate={new Date()}
+              maxDate={moment()
+                .add(CALENDAR_LENGTH - 1, 'days')
+                .toDate()}
               value={selectedDate}
               onChange={(newValue) => {
                 if (newValue) handleMenuClose(newValue)
@@ -262,21 +267,15 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                   {element.slice(2).map((occupy, time) => (
                     <td
                       id={element[0] + element[1] + time.toString()}
-                      onClick={() => selectSlot(element[0], element[1], time)}
+                      onClick={() => selectSlot(element[0], element[1], time, occupy as BookingOccupy)}
                       key={time}
                       className={
-                        element[0] + element[1] + time.toString() === selectedSlot
-                          ? 'ts-' + occupy + ' ts-td-active'
-                          : 'ts-' + occupy
+                        `ts-${occupy}` +
+                        (element[0] + element[1] + time.toString() === selectedSlot ? ' ts-td-active' : '') +
+                        (pastIds.includes(element[0] + element[1] + time.toString()) ? ' ts-passed' : '')
                       }
                     >
-                      {pastIds.includes(element[0] + element[1] + time.toString()) ? (
-                        <div className='ts-passed'>Aaaaa</div>
-                      ) : occupy != 'Half' ? (
-                        occupy
-                      ) : (
-                        <img src={stripes} alt='' />
-                      )}
+                      {SLOT_LABELS[time]}
                     </td>
                   ))}
                 </tr>
@@ -291,7 +290,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
           <div className='ts-legend-icon ts-full'>-</div>
           <span className='ts-legend-text'>Fully booked</span>
           <img className='ts-legend-icon' src={stripes} alt='' />
-          <span className='ts-legend-text'>Half booked</span>
+          <span className='ts-legend-text'>Almost Full</span>
           <div className='ts-legend-icon ts-free'>-</div>
           <span className='ts-legend-text'>Free</span>
           {liveBooking && (
