@@ -9,6 +9,7 @@ import stripes from '@glass/assets/icons/stripes_s.png'
 import {
   BOOKING_DATE_FORMAT,
   CALENDAR_DAYS,
+  CALENDAR_LENGTH,
   CALENDAR_TIME_INTERVAL,
   CALENDAR_TIME_SLOTS,
   SLOT_LABELS,
@@ -138,10 +139,16 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const changePage = (navValue: string) => {
     if (navValue === 'next' && pages.includes(currentPage + 1)) {
       setCurrentPage(currentPage + 1)
+      setSelectedDate((prev) => moment(prev).add(3, 'days').toDate())
     } else if (navValue === 'prev' && pages.includes(currentPage - 1)) {
       setCurrentPage(currentPage - 1)
+      setSelectedDate((prev) => moment(prev).subtract(3, 'days').toDate())
     }
   }
+
+  useEffect(() => {
+    setCurrentPage(Math.floor(moment(selectedDate).startOf('date').diff(moment().startOf('date'), 'days') / 3 + 1))
+  }, [selectedDate])
 
   // navigating calendar pages and disable passed slots
   useEffect(() => {
@@ -226,6 +233,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
               displayStaticWrapperAs='desktop'
               openTo='day'
               minDate={new Date()}
+              maxDate={moment()
+                .add(CALENDAR_LENGTH - 1, 'days')
+                .toDate()}
               value={selectedDate}
               onChange={(newValue) => {
                 if (newValue) handleMenuClose(newValue)
