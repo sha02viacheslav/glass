@@ -107,17 +107,21 @@
 .ts-table tr td {
   display: block;
   height: 64px;
+  text-align: center;
+  line-height: 64px;
 }
 
 .ts-Full {
   background-color: #bb95fd;
-  color: transparent;
 }
 
 .ts-Empty {
   background-color: white;
-  color: transparent;
-  text-indent: 105%;
+}
+
+.ts-Half {
+  background-image: url('/src/assets/icons/stripes_s.png');
+  background-size: cover;
 }
 
 .ts-Half img {
@@ -128,9 +132,6 @@
 
 .ts-passed {
   background-color: #dfdfdf;
-  color: transparent;
-  height: 100%;
-  text-indent: 105%;
 }
 
 .ts-table tr:nth-child(n + 2) > td:nth-child(1) {
