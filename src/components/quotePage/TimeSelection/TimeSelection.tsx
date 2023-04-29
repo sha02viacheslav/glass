@@ -155,12 +155,10 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }, [currentPage, timeData])
 
   useEffect(() => {
-    let selectionId = ''
     if (!!bookingStartDate) {
       if (moment(bookingStartDate).add(CALENDAR_TIME_INTERVAL, 'hours').isAfter(moment())) {
         // only set prev selected slot if it has not passed
-        selectionId = formatSlotId(bookingStartDate)
-        setSelectedSlot(selectionId)
+        setSelectedSlot(formatSlotId(bookingStartDate))
       }
     }
     // find which slots have passed
