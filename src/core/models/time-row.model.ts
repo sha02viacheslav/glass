@@ -1,4 +1,6 @@
+import { BookingOccupy } from '@glass/enums'
+
 export type TimeRow = {
   date: string
-  schedules: number[]
+  schedules: BookingOccupy[]
 }

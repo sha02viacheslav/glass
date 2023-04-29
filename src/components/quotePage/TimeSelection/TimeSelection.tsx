@@ -17,7 +17,7 @@ import {
 import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import './time-select-new.css'
-import { TimeSlot } from '@glass/models'
+import { TimeRow, TimeSlot } from '@glass/models'
 import { formatSlotId } from '@glass/utils/format-slot-id/format-slot-id.util'
 
 const timeHeaders = ['08:00', '12:00', '16:00', '20:00']
@@ -53,12 +53,11 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedSlot, setSelectedSlot] = useState('')
   const [slotChanged, setSlotChanged] = useState(false)
-  const [timeData, setTimeData] = useState<string[][]>([])
-  const [slots, setSlots] = useState<string[][]>([])
+  const [timeData, setTimeData] = useState<TimeRow[]>([])
+  const [slots, setSlots] = useState<TimeRow[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [pages, setPages] = useState<number[]>([])
   const [pastIds, setPastIds] = useState<string[]>([])
-  const today = selectedDate.getDate()
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
@@ -78,7 +77,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     setSelectedDate(newDate)
   }
 
-  function getTimeData(data: string[][]) {
+  function getTimeData(data: TimeRow[]) {
     setTimeData(data)
   }
 
@@ -106,9 +105,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
       odooDay = '0' + odooDay
     }
     // for sending slot info to odoo, slot starting time
-    const startDate = moment(`${monthSelected} ${odooDay}, ${currentYear} ${8 + timeSelected * 2}:00:00`).format(
-      BOOKING_DATE_FORMAT,
-    )
+    const startDate = moment(
+      `${monthSelected} ${odooDay}, ${currentYear} ${8 + timeSelected * CALENDAR_TIME_INTERVAL}:00:00`,
+    ).format(BOOKING_DATE_FORMAT)
     setSelectedSlot(idTag)
     setSlotChanged(true)
     if (!liveBooking) {
@@ -156,19 +155,17 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }, [currentPage, timeData])
 
   useEffect(() => {
-    let selectionId = ''
     if (!!bookingStartDate) {
       if (moment(bookingStartDate).add(CALENDAR_TIME_INTERVAL, 'hours').isAfter(moment())) {
         // only set prev selected slot if it has not passed
-        selectionId = formatSlotId(bookingStartDate)
-        setSelectedSlot(selectionId)
+        setSelectedSlot(formatSlotId(bookingStartDate))
       }
     }
     // find which slots have passed
     const past: string[] = []
     if (timeData.length > 0) {
       for (let i = 0; i < CALENDAR_TIME_SLOTS; i++) {
-        const idTag = timeData[0][0].concat(timeData[0][1]).concat(i.toString())
+        const idTag = moment(timeData[0].date).format('MMMDD').concat(i.toString())
         const timeCheck = passedSlots[i] - currentHour
         if (timeCheck <= 0) {
           past.push(idTag)
@@ -260,19 +257,39 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                 <tr key={index}>
                   {/* first row maps dates */}
                   <td className='ts-date-container'>
-                    <div className='ts-date-month'>{element[0]}</div>
-                    <div className={Number(element[1]) != today ? 'ts-date-day' : 'ts-date-today'}>{element[1]}</div>
+                    <div className='ts-date-month'>{moment(element.date).format('MMM')}</div>
+                    <div className='d-flex align-items-center'>
+                      <div
+                        className={
+                          moment(element.date).format('YYYY-MM-DD') != moment().format('YYYY-MM-DD')
+                            ? 'ts-date-day'
+                            : 'ts-date-today'
+                        }
+                      >
+                        {moment(element.date).format('DD')}
+                      </div>
+                      <div className='ms-2'>{moment(element.date).format('ddd')}</div>
+                    </div>
                   </td>
                   {/* subsequent rows map timeslots */}
-                  {element.slice(2).map((occupy, time) => (
+                  {element.schedules.map((occupy, time) => (
                     <td
-                      id={element[0] + element[1] + time.toString()}
-                      onClick={() => selectSlot(element[0], element[1], time, occupy as BookingOccupy)}
+                      id={moment(element.date).format('MMMDD') + time.toString()}
+                      onClick={() =>
+                        selectSlot(
+                          moment(element.date).format('MMM'),
+                          moment(element.date).format('DD'),
+                          time,
+                          occupy as BookingOccupy,
+                        )
+                      }
                       key={time}
                       className={
                         `ts-${occupy}` +
-                        (element[0] + element[1] + time.toString() === selectedSlot ? ' ts-td-active' : '') +
-                        (pastIds.includes(element[0] + element[1] + time.toString()) ? ' ts-passed' : '')
+                        (moment(element.date).format('MMMDD') + time.toString() === selectedSlot
+                          ? ' ts-td-active'
+                          : '') +
+                        (pastIds.includes(moment(element.date).format('MMMDD') + time.toString()) ? ' ts-passed' : '')
                       }
                     >
                       {SLOT_LABELS[time]}
