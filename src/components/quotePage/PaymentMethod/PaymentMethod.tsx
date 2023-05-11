@@ -13,6 +13,7 @@ import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import {
   Address,
+  InvoicePdf,
   MonthlyPayment,
   Offer,
   OptionalOrderLine,
@@ -63,7 +64,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [paymentMethodType, setPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
   const [tempPaymentMethodType, setTempPaymentMethodType] = useState<PaymentMethodType | undefined>(undefined)
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(PaymentStatus.NOT_PAID)
-  const [invoicePDF, setInvoicePDF] = useState('')
+  const [invoicePDF, setInvoicePDF] = useState<InvoicePdf | undefined>()
   const [showInvoice, setShowInvoice] = useState(false)
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
   const [PAErrorMsg] = useState('')
@@ -115,8 +116,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       getInvoicePdfService(qid)
         .then((res) => {
           if (res.success) {
-            if (res.data.invoice_pdf_url !== '') {
-              setInvoicePDF(res.data.invoice_pdf_url)
+            if (res.data.pdf_content !== '') {
+              setInvoicePDF(res.data)
               setShowInvoice(true)
               setInvoiceMessage('')
             } else {

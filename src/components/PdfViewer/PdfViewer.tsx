@@ -4,23 +4,24 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import { trackPromise } from 'react-promise-tracker'
 import close from '@glass/assets/icons/x.png'
 import { Loader } from '@glass/components/Loader'
+import { InvoicePdf } from '@glass/models'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 
 export type PdfViewerProps = {
-  invoicePDF: string
+  invoicePDF: InvoicePdf
   isOpen: (value: boolean) => void
 }
 
 export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen }) => {
   const [loading, setLoading] = useState<boolean>(true)
   const invoiceID = useMemo(() => {
-    return invoicePDF.split('?')?.[0]?.split('/')?.at(-1) || ''
+    return invoicePDF?.invoice_pdf_url?.split('?')?.[0]?.split('/')?.at(-1) || ''
   }, [invoicePDF])
 
   const downloadInvoice = () => {
     trackPromise(
-      fetch(invoicePDF)
+      fetch(invoicePDF.pdf_content)
         .then((res) => res.blob())
         .then((blob) => {
           // Create blob link to download
@@ -52,7 +53,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen }) => {
           event.preventDefault()
         }}
       >
-        <Document className='pdf-invoice' file={invoicePDF} onLoadSuccess={() => setLoading(false)}>
+        <Document className='pdf-invoice' file={invoicePDF.pdf_content} onLoadSuccess={() => setLoading(false)}>
           <Page pageNumber={1} />
           <img className='PDF-close' src={close} alt='' onClick={() => isOpen(false)} />
           <div className='PDF-button-container'>
