@@ -162,6 +162,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const retrievePlan = () => {
     if (
       qid &&
+      quoteDetails?.is_published &&
       paymentStatus !== PaymentStatus.PAID &&
       selectedMethod === PaymentOptionEnum.FOUR_MONTH &&
       !monthlyPayments
