@@ -18,3 +18,13 @@
 .review-author-img {
   width: 60px;
 }
+
+.purple-link {
+  text-decoration: none;
+  color: #9557e8;
+}
+
+.purple-link:hover {
+  text-decoration: underline;
+  color: #9557e8;
+}
