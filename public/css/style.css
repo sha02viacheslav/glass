@@ -458,14 +458,18 @@ ul.list-f {
   position: relative;
   width: 100%;
   max-width: 400px;
+  height: 100%;
   margin: auto;
   overflow: hidden;
   padding: 20px 15px;
   border-radius: 8px;
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.2);
+  transition: transform 0.42s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .content:hover {
-  box-shadow: 0 11px 15px -7px rgb(0 0 0 / 20%), 0 24px 38px 3px rgb(0 0 0 / 14%), 0 9px 46px 8px rgb(0 0 0 / 12%);
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5);
+  transform: scale(1.05) translate(0, -12px);
 }
 
 /* .content .content-overlay {
