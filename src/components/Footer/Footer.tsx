@@ -186,7 +186,8 @@ export const Footer: React.FC = () => {
               <div className='row'>
                 <div className='col-lg-6 offset-lg-6'>
                   <h3 className='text-white mb-4'>
-                    Call us {PHONE_NUMBER} or ask a quote online. We accept all cards, cash and installments.
+                    Call us on {PHONE_NUMBER} or ask a quote online. We accept all major credit cards and 0% monthly
+                    instalments are available.
                   </h3>
                   <div className='row align-items-center'>
                     <div className='col-md-6'>
@@ -256,7 +257,7 @@ export const Footer: React.FC = () => {
         </section>
         <section className='footer-btm py-3'>
           <div className='container'>
-            <p className='mb-0'>Copyright by © FixGlass (Estglass Limited) Company No.11808031. All rights reserved.</p>
+            <p className='mb-0'>Copyright by © FixGlass Company No.11808031. All rights reserved.</p>
           </div>
         </section>
       </footer>
