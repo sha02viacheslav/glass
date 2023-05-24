@@ -1311,12 +1311,12 @@ body {
 }
 
 .get-quote-wrap {
-  max-width: 600px;
+  max-width: 720px;
   margin: 2% auto 10%;
 }
 
 .reg-input-wrap {
-  max-width: 230px;
+  max-width: 260px;
 }
 
 .get-quote-btn {
