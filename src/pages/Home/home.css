@@ -242,7 +242,6 @@ body {
   width: 5%;
   float: left;
   border: 3px dashed #7cd6e4;
-  margin-top: 8%;
 }
 .textworks {
   margin-top: 20px;
@@ -269,6 +268,7 @@ body {
 }
 .bottom {
   width: 100%;
+  line-height: 1.5;
 }
 .left {
   width: 48%;
@@ -535,9 +535,6 @@ body {
     font-size: 13px;
     padding-top: 10px;
   }
-  .blueline {
-    margin-top: 10%;
-  }
 }
 
 @media (max-width: 1320px) {
@@ -571,7 +568,6 @@ body {
     width: 5%;
     float: left;
     border: 3px dashed #7cd6e4;
-    margin-top: 10%;
   }
 }
 @media (max-width: 1170px) {
@@ -586,7 +582,7 @@ body {
 }
 @media (max-width: 1100px) {
   .left div:nth-child(2) {
-    font-size: 12px;
+    font-size: 14px;
   }
   .carousal {
     padding-top: 6%;

@@ -26,7 +26,6 @@ export const Home: React.FC = () => {
           <div className='col-md-8 centerDiv'>
             <div className='topDiv'>
               <img src={flag} alt='UK Flag' />
-              <div className='ms-2'>Nationwide</div>
             </div>
             <div className='maincontent'>
               High Quality <br />
@@ -102,7 +101,7 @@ export const Home: React.FC = () => {
         </div>
         <div className='rightworks'>
           <div className='rightTop'>Here&apos;s how it works</div>
-          <div className='rightCenter'>
+          <div className='rightCenter d-flex align-items-center'>
             <div className='head1'>
               <div>1</div>
               <div>Fill out the quote form or call</div>
@@ -136,11 +135,15 @@ export const Home: React.FC = () => {
         <div className='top'>Payment options</div>
         <div className='bottom'>
           <div className='left'>
-            <div>Finance</div>
+            <div className='mb-2'>Finance</div>
+            <div>
+              0% monthly instalments so you can pay much less as a deposit to secure your booking. Contract our friendly
+              sales for more details on {PHONE_NUMBER}
+            </div>
           </div>
           <div className='right'>
-            <div>Pay Now</div>
-            <div>By debit or credit card.</div>
+            <div className='mb-2'>Pay Now</div>
+            <div>We accept all major credit cards.</div>
           </div>
           <div className='clear'></div>
         </div>
@@ -225,7 +228,7 @@ export const Home: React.FC = () => {
               <p style={{ fontWeight: 'bold', color: '#000' }}>
                 We can replace every model out there and every glass of the vehicle:
                 <p style={{ color: '#707070', fontWeight: 'normal' }}>
-                  windscreen, door glass, sunroof or rear backlight/windscreen.
+                  front windscreen, door glass or rear backlight/windscreen.
                 </p>
               </p>
             </div>

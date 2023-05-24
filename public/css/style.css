@@ -1375,7 +1375,7 @@ Media Queries
     margin-bottom: 15px;
   }
   .contact {
-    display: none;
+    width: 80%;
   }
   h5.text-blue.fw-normal.mt-mob-h {
     margin-top: 30px;
