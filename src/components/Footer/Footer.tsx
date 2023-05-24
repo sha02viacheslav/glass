@@ -195,7 +195,7 @@ export const Footer: React.FC = () => {
                         <input
                           ref={licenseRef}
                           type='text'
-                          className='form-control'
+                          className='form-control mb-3 mb-md-0'
                           placeholder='Vehicle Registration Number...'
                           onChange={patternMatch}
                           maxLength={8}

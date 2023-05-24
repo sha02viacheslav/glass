@@ -34,27 +34,19 @@ export const Home: React.FC = () => {
   return (
     <div>
       <div className='container-fluid mainslider'>
-        <div className='row carousal'>
-          <div className='col-md-2 leftDiv'></div>
-          <div className='col-md-8 centerDiv'>
+        <div className='row carousal justify-content-center'>
+          <div className='col-md-10 col-lg-8 text-center'>
             <div className='topDiv'>
               <img src={flag} alt='UK Flag' />
             </div>
             <div className='maincontent'>
               High Quality <br />
-              Windscreen Repair <br />
+              Windscreen Replacement <br />
               at Your Home or Work
-            </div>
-
-            <div className='maincontentmobile'>
-              High Quality <br />
-              Windscreen Repair
-              <br /> at Your Home or Work
             </div>
 
             <div className='bottomDiv'></div>
           </div>
-          <div className='col-md-2 rightDiv'></div>
 
           <div className='top-get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
             <div className='reg-input-wrap'>
@@ -63,7 +55,7 @@ export const Home: React.FC = () => {
                   ref={licenseRef}
                   type='text'
                   className='form-control'
-                  placeholder='Vehicle Registration Number...'
+                  placeholder='Reg Number'
                   onChange={patternMatch}
                   maxLength={8}
                 />
