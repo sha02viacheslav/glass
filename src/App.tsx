@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   const [showMenu, setShowMenu] = useState<boolean>(true)
 
   useEffect(() => {
-    setShowMenu(!location.pathname.startsWith('/quote') && !location.pathname.startsWith('/customer/edit'))
+    setShowMenu(!location.pathname.startsWith('/quote') && !location.pathname.startsWith('/customer'))
   }, [location])
 
   return (

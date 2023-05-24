@@ -78,7 +78,7 @@ export const GoogleReviews: React.FC = () => {
           ))}
         </Slider>
 
-        <div className='d-flex justify-content-center mt-5'>
+        <div className='d-flex justify-content-center mt-5 pt-4 pt-md-0'>
           <Link to='https://goo.gl/maps/op8VTNi3X56yvVhV6' target='_blank' className='purple-link fs-18'>
             More Reviews
           </Link>
