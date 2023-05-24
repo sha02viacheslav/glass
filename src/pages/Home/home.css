@@ -1310,9 +1310,14 @@ body {
   color: #9941e5 !important;
 }
 
-.get-quote-wrap {
+.top-get-quote-wrap {
   max-width: 720px;
   margin: 2% auto 10%;
+}
+
+.get-quote-wrap {
+  max-width: 720px;
+  margin: 6% auto 6%;
 }
 
 .reg-input-wrap {
@@ -1326,7 +1331,7 @@ body {
   background: #fff;
   font-size: 16px;
   font-weight: bold;
-  padding: 16px 24px;
+  padding: 20px 32px;
   line-height: 1;
 }
 .get-quote-btn:hover {
@@ -1352,15 +1357,15 @@ body {
 }
 
 @media (max-width: 767px) {
-  /*.get-quote-btn {*/
-  /*  padding: 4px 8px;*/
-  /*}*/
+  .get-quote-btn {
+    padding: 16px 24px;
+  }
 
-  /*.or-call {*/
-  /*  font-size: 16px;*/
-  /*}*/
+  .or-call {
+    font-size: 16px;
+  }
 
-  /*.purple-phone-number {*/
-  /*  font-size: 18px;*/
-  /*}*/
+  .purple-phone-number {
+    font-size: 18px;
+  }
 }

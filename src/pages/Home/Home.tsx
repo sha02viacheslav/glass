@@ -56,7 +56,7 @@ export const Home: React.FC = () => {
           </div>
           <div className='col-md-2 rightDiv'></div>
 
-          <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center gap-3'>
+          <div className='top-get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
             <div className='reg-input-wrap'>
               <div className='form-group'>
                 <input
@@ -140,47 +140,13 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className='wrapper2 afterpaynow'>
-        <div className='row'>
-          <div className='offset-2 col-md-3 quote-footer'>
-            <button type='submit' className='btn1' onClick={directToCustomer}>
-              GET A QUOTE
-            </button>
-          </div>
-          <div className='col-md-2 call'>or call</div>
-          <div className='col-md-3 num'>
-            <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-              {PHONE_NUMBER}
-            </a>
-          </div>
-          <div className='col-md-2'></div>
-        </div>
-      </div>
-
-      <div className='wrapper2 newipad'>
-        <div className='btnDivmobile'>
-          <button className='btn1' onClick={directToCustomer}>
+      <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
+        <div className='d-flex flex-column flex-md-row align-items-center'>
+          <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
             GET A QUOTE
           </button>
-        </div>
-        <div className='btnDivtext'>or call</div>
-        <div className='btnDivcontact'>
-          <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-            {PHONE_NUMBER}
-          </a>
-        </div>
-        <div className='clear'></div>
-      </div>
-
-      <div className='newmobile'>
-        <div className='btnDivmobile'>
-          <button className='btn1' onClick={directToCustomer}>
-            GET A QUOTE
-          </button>
-        </div>
-        <div className='btnDivtext'>or call</div>
-        <div className='btnDivcontact'>
-          <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
+          <div className='or-call m-3'>or call</div>
+          <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
             {PHONE_NUMBER}
           </a>
         </div>
@@ -228,45 +194,13 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className='wrapper2 afternotice'>
-        <div className='row'>
-          <div className='offset-2 col-md-3 quote-footer'>
-            <button className='btn1' onClick={directToCustomer}>
-              GET A QUOTE
-            </button>
-          </div>
-          <div className='col-md-2 call'>or call</div>
-          <div className='col-md-3 num'>
-            <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-              {PHONE_NUMBER}
-            </a>
-          </div>
-          <div className='col-md-2'></div>
-        </div>
-      </div>
-      <div className='wrapper2 newipad'>
-        <div className='btnDivmobile'>
-          <button className='btn1' onClick={directToCustomer}>
+      <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
+        <div className='d-flex flex-column flex-md-row align-items-center'>
+          <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
             GET A QUOTE
           </button>
-        </div>
-        <div className='btnDivtext'>or call</div>
-        <div className='btnDivcontact'>
-          <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-            {PHONE_NUMBER}
-          </a>
-        </div>
-        <div className='clear'></div>
-      </div>
-      <div className='newmobile'>
-        <div className='btnDivmobile'>
-          <button className='btn1' onClick={directToCustomer}>
-            GET A QUOTE
-          </button>
-        </div>
-        <div className='btnDivtext'>or call</div>
-        <div className='btnDivcontact'>
-          <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
+          <div className='or-call m-3'>or call</div>
+          <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
             {PHONE_NUMBER}
           </a>
         </div>
