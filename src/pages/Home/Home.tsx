@@ -1,17 +1,30 @@
 import './home.css'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import home1 from '@glass/assets/images/1.png'
 import home2 from '@glass/assets/images/2.png'
 import flag from '@glass/assets/images/uk-flag.svg'
 import { PHONE_NUMBER } from '@glass/constants'
+import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Home: React.FC = () => {
   const navigate = useNavigate()
+  const licenseRef = useRef<HTMLInputElement>(null)
+
+  const patternMatch = () => {
+    if (licenseRef.current) {
+      licenseRef.current.value = formatLicenseNumber(licenseRef.current.value)
+    }
+  }
 
   const directToCustomer = () => {
-    navigate('/customer')
+    if (licenseRef.current?.value) {
+      navigate('/customer/' + licenseRef.current?.value)
+      licenseRef.current.value = ''
+    } else {
+      navigate('/customer')
+    }
   }
 
   useEffect(() => {
@@ -43,49 +56,27 @@ export const Home: React.FC = () => {
           </div>
           <div className='col-md-2 rightDiv'></div>
 
-          <div className='wrapper2 newipad'>
-            <div className='btnDivmobile'>
-              <button className='btn1' onClick={directToCustomer}>
+          <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center gap-3'>
+            <div className='reg-input-wrap'>
+              <div className='form-group'>
+                <input
+                  ref={licenseRef}
+                  type='text'
+                  className='form-control'
+                  placeholder='Vehicle Registration Number...'
+                  onChange={patternMatch}
+                  maxLength={8}
+                />
+              </div>
+            </div>
+            <div className='d-flex flex-column flex-md-row align-items-center'>
+              <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
                 GET A QUOTE
               </button>
-            </div>
-            <div className='btnDivtext'>or call</div>
-            <div className='btnDivcontact'>
-              <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
+              <div className='or-call m-3'>or call</div>
+              <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
                 {PHONE_NUMBER}
               </a>
-            </div>
-            <div className='clear'></div>
-          </div>
-
-          <div className='newmobile'>
-            <div className='btnDivmobile'>
-              <button className='btn1' onClick={directToCustomer}>
-                GET A QUOTE
-              </button>
-            </div>
-            <div className='btnDivtext'>or call</div>
-            <div className='btnDivcontact'>
-              <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-                {PHONE_NUMBER}
-              </a>
-            </div>
-          </div>
-
-          <div className='wrapper2 new'>
-            <div className='row'>
-              <div className='offset-2 col-md-3 quote-footer'>
-                <button type='submit' className='btn1' onClick={directToCustomer}>
-                  GET A QUOTE
-                </button>
-              </div>
-              <div className='col-md-2 call'>or call</div>
-              <div className='col-md-3 num'>
-                <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
-                  {PHONE_NUMBER}
-                </a>
-              </div>
-              <div className='col-md-2'></div>
             </div>
           </div>
         </div>
@@ -95,8 +86,8 @@ export const Home: React.FC = () => {
         <div className='leftworks'>
           <div className='leftTop'>Wherever you are, whichever model you drive, we got you covered.</div>
           <div className='leftBottom'>
-            We offer nationwide windscreen repairs and replacements for passenger vehicles and vans. All jobs are done
-            by professionals at your home or work.
+            We offer windscreen repairs and replacements for passenger vehicles and vans. All jobs are done by
+            professionals at your home or work.
           </div>
         </div>
         <div className='rightworks'>
@@ -137,7 +128,7 @@ export const Home: React.FC = () => {
           <div className='left'>
             <div className='mb-2'>Finance</div>
             <div>
-              0% monthly instalments so you can pay much less as a deposit to secure your booking. Contract our friendly
+              0% monthly instalments so you can pay much less as a deposit to secure your booking. Contact our friendly
               sales for more details on {PHONE_NUMBER}
             </div>
           </div>

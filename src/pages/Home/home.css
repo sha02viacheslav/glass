@@ -98,9 +98,6 @@ body {
   margin-right: 20px;
 }
 
-.newmobile {
-  display: none;
-}
 .newmobilerightheader {
   display: none;
 }
@@ -938,9 +935,6 @@ body {
     position: relative;
     left: -4%;
   }
-  .newmobile {
-    display: none;
-  }
   .new {
     display: none;
   }
@@ -1314,4 +1308,59 @@ body {
   white-space: nowrap;
   text-decoration: none;
   color: #9941e5 !important;
+}
+
+.get-quote-wrap {
+  max-width: 600px;
+  margin: 2% auto 10%;
+}
+
+.reg-input-wrap {
+  max-width: 230px;
+}
+
+.get-quote-btn {
+  white-space: nowrap;
+  border: 3px solid #9941e5 !important;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 16px 24px;
+  line-height: 1;
+}
+.get-quote-btn:hover {
+  cursor: pointer;
+  background-color: #9941e5 !important;
+  color: #fff !important;
+  transition: 0.3s all;
+}
+
+.or-call {
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 18px;
+  color: #000000;
+}
+
+.purple-phone-number {
+  white-space: nowrap;
+  text-decoration: none;
+  color: #9941e5 !important;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 767px) {
+  /*.get-quote-btn {*/
+  /*  padding: 4px 8px;*/
+  /*}*/
+
+  /*.or-call {*/
+  /*  font-size: 16px;*/
+  /*}*/
+
+  /*.purple-phone-number {*/
+  /*  font-size: 18px;*/
+  /*}*/
 }

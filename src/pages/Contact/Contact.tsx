@@ -16,8 +16,8 @@ export const Contact: React.FC = () => {
           <div className='row'>
             <div className='col-md-8'>
               <p className='main-content mt-3 mb-4'>
-                You can come to our workshop
-                <br /> or we come to you.
+                Our office is registered in London <br />
+                but we offer service in different parts of UK
               </p>
               <div className='row'>
                 <div className='col-md-6'>
