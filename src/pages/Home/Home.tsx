@@ -127,11 +127,11 @@ export const Home: React.FC = () => {
           </div>
           <div className='content-right1'>
             <div className='content-text'>
-              <p style={{ fontWeight: 'bold', color: '#000' }}>
+              <p className='mb-0' style={{ fontWeight: 'bold', color: '#000' }}>
                 We can replace every model out there and every glass of the vehicle:
-                <p style={{ color: '#707070', fontWeight: 'normal' }}>
-                  front windscreen, door glass or rear backlight/windscreen.
-                </p>
+              </p>
+              <p style={{ color: '#707070', fontWeight: 'normal' }}>
+                front windscreen, door glass or rear backlight/windscreen.
               </p>
             </div>
           </div>
