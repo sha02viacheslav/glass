@@ -24,7 +24,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [billingAddress, setBillingAddress] = useState<Address | undefined>(quoteInfo?.invoice_address || undefined)
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(
+    (editMode ? quoteInfo?.invoice_address : undefined) || undefined,
+  )
   const [fixingAddressText, setFixingAddressText] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
   const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
   const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
@@ -320,7 +322,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           <div className='col-md-12'>
                             <div className='form-group mb-4'>
                               <div className='d-flex justify-content-between'>
-                                <div className='h6 text-left text-black-50'>Billing address</div>
+                                <div className='h6 text-left text-black-50'>Postcode</div>
                                 {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && editMode && (
                                   <ChangeAddress
                                     qid={quoteInfo.fe_token}
