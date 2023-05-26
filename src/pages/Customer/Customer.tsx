@@ -24,7 +24,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const { licenseNum } = useParams()
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(quoteInfo?.invoice_address || undefined)
   const [fixingAddressText, setFixingAddressText] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
   const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
   const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
@@ -334,9 +334,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 )}
                               </div>
                               <AddressInput
-                                address={quoteInfo?.invoice_address}
+                                address={billingAddress}
                                 formError={incorrectFormIndex === 4}
                                 onChange={setBillingAddress}
+                                disabled={editMode}
                               />
                             </div>
                           </div>
