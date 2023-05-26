@@ -1,32 +1,13 @@
-import './home.css'
-import React, { useRef } from 'react'
+import './Home.css'
+import React from 'react'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import home1 from '@glass/assets/images/1.png'
 import home2 from '@glass/assets/images/2.png'
 import flag from '@glass/assets/images/uk-flag.svg'
+import { GetQuoteOrCall } from '@glass/components/GetQuoteOrCall'
 import { PHONE_NUMBER } from '@glass/constants'
-import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Home: React.FC = () => {
-  const navigate = useNavigate()
-  const licenseRef = useRef<HTMLInputElement>(null)
-
-  const patternMatch = () => {
-    if (licenseRef.current) {
-      licenseRef.current.value = formatLicenseNumber(licenseRef.current.value)
-    }
-  }
-
-  const directToCustomer = () => {
-    if (licenseRef.current?.value) {
-      navigate('/customer/' + licenseRef.current?.value)
-      licenseRef.current.value = ''
-    } else {
-      navigate('/customer')
-    }
-  }
-
   useEffect(() => {
     localStorage.setItem('development version', JSON.stringify('1.1.7'))
   }, [])
@@ -48,28 +29,8 @@ export const Home: React.FC = () => {
             <div className='bottomDiv'></div>
           </div>
 
-          <div className='top-get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
-            <div className='reg-input-wrap'>
-              <div className='form-group'>
-                <input
-                  ref={licenseRef}
-                  type='text'
-                  className='form-control'
-                  placeholder='Reg Number'
-                  onChange={patternMatch}
-                  maxLength={8}
-                />
-              </div>
-            </div>
-            <div className='d-flex flex-column flex-md-row align-items-center'>
-              <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
-                GET A QUOTE
-              </button>
-              <div className='or-call m-3'>or call</div>
-              <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
-                {PHONE_NUMBER}
-              </a>
-            </div>
+          <div className='top-get-quote-wrap'>
+            <GetQuoteOrCall />
           </div>
         </div>
       </div>
@@ -132,16 +93,8 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
-        <div className='d-flex flex-column flex-md-row align-items-center'>
-          <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
-            GET A QUOTE
-          </button>
-          <div className='or-call m-3'>or call</div>
-          <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
-            {PHONE_NUMBER}
-          </a>
-        </div>
+      <div className='get-quote-wrap'>
+        <GetQuoteOrCall showRegInput={false} />
       </div>
 
       <div className='wrapper'>
@@ -174,11 +127,11 @@ export const Home: React.FC = () => {
           </div>
           <div className='content-right1'>
             <div className='content-text'>
-              <p style={{ fontWeight: 'bold', color: '#000' }}>
+              <p className='mb-0' style={{ fontWeight: 'bold', color: '#000' }}>
                 We can replace every model out there and every glass of the vehicle:
-                <p style={{ color: '#707070', fontWeight: 'normal' }}>
-                  front windscreen, door glass or rear backlight/windscreen.
-                </p>
+              </p>
+              <p style={{ color: '#707070', fontWeight: 'normal' }}>
+                front windscreen, door glass or rear backlight/windscreen.
               </p>
             </div>
           </div>
@@ -186,16 +139,8 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className='get-quote-wrap d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
-        <div className='d-flex flex-column flex-md-row align-items-center'>
-          <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
-            GET A QUOTE
-          </button>
-          <div className='or-call m-3'>or call</div>
-          <a href={`tel:${PHONE_NUMBER}`} className='purple-phone-number'>
-            {PHONE_NUMBER}
-          </a>
-        </div>
+      <div className='get-quote-wrap'>
+        <GetQuoteOrCall showRegInput={false} />
       </div>
     </div>
   )
