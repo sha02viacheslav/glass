@@ -1,4 +1,4 @@
-import './style.css'
+import './Header.css'
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
@@ -39,11 +39,11 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
                 <>
                   <div className='col-5 ms-auto'>
                     <div className='d-flex flex-column align-items-center'>
-                      <button className='get-quote-btn' onClick={directToCustomer}>
+                      <button className='header-get-quote-btn' onClick={directToCustomer}>
                         Get a Quote
                       </button>
-                      <div className='or-call'>or call</div>
-                      <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
+                      <div className='header-or-call'>or call</div>
+                      <a href={`tel:${PHONE_NUMBER}`} className='header-phone-number'>
                         {PHONE_NUMBER}
                       </a>
                     </div>
