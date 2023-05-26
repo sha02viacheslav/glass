@@ -629,12 +629,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   )}
 
                   <div className='booking-address'>
-                    {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2},{' '}
-                    {quoteDetails.delivery_address?.town_or_city}
+                    {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2 || 'N/A'},{' '}
+                    {quoteDetails.delivery_address?.town_or_city || 'N/A'}
                     <br />
-                    {quoteDetails.delivery_address?.county}
+                    {quoteDetails.delivery_address?.county || 'N/A'}
                     <br />
-                    {quoteDetails.delivery_address?.postcode}
+                    {quoteDetails.delivery_address?.postcode || 'N/A'}
                   </div>
                   {quoteDetails?.order_state !== OrderState.WON && (
                     <div className='d-flex justify-content-end'>
