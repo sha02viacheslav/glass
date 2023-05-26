@@ -6,7 +6,7 @@
   width: 200px;
 }
 
-.get-quote-btn {
+.header-get-quote-btn {
   white-space: nowrap;
   border: 3px solid #9941e5 !important;
   border-radius: 10px;
@@ -16,27 +16,29 @@
   padding: 16px 24px;
   line-height: 1;
 }
-.get-quote-btn:hover {
+
+.header-get-quote-btn:hover {
   cursor: pointer;
   background-color: #9941e5 !important;
   color: #fff !important;
   transition: 0.3s all;
 }
 
-.or-call {
+.header-or-call {
   white-space: nowrap;
   font-weight: bold;
   font-size: 18px;
   color: #000000;
 }
 
-.phone-number {
+.header-phone-number {
   white-space: nowrap;
   text-decoration: none;
   color: #9941e5 !important;
   font-size: 20px;
   font-weight: bold;
 }
+
 @media (min-width: 768px) {
   #navbar_top {
     min-height: 111px;
@@ -44,14 +46,15 @@
 }
 
 @media (max-width: 767px) {
-  .get-quote-btn {
+  .header-get-quote-btn {
     padding: 4px 8px;
   }
-  .or-call {
+
+  .header-or-call {
     font-size: 16px;
   }
 
-  .phone-number {
+  .header-phone-number {
     font-size: 18px;
   }
 }

@@ -1,4 +1,6 @@
+import './Services.css'
 import React from 'react'
+import { GetQuoteOrCall } from '@glass/components/GetQuoteOrCall'
 
 export const Services: React.FC = () => {
   const services = [
@@ -46,6 +48,11 @@ export const Services: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <div className='get-quote-wrap'>
+        <GetQuoteOrCall />
+      </div>
+
       {/*Remove for now, will check later*/}
       {/*<CaseStudies />*/}
     </div>

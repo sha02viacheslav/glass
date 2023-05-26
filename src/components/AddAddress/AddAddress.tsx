@@ -1,11 +1,10 @@
 import './style.css'
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Modal, Typography } from '@mui/material'
-import { autocomplete } from 'getaddress-autocomplete'
 import { trackPromise } from 'react-promise-tracker'
+import { AddressInput } from '@glass/components/AddressInput'
 import { AddressType } from '@glass/enums'
-import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address } from '@glass/models'
 import { createAddressService } from '@glass/services/apis/create-address.service'
 
@@ -17,8 +16,6 @@ export type ChangeAddressProps = {
 }
 
 export const AddAddress: React.FC<ChangeAddressProps> = ({ customerId, addressType, onSuccess, onCancel }) => {
-  const addressRef = useRef<HTMLInputElement>(null)
-  const [addressVal, setAddressVal] = useState<string>('')
   const [fullAddress, setFullAddress] = useState<Address | undefined>(undefined)
   const [errMsg, setErrMsg] = useState<string>('')
 
@@ -32,31 +29,9 @@ export const AddAddress: React.FC<ChangeAddressProps> = ({ customerId, addressTy
         }),
       )
     } else {
-      setErrMsg('Please select the correct address from the auto complete')
+      setErrMsg('Please enter post code')
     }
   }
-
-  const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setAddressVal(event.target.value)
-  }
-
-  useEffect(() => {
-    setTimeout(() => {
-      autocomplete('addressModalInput', REACT_APP_AUTOCOMPLETE, {
-        delay: 500,
-      })
-    })
-
-    // Preventing Default to show complete address with Postal Code
-    window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
-      e.preventDefault()
-      // @ts-ignore
-      const address: Address = e.address
-      setFullAddress(address)
-      const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
-      setAddressVal(tempAddress)
-    })
-  }, [])
 
   return (
     <Modal
@@ -92,15 +67,7 @@ export const AddAddress: React.FC<ChangeAddressProps> = ({ customerId, addressTy
         </Box>
 
         <Box marginTop={4}>
-          <input
-            id='addressModalInput'
-            ref={addressRef}
-            type='text'
-            placeholder={addressType == AddressType.INVOICE ? 'Billing address' : 'Fixing address'}
-            className={'form-control'}
-            onChange={handlePCodeChange}
-            value={addressVal}
-          />
+          <AddressInput address={fullAddress} formError={!!errMsg} onChange={setFullAddress} />
           {!!errMsg && (
             <Box className='formError' marginTop={1}>
               {errMsg}

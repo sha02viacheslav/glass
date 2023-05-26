@@ -1,92 +1,70 @@
 import './location.css'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
-import { autocomplete } from 'getaddress-autocomplete'
-import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import { Address } from '@glass/models'
+import { ChangeAddress } from '@glass/components/ChangeAddress'
+import { AddressType } from '@glass/enums'
+import { Address, Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 
 export type LocationSelectionProps = {
-  userBillingAddress: Address
-  deliveryAddressToChild?: Address
+  qid: string | undefined
+  quoteInfo: Quote
   deliveryAddressToParent: (value: Address | undefined) => void
 }
 
-export const LocationSelection: React.FC<LocationSelectionProps> = ({
-  userBillingAddress,
-  deliveryAddressToChild,
-  deliveryAddressToParent,
-}) => {
-  const [address, setAddress] = useState<string>(formatAddress(deliveryAddressToChild))
+export const LocationSelection: React.FC<LocationSelectionProps> = ({ qid, quoteInfo, deliveryAddressToParent }) => {
+  const [addressText, setAddressText] = useState<string>(formatAddress(quoteInfo.delivery_address))
   const [addressInput, setAddressInput] = useState<boolean>(
-    formatAddress(userBillingAddress) !== formatAddress(deliveryAddressToChild),
+    formatAddress(quoteInfo.invoice_address) !== formatAddress(quoteInfo.delivery_address),
   )
 
   const handleAddressCheck = () => {
     if (addressInput) {
       setAddressInput(false)
-      newDeliveryAddress(userBillingAddress)
+      newDeliveryAddress(quoteInfo.invoice_address)
       const field = document.getElementById('autocomplete-field')
       if (field) field.setAttribute('readonly', '')
     } else {
       setAddressInput(true)
       const field = document.getElementById('autocomplete-field')
       if (field) {
-        if (formatAddress(deliveryAddressToChild) === address) {
+        if (formatAddress(quoteInfo.delivery_address) === addressText) {
           newDeliveryAddress(undefined)
           field.removeAttribute('readonly')
           field.focus()
         } else {
-          newDeliveryAddress(deliveryAddressToChild)
+          newDeliveryAddress(quoteInfo.delivery_address)
           field.removeAttribute('readonly')
         }
       }
     }
   }
 
-  const handlePCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(event.target.value)
-  }
-
   const newDeliveryAddress = (address: Address | undefined) => {
     deliveryAddressToParent(address)
-    setAddress(formatAddress(address))
+    setAddressText(formatAddress(address))
   }
-
-  useEffect(() => {
-    // Integration of PostalCode/ Address AutoComplete API
-    autocomplete('autocomplete-field', REACT_APP_AUTOCOMPLETE, {
-      delay: 500,
-    })
-
-    // Preventing Default to show complete address with Postal Code
-    window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
-      e.preventDefault()
-      // @ts-ignore
-      const address: Address = e.address
-      newDeliveryAddress(address)
-    })
-
-    // get the width of the main container and set the input bar's width accordingly (the width needs to be hard set in pixels)
-    const mainContainer = document.getElementById('loc-container')
-    const inputField = document.getElementById('autocomplete-field')
-    if (mainContainer != null && inputField) {
-      inputField.style.width = (mainContainer.offsetWidth - 60).toString().concat('px')
-    }
-  }, [])
 
   return (
     <div className='location-container' id='loc-container'>
       <h3 className='text-24 text-blue mb-4 LS-header'>Where do we fix?</h3>
       <div className='option-header'>At home or work</div>
-      <input
-        id='autocomplete-field'
-        type='text'
-        className='address-input'
-        onChange={handlePCodeChange}
-        value={address}
-        disabled={!addressInput}
-      />
+
+      {addressInput && !!qid && (
+        <div className='w-100 d-flex justify-content-end mb-2'>
+          <ChangeAddress
+            qid={qid}
+            customerId={quoteInfo.customer_id}
+            addressType={AddressType.DELIVERY}
+            initialAddress={quoteInfo.delivery_address}
+            onChangeAddress={(event) => {
+              newDeliveryAddress(event)
+              setAddressText(formatAddress(event))
+            }}
+          />
+        </div>
+      )}
+      <input type='text' className='address-input' value={addressText || ''} disabled={true} />
       <div className='option-container'>
         <div>
           <span className='shop-address'>Same as billing address</span>
