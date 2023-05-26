@@ -1,13 +1,12 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { autocomplete } from 'getaddress-autocomplete'
+import React, { useEffect, useRef, useState } from 'react'
 import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
+import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { AddressType, CarType } from '@glass/enums'
-import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
@@ -26,9 +25,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
   const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
-  const [billingAddressText, setBillingAddressText] = useState(
-    editMode ? formatAddress(quoteInfo?.invoice_address) : '',
-  )
   const [fixingAddressText, setFixingAddressText] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
   const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
   const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
@@ -42,7 +38,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const lastNameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const phoneRef = useRef<HTMLInputElement>(null)
-  const billingRef = useRef<HTMLInputElement>(null)
 
   const [comment, setComment] = useState<string>(editMode ? quoteInfo?.customer_comments?.[0]?.comment || '' : '')
   const [attachments, setAttachments] = useState<Attachment[]>(
@@ -97,7 +92,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     const lastNameNotFilled = checkIfFilled(lastNameRef?.current?.value, 'Last name not filled', 1)
     const emailNotFilled = checkIfFilled(emailRef?.current?.value, 'Email not filled', 2)
     const phoneNotFilled = checkIfFilled(phoneRef?.current?.value, 'Phone number not filled', 3)
-    const billingNotFilled = checkIfFilled(billingRef?.current?.value, 'Postal code not filled', 4)
+    const billingNotFilled = checkIfFilled(billingAddress?.postcode, 'Postal code not filled', 4)
     const licenseNumNotFilled = checkIfFilled(licenseSearchVal, 'License number not filled', 5)
     const windowNotFilled = checkIfSelected()
 
@@ -200,23 +195,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   useEffect(() => {
     fetchVehData(licenseNum)
 
-    if (!editMode) {
-      // Integration of PostalCode/ Address AutoComplete API
-      autocomplete('billingAddress', REACT_APP_AUTOCOMPLETE, {
-        delay: 500,
-      })
-
-      // Preventing Default to show complete address with Postal Code
-      window.addEventListener('getaddress-autocomplete-address-selected', function (e) {
-        e.preventDefault()
-        // @ts-ignore
-        const address: Address = e.address
-        setBillingAddress(address)
-        const tempAddress = address.formatted_address.filter(Boolean).join(', ') + ' ' + address.postcode
-        setBillingAddressText(tempAddress)
-      })
-    }
-
     // send previously selected windows to window selection component
     const selectedWindows: string[] = []
     if (selected.length > 0) {
@@ -231,10 +209,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const handleVehInputChange = (data: string | undefined) => {
     fetchVehData(data)
     setLicense(formatLicenseNumber(data))
-  }
-
-  const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setBillingAddressText(event.target.value)
   }
 
   return (
@@ -355,20 +329,14 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                     initialAddress={quoteInfo.invoice_address}
                                     onChangeAddress={(event) => {
                                       setBillingAddress(event)
-                                      setBillingAddressText(formatAddress(event))
                                     }}
                                   />
                                 )}
                               </div>
-                              <input
-                                id='billingAddress'
-                                ref={billingRef}
-                                type='text'
-                                className={incorrectFormIndex === 4 ? 'form-control form-not-filled' : 'form-control'}
-                                placeholder='Billing address'
-                                onChange={handlePCodeChange}
-                                value={billingAddressText}
-                                disabled={editMode}
+                              <AddressInput
+                                address={quoteInfo?.invoice_address}
+                                formError={incorrectFormIndex === 4}
+                                onChange={setBillingAddress}
                               />
                             </div>
                           </div>

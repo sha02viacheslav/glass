@@ -660,8 +660,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     }
                   />
                   <LocationSelection
-                    userBillingAddress={quoteDetails.invoice_address}
-                    deliveryAddressToChild={quoteDetails.delivery_address}
+                    qid={id}
+                    quoteInfo={quoteDetails}
                     deliveryAddressToParent={deliveryAddressToParent}
                   />
                   {(editBooking || timeSlotIsChanged || deliveryAddressIsChanged) && (
