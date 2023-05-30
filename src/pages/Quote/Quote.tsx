@@ -477,21 +477,11 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   <div className='client-info'>
                     {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
                   </div>
-                  <div className='client-info'>
-                    <b>Billing address:</b> {formatAddress(quoteDetails?.invoice_address)}
-                  </div>
-                  <div className='client-info'>
-                    <b>Email:</b> {quoteDetails?.customer_email}
-                  </div>
-                  <div className='client-info'>
-                    <b>Phone number:</b> {quoteDetails?.customer_phone}
-                  </div>
-                  <div className='client-info'>
-                    <b>Make:</b> {quoteDetails?.make}
-                  </div>
-                  <div className='client-info'>
-                    <b>Model:</b> {quoteDetails?.model}
-                  </div>
+                  <div className='client-info'>{formatAddress(quoteDetails?.invoice_address)}</div>
+                  <div className='client-info'>{quoteDetails?.customer_email}</div>
+                  <div className='client-info'>{quoteDetails?.customer_phone}</div>
+                  <div className='client-info'>{quoteDetails?.make}</div>
+                  <div className='client-info'>{quoteDetails?.model}</div>
                 </div>
               </div>
               <div className='edit-btn-container'>
