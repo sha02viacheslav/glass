@@ -100,6 +100,12 @@
   padding: 8px 12px;
 }
 
+@media (max-width: 767px) {
+  .total-container-in {
+    width: 70%;
+  }
+}
+
 .total-row {
   border-bottom: 1px solid #999999;
   display: flex;

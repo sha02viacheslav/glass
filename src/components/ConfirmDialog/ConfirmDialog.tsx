@@ -47,7 +47,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           justifyContent: 'center',
           flexDirection: 'column',
           maxWidth: subDescription ? '550px' : '450px',
-          p: 4,
+          p: { xs: 3, md: 4 },
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
@@ -66,7 +66,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               display: 'flex',
               justifyContent: 'center',
               marginTop: '30px',
-              gap: '40px',
+              gap: { xs: '24px', md: '40px' },
             }}
           >
             {showCancel && (

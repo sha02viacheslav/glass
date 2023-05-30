@@ -1,6 +1,5 @@
 import './payment-method.css'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import Tooltip from '@mui/material/Tooltip'
 import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import { trackPromise } from 'react-promise-tracker'
@@ -25,6 +24,7 @@ import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.servi
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
+import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -121,7 +121,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
               setShowInvoice(true)
               setInvoiceMessage('')
             } else {
-              setInvoiceMessage('Receipt can be created after booking is confirmed')
+              setInvoiceMessage('Receipt is available after payment. Select the payment method below and pay online.')
             }
           }
         })
@@ -181,6 +181,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (method === PaymentOptionEnum.FOUR_MONTH) {
       handleChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)
     }
+    scrollToElementWithOffset('PM-button-wrap-title', 200)
   }
 
   useEffect(() => {
@@ -241,9 +242,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     <div className='center'>
       {showInvoice && !!invoicePDF && <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} />}
       <div className='quote-card'>
-        <Tooltip disableFocusListener title='Receipt'>
-          <img className='PM-invoice' onClick={retrieveInvoice} src={invoice} alt='' />
-        </Tooltip>
+        <div className='d-flex align-items-center PM-invoice-wrap'>
+          <img onClick={retrieveInvoice} src={invoice} alt='' />
+          <span>Download Receipt</span>
+        </div>
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
         <div className='PM-invoice-status'>{invoiceMessage}</div>
         <div className='PM-status'>
@@ -259,29 +261,34 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         />
 
         {paymentStatus !== PaymentStatus.PAID && (
-          <div className='PM-btn-container'>
-            <button
-              className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
-              onClick={() => handleChangePaymentOption(PaymentOptionEnum.FOUR_MONTH)}
-            >
-              <small className='fs-14'>4 month</small>
-              <div className='PM-price'>£ {(totalPrice / 4).toFixed(2)}</div>
-            </button>
-            {/*<button*/}
-            {/*  className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}*/}
-            {/*  onClick={() => handleChangePaymentOption(PaymentOptionEnum.INSURANCE)}*/}
-            {/*>*/}
-            {/*  <small className='fs-14'>Insurance</small>*/}
-            {/*  <div className='PM-price'>£ {excess}</div>*/}
-            {/*</button>*/}
-            <button
-              className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
-              onClick={() => handleChangePaymentOption(PaymentOptionEnum.SINGLE_PAY)}
-            >
-              <small className='fs-14'>Single pay</small>
-              <div className='PM-price'>£ {totalPrice}</div>
-            </button>
-          </div>
+          <>
+            <div className='PM-button-wrap-title' id='PM-button-wrap-title'>
+              Select payment method and pay online
+            </div>
+            <div className='PM-btn-container'>
+              <button
+                className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
+                onClick={() => handleChangePaymentOption(PaymentOptionEnum.FOUR_MONTH)}
+              >
+                <small className='fs-14'>4 month</small>
+                <div className='PM-price'>£ {(totalPrice / 4).toFixed(2)}</div>
+              </button>
+              {/*<button*/}
+              {/*  className={selectedMethod === PaymentOptionEnum.INSURANCE ? 'PM-button-active' : 'PM-button'}*/}
+              {/*  onClick={() => handleChangePaymentOption(PaymentOptionEnum.INSURANCE)}*/}
+              {/*>*/}
+              {/*  <small className='fs-14'>Insurance</small>*/}
+              {/*  <div className='PM-price'>£ {excess}</div>*/}
+              {/*</button>*/}
+              <button
+                className={selectedMethod === PaymentOptionEnum.SINGLE_PAY ? 'PM-button-active' : 'PM-button'}
+                onClick={() => handleChangePaymentOption(PaymentOptionEnum.SINGLE_PAY)}
+              >
+                <small className='fs-14'>Single pay</small>
+                <div className='PM-price'>£ {totalPrice}</div>
+              </button>
+            </div>
+          </>
         )}
 
         {paymentStatus !== PaymentStatus.PAID && (
