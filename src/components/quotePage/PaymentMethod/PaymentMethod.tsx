@@ -24,6 +24,7 @@ import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.servi
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
+import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
 export type PaymentMethodProps = {
   offerDetails?: Offer[]
@@ -180,6 +181,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (method === PaymentOptionEnum.FOUR_MONTH) {
       handleChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)
     }
+    scrollToElementWithOffset('PM-button-wrap-title', 200)
   }
 
   useEffect(() => {
@@ -260,7 +262,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
         {paymentStatus !== PaymentStatus.PAID && (
           <>
-            <div className='PM-button-wrap-title'>Select payment method and pay online</div>
+            <div className='PM-button-wrap-title' id='PM-button-wrap-title'>
+              Select payment method and pay online
+            </div>
             <div className='PM-btn-container'>
               <button
                 className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
