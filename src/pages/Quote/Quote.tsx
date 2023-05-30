@@ -27,6 +27,7 @@ import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
 export type QuoteProps = {
   quoteCount?: boolean
@@ -95,14 +96,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     switch (action) {
       case QuoteAction.GO_TIMESLOT: {
         setSnapValue(QuoteStep.TIMESLOT)
-        const dom = document.getElementById('2')
-        if (dom) dom.scrollIntoView({ behavior: 'smooth' })
+        scrollToElementWithOffset('2')
         return
       }
       case QuoteAction.GO_PAYMENT: {
         setSnapValue(QuoteStep.PAYMENT)
-        const dom = document.getElementById('1')
-        if (dom) dom.scrollIntoView({ behavior: 'smooth' })
+        scrollToElementWithOffset('1')
         return
       }
       case QuoteAction.CONFIRM_BOOKING: {
@@ -353,10 +352,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
 
     // scroll to top on page load
-    const topSelector = document.getElementById('1')
-    if (topSelector !== null) {
-      topSelector.scrollIntoView({ behavior: 'smooth' })
-    }
+    scrollToElementWithOffset('1')
   }, [])
 
   useEffect(() => {
@@ -477,21 +473,11 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   <div className='client-info'>
                     {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
                   </div>
-                  <div className='client-info'>
-                    <b>Billing address:</b> {formatAddress(quoteDetails?.invoice_address)}
-                  </div>
-                  <div className='client-info'>
-                    <b>Email:</b> {quoteDetails?.customer_email}
-                  </div>
-                  <div className='client-info'>
-                    <b>Phone number:</b> {quoteDetails?.customer_phone}
-                  </div>
-                  <div className='client-info'>
-                    <b>Make:</b> {quoteDetails?.make}
-                  </div>
-                  <div className='client-info'>
-                    <b>Model:</b> {quoteDetails?.model}
-                  </div>
+                  <div className='client-info'>{formatAddress(quoteDetails?.invoice_address)}</div>
+                  <div className='client-info'>{quoteDetails?.customer_email}</div>
+                  <div className='client-info'>{quoteDetails?.customer_phone}</div>
+                  <div className='client-info'>{quoteDetails?.make}</div>
+                  <div className='client-info'>{quoteDetails?.model}</div>
                 </div>
               </div>
               <div className='edit-btn-container'>
