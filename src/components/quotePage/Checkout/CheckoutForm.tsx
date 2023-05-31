@@ -1,8 +1,9 @@
+import './checkout.css'
 import React, { useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { StripePaymentElementChangeEvent } from '@stripe/stripe-js'
 import { updatePaymentStatusService } from '@glass/services/apis/update-payment-status.service'
-import './checkout.css'
+import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
 export type CheckoutFormProps = {
   amount: number
@@ -28,6 +29,10 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     // We don't want to let default form submission happen here,
     // which would refresh the page.
     event.preventDefault()
+
+    setTimeout(() => {
+      scrollToElementWithOffset('PM-button-wrap-title', 10)
+    })
 
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
