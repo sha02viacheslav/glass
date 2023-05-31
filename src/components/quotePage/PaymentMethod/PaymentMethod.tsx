@@ -74,6 +74,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
+  const [showCashConfirm, setShowCashConfirm] = useState<boolean>(false)
   const [warningMsg, setWarningMsg] = useState<string>('')
 
   const emptyMonthlyPayments = useMemo<MonthlyPayment | undefined>(() => {
@@ -143,7 +144,17 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const handleChangePaymentMethodType = (value: PaymentMethodType) => {
     if (value == paymentMethodType) return
     setTempPaymentMethodType(value)
+
+    if (value === PaymentMethodType.CASH) {
+      setShowCashConfirm(true)
+    } else {
+      setShowPaymentConfirm(true)
+    }
+  }
+
+  const handleConfirmCashType = () => {
     setShowPaymentConfirm(true)
+    setShowCashConfirm(false)
   }
 
   const handleConfirmChangePaymentMethodType = () => {
@@ -585,6 +596,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 {!!paymentMethodType && (
                   <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
                 )}
+
+                {paymentMethodType === PaymentMethodType.CASH && (
+                  <div className='cash-payment-msg'>
+                    Cash in hand payment. <br />
+                    On the day of booking, technician will confirm the payment and we can start working.
+                  </div>
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
@@ -592,10 +610,26 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         )}
       </div>
 
+      {showCashConfirm && (
+        <ConfirmDialog
+          title='I want to pay cash in hand'
+          showIcon={false}
+          onConfirm={handleConfirmCashType}
+          onCancel={() => {
+            setShowCashConfirm(false)
+          }}
+        />
+      )}
+
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Confirm payment method'
+          title={
+            tempPaymentMethodType === PaymentMethodType.CASH
+              ? 'Cash in hand must be paid on the day of booking, before starting the work.'
+              : 'Confirm payment method'
+          }
           showIcon={false}
+          confirmStr={tempPaymentMethodType === PaymentMethodType.CASH ? 'Ok' : 'Yes'}
           onConfirm={handleConfirmChangePaymentMethodType}
           onCancel={() => {
             setShowPaymentConfirm(false)
