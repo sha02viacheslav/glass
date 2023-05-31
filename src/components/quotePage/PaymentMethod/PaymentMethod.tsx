@@ -242,8 +242,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     <div className='center'>
       {showInvoice && !!invoicePDF && <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} />}
       <div className='quote-card'>
-        <div className='d-flex align-items-center PM-invoice-wrap'>
-          <img onClick={retrieveInvoice} src={invoice} alt='' />
+        <div className='d-flex align-items-center PM-invoice-wrap' onClick={retrieveInvoice}>
+          <img src={invoice} alt='Invoice' />
           <span>Download Receipt</span>
         </div>
         <h3 className='text-24 text-blue PM-header'>Quotation</h3>
