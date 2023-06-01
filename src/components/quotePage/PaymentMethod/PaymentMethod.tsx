@@ -20,9 +20,11 @@ import {
   PaymentSchedule,
   Quote,
 } from '@glass/models'
+import { customerLogService } from '@glass/services/apis/customer-log.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
+import { paymentMethodButton } from '@glass/utils/payment-method-button/payment-method-button.util'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
@@ -74,6 +76,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [invoiceMessage, setInvoiceMessage] = useState('')
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
+  const [showCashConfirm, setShowCashConfirm] = useState<boolean>(false)
   const [warningMsg, setWarningMsg] = useState<string>('')
 
   const emptyMonthlyPayments = useMemo<MonthlyPayment | undefined>(() => {
@@ -143,7 +146,31 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const handleChangePaymentMethodType = (value: PaymentMethodType) => {
     if (value == paymentMethodType) return
     setTempPaymentMethodType(value)
+
+    if (value === PaymentMethodType.CASH) {
+      setShowCashConfirm(true)
+    } else {
+      setShowPaymentConfirm(true)
+    }
+
+    if (qid) {
+      customerLogService(qid, `Clicked ${paymentMethodButton(value)}`)
+    }
+  }
+
+  const handleConfirmCashType = () => {
     setShowPaymentConfirm(true)
+    setShowCashConfirm(false)
+    if (qid) {
+      customerLogService(qid, 'Request Cash = "Yes"')
+    }
+  }
+
+  const handleCancelCashType = () => {
+    setShowCashConfirm(false)
+    if (qid) {
+      customerLogService(qid, 'Request Cash = "No"')
+    }
   }
 
   const handleConfirmChangePaymentMethodType = () => {
@@ -156,6 +183,20 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         }
         if (refetchQuote) refetchQuote()
       })
+
+      customerLogService(
+        qid,
+        `Confirm ${paymentMethodButton(tempPaymentMethodType)} = "${
+          tempPaymentMethodType === PaymentMethodType.CASH ? 'Ok' : 'Yes'
+        }"`,
+      )
+    }
+  }
+
+  const handleCancelChangePaymentMethodType = () => {
+    setShowPaymentConfirm(false)
+    if (qid && tempPaymentMethodType) {
+      customerLogService(qid, `Confirm ${paymentMethodButton(tempPaymentMethodType)} = "No"`)
     }
   }
 
@@ -585,6 +626,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 {!!paymentMethodType && (
                   <Checkout paymentMethodType={paymentMethodType} amount={totalPrice} succeedPayment={refetchQuote} />
                 )}
+
+                {paymentMethodType === PaymentMethodType.CASH && (
+                  <div className='cash-payment-msg'>
+                    Cash in hand payment. <br />
+                    On the day of booking, technician will confirm the payment and we can start working.
+                  </div>
+                )}
               </div>
             )}
             {selectedMethod === PaymentOptionEnum.NONE && <div className='transparent-element'>-</div>}
@@ -592,14 +640,26 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         )}
       </div>
 
+      {showCashConfirm && (
+        <ConfirmDialog
+          title='I want to pay cash in hand'
+          showIcon={false}
+          onConfirm={handleConfirmCashType}
+          onCancel={handleCancelCashType}
+        />
+      )}
+
       {showPaymentConfirm && (
         <ConfirmDialog
-          title='Confirm payment method'
+          title={
+            tempPaymentMethodType === PaymentMethodType.CASH
+              ? 'Cash in hand must be paid on the day of booking, before starting the work.'
+              : 'Confirm payment method'
+          }
           showIcon={false}
+          confirmStr={tempPaymentMethodType === PaymentMethodType.CASH ? 'Ok' : 'Yes'}
           onConfirm={handleConfirmChangePaymentMethodType}
-          onCancel={() => {
-            setShowPaymentConfirm(false)
-          }}
+          onCancel={handleCancelChangePaymentMethodType}
         />
       )}
 

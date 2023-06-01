@@ -350,3 +350,9 @@
 .transaction-state-success {
   background: #649a2b;
 }
+
+.cash-payment-msg {
+  font-size: 16px;
+  margin-top: 16px;
+  line-height: 1.5;
+}
