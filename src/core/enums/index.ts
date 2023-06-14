@@ -1,6 +1,7 @@
 export * from './address-type.enum'
 export * from './booking-occupy.enum'
 export * from './car-type.enum'
+export * from './customer-chat-state.enum'
 export * from './order-state.enum'
 export * from './payment-method-type.enum'
 export * from './payment-method.enum'

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import home1 from '@glass/assets/images/1.png'
 import home2 from '@glass/assets/images/2.png'
 import flag from '@glass/assets/images/uk-flag.svg'
+import { Chat } from '@glass/components/Chat'
 import { GetQuoteOrCall } from '@glass/components/GetQuoteOrCall'
 import { PHONE_NUMBER } from '@glass/constants'
 
@@ -142,6 +143,8 @@ export const Home: React.FC = () => {
       <div className='get-quote-wrap'>
         <GetQuoteOrCall showRegInput={false} />
       </div>
+
+      <Chat />
     </div>
   )
 }
