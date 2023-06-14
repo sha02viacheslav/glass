@@ -266,7 +266,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
                       <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
-                      <form className='form-car my-md-5 my-4'>
+                      <form className='my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>
                         <br />
                         <div className='row'>

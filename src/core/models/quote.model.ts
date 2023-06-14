@@ -38,4 +38,7 @@ export type Quote = {
     assist_4_payment: PaTransaction[]
     stripe: PaTransaction[]
   }
+  customer_chat_state: string
+  live_chat_url: string
+  live_chat_route: string
 }
