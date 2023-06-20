@@ -145,7 +145,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       }
 
       if (editMode) {
-        delete postData.customer_comments
+        // delete postData.customer_comments
         delete postData.customer_address
         trackPromise(
           updateQuoteService({ fe_token: quoteInfo?.fe_token, ...postData }).then((res) => {
@@ -260,11 +260,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           placeholder='Details for glass or any other comment.'
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
-                          disabled={editMode}
                         ></textarea>
                       </div>
 
-                      <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
+                      <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
                       <form className='my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>

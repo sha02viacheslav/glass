@@ -4,7 +4,7 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import { Attachment } from '@glass/models'
 
 type AddPicturesProps = {
-  disabled: boolean
+  disabled?: boolean
   attachments: Attachment[]
   limit?: number
   onChangeFiles: (files: Attachment[]) => void
@@ -15,7 +15,7 @@ type ValidateFileResponse = {
   message?: string
 }
 
-export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments, limit, onChangeFiles }) => {
+export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, attachments, limit, onChangeFiles }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [validFiles, setValidFiles] = useState<Attachment[]>(attachments || [])
   const [errorMessage, setErrorMessage] = useState<string>('')
