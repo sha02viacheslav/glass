@@ -7,7 +7,7 @@ type AddPicturesProps = {
   disabled?: boolean
   attachments: Attachment[]
   limit?: number
-  onChangeFiles: (files: Attachment[]) => void
+  onChangeFiles?: (files: Attachment[]) => void
 }
 
 type ValidateFileResponse = {
@@ -81,7 +81,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
           datas: reader.result as string,
         }
         setValidFiles((pre) => [...pre, newAttachment])
-        onChangeFiles(validFiles)
+        onChangeFiles && onChangeFiles([...validFiles, newAttachment])
       }
     })
   }
@@ -89,7 +89,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
-    onChangeFiles(validFiles)
+    onChangeFiles && onChangeFiles(validFiles)
   }
 
   useEffect(() => {
