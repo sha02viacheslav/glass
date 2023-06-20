@@ -133,29 +133,33 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       addr = PAData[4] || ''
     }
 
-    preApprovePaymentService({
-      f_name: first,
-      s_name: second,
-      addr1: addr,
-      postcode: post,
-    }).then((res) => {
-      if (res.success) {
-        if (res.data.approved) {
-          PABegin()
+    trackPromise(
+      preApprovePaymentService({
+        f_name: first,
+        s_name: second,
+        addr1: addr,
+        postcode: post,
+      }).then((res) => {
+        if (res.success) {
+          if (res.data.approved) {
+            PABegin()
+          }
         }
-      }
-    })
+      }),
+    )
   }
 
   const PABegin = () => {
     // create payment API call
     if (id) {
-      beginPaymentAssistService(id).then((res) => {
-        if (res.success) {
-          window.open(res.data.url, '_blank', 'noreferrer')
-          setPAUrl(res.data.url)
-        }
-      })
+      trackPromise(
+        beginPaymentAssistService(id).then((res) => {
+          if (res.success) {
+            window.open(res.data.url, '_blank', 'noreferrer')
+            setPAUrl(res.data.url)
+          }
+        }),
+      )
     }
   }
 
