@@ -281,11 +281,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                             <strong>Comment {index + 1}: </strong>
                             {item.comment}
                           </p>
-                          <AddPictures
-                            disabled={true}
-                            attachments={item.attachments}
-                            onChangeFiles={handleChangeFiles}
-                          />
+                          <AddPictures disabled={true} attachments={item.attachments} />
                         </div>
                       ))}
 
