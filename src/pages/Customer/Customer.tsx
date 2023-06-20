@@ -8,7 +8,7 @@ import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { AddressType, CarType } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
+import { Address, Attachment, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
@@ -29,6 +29,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [vehData, setVehData] = useState<VehicleData | undefined>()
   const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
   const [fixingAddressText, setFixingAddressText] = useState('')
+  const [comments, setComments] = useState<Comment[]>([])
 
   // keep track if request can be submitted
   const firstNameRef = useRef<HTMLInputElement>(null)
@@ -210,6 +211,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (quoteDetails) {
       setBillingAddress(quoteDetails.invoice_address)
       setFixingAddressText(formatAddress(quoteDetails.delivery_address))
+      setComments(quoteDetails.customer_comments?.reverse() || [])
 
       // send previously selected windows to window selection component
       const selectedWindows: string[] = []
@@ -273,7 +275,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <br />
                       <p className='fs-18 text-blue'>Your comments (optional)</p>
 
-                      {(quoteDetails?.customer_comments || []).map((item, index) => (
+                      {comments.map((item, index) => (
                         <div key={index} className='text-left'>
                           <p>
                             <strong>Comment {index + 1}: </strong>
