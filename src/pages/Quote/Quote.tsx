@@ -294,8 +294,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const backToCustomer = () => {
     const licenseReg = quoteDetails?.registration_number.replace(' ', '')
-    sessionStorage.setItem('quoteInfo', JSON.stringify({ fe_token: id, ...quoteDetails }))
-    navigate('/customer/edit/' + licenseReg)
+    navigate(`/customer/edit/${licenseReg}/${id}`)
   }
 
   const timeSlotToParent = (data: TimeSlot) => {

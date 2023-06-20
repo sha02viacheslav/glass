@@ -17,7 +17,7 @@ type ValidateFileResponse = {
 
 export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, attachments, limit, onChangeFiles }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [validFiles, setValidFiles] = useState<Attachment[]>(attachments || [])
+  const [validFiles, setValidFiles] = useState<Attachment[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const btnOnClick = (e: MouseEvent<HTMLElement>) => {
@@ -47,7 +47,6 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
 
   const filesSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    console.error(files)
     handleFiles(files)
     // Have to release file input element
     e.target.value = ''
@@ -82,6 +81,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
           datas: reader.result as string,
         }
         setValidFiles((pre) => [...pre, newAttachment])
+        onChangeFiles(validFiles)
       }
     })
   }
@@ -89,11 +89,12 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
+    onChangeFiles(validFiles)
   }
 
   useEffect(() => {
-    onChangeFiles(validFiles)
-  }, [validFiles])
+    setValidFiles(attachments || [])
+  }, [attachments])
 
   const renderFiles = () => (
     <div className='row'>
@@ -118,21 +119,24 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
   return (
     <div>
       {renderFiles()}
-      <button className='btn-raised' onClick={btnOnClick} disabled={disabled}>
-        <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
-          <input
-            ref={inputRef}
-            type='file'
-            className='d-none'
-            onChange={filesSelected}
-            multiple
-            accept='image/png, image/jpeg, image/gif, image/bmp'
-            onClick={(event) => event.stopPropagation()}
-            disabled={disabled}
-          />
-          Add Pictures
-        </label>
-      </button>
+
+      {!disabled && (
+        <button className='btn-raised' onClick={btnOnClick}>
+          <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
+            <input
+              ref={inputRef}
+              type='file'
+              className='d-none'
+              onChange={filesSelected}
+              multiple
+              accept='image/png, image/jpeg, image/gif, image/bmp'
+              onClick={(event) => event.stopPropagation()}
+              disabled={disabled}
+            />
+            Add Pictures
+          </label>
+        </button>
+      )}
 
       <div>{errorMessage}</div>
     </div>
