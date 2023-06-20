@@ -133,7 +133,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         const index = brokenWindows.findIndex((element) => element.name === selectedWindows[i])
-        if (brokenWindows[index].hasTinted) {
+        if (brokenWindows[index]?.hasTinted) {
           selectedWindows[i] = selectedWindows[i].concat(' privacy')
         }
       }

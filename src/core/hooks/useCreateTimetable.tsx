@@ -30,7 +30,7 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
   const retrieveBookings = (nextDate: Date, timetable: TimeRow[]) => {
     // get past bookings
     getCalendarService(new Date(), nextDate).then((res) => {
-      if (res.success) {
+      if (res.success && res.data?.length) {
         fillTimeslots(timetable, res.data)
       }
     })
