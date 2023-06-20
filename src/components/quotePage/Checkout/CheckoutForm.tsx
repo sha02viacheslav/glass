@@ -1,7 +1,8 @@
 import './checkout.css'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { StripePaymentElementChangeEvent } from '@stripe/stripe-js'
+import { Loader } from '@glass/components/Loader'
 import { updatePaymentStatusService } from '@glass/services/apis/update-payment-status.service'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
@@ -19,6 +20,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
   const [err, setErr] = useState('')
   const [valid, setValid] = useState(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
+  const [scriptLoaded, setScriptLoaded] = useState<boolean>(false)
 
   const handleCardChange = (event: StripePaymentElementChangeEvent) => {
     if (event.complete) setValid(true)
@@ -37,6 +39,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
+      setErr('Script not loaded, please refresh or try again later')
       return
     }
 
@@ -87,6 +90,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
       .catch(() => {})
   }
 
+  useEffect(() => {
+    if (!!stripe && !!elements) {
+      setScriptLoaded(true)
+    }
+  }, [stripe, elements])
+
   return success ? (
     <div className='mt-2 h5 py-4 success-msg'>
       <svg
@@ -106,6 +115,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     </div>
   ) : (
     <form className='mt-2' onSubmit={handleSubmit}>
+      <Loader loading={!scriptLoaded} />
       {err && <div className='h6 text-left text-danger'>{err}</div>}
       <PaymentElement onChange={handleCardChange} />
       <button type='submit' className={`pay-now mt-2 ${!valid ? 'invalid' : ''}`} disabled={submitted}>
