@@ -2,6 +2,7 @@ import './checkout.css'
 import React, { useEffect, useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { StripePaymentElementChangeEvent } from '@stripe/stripe-js'
+import { trackPromise } from 'react-promise-tracker'
 import { Loader } from '@glass/components/Loader'
 import { updatePaymentStatusService } from '@glass/services/apis/update-payment-status.service'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
@@ -46,11 +47,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     setErr('')
 
     setSubmitted(true)
-    const confirmPaymentResult = await stripe.confirmPayment({
-      //`Elements` instance that was used to create the Payment Element
-      elements,
-      redirect: 'if_required',
-    })
+
+    const confirmPaymentResult = await trackPromise(
+      stripe.confirmPayment({
+        //`Elements` instance that was used to create the Payment Element
+        elements,
+        redirect: 'if_required',
+      }),
+    )
 
     if (confirmPaymentResult.error) {
       // Show error to your customer (for example, payment details incomplete)
@@ -62,7 +66,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
     let status = false
     // 3D secure authentication
     if (confirmPaymentResult.paymentIntent.status == 'requires_action') {
-      const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret)
+      const { paymentIntent, error } = await trackPromise(stripe.confirmCardPayment(clientSecret))
       if (error) {
         setErr('Error in payment, please try again later')
         setSubmitted(false)
@@ -79,15 +83,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, clientSecret
       status = true
     }
 
-    await updatePaymentStatusService(
-      confirmPaymentResult.paymentIntent.id,
-      confirmPaymentResult.paymentIntent.client_secret,
-      status ? 'success' : 'Failed',
+    await trackPromise(
+      updatePaymentStatusService(
+        confirmPaymentResult.paymentIntent.id,
+        confirmPaymentResult.paymentIntent.client_secret,
+        status ? 'success' : 'Failed',
+      )
+        .then(() => {
+          succeedPayment()
+        })
+        .catch(() => {}),
     )
-      .then(() => {
-        succeedPayment()
-      })
-      .catch(() => {})
   }
 
   useEffect(() => {
