@@ -1,5 +1,5 @@
 import './style.css'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Modal } from '@mui/material'
 import { trackPromise } from 'react-promise-tracker'
@@ -12,10 +12,13 @@ import { formatLicenseNumber } from '@glass/utils/format-license-number/format-l
 
 export type ChatProps = { quoteInfo?: Quote }
 
+const CHAT_RELOAD_TIME = 60000
+
 export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
   const navigate = useNavigate()
 
   const [isOpenChat, setIsOpenChat] = useState<boolean>(false)
+  const [chatKey, setChatKey] = useState<string>('')
 
   const firstNameRef = useRef<HTMLInputElement>(null)
   const lastNameRef = useRef<HTMLInputElement>(null)
@@ -81,6 +84,19 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
     )
   }
 
+  const reloadChat = () => {
+    if (quoteInfo?.live_chat_route && isOpenChat) {
+      setChatKey(Math.floor(Math.random() * 1000).toString())
+      setTimeout(() => {
+        reloadChat()
+      }, CHAT_RELOAD_TIME)
+    }
+  }
+
+  useEffect(() => {
+    reloadChat()
+  }, [quoteInfo, isOpenChat])
+
   return (
     <>
       <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>
@@ -113,6 +129,8 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
           </Box>
           {!!quoteInfo?.live_chat_route ? (
             <iframe
+              id='odooChatIframe'
+              key={chatKey}
               src={`${process.env.REACT_APP_SERVER_URL}${quoteInfo.live_chat_route}`}
               width='100%'
               height='600px'

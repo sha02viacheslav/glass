@@ -15,7 +15,12 @@ type ValidateFileResponse = {
   message?: string
 }
 
-export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, attachments, limit, onChangeFiles }) => {
+export const AddPictures: React.FC<AddPicturesProps> = ({
+  disabled = false,
+  attachments,
+  limit,
+  onChangeFiles = () => {},
+}) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [validFiles, setValidFiles] = useState<Attachment[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -81,7 +86,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
           datas: reader.result as string,
         }
         setValidFiles((pre) => [...pre, newAttachment])
-        onChangeFiles && onChangeFiles([...validFiles, newAttachment])
+        onChangeFiles([...validFiles, newAttachment])
       }
     })
   }
@@ -89,7 +94,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled = false, atta
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
-    onChangeFiles && onChangeFiles(validFiles)
+    onChangeFiles(validFiles)
   }
 
   useEffect(() => {
