@@ -7,7 +7,6 @@ import { OptionalOrderLine } from './optional-order-line.model'
 import { PaTransaction } from './pa-transaction.model'
 
 export type Quote = {
-  fe_token?: string
   customer_id: number
   registration_number: string
   customer_f_name: string

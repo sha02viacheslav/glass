@@ -173,6 +173,11 @@ area:hover {
   color: #ffffff99;
 }
 
+.pay-now:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
 .text-left {
   text-align: left;
 }

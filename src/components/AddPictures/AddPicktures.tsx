@@ -4,10 +4,10 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import { Attachment } from '@glass/models'
 
 type AddPicturesProps = {
-  disabled: boolean
+  disabled?: boolean
   attachments: Attachment[]
   limit?: number
-  onChangeFiles: (files: Attachment[]) => void
+  onChangeFiles?: (files: Attachment[]) => void
 }
 
 type ValidateFileResponse = {
@@ -15,9 +15,14 @@ type ValidateFileResponse = {
   message?: string
 }
 
-export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments, limit, onChangeFiles }) => {
+export const AddPictures: React.FC<AddPicturesProps> = ({
+  disabled = false,
+  attachments,
+  limit,
+  onChangeFiles = () => {},
+}) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [validFiles, setValidFiles] = useState<Attachment[]>(attachments || [])
+  const [validFiles, setValidFiles] = useState<Attachment[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const btnOnClick = (e: MouseEvent<HTMLElement>) => {
@@ -47,7 +52,6 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments,
 
   const filesSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    console.error(files)
     handleFiles(files)
     // Have to release file input element
     e.target.value = ''
@@ -82,6 +86,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments,
           datas: reader.result as string,
         }
         setValidFiles((pre) => [...pre, newAttachment])
+        onChangeFiles([...validFiles, newAttachment])
       }
     })
   }
@@ -89,11 +94,12 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments,
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
+    onChangeFiles(validFiles)
   }
 
   useEffect(() => {
-    onChangeFiles(validFiles)
-  }, [validFiles])
+    setValidFiles(attachments || [])
+  }, [attachments])
 
   const renderFiles = () => (
     <div className='row'>
@@ -118,21 +124,24 @@ export const AddPictures: React.FC<AddPicturesProps> = ({ disabled, attachments,
   return (
     <div>
       {renderFiles()}
-      <button className='btn-raised' onClick={btnOnClick} disabled={disabled}>
-        <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
-          <input
-            ref={inputRef}
-            type='file'
-            className='d-none'
-            onChange={filesSelected}
-            multiple
-            accept='image/png, image/jpeg, image/gif, image/bmp'
-            onClick={(event) => event.stopPropagation()}
-            disabled={disabled}
-          />
-          Add Pictures
-        </label>
-      </button>
+
+      {!disabled && (
+        <button className='btn-raised' onClick={btnOnClick}>
+          <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
+            <input
+              ref={inputRef}
+              type='file'
+              className='d-none'
+              onChange={filesSelected}
+              multiple
+              accept='image/png, image/jpeg, image/gif, image/bmp'
+              onClick={(event) => event.stopPropagation()}
+              disabled={disabled}
+            />
+            Add Pictures
+          </label>
+        </button>
+      )}
 
       <div>{errorMessage}</div>
     </div>

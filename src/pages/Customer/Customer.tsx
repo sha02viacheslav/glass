@@ -8,8 +8,9 @@ import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { AddressType, CarType } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, Quote, QuoteDto, VehicleData } from '@glass/models'
+import { Address, Attachment, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
+import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
@@ -19,21 +20,16 @@ export type CustomerProps = {
 }
 
 export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
-  const [quoteInfo] = useState<Quote | undefined>(JSON.parse(sessionStorage.getItem('quoteInfo') || 'null'))
-  const [, setVehicleData] = useState('')
-  const { licenseNum } = useParams()
+  const navigate = useNavigate()
+
+  const { licenseNum, quoteId } = useParams()
+
+  const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
-  const [billingAddress, setBillingAddress] = useState<Address | undefined>(
-    (editMode ? quoteInfo?.invoice_address : undefined) || undefined,
-  )
-  const [fixingAddressText, setFixingAddressText] = useState(editMode ? formatAddress(quoteInfo?.delivery_address) : '')
-  const firstName = editMode ? quoteInfo?.customer_f_name || '' : ''
-  const lastName = editMode ? quoteInfo?.customer_s_name || '' : ''
-  const email = editMode ? quoteInfo?.customer_email || '' : ''
-  const phone = editMode ? quoteInfo?.customer_phone || '' : ''
-  const selected = editMode ? quoteInfo?.glass_location || [] : []
-  const navigate = useNavigate()
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
+  const [fixingAddressText, setFixingAddressText] = useState('')
+  const [comments, setComments] = useState<Comment[]>([])
 
   // keep track if request can be submitted
   const firstNameRef = useRef<HTMLInputElement>(null)
@@ -41,10 +37,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const emailRef = useRef<HTMLInputElement>(null)
   const phoneRef = useRef<HTMLInputElement>(null)
 
-  const [comment, setComment] = useState<string>(editMode ? quoteInfo?.customer_comments?.[0]?.comment || '' : '')
-  const [attachments, setAttachments] = useState<Attachment[]>(
-    editMode ? quoteInfo?.customer_comments?.[0]?.attachments || [] : [],
-  )
+  const [comment, setComment] = useState<string>('')
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   // for determining which form is not filled
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
@@ -58,11 +52,25 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   // for getting the array of broken windows
   const [selectedBrokenWindows, setSelectedBrokenWindows] = useState<string[]>([])
+
+  // preselect broken windows if editing quote
+  const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState<string[]>([])
+
   const brokenWindowsToCustomer = (windows: string[]) => {
     setSelectedBrokenWindows(windows)
   }
-  // preselect broken windows if editing quote
-  const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState<string[]>([])
+
+  const getQuote = () => {
+    if (quoteId) {
+      trackPromise(
+        getQuoteService(quoteId, false).then((res) => {
+          if (res.success) {
+            setQuoteDetails(res.data)
+          }
+        }),
+      )
+    }
+  }
 
   // functions for checking if necessary fields are filled and enable submit request
   const checkIfFilled = (value: string | undefined, errorMsg: string, formIndex: number) => {
@@ -144,13 +152,15 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         },
       }
 
-      if (editMode) {
-        delete postData.customer_comments
+      if (quoteDetails) {
+        if (!postData.customer_comments?.comment && !postData.customer_comments?.attachments?.length) {
+          delete postData.customer_comments
+        }
         delete postData.customer_address
         trackPromise(
-          updateQuoteService({ fe_token: quoteInfo?.fe_token, ...postData }).then((res) => {
+          updateQuoteService({ fe_token: quoteId, ...postData }).then((res) => {
             if (res.success) {
-              navigate('/quote/' + quoteInfo?.fe_token)
+              navigate(`/quote/${quoteId}`)
             }
           }),
         )
@@ -183,9 +193,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               setVehData(data.Response.DataItems)
             }
           })
-          .catch(() => {
-            setVehicleData('No Data Found! Error in API.')
-          }),
+          .catch(() => {}),
       )
     }
   }
@@ -194,24 +202,39 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     setAttachments(files)
   }
 
-  useEffect(() => {
-    fetchVehData(licenseNum)
-
-    // send previously selected windows to window selection component
-    const selectedWindows: string[] = []
-    if (selected.length > 0) {
-      for (let i = 0; i < selected.length; i++) {
-        // capitalize first letter to match window name
-        selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1))
-      }
-      setBrokenWindowsToComponent(selectedWindows)
-    }
-  }, [])
-
   const handleVehInputChange = (data: string | undefined) => {
     fetchVehData(data)
     setLicense(formatLicenseNumber(data))
   }
+
+  useEffect(() => {
+    if (quoteDetails) {
+      setBillingAddress(quoteDetails.invoice_address)
+      setFixingAddressText(formatAddress(quoteDetails.delivery_address))
+      setComments(quoteDetails.customer_comments?.reverse() || [])
+
+      // send previously selected windows to window selection component
+      const selectedWindows: string[] = []
+      const selected = editMode ? quoteDetails.glass_location || [] : []
+      if (selected.length > 0) {
+        for (let i = 0; i < selected.length; i++) {
+          // capitalize first letter to match window name
+          selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1))
+        }
+        setBrokenWindowsToComponent(selectedWindows)
+      }
+    }
+  }, [quoteDetails])
+
+  useEffect(() => {
+    fetchVehData(licenseNum)
+  }, [licenseNum])
+
+  useEffect(() => {
+    if (editMode && quoteId) {
+      getQuote()
+    }
+  }, [editMode, quoteId])
 
   return (
     <div>
@@ -251,6 +274,17 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <br />
                       <br />
                       <p className='fs-18 text-blue'>Your comments (optional)</p>
+
+                      {comments.map((item, index) => (
+                        <div key={index} className='text-left'>
+                          <p>
+                            <strong>Comment {index + 1}: </strong>
+                            {item.comment}
+                          </p>
+                          <AddPictures disabled={true} attachments={item.attachments} />
+                        </div>
+                      ))}
+
                       <div className='form-group mb-4'>
                         <textarea
                           name=''
@@ -260,11 +294,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           placeholder='Details for glass or any other comment.'
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
-                          disabled={editMode}
                         ></textarea>
                       </div>
 
-                      <AddPictures disabled={editMode} attachments={attachments} onChangeFiles={handleChangeFiles} />
+                      <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
                       <small className='d-block mt-2'>*Recommended</small>
                       <form className='my-md-5 my-4'>
                         <p className='fs-18 text-blue'>Fill your personal details</p>
@@ -278,7 +311,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 type='text'
                                 className={incorrectFormIndex === 0 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='First name'
-                                defaultValue={firstName}
+                                defaultValue={quoteDetails?.customer_f_name}
                               />
                             </div>
                           </div>
@@ -290,7 +323,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 type='text'
                                 className={incorrectFormIndex === 1 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Last name'
-                                defaultValue={lastName}
+                                defaultValue={quoteDetails?.customer_s_name}
                               />
                             </div>
                           </div>
@@ -302,7 +335,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 type='text'
                                 className={incorrectFormIndex === 2 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Email'
-                                defaultValue={email}
+                                defaultValue={quoteDetails?.customer_email}
                               />
                             </div>
                           </div>
@@ -314,7 +347,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                                 type='text'
                                 className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
                                 placeholder='Phone'
-                                defaultValue={phone}
+                                defaultValue={quoteDetails?.customer_phone}
                                 disabled={editMode}
                               />
                             </div>
@@ -323,12 +356,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                             <div className='form-group mb-4'>
                               <div className='d-flex justify-content-between'>
                                 <div className='h6 text-left text-black-50'>Postcode</div>
-                                {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && editMode && (
+                                {!!quoteDetails?.customer_id && !!quoteId && editMode && (
                                   <ChangeAddress
-                                    qid={quoteInfo.fe_token}
-                                    customerId={quoteInfo.customer_id}
+                                    qid={quoteId}
+                                    customerId={quoteDetails.customer_id}
                                     addressType={AddressType.INVOICE}
-                                    initialAddress={quoteInfo.invoice_address}
+                                    initialAddress={quoteDetails.invoice_address}
                                     onChangeAddress={(event) => {
                                       setBillingAddress(event)
                                     }}
@@ -348,12 +381,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                               <div className='form-group mb-4'>
                                 <div className='d-flex justify-content-between'>
                                   <div className='h6 text-left text-black-50'>Fixing address</div>
-                                  {!!quoteInfo?.customer_id && !!quoteInfo?.fe_token && (
+                                  {!!quoteDetails?.customer_id && !!quoteId && (
                                     <ChangeAddress
-                                      qid={quoteInfo.fe_token}
-                                      customerId={quoteInfo.customer_id}
+                                      qid={quoteId}
+                                      customerId={quoteDetails.customer_id}
                                       addressType={AddressType.DELIVERY}
-                                      initialAddress={quoteInfo.delivery_address}
+                                      initialAddress={quoteDetails.delivery_address}
                                       onChangeAddress={(event) => {
                                         setFixingAddressText(formatAddress(event))
                                       }}
