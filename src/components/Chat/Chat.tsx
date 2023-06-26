@@ -12,13 +12,13 @@ import { formatLicenseNumber } from '@glass/utils/format-license-number/format-l
 
 export type ChatProps = { quoteInfo?: Quote }
 
-const CHAT_RELOAD_TIME = 60000
+// const CHAT_RELOAD_TIME = 60000
 
 export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
   const navigate = useNavigate()
 
   const [isOpenChat, setIsOpenChat] = useState<boolean>(false)
-  const [chatKey, setChatKey] = useState<string>('')
+  const [chatKey] = useState<string>('')
 
   const firstNameRef = useRef<HTMLInputElement>(null)
   const lastNameRef = useRef<HTMLInputElement>(null)
@@ -84,17 +84,17 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
     )
   }
 
-  const reloadChat = () => {
-    if (quoteInfo?.live_chat_route && isOpenChat) {
-      setChatKey(Math.floor(Math.random() * 1000).toString())
-      setTimeout(() => {
-        reloadChat()
-      }, CHAT_RELOAD_TIME)
-    }
-  }
+  // const reloadChat = () => {
+  //   if (quoteInfo?.live_chat_route && isOpenChat) {
+  //     setChatKey(Math.floor(Math.random() * 1000).toString())
+  //     setTimeout(() => {
+  //       reloadChat()
+  //     }, CHAT_RELOAD_TIME)
+  //   }
+  // }
 
   useEffect(() => {
-    reloadChat()
+    // reloadChat()
   }, [quoteInfo, isOpenChat])
 
   return (
