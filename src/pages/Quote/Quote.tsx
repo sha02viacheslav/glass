@@ -14,7 +14,7 @@ import { LocationSelection } from '@glass/components/quotePage/LocationSelection
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
-import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep } from '@glass/enums'
+import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep, WorkingPlace } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { Address, Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
@@ -28,6 +28,7 @@ import { updateDeliveryAddressService } from '@glass/services/apis/update-delive
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
+import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 
 export type QuoteProps = {
   quoteCount?: boolean
@@ -592,21 +593,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     <>
                       <h1 className='mb-4'>You are booked in!</h1>
                       <div className='booking-address mb-4'>
-                        <div>
-                          {moment(quoteDetails?.booking_date)
-                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                            .format('dddd, DD MMMM')}
-                        </div>
-                        <div>
-                          Arrival window between{' '}
-                          {moment(quoteDetails?.booking_date)
-                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                            .format('HH')}{' '}
-                          -{' '}
-                          {moment(quoteDetails?.booking_date)
-                            .add(quoteDetails.time_slot.split('_')?.[1], 'hours')
-                            .format('HH')}
-                        </div>
+                        Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM YYYY')} from{' '}
+                        {slot2Time(quoteDetails.time_slot.split('_')?.[0])} to{' '}
+                        {slot2Time(quoteDetails.time_slot.split('_')?.[1])}
                       </div>
                     </>
                   )}
@@ -617,14 +606,18 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </>
                   )}
 
-                  <div className='booking-address'>
-                    {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2 || 'N/A'},{' '}
-                    {quoteDetails.delivery_address?.town_or_city || 'N/A'}
-                    <br />
-                    {quoteDetails.delivery_address?.county || 'N/A'}
-                    <br />
-                    {quoteDetails.delivery_address?.postcode || 'N/A'}
-                  </div>
+                  {quoteDetails.working_place === WorkingPlace.MOBILE && (
+                    <div className='booking-address'>
+                      Booked in at{' '}
+                      {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2 || 'N/A'},{' '}
+                      {quoteDetails.delivery_address?.town_or_city || 'N/A'}{' '}
+                      {quoteDetails.delivery_address?.county || 'N/A'}{' '}
+                      {quoteDetails.delivery_address?.postcode || 'N/A'}
+                    </div>
+                  )}
+                  {quoteDetails.working_place === WorkingPlace.WORKSHOP && (
+                    <div className='booking-address'>Booked in at {quoteDetails.workshop_address || 'N/A'}</div>
+                  )}
                   {quoteDetails?.order_state !== OrderState.WON && (
                     <div className='d-flex justify-content-end'>
                       <button className='edit-btn' onClick={() => setEditBooing(true)}>

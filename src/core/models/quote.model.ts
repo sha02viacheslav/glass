@@ -1,4 +1,4 @@
-import { OrderState, PaymentMethodType } from '@glass/enums'
+import { OrderState, PaymentMethodType, WorkingPlace } from '@glass/enums'
 import { Address } from './address.model'
 import { Comment } from './comment.model'
 import { Invoice } from './invoice.model'
@@ -40,4 +40,6 @@ export type Quote = {
   customer_chat_state: string
   live_chat_url: string
   live_chat_route: string
+  working_place: WorkingPlace
+  workshop_address: string
 }
