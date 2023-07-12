@@ -1,10 +1,10 @@
 import './Home.css'
 import React from 'react'
 import { useEffect } from 'react'
-import { Helmet } from 'react-helmet'
 import home1 from '@glass/assets/images/1.png'
 import home2 from '@glass/assets/images/2.png'
 import flag from '@glass/assets/images/uk-flag.svg'
+import { Chat } from '@glass/components/Chat'
 import { GetQuoteOrCall } from '@glass/components/GetQuoteOrCall'
 import { PHONE_NUMBER } from '@glass/constants'
 
@@ -144,19 +144,7 @@ export const Home: React.FC = () => {
         <GetQuoteOrCall showRegInput={false} />
       </div>
 
-      {/*<Chat />*/}
-
-      <Helmet>
-        <link rel='stylesheet' href='https://fixglass-staging-2-7305738.dev.odoo.com/im_livechat/external_lib.css' />
-        <script
-          type='text/javascript'
-          src='https://fixglass-staging-2-7305738.dev.odoo.com/im_livechat/external_lib.js'
-        ></script>
-        <script
-          type='text/javascript'
-          src='https://fixglass-staging-2-7305738.dev.odoo.com/im_livechat/loader/1'
-        ></script>
-      </Helmet>
+      <Chat />
     </div>
   )
 }

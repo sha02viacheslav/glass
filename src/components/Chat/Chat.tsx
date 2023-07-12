@@ -1,24 +1,22 @@
 import './style.css'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Modal } from '@mui/material'
+import { Helmet } from 'react-helmet'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate } from 'react-router-dom'
 import { AddressInput } from '@glass/components/AddressInput'
 import { CustomerChatState } from '@glass/enums'
-import { Address, Quote, QuoteDto } from '@glass/models'
+import { Address, QuoteDto } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
-export type ChatProps = { quoteInfo?: Quote }
+export type ChatProps = { qid?: string }
 
-// const CHAT_RELOAD_TIME = 60000
-
-export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
+export const Chat: React.FC<ChatProps> = ({ qid }) => {
   const navigate = useNavigate()
 
   const [isOpenChat, setIsOpenChat] = useState<boolean>(false)
-  const [chatKey] = useState<string>('')
 
   const firstNameRef = useRef<HTMLInputElement>(null)
   const lastNameRef = useRef<HTMLInputElement>(null)
@@ -84,22 +82,9 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
     )
   }
 
-  // const reloadChat = () => {
-  //   if (quoteInfo?.live_chat_route && isOpenChat) {
-  //     setChatKey(Math.floor(Math.random() * 1000).toString())
-  //     setTimeout(() => {
-  //       reloadChat()
-  //     }, CHAT_RELOAD_TIME)
-  //   }
-  // }
-
-  useEffect(() => {
-    // reloadChat()
-  }, [quoteInfo, isOpenChat])
-
   return (
     <>
-      <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>
+      {!qid && <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>}
 
       <Modal
         open={isOpenChat}
@@ -127,14 +112,18 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
           <Box display={'flex'} flexDirection={'row'} justifyContent={'end'}>
             <CloseIcon className='closeBtn' onClick={() => setIsOpenChat(false)} />
           </Box>
-          {!!quoteInfo?.live_chat_route ? (
-            <iframe
-              id='odooChatIframe'
-              key={chatKey}
-              src={`${process.env.REACT_APP_SERVER_URL}${quoteInfo.live_chat_route}`}
-              width='100%'
-              height='600px'
-            ></iframe>
+          {!!qid ? (
+            <Helmet>
+              <link rel='stylesheet' href={`${process.env.REACT_APP_API_DOMAIN_URL}/im_livechat/external_lib.css`} />
+              <script
+                type='text/javascript'
+                src={`${process.env.REACT_APP_API_DOMAIN_URL}/im_livechat/external_lib.js`}
+              ></script>
+              <script
+                type='text/javascript'
+                src={`${process.env.REACT_APP_API_DOMAIN_URL}/im_livechat/loader/1?fe_token=${qid}`}
+              ></script>
+            </Helmet>
           ) : (
             <>
               <form>

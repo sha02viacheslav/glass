@@ -9,6 +9,7 @@ import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
 import { BeforeAfter } from '@glass/components/BeforeAfter'
+import { Chat } from '@glass/components/Chat'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
@@ -783,7 +784,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         />
       )}
 
-      {/*{!!quoteDetails && <Chat quoteInfo={quoteDetails} />}*/}
+      {!!quoteDetails && <Chat qid={id} />}
     </div>
   )
 }

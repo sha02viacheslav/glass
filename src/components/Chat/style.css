@@ -15,17 +15,30 @@
 }
 
 .start-chart-btn {
-  width: 64px;
-  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: filter 0.3s;
+  padding: 0px;
+  margin: 0 30px 30px 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: none;
   border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  font-size: 24px;
+  font-weight: normal;
+  text-shadow: none;
+  background-color: rgb(135, 90, 123);
+  color: rgb(255, 255, 255);
   position: fixed;
-  bottom: 16px;
-  right: 16px;
-  background-image: url(src/assets/icons/chat.svg);
-  background-size: 42px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #9557e8;
+  right: 0;
+  bottom: 0;
   cursor: pointer;
-  z-index: 1;
+  z-index: 5;
+}
+
+.start-chart-btn::before {
+  content: '💬';
 }
