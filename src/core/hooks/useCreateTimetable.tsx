@@ -54,7 +54,7 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
         for (let k = 0; k < CALENDAR_TIME_SLOTS; k++) {
           if (k != CALENDAR_TIME_SLOTS - 1 && startHour >= CALENDAR_START_TIME + (k + 1) * CALENDAR_TIME_INTERVAL)
             continue
-          if (k != 0 && endHour < CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
+          if (k != 0 && endHour <= CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
           if (row.schedules[k] == BookingOccupy.FULL) continue
           if (row.schedules[k] == BookingOccupy.HALF) row.schedules[k] = BookingOccupy.FULL
           if (row.schedules[k] == BookingOccupy.EMPTY) row.schedules[k] = BookingOccupy.HALF
