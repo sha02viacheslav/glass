@@ -31,6 +31,7 @@ jobs:
             GH_TOKEN=${{ secrets.GH_TOKEN }}
             GH_USERNAME=${{ secrets.GH_USERNAME }}
             GH_REPO=${{ secrets.GH_REPO }}
+            SOURCE_ENV=production
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/fixglass-react:production
