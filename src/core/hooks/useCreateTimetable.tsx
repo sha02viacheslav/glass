@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import moment from 'moment'
 import { CALENDAR_LENGTH, CALENDAR_START_TIME, CALENDAR_TIME_INTERVAL, CALENDAR_TIME_SLOTS } from '@glass/constants'
-import { BookingOccupy, OrderState } from '@glass/enums'
+import { BookingOccupy } from '@glass/enums'
 import { BookingDate, TimeRow } from '@glass/models'
 import { getCalendarService } from '@glass/services/apis/get-calendar.service'
 import { slot2Hours } from '@glass/utils/slot-to-hours/slot-to-hours.util'
@@ -55,12 +55,9 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
           if (k != CALENDAR_TIME_SLOTS - 1 && startHour >= CALENDAR_START_TIME + (k + 1) * CALENDAR_TIME_INTERVAL)
             continue
           if (k != 0 && endHour < CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
-          // - if status = won -> it's Fully booked
-          // - if status = open/confirm -> it's Half booked
-          const occupy = booking.order_state === OrderState.WON ? BookingOccupy.FULL : BookingOccupy.HALF
-          if (occupy == row.schedules[k]) continue
           if (row.schedules[k] == BookingOccupy.FULL) continue
-          row.schedules[k] = occupy
+          if (row.schedules[k] == BookingOccupy.HALF) row.schedules[k] = BookingOccupy.FULL
+          if (row.schedules[k] == BookingOccupy.EMPTY) row.schedules[k] = BookingOccupy.HALF
         }
       })
     })
