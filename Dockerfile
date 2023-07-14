@@ -16,11 +16,12 @@ COPY . .
 
 ARG GH_TOKEN \
     GH_USERNAME \
-    GH_REPO
+    GH_REPO \
+    SOURCE_ENV
 
 RUN git clone https://$GH_TOKEN@github.com/$GH_USERNAME/$GH_REPO.git tmp_env
 
-RUN mv tmp_env/.env.production .env
+RUN mv tmp_env/.env.$SOURCE_ENV .env
 
 RUN rm -rf tmp_env
 
