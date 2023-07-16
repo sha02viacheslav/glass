@@ -132,6 +132,7 @@
 
 .ts-passed {
   background-color: #dfdfdf;
+  background-image: unset;
 }
 
 .ts-table tr:nth-child(n + 2) > td:nth-child(1) {

@@ -67,11 +67,12 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
         if (moment(row.date).format('YYYY-MM-DD') !== moment(booking.booking_date).format('YYYY-MM-DD')) return
 
         // find what time the booking is and mark
-        for (let j = 0; j < CALENDAR_TIME_SLOTS; j++) {
-          for (let k = 0; k < CALENDAR_TIME_INTERVAL / CALENDAR_TIME_UNIT; k++) {
-            if (startHour >= CALENDAR_START_TIME + (k + 1) * CALENDAR_TIME_INTERVAL) continue
-            if (endHour <= CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
-            row.schedules[j].bookings[k] += 1
+        for (let feSlotIdx = 0; feSlotIdx < CALENDAR_TIME_SLOTS; feSlotIdx++) {
+          const feSlotStartTime = CALENDAR_START_TIME + feSlotIdx * CALENDAR_TIME_INTERVAL
+          for (let timeUnitIdx = 0; timeUnitIdx < CALENDAR_TIME_INTERVAL / CALENDAR_TIME_UNIT; timeUnitIdx++) {
+            if (startHour >= feSlotStartTime + (timeUnitIdx + 1) * CALENDAR_TIME_UNIT) continue
+            if (endHour <= feSlotStartTime + timeUnitIdx * CALENDAR_TIME_UNIT) continue
+            row.schedules[feSlotIdx].bookings[timeUnitIdx] += 1
           }
         }
       })
