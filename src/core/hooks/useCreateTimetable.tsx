@@ -1,18 +1,34 @@
 import { useEffect } from 'react'
 import moment from 'moment'
-import { CALENDAR_LENGTH, CALENDAR_START_TIME, CALENDAR_TIME_INTERVAL, CALENDAR_TIME_SLOTS } from '@glass/constants'
+import {
+  CALENDAR_LENGTH,
+  CALENDAR_START_TIME,
+  CALENDAR_TIME_INTERVAL,
+  CALENDAR_TIME_SLOTS,
+  CALENDAR_TIME_UNIT,
+} from '@glass/constants'
 import { BookingOccupy } from '@glass/enums'
 import { BookingDate, TimeRow } from '@glass/models'
 import { getCalendarService } from '@glass/services/apis/get-calendar.service'
 import { slot2Hours } from '@glass/utils/slot-to-hours/slot-to-hours.util'
 
 export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void) => {
+  const createEmptySchedules = () => {
+    const schedules = []
+    for (let i = 0; i < CALENDAR_TIME_SLOTS; i++) {
+      schedules.push({
+        occupy: BookingOccupy.EMPTY,
+        bookings: Array(CALENDAR_TIME_INTERVAL / CALENDAR_TIME_UNIT).fill(0),
+      })
+    }
+    return schedules
+  }
   const createTimetable = () => {
     // initialize with today's entry
     const newTimetable: TimeRow[] = [
       {
         date: moment().format('YYYY-MM-DD'),
-        schedules: Array(CALENDAR_TIME_SLOTS).fill(BookingOccupy.EMPTY),
+        schedules: createEmptySchedules(),
       },
     ]
 
@@ -22,7 +38,7 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
       tomorrow.setDate(tomorrow.getDate() + 1)
       newTimetable.push({
         date: moment(tomorrow).format('YYYY-MM-DD'),
-        schedules: Array(CALENDAR_TIME_SLOTS).fill(BookingOccupy.EMPTY),
+        schedules: createEmptySchedules(),
       })
     }
     retrieveBookings(tomorrow, newTimetable)
@@ -51,13 +67,23 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
         if (moment(row.date).format('YYYY-MM-DD') !== moment(booking.booking_date).format('YYYY-MM-DD')) return
 
         // find what time the booking is and mark
-        for (let k = 0; k < CALENDAR_TIME_SLOTS; k++) {
-          if (k != CALENDAR_TIME_SLOTS - 1 && startHour >= CALENDAR_START_TIME + (k + 1) * CALENDAR_TIME_INTERVAL)
-            continue
-          if (k != 0 && endHour <= CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
-          if (row.schedules[k] == BookingOccupy.FULL) continue
-          if (row.schedules[k] == BookingOccupy.HALF) row.schedules[k] = BookingOccupy.FULL
-          if (row.schedules[k] == BookingOccupy.EMPTY) row.schedules[k] = BookingOccupy.HALF
+        for (let j = 0; j < CALENDAR_TIME_SLOTS; j++) {
+          for (let k = 0; k < CALENDAR_TIME_INTERVAL / CALENDAR_TIME_UNIT; k++) {
+            if (startHour >= CALENDAR_START_TIME + (k + 1) * CALENDAR_TIME_INTERVAL) continue
+            if (endHour <= CALENDAR_START_TIME + k * CALENDAR_TIME_INTERVAL) continue
+            row.schedules[j].bookings[k] += 1
+          }
+        }
+      })
+    })
+
+    times.map((row) => {
+      row.schedules.map((schedule) => {
+        const cnt = schedule.bookings.filter((item) => item > 0).length
+        if (cnt == schedule.bookings.length) {
+          schedule.occupy = BookingOccupy.FULL
+        } else if (cnt > 0) {
+          schedule.occupy = BookingOccupy.HALF
         }
       })
     })
