@@ -272,7 +272,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                     </div>
                   </td>
                   {/* subsequent rows map timeslots */}
-                  {element.schedules.map((occupy, time) => (
+                  {element.schedules.map((schedule, time) => (
                     <td
                       id={moment(element.date).format('MMMDD') + time.toString()}
                       onClick={() =>
@@ -280,12 +280,12 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                           moment(element.date).format('MMM'),
                           moment(element.date).format('DD'),
                           time,
-                          occupy as BookingOccupy,
+                          schedule.occupy as BookingOccupy,
                         )
                       }
                       key={time}
                       className={
-                        `ts-${occupy}` +
+                        `ts-${schedule.occupy}` +
                         (moment(element.date).format('MMMDD') + time.toString() === selectedSlot
                           ? ' ts-td-active'
                           : '') +
