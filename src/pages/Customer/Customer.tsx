@@ -117,62 +117,62 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       licenseNumNotFilled
     ) {
       return
+    }
+
+    // post data
+    setSubmitClicked(true)
+    const firstName = (firstNameRef?.current?.value || '').trim()
+    const lastName = (lastNameRef?.current?.value || '').trim()
+    const fullName = `${firstName} ${lastName}`
+
+    const postData: QuoteDto = {
+      customer_name: fullName,
+      customer_f_name: firstName,
+      customer_s_name: lastName,
+      customer_phone: (phoneRef?.current?.value || '').trim(),
+      customer_email: (emailRef?.current?.value || '').trim(),
+      customer_address: {
+        postcode: billingAddress?.postcode || '',
+        latitude: billingAddress?.latitude || '',
+        longitude: billingAddress?.longitude || '',
+        line_1: billingAddress?.line_1 || '',
+        line_2: billingAddress?.line_2 || '',
+        line_3: billingAddress?.line_3 || '',
+        line_4: billingAddress?.line_4 || '',
+        locality: billingAddress?.locality || '',
+        town_or_city: billingAddress?.town_or_city || '',
+        county: billingAddress?.county || '',
+        district: billingAddress?.district || '',
+        country: billingAddress?.country || '',
+      },
+      registration_number: licenseSearchVal,
+      glass_location: selectedBrokenWindows || [],
+      customer_comments: {
+        comment: comment,
+        attachments: attachments,
+      },
+    }
+
+    if (quoteDetails) {
+      if (!postData.customer_comments?.comment && !postData.customer_comments?.attachments?.length) {
+        delete postData.customer_comments
+      }
+      delete postData.customer_address
+      trackPromise(
+        updateQuoteService({ fe_token: quoteId, ...postData }).then((res) => {
+          if (res.success) {
+            navigate(`/quote/${quoteId}`)
+          }
+        }),
+      )
     } else {
-      // post data
-      setSubmitClicked(true)
-      const firstName = firstNameRef?.current?.value || ''
-      const lastName = lastNameRef?.current?.value || ''
-      const fullName = `${firstName} ${lastName}`
-
-      const postData: QuoteDto = {
-        customer_name: fullName,
-        customer_f_name: firstName,
-        customer_s_name: lastName,
-        customer_phone: phoneRef?.current?.value || '',
-        customer_email: emailRef?.current?.value || '',
-        customer_address: {
-          postcode: billingAddress?.postcode || '',
-          latitude: billingAddress?.latitude || '',
-          longitude: billingAddress?.longitude || '',
-          line_1: billingAddress?.line_1 || '',
-          line_2: billingAddress?.line_2 || '',
-          line_3: billingAddress?.line_3 || '',
-          line_4: billingAddress?.line_4 || '',
-          locality: billingAddress?.locality || '',
-          town_or_city: billingAddress?.town_or_city || '',
-          county: billingAddress?.county || '',
-          district: billingAddress?.district || '',
-          country: billingAddress?.country || '',
-        },
-        registration_number: licenseSearchVal,
-        glass_location: selectedBrokenWindows || [],
-        customer_comments: {
-          comment: comment,
-          attachments: attachments,
-        },
-      }
-
-      if (quoteDetails) {
-        if (!postData.customer_comments?.comment && !postData.customer_comments?.attachments?.length) {
-          delete postData.customer_comments
-        }
-        delete postData.customer_address
-        trackPromise(
-          updateQuoteService({ fe_token: quoteId, ...postData }).then((res) => {
-            if (res.success) {
-              navigate(`/quote/${quoteId}`)
-            }
-          }),
-        )
-      } else {
-        trackPromise(
-          createQuoteService(postData).then((res) => {
-            if (res.success) {
-              navigate('/quote/' + res.data.fe_token)
-            }
-          }),
-        )
-      }
+      trackPromise(
+        createQuoteService(postData).then((res) => {
+          if (res.success) {
+            navigate('/quote/' + res.data.fe_token)
+          }
+        }),
+      )
     }
   }
 
