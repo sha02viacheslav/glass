@@ -7,7 +7,7 @@ export const getCalendarService = async (
   endDate: Date,
   limit = 'all',
   offset = 0,
-): Promise<ApiResponse<BookingDate[]>> => {
+): Promise<ApiResponse<{ [key: string]: BookingDate }>> => {
   return await postApi('order/get_calendar', {
     start_date: moment(startDate).format('YYYY-MM-DD'),
     end_date: moment(endDate).format('YYYY-MM-DD'),
