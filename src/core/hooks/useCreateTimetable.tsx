@@ -7,7 +7,7 @@ import {
   CALENDAR_TIME_SLOTS,
   CALENDAR_TIME_UNIT,
 } from '@glass/constants'
-import { BookingOccupy } from '@glass/enums'
+import { BookingOccupy, SlotStatus } from '@glass/enums'
 import { BookingDate, TimeRow } from '@glass/models'
 import { getCalendarService } from '@glass/services/apis/get-calendar.service'
 import { slot2Hours } from '@glass/utils/slot-to-hours/slot-to-hours.util'
@@ -47,24 +47,25 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
   const retrieveBookings = (nextDate: Date, timetable: TimeRow[]) => {
     // get past bookings
     getCalendarService(new Date(), nextDate).then((res) => {
-      if (res.success && res.data?.length) {
-        fillTimeslots(
-          timetable,
-          res.data.filter((item) => item.time_slot_visual),
-        )
+      if (res.success && res.data) {
+        fillTimeslots(timetable, res.data)
       }
     })
   }
 
-  const fillTimeslots = (times: TimeRow[], bookingData: BookingDate[]) => {
+  const fillTimeslots = (times: TimeRow[], bookingData: { [key: string]: BookingDate }) => {
     // find indexes of booked slots
     times.forEach((row) => {
-      bookingData.forEach((booking) => {
-        const startHour = slot2Hours(booking.time_slot_visual.split('_')[0])
-        const endHour = slot2Hours(booking.time_slot_visual.split('_')[1])
+      const booking = bookingData[moment(row.date).format('YYYY-MM-DD')]
+
+      Object.keys(booking.time_slot).forEach((timeSlot) => {
+        const slotStatus = booking.time_slot[timeSlot]
+        if (slotStatus !== SlotStatus.BOOKED) return
+
+        const startHour = slot2Hours(timeSlot.split('_')[0])
+        const endHour = slot2Hours(timeSlot.split('_')[1])
 
         if (!startHour || !endHour) return
-        if (moment(row.date).format('YYYY-MM-DD') !== moment(booking.booking_date).format('YYYY-MM-DD')) return
 
         // find what time the booking is and mark
         for (let feSlotIdx = 0; feSlotIdx < CALENDAR_TIME_SLOTS; feSlotIdx++) {
