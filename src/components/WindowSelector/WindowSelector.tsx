@@ -134,7 +134,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setTinted(false)
       // update tinted windows in brokenWindows array as not tinted
       for (let i = 0; i < selectedWindows.length; i++) {
-        selectedWindows[i] = selectedWindows[i].replace('privacy', 'non-privacy')
+        selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy').replace('privacy', 'non-privacy')
       }
       // update tinted windows in selectedWindows array as not tinted
       setSelectedWindows(selectedWindows.slice())
