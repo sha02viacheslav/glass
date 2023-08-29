@@ -25,7 +25,7 @@ import { WinLoc } from '@glass/enums'
 import { WindowSelection } from '@glass/models'
 
 export const VANS_WINDOWS: WindowSelection[] = [
-  { name: 'Windscreen', window: WinLoc.FRONT, broken: false, source: front, hasTinted: false },
+  { name: 'Front windscreen', window: WinLoc.FRONT, broken: false, source: front, hasTinted: false },
   {
     name: 'Backlight: left barn door',
     window: WinLoc.L_REAR,
