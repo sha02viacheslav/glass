@@ -27,7 +27,7 @@ import { WindowSelection } from '@glass/models'
 export const VANS_WINDOWS: WindowSelection[] = [
   { name: 'Windscreen', window: WinLoc.FRONT, broken: false, source: front, hasTinted: false },
   {
-    name: 'Left barn door',
+    name: 'Backlight: left barn door',
     window: WinLoc.L_REAR,
     broken: false,
     source: l_rear,
@@ -35,7 +35,7 @@ export const VANS_WINDOWS: WindowSelection[] = [
     tintedSource: l_rear_t,
   },
   {
-    name: 'Right barn door',
+    name: 'Backlight: right barn door',
     window: WinLoc.R_REAR,
     broken: false,
     source: r_rear,
@@ -44,13 +44,13 @@ export const VANS_WINDOWS: WindowSelection[] = [
   },
   { name: 'Backlight', window: WinLoc.REAR, broken: false, source: rear, hasTinted: true, tintedSource: rear_t },
   { name: 'Left front quarter', window: WinLoc.L1, broken: false, source: l_1, hasTinted: false },
-  { name: 'Left front drop', window: WinLoc.L2, broken: false, source: l_2, hasTinted: false },
-  { name: 'Left rear door', window: WinLoc.L3, broken: false, source: l_3, hasTinted: true, tintedSource: l_3_t },
+  { name: 'Left front door/drop', window: WinLoc.L2, broken: false, source: l_2, hasTinted: false },
+  { name: 'Left rear door/drop', window: WinLoc.L3, broken: false, source: l_3, hasTinted: true, tintedSource: l_3_t },
   { name: 'Left middle quarter', window: WinLoc.L4, broken: false, source: l_4, hasTinted: true, tintedSource: l_4_t },
   { name: 'Left rear quarter', window: WinLoc.L5, broken: false, source: l_5, hasTinted: true, tintedSource: l_5_t },
   { name: 'Right front quarter', window: WinLoc.R1, broken: false, source: r_1, hasTinted: false },
-  { name: 'Right front drop', window: WinLoc.R2, broken: false, source: r_2, hasTinted: false },
-  { name: 'Right rear door', window: WinLoc.R3, broken: false, source: r_3, hasTinted: true, tintedSource: r_3_t },
+  { name: 'Right front door/drop', window: WinLoc.R2, broken: false, source: r_2, hasTinted: false },
+  { name: 'Right rear door/drop', window: WinLoc.R3, broken: false, source: r_3, hasTinted: true, tintedSource: r_3_t },
   { name: 'Right middle quarter', window: WinLoc.R4, broken: false, source: r_4, hasTinted: true, tintedSource: r_4_t },
   { name: 'Right rear quarter', window: WinLoc.R5, broken: false, source: r_5, hasTinted: true, tintedSource: r_5_t },
 ]
