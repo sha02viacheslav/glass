@@ -499,7 +499,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 {!!quoteDetails &&
                   quoteDetails.glass_location.map((element) => (
                     <span key={element} className='client-windows'>
-                      {element}
+                      {element.charAt(0).toUpperCase() + element.slice(1)}
                     </span>
                   ))}
               </div>

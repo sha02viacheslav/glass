@@ -146,7 +146,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         country: billingAddress?.country || '',
       },
       registration_number: licenseSearchVal,
-      glass_location: selectedBrokenWindows || [],
+      glass_location: (selectedBrokenWindows || []).map((item) => item.toLowerCase()),
       customer_comments: {
         comment: comment,
         attachments: attachments,

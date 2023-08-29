@@ -73,7 +73,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     // add to array which is sent to customer page
     if (brokenWindows[index].broken) {
       const index2 = selectedWindows.findIndex((element) => element === brokenWindows[index].name)
-      const index3 = selectedWindows.findIndex((element) => element === brokenWindows[index].name.concat(' privacy'))
+      const index3 = selectedWindows.findIndex(
+        (element) => element === brokenWindows[index].name.concat(' non-privacy'),
+      )
+      const index4 = selectedWindows.findIndex((element) => element === brokenWindows[index].name.concat(' privacy'))
       // find if it was selected as a tinted glass or not and remove from array
       if (index2 >= 0) {
         selectedWindows.splice(index2, 1)
@@ -81,9 +84,16 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       if (index3 >= 0) {
         selectedWindows.splice(index3, 1)
       }
+      if (index4 >= 0) {
+        selectedWindows.splice(index4, 1)
+      }
     } else {
-      if (tinted && brokenWindows[index].hasTinted) {
-        selectedWindows.push(brokenWindows[index].name + ' privacy')
+      if (brokenWindows[index].hasTinted) {
+        if (tinted) {
+          selectedWindows.push(brokenWindows[index].name + ' privacy')
+        } else {
+          selectedWindows.push(brokenWindows[index].name + ' non-privacy')
+        }
       } else {
         selectedWindows.push(brokenWindows[index].name)
       }
@@ -124,7 +134,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setTinted(false)
       // update tinted windows in brokenWindows array as not tinted
       for (let i = 0; i < selectedWindows.length; i++) {
-        selectedWindows[i] = selectedWindows[i].replace(' privacy', '')
+        selectedWindows[i] = selectedWindows[i].replace('privacy', 'non-privacy')
       }
       // update tinted windows in selectedWindows array as not tinted
       setSelectedWindows(selectedWindows.slice())
@@ -132,10 +142,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setTinted(true)
       // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
-        const index = brokenWindows.findIndex((element) => element.name === selectedWindows[i])
-        if (brokenWindows[index]?.hasTinted) {
-          selectedWindows[i] = selectedWindows[i].concat(' privacy')
-        }
+        selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy')
       }
       // update tinted windows in selectedWindows array as tinted
       setSelectedWindows(selectedWindows.slice())
@@ -156,7 +163,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         // disable tailgater back window
         brokenWindows[3].broken = false
         // find if any of the back windows are selected and remove them from array sent to customer if so
-        const index2 = selectedWindows.findIndex((element) => element === 'Backlight')
+        const index2 = selectedWindows.findIndex((element) => element === 'Backlight non-privacy')
         const index3 = selectedWindows.findIndex((element) => element === 'Backlight privacy')
         if (index2 >= 0) {
           selectedWindows.splice(index2, 1)
@@ -172,8 +179,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       if (brokenWindows[1].broken) {
         brokenWindows[1].broken = false
         // find if any of the back windows are selected and remove them from array sent to customer if so
-        const index2 = selectedWindows.findIndex((element) => element === 'Left barn door')
-        const index3 = selectedWindows.findIndex((element) => element === 'Left barn door privacy')
+        const index2 = selectedWindows.findIndex((element) => element === 'Backlight: left barn door non-privacy')
+        const index3 = selectedWindows.findIndex((element) => element === 'Backlight: left barn door privacy')
         if (index2 >= 0) {
           selectedWindows.splice(index2, 1)
         }
@@ -184,7 +191,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       if (brokenWindows[2].broken) {
         brokenWindows[2].broken = false
         // find if any of the back windows are selected and remove them from array sent to customer if so
-        const index2 = selectedWindows.findIndex((element) => element === 'Right barn door')
+        const index2 = selectedWindows.findIndex((element) => element === 'Right barn door non-privacy')
         const index3 = selectedWindows.findIndex((element) => element === 'Right barn door privacy')
         if (index2 >= 0) {
           selectedWindows.splice(index2, 1)
@@ -217,7 +224,9 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     if (selection.includes(' privacy')) {
       tintedButtonHandle('yes')
     }
-    const index = brokenWindows.findIndex((element) => element.name === selection.replace(' privacy', ''))
+    const index = brokenWindows.findIndex(
+      (element) => element.name === selection.replace(' non-privacy', '').replace(' privacy', ''),
+    )
     if (index >= 0) {
       brokenWindows[index].broken = true
     }
@@ -231,7 +240,9 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     if (carType) {
       const tempWindows = cloneDeep(WINDOWS[carType])
       tempWindows.map((item) => {
-        if (selectedWindows.findIndex((x) => x.replace(' privacy', '') === item.name) > -1) {
+        if (
+          selectedWindows.findIndex((x) => x.replace(' non-privacy', '').replace(' privacy', '') === item.name) > -1
+        ) {
           item.broken = true
         }
       })
@@ -357,7 +368,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             className={element.broken ? 'btn btn-gray-active' : 'btn btn-gray'}
             onClick={() => selectWindow(element.window)}
           >
-            {tinted && element.hasTinted ? element.name + ' privacy' : element.name}
+            {element.hasTinted ? (tinted ? element.name + ' privacy' : element.name + ' non-privacy') : element.name}
           </a>
         ))}
       </div>
