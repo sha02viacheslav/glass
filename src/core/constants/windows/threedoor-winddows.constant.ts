@@ -13,12 +13,26 @@ import { WinLoc } from '@glass/enums'
 import { WindowSelection } from '@glass/models'
 
 export const THREE_DOOR_WINDOWS: WindowSelection[] = [
-  { name: 'Windscreen', window: WinLoc.FRONT, broken: false, source: front, hasTinted: false },
+  { name: 'Front windscreen', window: WinLoc.FRONT, broken: false, source: front, hasTinted: false },
   { name: 'Backlight', window: WinLoc.REAR, broken: false, source: rear, hasTinted: true, tintedSource: rear_t },
   { name: 'Left front quarter', window: WinLoc.L1, broken: false, source: l_1, hasTinted: false },
-  { name: 'Left front drop', window: WinLoc.L2, broken: false, source: l_2, hasTinted: false },
-  { name: 'Left rear quarter', window: WinLoc.L3, broken: false, source: l_3, hasTinted: true, tintedSource: l_3_t },
+  { name: 'Left front door/drop', window: WinLoc.L2, broken: false, source: l_2, hasTinted: false },
+  {
+    name: 'Left rear body quarter',
+    window: WinLoc.L3,
+    broken: false,
+    source: l_3,
+    hasTinted: true,
+    tintedSource: l_3_t,
+  },
   { name: 'Right front quarter', window: WinLoc.R1, broken: false, source: r_1, hasTinted: false },
-  { name: 'Right front drop', window: WinLoc.R2, broken: false, source: r_2, hasTinted: false },
-  { name: 'Right rear quarter', window: WinLoc.R3, broken: false, source: r_3, hasTinted: true, tintedSource: r_3_t },
+  { name: 'Right front door/drop', window: WinLoc.R2, broken: false, source: r_2, hasTinted: false },
+  {
+    name: 'Right rear body quarter',
+    window: WinLoc.R3,
+    broken: false,
+    source: r_3,
+    hasTinted: true,
+    tintedSource: r_3_t,
+  },
 ]
