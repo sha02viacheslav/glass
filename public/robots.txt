@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /customer/edit/
+Disallow: /payment/
+Disallow: /paid/
+Disallow: /quote/
+Sitemap: https://fix.glass/sitemap.xml
+Host: https://fix.glass
+
