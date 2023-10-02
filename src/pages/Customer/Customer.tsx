@@ -14,6 +14,7 @@ import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
 
 export type CustomerProps = {
   editMode?: boolean
@@ -166,10 +167,14 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }),
       )
     } else {
+      if (getRequestedURL()) {
+        postData.fe_requested_url = getRequestedURL()
+      }
       trackPromise(
         createQuoteService(postData).then((res) => {
           if (res.success) {
             navigate('/quote/' + res.data.fe_token)
+            clearRequestedURL()
           }
         }),
       )

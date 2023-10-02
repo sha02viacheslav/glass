@@ -13,6 +13,7 @@ import { Paid } from '@glass/pages/Paid'
 import { Pricing } from '@glass/pages/Pricing'
 import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
+import { setRequestedURL } from '@glass/utils/session/session.util'
 
 export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress } = usePromiseTracker()
@@ -25,6 +26,10 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     setShowMenu(!location.pathname.startsWith('/quote') && !location.pathname.startsWith('/customer'))
+
+    if (location.pathname === '/' && location.search) {
+      setRequestedURL(window.location.href)
+    }
   }, [location])
 
   return (
