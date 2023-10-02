@@ -1,4 +1,4 @@
-import { SESSION_ASKED_TINT, SESSION_ASKED_VAN, SESSION_VAN_BODY } from '@glass/constants'
+import { SESSION_ASKED_TINT, SESSION_ASKED_VAN, SESSION_REQUESTED_URL, SESSION_VAN_BODY } from '@glass/constants'
 import { CarType } from '@glass/enums'
 
 export const getVanBodyType = (): CarType.BARN | CarType.TAILGATER => {
@@ -23,4 +23,16 @@ export const getAskedTint = (): boolean => {
 
 export const setAskedTint = () => {
   sessionStorage.setItem(SESSION_ASKED_TINT, JSON.stringify(true))
+}
+
+export const getRequestedURL = (): string => {
+  return JSON.parse(sessionStorage.getItem(SESSION_REQUESTED_URL) || '')
+}
+
+export const setRequestedURL = (value: string) => {
+  sessionStorage.setItem(SESSION_REQUESTED_URL, JSON.stringify(value))
+}
+
+export const clearRequestedURL = () => {
+  sessionStorage.removeItem(SESSION_REQUESTED_URL)
 }

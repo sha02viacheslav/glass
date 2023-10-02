@@ -33,4 +33,5 @@ export type QuoteDto = {
     attachments: CommentAttachment[]
   }
   customer_chat_state?: CustomerChatState
+  fe_requested_url?: string
 }

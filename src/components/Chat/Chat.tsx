@@ -9,6 +9,7 @@ import { CustomerChatState } from '@glass/enums'
 import { Address, Quote, QuoteDto } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
 
 export type ChatProps = { quoteInfo?: Quote }
 
@@ -75,10 +76,15 @@ export const Chat: React.FC<ChatProps> = ({ quoteInfo }) => {
       registration_number: licenseRef.current?.value || '',
     }
 
+    if (getRequestedURL()) {
+      postData.fe_requested_url = getRequestedURL()
+    }
+
     trackPromise(
       createQuoteService(postData).then((res) => {
         if (res.success) {
           navigate('/quote/' + res.data.fe_token)
+          clearRequestedURL()
         }
       }),
     )
