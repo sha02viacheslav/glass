@@ -222,7 +222,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (method === PaymentOptionEnum.FOUR_MONTH) {
       handleChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)
     }
-    scrollToElementWithOffset('PM-button-wrap-title', 200)
+    scrollToElementWithOffset('quote-card', -16)
   }
 
   useEffect(() => {
@@ -282,16 +282,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   return (
     <div className='center'>
       {showInvoice && !!invoicePDF && <PdfViewer invoicePDF={invoicePDF} isOpen={handleInvoicePopup} />}
-      <div className='quote-card'>
-        <div className='d-flex align-items-center PM-invoice-wrap' onClick={retrieveInvoice}>
-          <img src={invoice} alt='Invoice' />
-          <span>Download Receipt</span>
-        </div>
-        <h3 className='text-24 text-blue PM-header'>Quotation</h3>
-        <div className='PM-invoice-status'>{invoiceMessage}</div>
-        <div className='PM-status'>
-          Status: <span className={paymentStatus}>{paymentStatusText(quoteDetails)}</span>
-        </div>
+      <div className='quote-card' id='quote-card'>
         {/* show quotation price details */}
         <SelectOfferNew
           selectOfferToCustomer={offerDetails || []}
@@ -301,11 +292,23 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           onCheckOptionalOrderLine={onCheckOptionalOrderLine}
         />
 
+        <div className='PM-status mt-3'>
+          Status: <span className={paymentStatus}>{paymentStatusText(quoteDetails)}</span>
+        </div>
+
+        <div className='mb-4'>
+          <div className='d-flex justify-content-end'>
+            <div className='d-flex align-items-center PM-invoice-wrap' onClick={retrieveInvoice}>
+              <img src={invoice} alt='Invoice' />
+              <span>Download Receipt</span>
+            </div>
+          </div>
+          {!!invoiceMessage && <div className='PM-invoice-status'>{invoiceMessage}</div>}
+        </div>
+
         {paymentStatus !== PaymentStatus.PAID && (
           <>
-            <div className='PM-button-wrap-title' id='PM-button-wrap-title'>
-              Select payment method and pay online
-            </div>
+            <div className='PM-button-wrap-title'>Select payment method and pay online</div>
             <div className='PM-btn-container'>
               <button
                 className={selectedMethod === PaymentOptionEnum.FOUR_MONTH ? 'PM-button-active' : 'PM-button'}
