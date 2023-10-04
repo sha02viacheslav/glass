@@ -26,7 +26,7 @@ export const setAskedTint = () => {
 }
 
 export const getRequestedURL = (): string => {
-  return JSON.parse(sessionStorage.getItem(SESSION_REQUESTED_URL) || '')
+  return JSON.parse(sessionStorage.getItem(SESSION_REQUESTED_URL) || '""')
 }
 
 export const setRequestedURL = (value: string) => {
