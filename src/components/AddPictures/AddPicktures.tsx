@@ -4,10 +4,13 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import { Attachment } from '@glass/models'
 
 type AddPicturesProps = {
+  size?: 'small' | 'medium'
   disabled?: boolean
+  showUpload?: boolean
   attachments: Attachment[]
   limit?: number
   onChangeFiles?: (files: Attachment[]) => void
+  onClickUpload?: () => void
 }
 
 type ValidateFileResponse = {
@@ -16,10 +19,13 @@ type ValidateFileResponse = {
 }
 
 export const AddPictures: React.FC<AddPicturesProps> = ({
+  size = 'medium',
   disabled = false,
+  showUpload = false,
   attachments,
   limit,
   onChangeFiles = () => {},
+  onClickUpload = () => {},
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [validFiles, setValidFiles] = useState<Attachment[]>([])
@@ -76,25 +82,42 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   }
 
   const handleNewFiles = (newFiles: File[]) => {
+    const promises: Promise<Attachment>[] = []
+
     newFiles.map((file) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => {
-        const newAttachment: Attachment = {
-          attachment_id: 0,
-          name: file.name,
-          datas: reader.result as string,
-        }
-        setValidFiles((pre) => [...pre, newAttachment])
-        onChangeFiles([...validFiles, newAttachment])
-      }
+      promises.push(
+        new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = () => {
+            const newAttachment: Attachment = {
+              attachment_id: 0,
+              name: file.name,
+              datas: reader.result as string,
+            }
+            resolve(newAttachment)
+          }
+          reader.onerror = (error) => {
+            reject(error)
+          }
+        }),
+      )
+    })
+
+    Promise.all(promises).then((files) => {
+      setValidFiles((pre) => [...pre, ...files])
+      onChangeFiles([...validFiles, ...files])
     })
   }
 
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
-    onChangeFiles(validFiles)
+    onChangeFiles([...validFiles])
+  }
+
+  const handleClickUpload = () => {
+    onClickUpload()
   }
 
   useEffect(() => {
@@ -104,11 +127,11 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   const renderFiles = () => (
     <div className='row'>
       {validFiles.map((file, idx) => (
-        <div key={idx} className='col-6 col-lg-4 broken-image-wrap mb-4'>
+        <div key={idx} className={(size === 'small' ? 'col-4 col-lg-3' : 'col-6 col-lg-4') + ' broken-image-wrap mb-4'}>
           <div className='square'>
             <div>
               <img src={file.datas} alt='Broken Image' />
-              <div className='title'>{file.name}</div>
+              {size !== 'small' && <div className='title'>{file.name}</div>}
               {!disabled && (
                 <button className='btn-icon' onClick={() => deleteFile(idx)}>
                   <DeleteForeverOutlinedIcon />
@@ -126,21 +149,28 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
       {renderFiles()}
 
       {!disabled && (
-        <button className='btn-raised' onClick={btnOnClick}>
-          <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
-            <input
-              ref={inputRef}
-              type='file'
-              className='d-none'
-              onChange={filesSelected}
-              multiple
-              accept='image/png, image/jpeg, image/gif, image/bmp'
-              onClick={(event) => event.stopPropagation()}
-              disabled={disabled}
-            />
-            Add Pictures
-          </label>
-        </button>
+        <div>
+          <button className='btn-raised' onClick={btnOnClick}>
+            <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
+              <input
+                ref={inputRef}
+                type='file'
+                className='d-none'
+                onChange={filesSelected}
+                multiple
+                accept='image/png, image/jpeg, image/gif, image/bmp'
+                onClick={(event) => event.stopPropagation()}
+                disabled={disabled}
+              />
+              Add Pictures
+            </label>
+          </button>
+          {showUpload && !!validFiles?.length && (
+            <button className='btn-stroked ms-3' onClick={handleClickUpload}>
+              <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>Confirm Upload</label>
+            </button>
+          )}
+        </div>
       )}
 
       <div>{errorMessage}</div>
