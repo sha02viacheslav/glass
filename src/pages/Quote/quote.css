@@ -271,3 +271,11 @@
   color: #9a73dd;
   font-size: 24px;
 }
+
+.no-pictures {
+  color: red;
+  font-size: 16px;
+  line-height: 24px;
+  margin-right: 16px;
+  margin-bottom: 16px;
+}

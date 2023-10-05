@@ -8,6 +8,7 @@ import expand from '@glass/assets/icons/expand.png'
 import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
+import { AddPictures } from '@glass/components/AddPictures'
 import { BeforeAfter } from '@glass/components/BeforeAfter'
 import { Chat } from '@glass/components/Chat'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
@@ -17,7 +18,16 @@ import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
 import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep, WorkingPlace } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
-import { Address, Offer, OptionalOrderLine, PaymentOptionDto, Quote, TimeSlot } from '@glass/models'
+import {
+  Address,
+  Attachment,
+  Offer,
+  OptionalOrderLine,
+  PaymentOptionDto,
+  Quote,
+  QuoteDto,
+  TimeSlot,
+} from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
@@ -26,6 +36,7 @@ import { removeOptionalProductService } from '@glass/services/apis/remove-option
 import { requestAvailabilityService } from '@glass/services/apis/request-availability.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { updateDeliveryAddressService } from '@glass/services/apis/update-delivery-address.service'
+import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
@@ -63,6 +74,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [showRequestAvailabilityMsg, setShowRequestAvailabilityMsg] = useState<boolean>(false)
   const [showConfirmBooking, setShowConfirmBooking] = useState<boolean>(false)
   const [editBooking, setEditBooing] = useState<boolean>(false)
+  const [preAttachments, setPreAttachments] = useState<Attachment[]>([])
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -350,6 +363,53 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
+  const handleChangeFiles = (files: Attachment[]) => {
+    setAttachments(files)
+  }
+
+  const handleClickUpload = () => {
+    const postData: QuoteDto = {
+      customer_name: `${quoteDetails?.customer_f_name} ${quoteDetails?.customer_s_name}`,
+      customer_f_name: (quoteDetails?.customer_f_name || '').trim(),
+      customer_s_name: (quoteDetails?.customer_s_name || '').trim(),
+      customer_phone: (quoteDetails?.customer_phone || '').trim(),
+      customer_email: (quoteDetails?.customer_email || '').trim(),
+      registration_number: (quoteDetails?.registration_number || '').trim(),
+      glass_location: (quoteDetails?.glass_location || []).map((item) => item.toLowerCase()),
+      customer_comments: {
+        comment: 'Upload Pictures',
+        attachments: attachments,
+      },
+    }
+
+    trackPromise(
+      updateQuoteService({ fe_token: id, ...postData }).then((res) => {
+        if (res.success) {
+          setAttachments([])
+          getQuote()
+        }
+      }),
+    )
+  }
+
+  const renderPictures = () => {
+    return !!quoteDetails ? (
+      <div className='p-1 mb-3'>
+        <AddPictures size='small' disabled={true} attachments={preAttachments} />
+        {!preAttachments.length && !attachments.length && <div className='no-pictures'>No Pictures Added</div>}
+        <AddPictures
+          size='small'
+          showUpload={true}
+          attachments={attachments}
+          onChangeFiles={handleChangeFiles}
+          onClickUpload={handleClickUpload}
+        />
+      </div>
+    ) : (
+      <></>
+    )
+  }
+
   useEffect(() => {
     // Get Quote Data
     if (id) {
@@ -381,6 +441,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       }
       setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
       initTimeSlot()
+
+      let pictures: Attachment[] = []
+      quoteDetails.customer_comments.forEach((comment) => {
+        pictures = pictures.concat(comment.attachments)
+      })
+      setPreAttachments(pictures)
     }
   }, [quoteDetails])
 
@@ -491,6 +557,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 </button>
               </div>
             </div>
+            {renderPictures()}
             <div className='quote-info-bottom'>
               <div className='compact-bottom-row'>
                 <span className='quote-selected-windows'>
@@ -531,6 +598,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               <div className='client-info'>
                 {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
               </div>
+              {renderPictures()}
               <div className='compact-bottom-row'>
                 {!!quoteDetails &&
                   quoteDetails.glass_location.map((element) => (
