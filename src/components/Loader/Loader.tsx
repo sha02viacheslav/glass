@@ -28,12 +28,14 @@ export const Loader: React.FC<LoaderProps> = ({ loading }) => {
           width: '100%',
           height: '100%',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 999,
         }}
       >
         <ThreeCircles visible={true} color='#9557E8' height='100' width='100' />
+        <div className='text-dark mt-3'>Loading... Please wait</div>
       </div>
     </div>
   ) : (

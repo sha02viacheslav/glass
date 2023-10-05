@@ -82,18 +82,31 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   }
 
   const handleNewFiles = (newFiles: File[]) => {
+    const promises: Promise<Attachment>[] = []
+
     newFiles.map((file) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => {
-        const newAttachment: Attachment = {
-          attachment_id: 0,
-          name: file.name,
-          datas: reader.result as string,
-        }
-        setValidFiles((pre) => [...pre, newAttachment])
-        onChangeFiles([...validFiles, newAttachment])
-      }
+      promises.push(
+        new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = () => {
+            const newAttachment: Attachment = {
+              attachment_id: 0,
+              name: file.name,
+              datas: reader.result as string,
+            }
+            resolve(newAttachment)
+          }
+          reader.onerror = (error) => {
+            reject(error)
+          }
+        }),
+      )
+    })
+
+    Promise.all(promises).then((files) => {
+      setValidFiles((pre) => [...pre, ...files])
+      onChangeFiles([...validFiles, ...files])
     })
   }
 
@@ -154,7 +167,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
           </button>
           {showUpload && !!validFiles?.length && (
             <button className='btn-stroked ms-3' onClick={handleClickUpload}>
-              <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>Upload</label>
+              <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>Confirm Upload</label>
             </button>
           )}
         </div>
