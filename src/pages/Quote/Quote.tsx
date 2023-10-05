@@ -75,6 +75,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [editBooking, setEditBooing] = useState<boolean>(false)
   const [preAttachments, setPreAttachments] = useState<Attachment[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [comment, setComment] = useState<string>('')
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -376,7 +377,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       registration_number: (quoteDetails?.registration_number || '').trim(),
       glass_location: (quoteDetails?.glass_location || []).map((item) => item.toLowerCase()),
       customer_comments: {
-        comment: 'Upload Pictures',
+        comment: comment || 'Upload Pictures',
         attachments: attachments,
       },
     }
@@ -385,6 +386,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       updateQuoteService({ fe_token: id, ...postData }).then((res) => {
         if (res.success) {
           setAttachments([])
+          setComment('')
           getQuote()
         }
       }),
@@ -394,7 +396,28 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const renderPictures = () => {
     return !!quoteDetails ? (
       <div className='p-1 mb-3'>
-        <AddPictures size='small' disabled={true} attachments={preAttachments} />
+        {quoteDetails.customer_comments.map((item, index) => (
+          <div key={index} className='text-left'>
+            <p>
+              <strong>Comment {index + 1}: </strong>
+              {item.comment}
+            </p>
+            <AddPictures size='small' disabled={true} attachments={item.attachments} />
+          </div>
+        ))}
+
+        <div className='form-group mb-4'>
+          <textarea
+            name=''
+            id=''
+            rows={4}
+            className='form-control h-auto'
+            placeholder='Details for glass or any other comment.'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          ></textarea>
+        </div>
+
         {!preAttachments.length && !attachments.length && <div className='no-pictures'>No Pictures Added</div>}
         <AddPictures
           size='small'
