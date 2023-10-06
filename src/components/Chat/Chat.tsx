@@ -90,7 +90,7 @@ export const Chat: React.FC<ChatProps> = ({ qid }) => {
 
   return (
     <>
-      {!qid && <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>}
+      {false && <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>}
 
       <Modal
         open={isOpenChat}
