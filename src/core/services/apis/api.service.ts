@@ -37,7 +37,7 @@ export const postApi = async (url: string, params: object) => {
     return {
       success: false,
       data: null,
-      message: 'Error',
+      message: error,
     }
   }
 }
