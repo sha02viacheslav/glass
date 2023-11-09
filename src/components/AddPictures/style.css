@@ -2,10 +2,17 @@
   position: relative;
 }
 
-.broken-image-wrap img {
+.broken-image-wrap .broken-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 4px;
+}
+
+.broken-image-wrap .pdf-icon {
+  width: 80%;
+  max-width: 80px;
+  object-fit: contain;
 }
 
 .broken-image-wrap .title {
@@ -20,6 +27,7 @@
   font-size: 12px;
   font-weight: 600;
   line-height: normal;
+  max-width: calc(100% - 64px);
 }
 
 .broken-image-wrap .btn-icon {
@@ -41,4 +49,9 @@
   position: absolute;
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dedede;
+  border-radius: 4px;
 }

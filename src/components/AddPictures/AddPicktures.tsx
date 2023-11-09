@@ -1,7 +1,9 @@
 import './style.css'
-import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react'
+import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import pdfIcon from '@glass/assets/images/pdf.svg'
 import { Attachment } from '@glass/models'
+import { isBase64PDF } from '@glass/utils/check-type-base64/check-type-base64.util'
 
 type AddPicturesProps = {
   size?: 'small' | 'medium'
@@ -27,6 +29,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   onChangeFiles = () => {},
   onClickUpload = () => {},
 }) => {
+  const VALID_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf']
   const inputRef = useRef<HTMLInputElement>(null)
   const [validFiles, setValidFiles] = useState<Attachment[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -38,14 +41,13 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
 
   const validateFile = (file: File): ValidateFileResponse => {
     // Get the size of the file by files.item(i).size.
-    const validTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp']
     if (Math.round(file.size / 1024) > 25000) {
       return {
         status: false,
         message: 'This file exceeds maximum allowed size of 25 MB',
       }
     }
-    if (validTypes.indexOf(file.type) === -1) {
+    if (VALID_FILE_TYPES.indexOf(file.type) === -1) {
       return {
         status: false,
         message: 'Please only submit png, jpeg, gif or bmp',
@@ -90,6 +92,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
           const reader = new FileReader()
           reader.readAsDataURL(file)
           reader.onload = () => {
+            console.warn(reader.result)
             const newAttachment: Attachment = {
               attachment_id: 0,
               name: file.name,
@@ -130,7 +133,12 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
         <div key={idx} className={(size === 'small' ? 'col-4 col-lg-3' : 'col-6 col-lg-4') + ' broken-image-wrap mb-4'}>
           <div className='square'>
             <div>
-              <img src={file.datas} alt='Broken Image' />
+              {isBase64PDF(file.datas) ? (
+                <img src={pdfIcon} className='pdf-icon' alt='PDF Image' />
+              ) : (
+                <img src={file.datas} className='broken-image' alt='Broken Image' />
+              )}
+
               {size !== 'small' && <div className='title'>{file.name}</div>}
               {!disabled && (
                 <button className='btn-icon' onClick={() => deleteFile(idx)}>
@@ -158,11 +166,11 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
                 className='d-none'
                 onChange={filesSelected}
                 multiple
-                accept='image/png, image/jpeg, image/gif, image/bmp'
+                accept={VALID_FILE_TYPES.join(', ')}
                 onClick={(event) => event.stopPropagation()}
                 disabled={disabled}
               />
-              Add Pictures
+              Add Pictures or PDF Documents
             </label>
           </button>
           {showUpload && !!validFiles?.length && (
