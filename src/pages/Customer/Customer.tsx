@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
@@ -160,6 +161,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         updateQuoteService({ fe_token: quoteId, ...postData }).then((res) => {
           if (res.success) {
             navigate(`/quote/${quoteId}`)
+          } else {
+            setOnSubmitMessage(res.message)
           }
         }),
       )
@@ -172,6 +175,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           if (res.success) {
             navigate('/quote/' + res.data.fe_token)
             clearRequestedURL()
+          } else {
+            toast(res.message)
           }
         }),
       )

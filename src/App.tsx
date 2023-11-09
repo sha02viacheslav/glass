@@ -2,6 +2,7 @@ import './App.css'
 import React, { useEffect, useState } from 'react'
 import { usePromiseTracker } from 'react-promise-tracker'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 import { Footer } from '@glass/components/Footer'
 import { Header } from '@glass/components/Header'
 import { Loader } from '@glass/components/Loader'
@@ -14,6 +15,7 @@ import { Pricing } from '@glass/pages/Pricing'
 import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
 import { setRequestedURL } from '@glass/utils/session/session.util'
+import 'react-toastify/dist/ReactToastify.css'
 
 export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress } = usePromiseTracker()
@@ -54,6 +56,7 @@ export const App: React.FC = () => {
           <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
         </Routes>
         {showMenu && <Footer />}
+        <ToastContainer position='bottom-right' />
       </div>
     </>
   )

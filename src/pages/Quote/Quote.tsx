@@ -4,6 +4,7 @@ import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import expand from '@glass/assets/icons/expand.png'
 import flag from '@glass/assets/icons/uk-flag.png'
 import up from '@glass/assets/icons/up.png'
@@ -102,6 +103,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         getQuoteService(id, quoteCount).then((res) => {
           if (res.success) {
             setQuoteDetails(res.data)
+          } else {
+            toast(res.message)
           }
         }),
       )
