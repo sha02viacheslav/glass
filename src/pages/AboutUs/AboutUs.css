@@ -4,9 +4,9 @@
 
 .about-us .sec-banner {
   position: relative;
-  background: url(../../../public/images/aboutus.png) no-repeat;
+  background: url(../../../public/images/aboutus-banner.png) no-repeat;
   background-size: cover;
-  height: 400px;
+  height: 560px;
   display: flex;
   align-items: center;
   z-index: -1;
