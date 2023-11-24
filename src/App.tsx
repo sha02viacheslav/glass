@@ -7,6 +7,7 @@ import { Footer } from '@glass/components/Footer'
 import { Header } from '@glass/components/Header'
 import { Loader } from '@glass/components/Loader'
 import { PaymentAssist } from '@glass/components/PaymentAssist'
+import { AboutUs } from '@glass/pages/AboutUs'
 import { Contact } from '@glass/pages/Contact'
 import { Customer } from '@glass/pages/Customer'
 import { Home } from '@glass/pages/Home'
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/services' element={<Services />} />
+          <Route path='/aboutus' element={<AboutUs />} />
           <Route path='/pricing' element={<Pricing />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/customer' element={<Customer />} />
@@ -55,7 +57,7 @@ export const App: React.FC = () => {
           <Route path='/quote/in/:id' element={<QuotePage />} />
           <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
         </Routes>
-        {showMenu && <Footer />}
+        <Footer showReg={showMenu} />
         <ToastContainer position='bottom-right' />
       </div>
     </>

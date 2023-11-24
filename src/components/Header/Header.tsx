@@ -21,50 +21,43 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
 
   return (
     <header id='navbar-main'>
+      <div className='bg-primary d-md-none p-2'>
+        <div className='d-flex align-items-center justify-content-center gap-3'>
+          <button className='btn-stroked round' onClick={directToCustomer}>
+            Get a Quote
+          </button>
+          <div className='header-or-call text-white'>or call</div>
+          <a href={`tel:${PHONE_NUMBER}`} className='header-phone-number text-white'>
+            {PHONE_NUMBER}
+          </a>
+        </div>
+      </div>
+
       <nav id='navbar_top' className='navbar navbar-expand-lg navbar-light py-3 py-md-0'>
         <div className='container'>
           {/* Mobile Navigation */}
+
           <div className='mobile-nav d-sm-block d-md-block d-lg-none w-100'>
-            <div className='row align-items-start align-items-md-center w-100 g-0'>
-              <div className='col-4'>
-                <Link className=' py-2' to='/'>
-                  <img
-                    src={process.env.PUBLIC_URL + '/img/logo.png'}
-                    className='logo-img img-fluid d-block mx-auto'
-                    alt=''
-                  />
-                </Link>
-              </div>
+            <div className='d-flex align-items-center justify-content-between'>
+              <Link to='/'>
+                <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid d-block' alt='' />
+              </Link>
               {showMenu && (
-                <>
-                  <div className='col-5 ms-auto'>
-                    <div className='d-flex flex-column align-items-center'>
-                      <button className='header-get-quote-btn' onClick={directToCustomer}>
-                        Get a Quote
-                      </button>
-                      <div className='header-or-call'>or call</div>
-                      <a href={`tel:${PHONE_NUMBER}`} className='header-phone-number'>
-                        {PHONE_NUMBER}
-                      </a>
-                    </div>
+                <div className='text-end'>
+                  <div
+                    id='toggle'
+                    onClick={handleToggleClick}
+                    className='toggle-button ms-auto'
+                    data-bs-toggle='collapse'
+                    data-bs-target='#navbarSupportedContent'
+                    aria-controls='navbarSupportedContent'
+                    aria-expanded='false'
+                    aria-label='Toggle navigation'
+                  >
+                    <span className='bar'></span>
+                    <span className='bar'></span>
                   </div>
-                  <div className='col-2 text-end'>
-                    <div
-                      id='toggle'
-                      onClick={handleToggleClick}
-                      className='toggle-button ms-auto'
-                      data-bs-toggle='collapse'
-                      data-bs-target='#navbarSupportedContent'
-                      aria-controls='navbarSupportedContent'
-                      aria-expanded='false'
-                      aria-label='Toggle navigation'
-                    >
-                      <span className='bar top'></span>
-                      <span className='bar middle'></span>
-                      <span className='bar bottom'></span>
-                    </div>
-                  </div>
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -74,16 +67,17 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
           </Link>
 
           {showMenu && (
-            <div className='collapse navbar-collapse justify-content-between' id='navbarSupportedContent'>
-              <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav'>
+            <div className='collapse navbar-collapse justify-content-between ms-5' id='navbarSupportedContent'>
+              <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav gap-4'>
+                <CustomLink to='/'>Home</CustomLink>
                 <CustomLink to='/services'>Services</CustomLink>
-                <CustomLink to='/contact'>Contact us</CustomLink>
+                <CustomLink to='/aboutus'>About Us</CustomLink>
               </ul>
               <div className='d-none d-md-flex align-items-center'>
-                <button className='get-quote-btn' onClick={directToCustomer}>
+                <button className='btn-raised round' onClick={directToCustomer}>
                   Get a Quote
                 </button>
-                <div className='or-call mx-3'>or call</div>
+                <div className='or-call mx-3'>or Call</div>
                 <a href={`tel:${PHONE_NUMBER}`} className='phone-number'>
                   {PHONE_NUMBER}
                 </a>

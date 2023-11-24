@@ -1,0 +1,33 @@
+.about-us .sec-title {
+  padding: 32px;
+}
+
+.about-us .sec-banner {
+  position: relative;
+  background: url(../../../public/images/aboutus.png) no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  z-index: -1;
+}
+
+.sec-description {
+  padding: 32px;
+  background: var(--bg-color);
+  color: var(--primary-color);
+}
+
+@media (max-width: 767px) {
+  .about-us .sec-title {
+    padding: 24px;
+  }
+
+  .about-us .sec-banner {
+    height: 200px;
+  }
+
+  .about-us .sec-description {
+    padding: 24px 4px;
+  }
+}

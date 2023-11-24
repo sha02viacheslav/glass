@@ -1,0 +1,29 @@
+.customer-page .sec-title {
+  padding: 32px;
+}
+
+@media (max-width: 767px) {
+  .customer-page .sec-title {
+    padding: 24px;
+  }
+}
+
+.customer-page .sec-banner {
+  position: relative;
+  background: url(../../../public/images/customer-banner.png) no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  z-index: -1;
+}
+
+.customer-page .sec-form {
+  padding: 64px;
+}
+
+@media (max-width: 767px) {
+  .customer-page .sec-form {
+    padding: 24px;
+  }
+}

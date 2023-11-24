@@ -1,7 +1,6 @@
 import './style.css'
 import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import pdfIcon from '@glass/assets/images/pdf.svg'
+import CloseIcon from '@mui/icons-material/Close'
 import { Attachment } from '@glass/models'
 import { isBase64PDF } from '@glass/utils/check-type-base64/check-type-base64.util'
 
@@ -130,19 +129,19 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   const renderFiles = () => (
     <div className='row'>
       {validFiles.map((file, idx) => (
-        <div key={idx} className={(size === 'small' ? 'col-4 col-lg-3' : 'col-6 col-lg-4') + ' broken-image-wrap mb-4'}>
+        <div key={idx} className={(size === 'small' ? 'col-4 col-lg-3' : 'col-6 col-lg-4') + ' broken-image-wrap my-3'}>
           <div className='square'>
             <div>
               {isBase64PDF(file.datas) ? (
-                <img src={pdfIcon} className='pdf-icon' alt='PDF Image' />
+                <img src={process.env.PUBLIC_URL + '/images/pdf.png'} className='pdf-icon' alt='PDF Image' />
               ) : (
                 <img src={file.datas} className='broken-image' alt='Broken Image' />
               )}
 
               {size !== 'small' && <div className='title'>{file.name}</div>}
               {!disabled && (
-                <button className='btn-icon' onClick={() => deleteFile(idx)}>
-                  <DeleteForeverOutlinedIcon />
+                <button className='btn-stroked-icon' onClick={() => deleteFile(idx)}>
+                  <CloseIcon />
                 </button>
               )}
             </div>
@@ -158,7 +157,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
 
       {!disabled && (
         <div>
-          <button className='btn-raised' onClick={btnOnClick}>
+          <button className='btn-stroked round' onClick={btnOnClick}>
             <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
               <input
                 ref={inputRef}
@@ -174,7 +173,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
             </label>
           </button>
           {showUpload && !!validFiles?.length && (
-            <button className='btn-stroked ms-3' onClick={handleClickUpload}>
+            <button className='btn-stroked round ms-3' onClick={handleClickUpload}>
               <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>Confirm Upload</label>
             </button>
           )}

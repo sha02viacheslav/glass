@@ -183,11 +183,10 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }, [timeData])
 
   return (
-    <div>
+    <div className='bg-grey'>
+      <div className='fnt-28 fnt-md-34 text-primary p-3'>Set Date And Time</div>
       <div className='time-select-main'>
-        <h1>Set date and time</h1>
         <div className='date-pick-container'>
-          {/* <span className='time-select-month'>December</span> */}
           <Button
             id='basic-button'
             sx={{
@@ -257,18 +256,17 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                 <tr key={index}>
                   {/* first row maps dates */}
                   <td className='ts-date-container'>
-                    <div className='ts-date-month'>{moment(element.date).format('MMM')}</div>
-                    <div className='d-flex align-items-center'>
+                    <div className='d-flex align-items-center justify-content-center'>
                       <div
                         className={
                           moment(element.date).format('YYYY-MM-DD') != moment().format('YYYY-MM-DD')
-                            ? 'ts-date-day'
-                            : 'ts-date-today'
+                            ? 'ts-date-day text-primary'
+                            : 'ts-date-today text-primary'
                         }
                       >
                         {moment(element.date).format('DD')}
                       </div>
-                      <div className='ms-2'>{moment(element.date).format('ddd')}</div>
+                      <div className='text-primary ms-2'>{moment(element.date).format('ddd')}</div>
                     </div>
                   </td>
                   {/* subsequent rows map timeslots */}

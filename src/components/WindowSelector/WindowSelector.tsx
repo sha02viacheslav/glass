@@ -317,8 +317,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       </div>
 
       {/* tinted window toggle */}
-      <div>
-        <span className='fs-18 text-blue'>Privacy windows: </span>
+      <div className='d-flex align-items-center'>
+        <span className='fnt-20 fnt-md-28 text-primary'>Privacy windows: </span>
         <ToggleButtonGroup
           sx={{ ml: isVan ? 0 : '10px' }}
           color='secondary'
@@ -327,7 +327,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           aria-label='Platform'
         >
           <ToggleButton
-            sx={{ width: isVan ? 120 : 70 }}
+            sx={{ width: isVan ? 120 : 70, borderRadius: '48px' }}
             size='small'
             value='yes'
             onClick={() => tintedButtonHandle('yes')}
@@ -335,7 +335,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             Yes
           </ToggleButton>
           <ToggleButton
-            sx={{ width: isVan ? 120 : 70 }}
+            sx={{ width: isVan ? 120 : 70, borderRadius: '48px' }}
             size='small'
             value='no'
             onClick={() => tintedButtonHandle('no')}

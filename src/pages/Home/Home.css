@@ -1,3 +1,139 @@
+.home .sec-banner {
+  position: relative;
+  background: url(../../../public/images/home-banner.png) no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  z-index: -1;
+}
+
+.home .sec-banner .heart {
+  margin-top: -8px;
+}
+
+.home .sec-description {
+  padding: 32px;
+  background: var(--bg-color);
+  color: var(--primary-color);
+}
+
+.home .sec-quote {
+  background: var(--white-color);
+}
+
+.home .sec-services {
+  padding: 64px;
+}
+
+.discover-more {
+  position: relative;
+  padding-right: 60px;
+  line-height: 24px;
+}
+
+.discover-more::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 24px;
+  width: 54px;
+  background: url(../../../public/images/discover-more.png) no-repeat right;
+  background-size: contain;
+}
+
+.sec-selling {
+  position: relative;
+  background: var(--bg-color);
+}
+
+.sec-selling::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background-size: cover;
+  background: url(../../../public/images/home-selling.png) no-repeat right;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .sec-selling::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateX(83%);
+    height: 583px;
+    width: 1584px;
+    background-size: cover;
+    background: url(../../../public/images/home-selling-overlay.png) no-repeat right;
+    z-index: 1;
+  }
+}
+
+.selling-points li {
+  background: url(../../../public/images/list-dot.png) no-repeat left 4px;
+  padding-left: 24px;
+  line-height: 24px;
+}
+
+.sec-review {
+  background: var(--dark-color);
+  position: relative;
+  padding: 48px;
+}
+
+@media (min-width: 768px) {
+  .sec-review::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-65%);
+    height: 380px;
+    width: 730px;
+    background: url(../../../public/images/review-overlay.png) no-repeat;
+    background-size: cover;
+  }
+}
+
+@media (max-width: 767px) {
+  .home .sec-banner {
+    height: 240px;
+  }
+
+  .home .sec-description {
+    padding: 24px 4px;
+    background: var(--white-color);
+  }
+
+  .home .sec-quote {
+    background: var(--bg-color);
+  }
+
+  .home .sec-services {
+    padding: 24px;
+    background: var(--bg-color);
+  }
+
+  .sec-selling::before {
+    display: block;
+    width: 100%;
+    height: 200px;
+    position: relative;
+    background: url(../../../public/images/home-selling.mobile.png) no-repeat;
+    background-size: cover;
+  }
+
+  .sec-review {
+    padding: 24px 0 80px;
+  }
+}
+
 * {
   padding: 0;
   margin: 0;

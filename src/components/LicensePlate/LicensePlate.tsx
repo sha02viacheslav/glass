@@ -6,16 +6,18 @@ import './license-plate.css'
 
 export type LicensePlateProps = {
   licenseNumber: string
-  model: string
-  placeholderVal: string
-  handleVehInputChange: (value: string | undefined) => void
+  model?: string
+  placeholderVal?: string
+  showEdit?: boolean
+  handleVehInputChange?: (value: string | undefined) => void
 }
 
 export const LicensePlate: React.FC<LicensePlateProps> = ({
   licenseNumber,
-  model,
-  placeholderVal,
-  handleVehInputChange,
+  model = '',
+  placeholderVal = '',
+  showEdit = true,
+  handleVehInputChange = () => {},
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
 
@@ -31,33 +33,35 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }, [licenseNumber])
 
   return (
-    <div className='center'>
-      <div className='license-plate'>
-        <div className='left-container'>
-          <div className='yellow-box'>
-            <div className='blue-box'>
-              <img className='flag' src={flag} alt='' />
-              <div className='gb'>UK</div>
-            </div>
-            <input
-              autoFocus
-              className='license-input'
-              type='text'
-              placeholder={placeholderVal}
-              maxLength={8}
-              value={localLicenseNum}
-              onChange={(e) => setLocalLicenseNum(e.target.value)}
-            />
+    <div className='license-plate'>
+      <div className='left-container'>
+        <div className='yellow-box'>
+          <div className='blue-box d-flex justify-content-center align-items-center'>
+            <img className='flag' src={flag} alt='' />
+            <div className='gb fw-b'>UK</div>
           </div>
-          <p className='fw-500 mb-0 ms-2'>
+          <input
+            autoFocus
+            className='license-input'
+            type='text'
+            placeholder={placeholderVal}
+            maxLength={8}
+            value={localLicenseNum}
+            onChange={(e) => setLocalLicenseNum(e.target.value)}
+          />
+        </div>
+        {!!model && (
+          <div className='fnt-14 fnt-md-16 text-grey mt-1'>
             <img src={process.env.PUBLIC_URL + '/img/car-sv.svg'} className='img-fluid me-2' alt='' />
             {model}
-          </p>
-        </div>
-        <div className='right-container'>
-          <button className='edit-btn'>EDIT</button>
-        </div>
+          </div>
+        )}
       </div>
+      {showEdit && (
+        <div className='mt-3'>
+          <button className='btn-stroked round'>EDIT</button>
+        </div>
+      )}
     </div>
   )
 }

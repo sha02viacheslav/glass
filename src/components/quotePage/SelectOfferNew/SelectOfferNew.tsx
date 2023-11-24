@@ -20,11 +20,12 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
 }) => {
   return (
     <div className='select-offer'>
+      <div className='fnt-28 fnt-md-34 text-primary p-3'>Order Information</div>
       <div className='table-container'>
         <table className='SO-table'>
           <tbody>
             {selectOfferToCustomer.map((element, rowIndex) => (
-              <tr key={`order-line-${rowIndex}`} className='bg-light'>
+              <tr key={`order-line-${rowIndex}`} className={rowIndex % 2 ? '' : 'bg-grey'}>
                 <td className='so-info'>
                   <div className='info-div first-col'>{element.product}</div>
                 </td>
@@ -37,7 +38,10 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
               </tr>
             ))}
             {optionalOrderLines.map((element, rowIndex) => (
-              <tr key={`optional-order-line-${rowIndex}`}>
+              <tr
+                key={`optional-order-line-${rowIndex}`}
+                className={(selectOfferToCustomer.length + rowIndex) % 2 ? '' : 'bg-grey'}
+              >
                 <td className='so-info'>
                   <div className='info-div first-col'>
                     <Checkbox
@@ -65,24 +69,29 @@ export const SelectOfferNew: React.FC<SelectOfferNewProps> = ({
                 </td>
               </tr>
             ))}
+
+            <tr
+              key='total'
+              className={selectOfferToCustomer.concat(selectOfferToCustomer).length % 2 ? 'bg-white' : 'bg-white'}
+            >
+              <td className='so-info text-primary'>
+                <div className='info-div first-col'>Tax 20%</div>
+              </td>
+              <td className='so-info'>
+                <div className='info-div top-right'>£ {totalUnitPrice.toFixed(2)}</div>
+              </td>
+            </tr>
+
+            <tr key='total' className='bg-primary'>
+              <td className='so-info text-white'>
+                <div className='info-div first-col'>Total</div>
+              </td>
+              <td className='so-info text-white'>
+                <div className='info-div top-right'>£ {totalPrice.toFixed(2)}</div>
+              </td>
+            </tr>
           </tbody>
         </table>
-      </div>
-      <div className='total-container-out'>
-        <div className='total-container-in bg-light'>
-          <div className='total-row'>
-            <span>Untaxed amount</span>
-            <span>£ {totalUnitPrice.toFixed(2)}</span>
-          </div>
-          <div className='total-row'>
-            <span>Tax 20%</span>
-            <span>£ {(totalPrice - totalUnitPrice).toFixed(2)}</span>
-          </div>
-          <div className='total-row total-last'>
-            <span className='total-bold'>Total</span>
-            <span className='total-bold'>£ {totalPrice.toFixed(2)}</span>
-          </div>
-        </div>
       </div>
     </div>
   )

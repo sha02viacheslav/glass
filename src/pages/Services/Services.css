@@ -1,4 +1,69 @@
-.get-quote-wrap {
-  max-width: 720px;
-  margin: 6% auto 6%;
+.services-page .sec-banner {
+  position: relative;
+  background: url(../../../public/images/services-banner.png) no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  z-index: -1;
+}
+
+@media (max-width: 767px) {
+  .services-page .sec-banner {
+    height: 240px;
+  }
+}
+
+.services-page .sec-description {
+  padding: 32px;
+  background: var(--bg-color);
+  color: var(--primary-color);
+}
+
+@media (max-width: 767px) {
+  .services-page .sec-description {
+    padding: 24px 4px;
+    background: var(--white-color);
+  }
+}
+
+@media (max-width: 767px) {
+  .services-page .sec-quote {
+    background: var(--bg-color);
+  }
+}
+
+.services-page .sec-services {
+  padding: 64px;
+}
+
+@media (max-width: 767px) {
+  .services-page .sec-services {
+    padding: 24px;
+  }
+}
+
+.sec-install-film {
+  background: var(--dark-color);
+  position: relative;
+  padding: 48px;
+}
+
+@media (min-width: 768px) {
+  .sec-install-film::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 1920px;
+    background: url(../../../public/images/install-film-overlay.png) no-repeat right;
+    background-size: cover;
+  }
+}
+
+@media (max-width: 767px) {
+  .sec-install-film {
+    padding: 24px 0 80px;
+  }
 }

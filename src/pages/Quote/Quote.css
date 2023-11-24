@@ -1,3 +1,29 @@
+.quote-page .sec-title {
+  padding: 32px;
+}
+
+@media (max-width: 767px) {
+  .quote-page .sec-title {
+    padding: 24px;
+  }
+}
+
+.quote-page .sec-banner {
+  position: relative;
+  background: url(../../../public/images/quote-banner.png) no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  z-index: -1;
+}
+
+@media (max-width: 767px) {
+  .quote-page .sec-banner {
+    height: 200px;
+  }
+}
+
 .thank-you-header {
   margin: 50px 0 30px 0;
   color: #9a73dd;
@@ -15,21 +41,13 @@
 }
 
 .quote-info-main {
-  border: 1px solid #9a73dd;
+  border: 1px solid var(--primary-color);
   background-color: white;
   width: 100%;
   max-width: 550px;
-  border-radius: 10px;
+  border-radius: 16px;
   position: relative;
-}
-
-.client-info-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: 1s;
-  position: relative;
-  padding: 5px;
+  overflow: hidden;
 }
 
 .client-info {
@@ -178,12 +196,6 @@
   white-space: nowrap;
 }
 
-.quote-selected-windows {
-  font-size: 14px;
-  line-height: 25px;
-  margin-right: 5px;
-}
-
 .client-info-icon {
   width: 22px;
   margin-right: 10px;
@@ -192,26 +204,6 @@
 
 .client-info-icon:hover {
   cursor: pointer;
-}
-
-.client-up-icon {
-  width: 22px;
-  margin: 0 5px 0 10px;
-}
-
-.client-up-icon:hover {
-  cursor: pointer;
-}
-
-.quote-before-after {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 50px 0;
-}
-
-.quote-before-after div {
-  max-width: 550px;
 }
 
 .quote-scheduler-red {
@@ -251,14 +243,6 @@
 
 .client-info-blink:hover {
   cursor: default;
-}
-
-.booking-info h1 {
-  line-height: 40px;
-  font-weight: 500;
-  font-size: 20px;
-  color: #2e006c;
-  text-align: center;
 }
 
 .booking-address {

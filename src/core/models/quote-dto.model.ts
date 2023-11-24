@@ -28,10 +28,8 @@ export type QuoteDto = {
   }
   registration_number: string
   glass_location?: string[]
-  customer_comments?: {
-    comment: string
-    attachments: CommentAttachment[]
-  }
+  customer_comment?: string
+  customer_attachments?: CommentAttachment[]
   customer_chat_state?: CustomerChatState
   fe_requested_url?: string
 }

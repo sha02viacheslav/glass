@@ -15,7 +15,6 @@
 .time-select-main,
 .date-pick-container,
 .time-select-month,
-.ts-date-today,
 .ts-table tr:nth-child(n + 2) > td:nth-child(1) {
   justify-content: center;
 }
@@ -24,9 +23,7 @@
 .time-select-main,
 .time-select-month,
 .time-select-month,
-.ts-date-today,
-.ts-table tr:nth-child(n + 2) > td:nth-child(1),
-.ts-date-day {
+.ts-table tr:nth-child(n + 2) > td:nth-child(1) {
   align-items: center;
 }
 
@@ -147,27 +144,35 @@
 
 .ts-date-day,
 .ts-date-today {
-  position: relative;
-  font-size: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  line-height: 26px;
   height: 40px;
+  width: 40px;
+  padding-top: 1px;
   font-family: 'CourierPrime-Regular';
-  top: 0px;
+  box-sizing: border-box;
+  padding-top: 7px;
 }
 
 .ts-date-today {
-  background-color: rgb(70, 113, 255);
-  color: white;
+  border: solid 1px var(--primary-color);
   border-radius: 50%;
-  width: 40px;
+  padding-top: 5px;
 }
 
-.ts-table tr:nth-child(n + 3) {
-  border-left: 3px solid #6b6b6b;
-}
-
-.ts-table tr:nth-child(n + 2) > td {
+.ts-table tr:nth-child(n + 2) > td:nth-child(n + 2):not(:last-child) {
   overflow: hidden;
-  border-bottom: 0.5px solid #6b6b6b;
+  border-bottom: 5px solid var(--white-color);
+  box-sizing: content-box;
+}
+
+.ts-table tr:nth-child(n + 2):not(:last-child) > td:nth-child(n + 2) {
+  overflow: hidden;
+  border-right: 5px solid var(--white-color);
+  box-sizing: content-box;
 }
 
 .ts-table tr:nth-child(n + 2) > td:nth-child(n + 2):hover {

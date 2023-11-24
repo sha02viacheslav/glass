@@ -28,7 +28,7 @@ export const GetQuoteOrCall: React.FC<GetQuoteOrCallProps> = ({ showRegInput = t
   }
 
   return (
-    <div className='d-flex flex-column flex-md-row align-items-center justify-content-center gap-3'>
+    <div className='d-flex align-items-center justify-content-center gap-3'>
       {showRegInput && (
         <div className='reg-input-wrap'>
           <div className='form-group'>
@@ -43,8 +43,8 @@ export const GetQuoteOrCall: React.FC<GetQuoteOrCallProps> = ({ showRegInput = t
           </div>
         </div>
       )}
-      <div className='d-flex flex-column flex-md-row align-items-center'>
-        <button type='submit' className='get-quote-btn' onClick={directToCustomer}>
+      <div className='d-flex align-items-center justify-content-center'>
+        <button type='submit' className='btn-raised round' onClick={directToCustomer}>
           GET A QUOTE
         </button>
         <div className='or-call m-3'>or call</div>

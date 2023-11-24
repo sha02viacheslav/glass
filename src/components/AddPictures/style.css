@@ -30,7 +30,7 @@
   max-width: calc(100% - 64px);
 }
 
-.broken-image-wrap .btn-icon {
+.broken-image-wrap .btn-stroked-icon {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -52,6 +52,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #dedede;
   border-radius: 4px;
 }

@@ -1,19 +1,20 @@
-import './quote.css'
+import './Quote.css'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp'
+import UnfoldMore from '@mui/icons-material/UnfoldMore'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import expand from '@glass/assets/icons/expand.png'
-import flag from '@glass/assets/icons/uk-flag.png'
-import up from '@glass/assets/icons/up.png'
 import close from '@glass/assets/icons/x.png'
 import { AddPictures } from '@glass/components/AddPictures'
-import { BeforeAfter } from '@glass/components/BeforeAfter'
 import { Chat } from '@glass/components/Chat'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
+import { LicensePlate } from '@glass/components/LicensePlate'
+import { OurMethod } from '@glass/components/OurMethod'
 import { LocationSelection } from '@glass/components/quotePage/LocationSelection'
+import { OrderInformation } from '@glass/components/quotePage/OrderInformation'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
@@ -54,7 +55,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIMESLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
-  const [quoteInfoOpen, setInfoOpen] = useState<boolean>(true)
+  const [quoteInfoOpen, setInfoOpen] = useState<boolean>(false)
   const [deliveryAddress, setDeliveryAddress] = useState<Address | undefined>(undefined)
   const [paymentOption, setPaymentOption] = useState<PaymentOptionDto>({
     p_option: PaymentOptionEnum.NONE,
@@ -380,10 +381,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       customer_email: (quoteDetails?.customer_email || '').trim(),
       registration_number: (quoteDetails?.registration_number || '').trim(),
       glass_location: (quoteDetails?.glass_location || []).map((item) => item.toLowerCase()),
-      customer_comments: {
-        comment: comment || 'Upload Pictures',
-        attachments: attachments,
-      },
+      customer_comment: comment,
+      customer_attachments: attachments,
     }
 
     trackPromise(
@@ -400,15 +399,16 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const renderPictures = () => {
     return !!quoteDetails ? (
       <div className='p-1 mb-3'>
-        {quoteDetails.customer_comments.map((item, index) => (
-          <div key={index} className='text-left'>
-            <p>
-              <strong>Comment {index + 1}: </strong>
-              {item.comment}
-            </p>
-            <AddPictures size='small' disabled={true} attachments={item.attachments} />
+        {quoteDetails.customer_comment.map((item, index) => (
+          <div key={index} className='text-grey'>
+            <strong>Comment {index + 1}: </strong>
+            {item.comment}
           </div>
         ))}
+
+        <div className='text-left'>
+          <AddPictures size='small' disabled={true} attachments={preAttachments} />
+        </div>
 
         <div className='form-group mb-4'>
           <textarea
@@ -472,6 +472,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       quoteDetails.customer_comments.forEach((comment) => {
         pictures = pictures.concat(comment.attachments)
       })
+      quoteDetails.customer_attachments.forEach((attachment) => {
+        pictures = pictures.concat(attachment.attachments)
+      })
       setPreAttachments(pictures)
     }
   }, [quoteDetails])
@@ -513,7 +516,15 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
   return (
-    <div className='my-4 my-md-5'>
+    <div className='quote-page px-3 px-md-0'>
+      <section className='sec-title'>
+        <div className='container'>
+          <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Your Quote</h1>
+        </div>
+      </section>
+
+      <section className='sec-banner d-none d-md-block mb-5'></section>
+
       {declinePopup && (
         <div className='popup-background'>
           <div className='popup-container'>
@@ -550,94 +561,86 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       )}
 
       <div className='center'>
-        {quoteInfoOpen && (
-          <div className='quote-info-main'>
-            <div className='client-info-container'>
-              {isBlink && (
-                <Tooltip disableFocusListener title='Booking confirmed'>
-                  <div className='client-info-blink'>-</div>
-                </Tooltip>
-              )}
-              <div className='info-container'>
-                <div id='scroll-to-top'>
-                  <div className='yellow-box' key={tempLicenseNum}>
-                    <div className='blue-box'>
-                      <img className='flag' src={flag} alt='' />
-                      <div className='gb'>UK</div>
-                    </div>
-                    <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
-                  </div>
-                  <div className='client-info'>
-                    {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
-                  </div>
-                  <div className='client-info'>{formatAddress(quoteDetails?.invoice_address)}</div>
-                  <div className='client-info'>{quoteDetails?.customer_email}</div>
-                  <div className='client-info'>{quoteDetails?.customer_phone}</div>
-                  <div className='client-info'>{quoteDetails?.make}</div>
-                  <div className='client-info'>{quoteDetails?.model}</div>
-                </div>
-              </div>
-              <div className='edit-btn-container'>
-                <button className='edit-btn' onClick={backToCustomer}>
-                  EDIT
-                </button>
+        <div className='quote-info-main'>
+          {isBlink && (
+            <Tooltip disableFocusListener title='Booking confirmed'>
+              <div className='client-info-blink'>-</div>
+            </Tooltip>
+          )}
+          <div id='scroll-to-top' className='info-container'>
+            <div className='fnt-28 fnt-md-34 text-primary p-3'>Customer Details</div>
+
+            <div className='w-100 p-3 bg-grey'>
+              <div className='fnt-20 fnt-md-28 text-primary'>Registry</div>
+              <div className='fnt-14 fnt-md-16 text-grey mt-2'>
+                {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
+                <br />
+                {formatAddress(quoteDetails?.invoice_address)}
+                <br />
+                {quoteDetails?.customer_email} {quoteDetails?.customer_phone}
               </div>
             </div>
-            {renderPictures()}
-            <div className='quote-info-bottom'>
-              <div className='compact-bottom-row'>
-                <span className='quote-selected-windows'>
-                  <b>Selected windows:</b>{' '}
-                </span>
-                {!!quoteDetails &&
-                  quoteDetails.glass_location.map((element) => (
-                    <span key={element} className='client-windows'>
-                      {element.charAt(0).toUpperCase() + element.slice(1)}
-                    </span>
-                  ))}
-              </div>
-              <img
-                onClick={() => setInfoOpen(false)}
-                src={up}
-                alt=''
-                style={{ width: '17px' }}
-                className='client-up-icon'
+
+            <div className='w-100 p-3'>
+              <div className='fnt-20 fnt-md-28 text-primary mb-2'>Vehicle Details</div>
+              <LicensePlate
+                placeholderVal={'NU71 REG'}
+                licenseNumber={tempLicenseNum}
+                model={quoteDetails?.make + ' ' + quoteDetails?.model}
+                showEdit={false}
               />
             </div>
-          </div>
-        )}
-        {!quoteInfoOpen && (
-          <div className='quote-info-compact'>
-            {isBlink && (
-              <Tooltip disableFocusListener title='Booking confirmed'>
-                <div className='client-info-blink'>-</div>
-              </Tooltip>
-            )}
-            <div className='client-info-compact'>
-              <div className='yellow-box' key={tempLicenseNum}>
-                <div className='blue-box'>
-                  <img className='flag' src={flag} alt='' />
-                  <div className='gb'>UK</div>
+
+            {quoteInfoOpen && (
+              <>
+                <div className='w-100 p-3 bg-grey'>
+                  <div className='fnt-20 fnt-md-28 text-primary'>Comments And Uploads</div>
+                  <div className='fnt-14 fnt-md-16 text-grey mt-2'>{renderPictures()}</div>
                 </div>
-                <input className='license-input' type='text' defaultValue={tempLicenseNum} placeholder='NU71 REG' />
-              </div>
-              <div className='client-info'>
-                {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
-              </div>
-              {renderPictures()}
-              <div className='compact-bottom-row'>
-                {!!quoteDetails &&
-                  quoteDetails.glass_location.map((element) => (
-                    <span key={element} className='client-windows'>
-                      {element}
-                    </span>
-                  ))}
-              </div>
-            </div>
-            <img onClick={() => setInfoOpen(true)} className='client-info-icon' src={expand} alt='' />
+
+                <div className='w-100 p-3'>
+                  <div className='fnt-20 fnt-md-28 text-primary'>Job Description</div>
+
+                  {!!quoteDetails &&
+                    quoteDetails.glass_location.map((element) => (
+                      <div key={element} className='fnt-14 fnt-md-16 text-grey mt-2'>
+                        <span className='text-primary'>{element.charAt(0).toUpperCase() + element.slice(1)}</span>{' '}
+                        Repair • Tint
+                      </div>
+                    ))}
+                </div>
+
+                <div className='w-100 p-3 bg-grey'>
+                  <div className='fnt-20 fnt-md-28 text-primary'>Place of Intervention</div>
+                  <div className='fnt-14 fnt-md-16 text-grey mt-2'>
+                    {quoteDetails?.working_place === WorkingPlace.MOBILE ? (
+                      <>
+                        <span className='text-primary'>At Your Home/Work</span>{' '}
+                        {formatAddress(quoteDetails?.delivery_address)}
+                      </>
+                    ) : (
+                      <>
+                        <span className='text-primary'>At Workshop</span> {quoteDetails?.workshop?.name}{' '}
+                        {quoteDetails?.workshop?.address}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        )}
+
+          <div className='d-flex justify-content-between align-items-center p-3'>
+            <button className='btn-raised round' onClick={backToCustomer}>
+              Edit
+            </button>
+            <button className='btn-icon' onClick={() => setInfoOpen((prev) => !prev)}>
+              {quoteInfoOpen ? <KeyboardArrowUp /> : <UnfoldMore />}
+            </button>
+          </div>
+        </div>
       </div>
+
       {!quoteDetails?.is_published && (
         <div className='center'>
           <h2 className='thank-you-header'>Thank you!</h2>
@@ -646,18 +649,38 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         </div>
       )}
 
-      <div className='true-top' id='1'>
-        -
-      </div>
-
       <div className='center'>
         <div className='scroll-container'>
           {/* select offer / payment method */}
-          <div id='offer' className='mt-5'>
-            {!!quoteDetails && (
-              <PaymentMethod
+          {!!quoteDetails && (
+            <div className='quote-card mt-5'>
+              <OrderInformation
                 offerDetails={quoteDetails.is_published ? offersDetails : [EMPTY_OFFER]}
                 optionalOrderLines={quoteDetails.is_published ? optionalOrderLines : []}
+                quoteDetails={quoteDetails}
+                qid={id}
+                totalPrice={quoteDetails.is_published ? totalPrice : 0}
+                totalUnitPrice={quoteDetails.is_published ? totalUnitPrice : 0}
+                onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
+              />
+
+              {((!quoteDetails?.booking_date && !quoteDetails.request_booking_date) || editBooking) && (
+                <TimeSelection
+                  timeSlotToParent={timeSlotToParent}
+                  liveBooking={false}
+                  bookingStartDate={
+                    quoteDetails?.booking_date
+                      ? moment(quoteDetails?.booking_date)
+                          .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
+                          .format(BOOKING_DATE_FORMAT)
+                      : moment(quoteDetails?.request_booking_date)
+                          .add(quoteDetails.request_time_slot.split('_')?.[0], 'hours')
+                          .format(BOOKING_DATE_FORMAT)
+                  }
+                />
+              )}
+
+              <PaymentMethod
                 quoteDetails={{
                   ...quoteDetails,
                   c_address: formatAddress(quoteDetails?.delivery_address, false),
@@ -665,28 +688,22 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 }}
                 qid={id}
                 totalPrice={quoteDetails.is_published ? totalPrice : 0}
-                totalUnitPrice={quoteDetails.is_published ? totalUnitPrice : 0}
                 payAssist={payAssistToParent}
                 refetchQuote={getQuote}
                 PADataToParent={PADataToParent}
                 PAUrl={PAUrl}
                 method={paymentOptionToParent}
-                onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
               />
-            )}
-          </div>
-
-          <div className='quote-scroll-target' id='2'>
-            -
-          </div>
+            </div>
+          )}
 
           {!!quoteDetails && (
-            <div className='quote-card'>
+            <div className='quote-card mt-5'>
               {(!!quoteDetails?.booking_date || !!quoteDetails?.request_booking_date) && !editBooking ? (
-                <div className='booking-info p-4'>
+                <div className='booking-info text-center bg-primary text-white p-4'>
                   {!!quoteDetails?.booking_date && (
                     <>
-                      <h1 className='mb-4'>You are booked in!</h1>
+                      <h1 className='fnt-20 fnt-md-28 mb-4'>You are booked in!</h1>
                       <div className='booking-address mb-4'>
                         Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM YYYY')} from{' '}
                         {slot2Time(quoteDetails.time_slot.split('_')?.[0])} to{' '}
@@ -714,8 +731,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     <div className='booking-address'>Booked in at {quoteDetails.workshop_address || 'N/A'}</div>
                   )}
                   {quoteDetails?.order_state !== OrderState.WON && (
-                    <div className='d-flex justify-content-end'>
-                      <button className='edit-btn' onClick={() => setEditBooing(true)}>
+                    <div className='d-flex justify-content-end mt-3'>
+                      <button className='btn-stroked round' onClick={() => setEditBooing(true)}>
                         EDIT
                       </button>
                     </div>
@@ -723,19 +740,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 </div>
               ) : (
                 <>
-                  <TimeSelection
-                    timeSlotToParent={timeSlotToParent}
-                    liveBooking={false}
-                    bookingStartDate={
-                      quoteDetails?.booking_date
-                        ? moment(quoteDetails?.booking_date)
-                            .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                            .format(BOOKING_DATE_FORMAT)
-                        : moment(quoteDetails?.request_booking_date)
-                            .add(quoteDetails.request_time_slot.split('_')?.[0], 'hours')
-                            .format(BOOKING_DATE_FORMAT)
-                    }
-                  />
                   <LocationSelection
                     qid={id}
                     quoteInfo={quoteDetails}
@@ -759,12 +763,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   )}
                 </>
               )}
-            </div>
-          )}
-
-          {showButtons && (
-            <div className='quote-scroll-target-2' id='3'>
-              -
             </div>
           )}
         </div>
@@ -792,12 +790,8 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         </div>
       )}
 
-      <div className='quote-before-after'>
-        <BeforeAfter />
-      </div>
-
-      <div className='center mb-5'>
-        <h2 className='contact-message'>If you have questions please call {PHONE_NUMBER}</h2>
+      <div className='mt-5'>
+        <OurMethod showTitle={false} />
       </div>
 
       {!!warningMsg && (

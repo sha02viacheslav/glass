@@ -1,6 +1,7 @@
+import './Customer.css'
 import React, { useEffect, useRef, useState } from 'react'
 import { trackPromise } from 'react-promise-tracker'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
@@ -146,15 +147,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       },
       registration_number: licenseSearchVal,
       glass_location: (selectedBrokenWindows || []).map((item) => item.toLowerCase()),
-      customer_comments: {
-        comment: comment,
-        attachments: attachments,
-      },
+      customer_comment: comment,
+      customer_attachments: attachments,
     }
 
     if (quoteDetails) {
-      if (!postData.customer_comments?.comment && !postData.customer_comments?.attachments?.length) {
-        delete postData.customer_comments
+      if (!postData.customer_comment) {
+        delete postData.customer_comment
+      }
+      if (!postData.customer_attachments?.length) {
+        delete postData.customer_attachments
       }
       delete postData.customer_address
       trackPromise(
@@ -244,32 +246,41 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [editMode, quoteId])
 
   return (
-    <div>
-      <section className='sec-customer my-4 my-md-5'>
+    <div className='customer-page px-3 px-md-0'>
+      <section className='sec-title'>
+        <div className='container'>
+          <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Get a Quote</h1>
+        </div>
+      </section>
+
+      <section className='sec-banner d-none d-md-block'></section>
+
+      <section className='sec-quote py-3'>
+        <div className='d-flex flex-column align-items-center p-3'>
+          <LicensePlate
+            placeholderVal={'NU71 REG'}
+            licenseNumber={licenseSearchVal}
+            model={
+              !!vehData ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model : 'Make & Model'
+            }
+            handleVehInputChange={handleVehInputChange}
+          />
+        </div>
+      </section>
+
+      <section className='sec-customer bg-grey pb-4 pb-md-5'>
         <div className='container'>
           <div className='tab-content'>
-            <div className='row' id='scroll-to-top'>
-              <LicensePlate
-                placeholderVal={'NU71 REG'}
-                licenseNumber={licenseSearchVal}
-                model={
-                  !!vehData
-                    ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model
-                    : 'Make & Model'
-                }
-                handleVehInputChange={handleVehInputChange}
-              />
-              <br />
-            </div>
+            <div className='row' id='scroll-to-top'></div>
             <div className='row mt-4 mt-md-5 text-center'>
               <div className='col-md-9 mx-auto'>
                 <div>
                   <div id='scroll-focus'>
-                    <h2 className='text-blue  text-24'>Select Broken Glasses</h2>
-                    <p>Tap directly or select below</p>
+                    <h2 className='fnt-48 fnt-md-60 fw-n text-primary'>Select Glasses </h2>
+                    <div className='fnt-20 fnt-md-28 text-primary'>Tap directly or select below</div>
                   </div>
 
-                  <div className='parent'>
+                  <div className='parent mt-4 mt-md-5'>
                     {/* car image display */}
                     <WindowSelector
                       carType={selectedCarType}
@@ -277,10 +288,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       brokenWindowsToCustomer={brokenWindowsToCustomer}
                       brokenWindowsToComponent={brokenWindowsToComponent}
                     />
-                    <br />
-                    <br />
-                    <p className='fs-18 text-blue'>Your comments (optional)</p>
 
+                    <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Place of Invervention</div>
+
+                    <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Your comments (optional)</div>
                     {comments.map((item, index) => (
                       <div key={index} className='text-left'>
                         <p>
@@ -304,156 +315,130 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                     </div>
 
                     <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
-                    <small className='d-block mt-2'>*Recommended</small>
-                    <form className='my-md-5 my-4'>
-                      <p className='fs-18 text-blue'>Fill your personal details</p>
-                      <br />
-                      <div className='row'>
-                        <div className='col-md-6'>
-                          <div className='form-group mb-4'>
-                            <div className='h6 text-left text-black-50'>First name</div>
-                            <input
-                              ref={firstNameRef}
-                              type='text'
-                              className={incorrectFormIndex === 0 ? 'form-control form-not-filled' : 'form-control'}
-                              placeholder='First name'
-                              defaultValue={quoteDetails?.customer_f_name}
-                            />
-                          </div>
-                        </div>
-                        <div className='col-md-6'>
-                          <div className='form-group mb-4'>
-                            <div className='h6 text-left text-black-50'>Last name</div>
-                            <input
-                              ref={lastNameRef}
-                              type='text'
-                              className={incorrectFormIndex === 1 ? 'form-control form-not-filled' : 'form-control'}
-                              placeholder='Last name'
-                              defaultValue={quoteDetails?.customer_s_name}
-                            />
-                          </div>
-                        </div>
-                        <div className='col-md-6'>
-                          <div className='form-group mb-4'>
-                            <div className='h6 text-left text-black-50'>Email</div>
-                            <input
-                              ref={emailRef}
-                              type='text'
-                              className={incorrectFormIndex === 2 ? 'form-control form-not-filled' : 'form-control'}
-                              placeholder='Email'
-                              defaultValue={quoteDetails?.customer_email}
-                            />
-                          </div>
-                        </div>
-                        <div className='col-md-6'>
-                          <div className='form-group mb-4'>
-                            <div className='h6 text-left text-black-50'>Phone</div>
-                            <input
-                              ref={phoneRef}
-                              type='text'
-                              className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
-                              placeholder='Phone'
-                              defaultValue={quoteDetails?.customer_phone}
-                              disabled={editMode}
-                            />
-                          </div>
-                        </div>
-                        <div className='col-md-12'>
-                          <div className='form-group mb-4'>
-                            <div className='d-flex justify-content-between'>
-                              <div className='h6 text-left text-black-50'>Postcode</div>
-                              {!!quoteDetails?.customer_id && !!quoteId && editMode && (
-                                <ChangeAddress
-                                  qid={quoteId}
-                                  customerId={quoteDetails.customer_id}
-                                  addressType={AddressType.INVOICE}
-                                  initialAddress={quoteDetails.invoice_address}
-                                  onChangeAddress={(event) => {
-                                    setBillingAddress(event)
-                                  }}
-                                />
-                              )}
-                            </div>
-                            <AddressInput
-                              address={billingAddress}
-                              formError={incorrectFormIndex === 4}
-                              onChange={setBillingAddress}
-                              disabled={editMode}
-                            />
-                          </div>
-                        </div>
-                        {editMode && (
-                          <div className='col-md-12'>
-                            <div className='form-group mb-4'>
-                              <div className='d-flex justify-content-between'>
-                                <div className='h6 text-left text-black-50'>Fixing address</div>
-                                {!!quoteDetails?.customer_id && !!quoteId && (
-                                  <ChangeAddress
-                                    qid={quoteId}
-                                    customerId={quoteDetails.customer_id}
-                                    addressType={AddressType.DELIVERY}
-                                    initialAddress={quoteDetails.delivery_address}
-                                    onChangeAddress={(event) => {
-                                      setFixingAddressText(formatAddress(event))
-                                    }}
-                                  />
-                                )}
-                              </div>
-                              <input
-                                id='deliveryAddress'
-                                type='text'
-                                className='form-control'
-                                placeholder='Fixing address'
-                                value={fixingAddressText || ''}
-                                disabled={true}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </form>
-                    {/* submit request button */}
-                    <div className='row'>
-                      <div className='col-md-7 mx-auto'>
-                        <div className='submit-request-msg'>{onSubmitMessage}</div>
-                        <button className='btn btn-purple-radius w-100 mb-3' onClick={handleSubmitClick} id='submitBtn'>
-                          {editMode ? 'Save Quote' : 'Submit request'}
-                        </button>
-                      </div>
-                    </div>
+                    <small className='fnt-12 fnt-md-14 text-grey mt-2'>* Optional (Recommended)</small>
                   </div>
                 </div>
-
-                {!editMode && (
-                  <>
-                    <br />
-                    <div className='position-relative pt-md-4'>
-                      <img
-                        src={process.env.PUBLIC_URL + '/img/hand-pic.png'}
-                        className='img-fluid w-100 mob-h'
-                        alt=''
-                      />
-                      <div className='recycle-content text-start phn-content'>
-                        <div className='d-flex justify-content-between'>
-                          <div className='content-left'>
-                            <h2 className='text-white mb-2'>Mobile Service </h2>
-                            <p className='fw-light fs-14 mb-0 text-white'>We come to your home or work.</p>
-                            <p className='mb-2 text-white'>Replacement 1-2 h</p>
-                            <Link to='/react/customer' className='btn  text-purple bg-white'>
-                              Get a Quote
-                            </Link>
-                          </div>
-                          <div className='re-img mt-auto'>
-                            <img src={process.env.PUBLIC_URL + '/img/phn.png'} className='img-fluid' alt='' />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className='sec-form'>
+        <div className='row justify-content-center'>
+          <form className='col-md-8'>
+            <div className='fnt-20 fnt-md-28 text-primary mb-2'>Fill your personal details</div>
+            <div className='row'>
+              <div className='col-md-6'>
+                <div className='form-group mb-4'>
+                  <label>First name</label>
+                  <input
+                    ref={firstNameRef}
+                    type='text'
+                    className={incorrectFormIndex === 0 ? 'form-control form-not-filled' : 'form-control'}
+                    placeholder='First name'
+                    defaultValue={quoteDetails?.customer_f_name}
+                  />
+                </div>
+              </div>
+              <div className='col-md-6'>
+                <div className='form-group mb-4'>
+                  <label>Last name</label>
+                  <input
+                    ref={lastNameRef}
+                    type='text'
+                    className={incorrectFormIndex === 1 ? 'form-control form-not-filled' : 'form-control'}
+                    placeholder='Last name'
+                    defaultValue={quoteDetails?.customer_s_name}
+                  />
+                </div>
+              </div>
+              <div className='col-md-6'>
+                <div className='form-group mb-4'>
+                  <label>Email</label>
+                  <input
+                    ref={emailRef}
+                    type='text'
+                    className={incorrectFormIndex === 2 ? 'form-control form-not-filled' : 'form-control'}
+                    placeholder='Email'
+                    defaultValue={quoteDetails?.customer_email}
+                  />
+                </div>
+              </div>
+              <div className='col-md-6'>
+                <div className='form-group mb-4'>
+                  <label>Phone</label>
+                  <input
+                    ref={phoneRef}
+                    type='text'
+                    className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
+                    placeholder='Phone'
+                    defaultValue={quoteDetails?.customer_phone}
+                    disabled={editMode}
+                  />
+                </div>
+              </div>
+              <div className='col-md-12'>
+                <div className='form-group mb-4'>
+                  <div className='d-flex justify-content-between'>
+                    <label>Postcode</label>
+                    {!!quoteDetails?.customer_id && !!quoteId && editMode && (
+                      <ChangeAddress
+                        qid={quoteId}
+                        customerId={quoteDetails.customer_id}
+                        addressType={AddressType.INVOICE}
+                        initialAddress={quoteDetails.invoice_address}
+                        onChangeAddress={(event) => {
+                          setBillingAddress(event)
+                        }}
+                      />
+                    )}
+                  </div>
+                  <AddressInput
+                    address={billingAddress}
+                    formError={incorrectFormIndex === 4}
+                    onChange={setBillingAddress}
+                    disabled={editMode}
+                  />
+                </div>
+              </div>
+              {editMode && (
+                <div className='col-md-12'>
+                  <div className='form-group mb-4'>
+                    <div className='d-flex justify-content-between'>
+                      <div className='h6 text-left text-black-50'>Fixing address</div>
+                      {!!quoteDetails?.customer_id && !!quoteId && (
+                        <ChangeAddress
+                          qid={quoteId}
+                          customerId={quoteDetails.customer_id}
+                          addressType={AddressType.DELIVERY}
+                          initialAddress={quoteDetails.delivery_address}
+                          onChangeAddress={(event) => {
+                            setFixingAddressText(formatAddress(event))
+                          }}
+                        />
+                      )}
+                    </div>
+                    <input
+                      id='deliveryAddress'
+                      type='text'
+                      className='form-control'
+                      placeholder='Fixing address'
+                      value={fixingAddressText || ''}
+                      disabled={true}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className='col-md-7 mx-auto'>
+                <div className='submit-request-msg'>{onSubmitMessage}</div>
+                <button className='btn-raised round w-100 mb-3' onClick={handleSubmitClick} id='submitBtn'>
+                  {editMode ? 'Save Quote' : 'Submit Request'}
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </section>
     </div>
