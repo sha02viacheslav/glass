@@ -72,6 +72,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
                 <CustomLink to='/'>Home</CustomLink>
                 <CustomLink to='/services'>Services</CustomLink>
                 <CustomLink to='/aboutus'>About Us</CustomLink>
+                <CustomLink to='/contact'>Contact Us</CustomLink>
               </ul>
               <div className='d-none d-md-flex align-items-center'>
                 <button className='btn-raised round' onClick={directToCustomer}>

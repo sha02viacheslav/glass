@@ -307,7 +307,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                         name=''
                         id=''
                         rows={4}
-                        className='form-control h-auto'
+                        className='form-control round h-auto'
                         placeholder='Details for glass or any other comment.'
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
@@ -335,7 +335,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <input
                     ref={firstNameRef}
                     type='text'
-                    className={incorrectFormIndex === 0 ? 'form-control form-not-filled' : 'form-control'}
+                    className={incorrectFormIndex === 0 ? 'form-control round form-not-filled' : 'form-control round'}
                     placeholder='First name'
                     defaultValue={quoteDetails?.customer_f_name}
                   />
@@ -347,7 +347,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <input
                     ref={lastNameRef}
                     type='text'
-                    className={incorrectFormIndex === 1 ? 'form-control form-not-filled' : 'form-control'}
+                    className={incorrectFormIndex === 1 ? 'form-control round form-not-filled' : 'form-control round'}
                     placeholder='Last name'
                     defaultValue={quoteDetails?.customer_s_name}
                   />
@@ -359,7 +359,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <input
                     ref={emailRef}
                     type='text'
-                    className={incorrectFormIndex === 2 ? 'form-control form-not-filled' : 'form-control'}
+                    className={incorrectFormIndex === 2 ? 'form-control round form-not-filled' : 'form-control round'}
                     placeholder='Email'
                     defaultValue={quoteDetails?.customer_email}
                   />
@@ -371,7 +371,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <input
                     ref={phoneRef}
                     type='text'
-                    className={incorrectFormIndex === 3 ? 'form-control form-not-filled' : 'form-control'}
+                    className={incorrectFormIndex === 3 ? 'form-control round form-not-filled' : 'form-control round'}
                     placeholder='Phone'
                     defaultValue={quoteDetails?.customer_phone}
                     disabled={editMode}
@@ -422,7 +422,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                     <input
                       id='deliveryAddress'
                       type='text'
-                      className='form-control'
+                      className='form-control round'
                       placeholder='Fixing address'
                       value={fixingAddressText || ''}
                       disabled={true}

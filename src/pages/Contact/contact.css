@@ -1,10 +1,45 @@
+.contact-page .sec-title {
+  padding: 32px;
+}
+
+@media (max-width: 767px) {
+  .contact-page .sec-title {
+    padding: 24px;
+  }
+}
+
 .map-container {
-  height: 180px;
+  height: 560px;
   width: 100%;
 }
 
 @media (max-width: 767px) {
   .map-container {
-    height: 80px;
+    height: 400px;
+  }
+}
+
+.contact-page .sec-workshop {
+  padding: 64px;
+}
+
+@media (max-width: 767px) {
+  .contact-page .sec-workshop {
+    padding: 24px;
+  }
+}
+
+.contact-page .sec-contact-form {
+  position: relative;
+  padding: 48px;
+  background: url(../../../public/images/contact-form-overlay.png) no-repeat center;
+  background-size: cover;
+  height: 676px;
+}
+
+@media (max-width: 767px) {
+  .contact-page .sec-contact-form {
+    padding: 48px 0 48px;
+    background: var(--dark-color);
   }
 }

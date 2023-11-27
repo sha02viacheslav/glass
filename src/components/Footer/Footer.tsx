@@ -72,8 +72,11 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
               <Link to='/services' className='text-white'>
                 Services
               </Link>
-              <Link to='/contact' className='text-white'>
+              <Link to='/aboutus' className='text-white'>
                 About Us
+              </Link>
+              <Link to='/contact' className='text-white'>
+                Contact Us
               </Link>
             </div>
           </div>

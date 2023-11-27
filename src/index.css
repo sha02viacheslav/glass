@@ -283,14 +283,13 @@ body {
 
 .form-control {
   border-color: var(--primary-color);
-  border-radius: 48px;
 }
 
-textarea.form-control {
+textarea.form-control.round {
   border-radius: 16px;
 }
 
-input.form-control {
+input.form-control.round {
   border-radius: 48px;
 }
 
