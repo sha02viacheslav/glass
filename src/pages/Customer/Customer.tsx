@@ -12,6 +12,7 @@ import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, Attachment, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
+import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
@@ -95,7 +96,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     setSelectedCarType(data)
   }
 
-  useRetrieveVehData(vehData?.VehicleRegistration, retrieveVehData)
+  useRetrieveVehData(vehData, retrieveVehData)
 
   function handleSubmitClick() {
     const firstNameNotFilled = checkIfFilled(firstNameRef?.current?.value, 'First name not filled', 0)
@@ -184,20 +185,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }
 
   const fetchVehData = (license: string | undefined) => {
-    if (license !== undefined) {
+    if (!!license) {
       // fetch vehicle data
       trackPromise(
-        fetch(process.env.REACT_APP_VEH_DATA + license)
-          .then((res) => res.json())
-          .then((data) => {
-            if (
-              data.Response.StatusCode === 'KeyInvalid' ||
-              data.Response.StatusCode === 'ItemNotFound' ||
-              data.Response.StatusCode === 'SandboxLimitation'
-            ) {
-              return
-            } else {
-              setVehData(data.Response.DataItems)
+        getVehicleService(license)
+          .then((res) => {
+            if (res.success) {
+              setVehData(res.data)
             }
           })
           .catch(() => {}),
@@ -252,11 +246,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <LicensePlate
                 placeholderVal={'NU71 REG'}
                 licenseNumber={licenseSearchVal}
-                model={
-                  !!vehData
-                    ? vehData.VehicleRegistration.Make + ' ' + vehData.VehicleRegistration.Model
-                    : 'Make & Model'
-                }
+                model={!!vehData ? vehData.Make + ' ' + vehData.Model : 'Make & Model'}
                 handleVehInputChange={handleVehInputChange}
               />
               <br />

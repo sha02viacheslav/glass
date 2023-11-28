@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { CarType } from '@glass/enums'
-import { VehicleRegistration } from '@glass/models'
+import { VehicleData } from '@glass/models'
 import { getVanBodyType } from '@glass/utils/session/session.util'
 
 const vehTypes = [
@@ -52,10 +52,7 @@ const mapBodyType = [
   CarType.TAILGATER,
 ]
 
-export const useRetrieveVehData = (
-  vehData: VehicleRegistration | undefined,
-  dataToCustomer: (value: CarType) => void,
-) => {
+export const useRetrieveVehData = (vehData: VehicleData | undefined, dataToCustomer: (value: CarType) => void) => {
   useEffect(() => {
     if (vehData) {
       const vehClass = vehData.DoorPlanLiteral

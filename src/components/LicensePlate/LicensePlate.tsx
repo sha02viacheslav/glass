@@ -19,7 +19,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
 
-  const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, 500), [])
+  const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, 2000), [])
 
   useEffect(() => {
     setLocalLicenseNum(formatLicenseNumber(localLicenseNum))
