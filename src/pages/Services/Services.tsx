@@ -1,30 +1,44 @@
 import './Services.css'
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PlantTree } from '@glass/components/PlantTree'
+import { SERVICES } from '@glass/constants'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Services: React.FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const serviceKey = queryParams.get('serviceKey')
+  const service = SERVICES.find((item) => item.key === serviceKey) || SERVICES[0]
   const [licenseSearchVal, setLicense] = useState('')
 
-  const services = [
+  const tintList = [
     {
-      title: 'New Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new windscreen will meet all quality standards. All different sensors and heating versions. Whole process 1-2 hours and vehicle is safe to drive.',
-      img: 'service1.png',
+      key: 'tint-very-dark',
+      title: 'Very Dark',
+      desp: 'Blocks 55% of the solar energy Blocks 99% of the UV rays Recommended to reduce glare and fading of the interior',
+      img: 'tint-very-dark.png',
     },
     {
-      title: 'New Door Glass Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated door glass will meet all quality standards. Rear doors have privacy glasses available. Shattered glass can be vacuumed. Whole process 1-2 hours.',
-      img: 'service2.png',
+      key: 'tint-medium-dark',
+      title: 'Medium Dark',
+      desp: 'Blocks 55% of the solar energy Blocks 99% of the UV rays Recommended to reduce glare and fading of the interior',
+      img: 'tint-medium-dark.png',
     },
     {
-      title: 'New Heated Rear Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated rear windscreen will meet all quality standards. Shattered glass can be vacuumed. Privacy glasses available. Whole process 1-2 hours.',
-      img: 'service3.png',
+      key: 'tint-average',
+      title: 'Average',
+      desp: 'Blocks 55% of the solar energy Blocks 99% of the UV rays Recommended to reduce glare and fading of the interior',
+      img: 'tint-average.png',
+    },
+    {
+      key: 'tint-clear',
+      title: 'Clear',
+      desp: 'Blocks 55% of the solar energy Blocks 99% of the UV rays Recommended to reduce glare and fading of the interior',
+      img: 'tint-clear.png',
     },
   ]
 
@@ -43,24 +57,14 @@ export const Services: React.FC = () => {
     <div className='services-page'>
       <section className='sec-banner'>
         <div className='container'>
-          <h2 className='fnt-48 fnt-md-60 fw-n text-white px-5'>
-            Drive Clear, Drive Cool:
-            <br />
-            Tinted Perfection.
-          </h2>
+          <h2 className='fnt-48 fnt-md-60 fw-n text-white px-5'>{service?.title}</h2>
         </div>
       </section>
 
       <div className='d-flex flex-column flex-md-column-reverse'>
         <section className='sec-description'>
           <div className='container'>
-            <p className='text-primary fnt-20 fnt-md-32 px-md-5'>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-              mollit anim id est laborum.
-            </p>
+            <p className='text-primary fnt-20 fnt-md-32 px-md-5'>{service?.desp}</p>
           </div>
         </section>
 
@@ -84,17 +88,17 @@ export const Services: React.FC = () => {
         </section>
       </div>
 
-      <section className='sec-services'>
+      <section className='sec-tint'>
         <div className='container'>
           <div className='row justify-content-center text-center gy-md-5 gy-4' autoFocus>
-            {services.map((service, index) => (
-              <div key={index} className='col-md-4 col-sm-6'>
+            {tintList.map((tintItem, index) => (
+              <div key={index} className='col-md-3 col-sm-6'>
                 <div className='content p-0'>
                   <div className='h-100 d-flex flex-column'>
-                    <img src={process.env.PUBLIC_URL + '/img/' + service.img} className='img-fluid' alt='' />
-                    <div className='bg-grey flex-fill content-sv text-left '>
-                      <div className='bg-dark text-primary px-4 py-3'>{service.title}</div>
-                      <p className='text-grey p-4'>{service.desp}</p>
+                    <img src={process.env.PUBLIC_URL + '/images/' + tintItem.img} className='img-fluid' alt='' />
+                    <div className='bg-grey flex-fill content-sv text-left'>
+                      <div className={'text-primary px-4 py-3 ' + tintItem.key}>{tintItem.title}</div>
+                      <p className='text-grey p-4'>{tintItem.desp}</p>
                     </div>
                   </div>
                 </div>

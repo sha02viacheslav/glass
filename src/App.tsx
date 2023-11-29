@@ -33,6 +33,8 @@ export const App: React.FC = () => {
     if (location.pathname === '/' && location.search) {
       setRequestedURL(window.location.href)
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [location])
 
   return (

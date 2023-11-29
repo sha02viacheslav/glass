@@ -33,12 +33,12 @@
   }
 }
 
-.services-page .sec-services {
+.services-page .sec-tint {
   padding: 64px;
 }
 
 @media (max-width: 767px) {
-  .services-page .sec-services {
+  .services-page .sec-tint {
     padding: 24px;
   }
 }
@@ -66,4 +66,20 @@
   .sec-install-film {
     padding: 24px 0 80px;
   }
+}
+
+.tint-very-dark {
+  background: #282828;
+}
+
+.tint-medium-dark {
+  background: #474747;
+}
+
+.tint-average {
+  background: #898989;
+}
+
+.tint-clear {
+  background: #bdbdbd;
 }

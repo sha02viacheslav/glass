@@ -8,39 +8,13 @@ import { GetQuoteOrCall } from '@glass/components/GetQuoteOrCall'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PlantTree } from '@glass/components/PlantTree'
+import { SERVICES } from '@glass/constants'
 import { PUBLIC_URL } from '@glass/envs'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export const Home: React.FC = () => {
   const navigate = useNavigate()
   const [licenseSearchVal, setLicense] = useState('')
-
-  const services = [
-    {
-      title: 'New Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new windscreen will meet all quality standards. All different sensors and heating versions. Whole process 1-2 hours and vehicle is safe to drive.',
-    },
-    {
-      title: 'New Door Glass Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated door glass will meet all quality standards. Rear doors have privacy glasses available. Shattered glass can be vacuumed. Whole process 1-2 hours.',
-    },
-    {
-      title: 'New Heated Rear Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated rear windscreen will meet all quality standards. Shattered glass can be vacuumed. Privacy glasses available. Whole process 1-2 hours.',
-    },
-    {
-      title: 'New Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new windscreen will meet all quality standards. All different sensors and heating versions. Whole process 1-2 hours and vehicle is safe to drive.',
-    },
-    {
-      title: 'New Door Glass Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated door glass will meet all quality standards. Rear doors have privacy glasses available. Shattered glass can be vacuumed. Whole process 1-2 hours.',
-    },
-    {
-      title: 'New Heated Rear Windscreen Replacement',
-      desp: 'We can source the new glass from the biggest suppliers and new, either tempered or laminated rear windscreen will meet all quality standards. Shattered glass can be vacuumed. Privacy glasses available. Whole process 1-2 hours.',
-    },
-  ]
 
   const handleVehInputChange = (data: string | undefined) => {
     setLicense(formatLicenseNumber(data))
@@ -51,6 +25,10 @@ export const Home: React.FC = () => {
       navigate('/customer/' + licenseSearchVal)
       setLicense('')
     }
+  }
+
+  const goToServicePage = (key: string) => {
+    navigate(`/services?serviceKey=${key}`)
   }
 
   useEffect(() => {
@@ -105,9 +83,12 @@ export const Home: React.FC = () => {
         <div className='container'>
           <h1 className='fnt-48 fnt-md-60 fw-n text-dark px-md-4 mb-4 mb-md-5'>Services</h1>
           <div className='row'>
-            {services.map((service, index) => (
+            {SERVICES.map((service, index) => (
               <div key={index} className='col-md-4 col-sm-6 mb-3 mb-md-5 pb-md-4'>
-                <div className='d-flex flex-column bg-white h-100 p-4'>
+                <div
+                  className='d-flex flex-column bg-white h-100 p-4 cursor-pointer'
+                  onClick={() => goToServicePage(service.key)}
+                >
                   <div className='fnt-20 fnt-md-28 text-primary mb-3'>{service.title}</div>
                   <p className='fnt-14 fnt-md-16 text-grey flex-fill mb-3'>{service.desp}</p>
                   <div className='d-flex justify-content-end'>

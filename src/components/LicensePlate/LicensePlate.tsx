@@ -42,7 +42,6 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
             <div className='gb fw-b'>UK</div>
           </div>
           <input
-            autoFocus
             className='license-input'
             type='text'
             placeholder={placeholderVal}

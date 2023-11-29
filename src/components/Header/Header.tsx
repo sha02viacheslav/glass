@@ -2,7 +2,7 @@ import './Header.css'
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
-import { PHONE_NUMBER } from '@glass/constants'
+import { PHONE_NUMBER, SERVICES } from '@glass/constants'
 
 export type HeaderProps = {
   showMenu: boolean
@@ -10,6 +10,9 @@ export type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const navigate = useNavigate()
+  const servicesMenuItems = SERVICES.map((item) => {
+    return { label: item.title, link: `/services?serviceKey=${item.key}` }
+  })
 
   const directToCustomer = () => {
     navigate('/customer')
@@ -70,7 +73,9 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
             <div className='collapse navbar-collapse justify-content-between ms-5' id='navbarSupportedContent'>
               <ul className='navbar-nav ms-md-4  mb-lg-0 align-items-center et-nav gap-4'>
                 <CustomLink to='/'>Home</CustomLink>
-                <CustomLink to='/services'>Services</CustomLink>
+                <CustomLink to='/services' dropdownItems={servicesMenuItems}>
+                  Services
+                </CustomLink>
                 <CustomLink to='/aboutus'>About Us</CustomLink>
                 <CustomLink to='/contact'>Contact Us</CustomLink>
               </ul>

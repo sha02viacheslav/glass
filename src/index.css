@@ -301,3 +301,7 @@ input.form-control.round {
   margin-left: 12px;
   color: var(--primary-color);
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
