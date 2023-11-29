@@ -107,9 +107,9 @@ export const Home: React.FC = () => {
           <div className='row'>
             {services.map((service, index) => (
               <div key={index} className='col-md-4 col-sm-6 mb-3 mb-md-5 pb-md-4'>
-                <div className='bg-white p-4'>
+                <div className='d-flex flex-column bg-white h-100 p-4'>
                   <div className='fnt-20 fnt-md-28 text-primary mb-3'>{service.title}</div>
-                  <p className='fnt-14 fnt-md-16 text-grey mb-3'>{service.desp}</p>
+                  <p className='fnt-14 fnt-md-16 text-grey flex-fill mb-3'>{service.desp}</p>
                   <div className='d-flex justify-content-end'>
                     <div className='fnt-18 fnt-md-20 text-dark discover-more'>Discover more</div>
                   </div>
