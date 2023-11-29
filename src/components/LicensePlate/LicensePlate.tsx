@@ -23,10 +23,11 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
 
   const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, 2000), [])
 
-  useEffect(() => {
-    setLocalLicenseNum(formatLicenseNumber(localLicenseNum))
-    debouncedChangeHandler(localLicenseNum)
-  }, [localLicenseNum])
+  const handleInputLicenseNum = (val: string) => {
+    const licenseNum = formatLicenseNumber(val)
+    setLocalLicenseNum(licenseNum)
+    debouncedChangeHandler(licenseNum)
+  }
 
   useEffect(() => {
     setLocalLicenseNum(formatLicenseNumber(licenseNumber))
@@ -47,7 +48,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
             placeholder={placeholderVal}
             maxLength={8}
             value={localLicenseNum}
-            onChange={(e) => setLocalLicenseNum(e.target.value)}
+            onChange={(e) => handleInputLicenseNum(e.target.value)}
           />
         </div>
         {!!model && (
