@@ -41,23 +41,30 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen }) => {
   }
 
   return (
-    <div
-      className='pdf-viewer'
-      onClick={() => {
-        isOpen(false)
-      }}
-    >
+    <>
       <div
-        onClick={(event) => {
-          event.stopPropagation()
-          event.preventDefault()
+        className='background-overlay'
+        onClick={() => {
+          isOpen(false)
+        }}
+      ></div>
+      <div
+        className='pdf-viewer'
+        onClick={() => {
+          isOpen(false)
         }}
       >
         <Document className='pdf-invoice' file={invoicePDF.pdf_content} onLoadSuccess={() => setLoading(false)}>
-          <Page pageNumber={1} />
+          <Page
+            pageNumber={1}
+            onClick={(event) => {
+              event.stopPropagation()
+              event.preventDefault()
+            }}
+          />
           <img className='PDF-close' src={close} alt='' onClick={() => isOpen(false)} />
           <div className='PDF-button-container'>
-            <button className='btn-raised round mb-3' onClick={downloadInvoice}>
+            <button className='btn-raised round' onClick={downloadInvoice}>
               Download Receipt
             </button>
           </div>
@@ -65,6 +72,6 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ invoicePDF, isOpen }) => {
 
         <Loader loading={loading} />
       </div>
-    </div>
+    </>
   )
 }
