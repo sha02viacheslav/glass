@@ -3,6 +3,8 @@ import React from 'react'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { PUBLIC_URL } from '@glass/envs'
 import { BeforeAfter } from '@glass/models'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
 
 function SliderNextArrow(props: CustomArrowProps) {
   const { onClick } = props
@@ -22,6 +24,24 @@ function SliderPrevArrow(props: CustomArrowProps) {
   )
 }
 
+function BeforeAfterImageSliderNextArrow(props: CustomArrowProps) {
+  const { onClick } = props
+  return (
+    <button className='slide-arrow next-arrow before-after-slick-arrow' onClick={onClick}>
+      <i className='fa fa-caret-right' aria-hidden='true'></i>
+    </button>
+  )
+}
+
+function BeforeAfterImageSliderPrevArrow(props: CustomArrowProps) {
+  const { onClick } = props
+  return (
+    <button className='slide-arrow prev-arrow before-after-slick-arrow' onClick={onClick}>
+      <i className='fa fa-caret-left' aria-hidden='true'></i>
+    </button>
+  )
+}
+
 export type OurMethodProps = { showTitle?: boolean }
 
 export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
@@ -32,29 +52,15 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
-    responsive: [
-      {
-        breakpoint: 1199,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 991,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
+  }
+
+  const imageSliderSettings = {
+    dots: false,
+    speed: 300,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    nextArrow: <BeforeAfterImageSliderNextArrow />,
+    prevArrow: <BeforeAfterImageSliderPrevArrow />,
   }
 
   const videos = [
@@ -70,8 +76,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
 
   const beforeAfterItems: BeforeAfter[] = [
     {
-      before: process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-      after: process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
+      beforeAfterImages: [
+        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
+        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
+      ],
       title: 'Glass Replacement',
       description:
         'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
@@ -81,8 +89,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
       ],
     },
     {
-      before: process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-      after: process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
+      beforeAfterImages: [
+        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
+        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
+      ],
       title: 'Glass Replacement',
       description:
         'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
@@ -115,15 +125,12 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
               {beforeAfterItems.map((item, index) => (
                 <div key={index} className='item'>
                   <div className='row g-0'>
-                    <div className='col-6 col-md-4'>
-                      <div className='item-img odd animated fadeIn h-100'>
-                        <img src={item.before} className='img-fluid h-100 before-after-img' alt='' />
-                      </div>
-                    </div>
-                    <div className='col-6 col-md-4'>
-                      <div className='item-img even animated fadeIn h-100'>
-                        <img src={item.after} className='img-fluid h-100 before-after-img' alt='' />
-                      </div>
+                    <div className='col-12 col-md-8'>
+                      <Slider {...imageSliderSettings} className='before-after-slider'>
+                        {item.beforeAfterImages.map((beforeAfterImage, beforeAfterImageIdx) => (
+                          <img key={beforeAfterImageIdx} src={beforeAfterImage} className='before-after-img' alt='' />
+                        ))}
+                      </Slider>
                     </div>
                     <div className='col-md-4 bg-grey bg-md-white'>
                       <div className='p-3 p-md-5'>

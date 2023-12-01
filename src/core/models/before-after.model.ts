@@ -1,6 +1,5 @@
 export type BeforeAfter = {
-  before: string
-  after: string
+  beforeAfterImages: string[]
   title: string
   description: string
   extraImages: string[]
