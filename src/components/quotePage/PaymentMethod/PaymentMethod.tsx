@@ -488,37 +488,19 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 <div className='d-flex justify-content-between'>
                   <button
                     className={
-                      'btn-stroked blue round' + (paymentMethodType === PaymentMethodType.STRIPE ? ' active' : '')
+                      'btn-stroked blue round card' + (paymentMethodType === PaymentMethodType.STRIPE ? ' active' : '')
                     }
                     onClick={() => handleChangePaymentMethodType(PaymentMethodType.STRIPE)}
                   >
-                    <img
-                      src={
-                        process.env.PUBLIC_URL +
-                        (paymentMethodType === PaymentMethodType.STRIPE ? '/images/card-white.png' : '/images/card.png')
-                      }
-                      className='img-fluid me-2'
-                      width='24'
-                      alt='card'
-                    />
-                    Card
+                    <span>Card</span>
                   </button>
                   <button
                     className={
-                      'btn-stroked green round' + (paymentMethodType === PaymentMethodType.CASH ? ' active' : '')
+                      'btn-stroked green round cash' + (paymentMethodType === PaymentMethodType.CASH ? ' active' : '')
                     }
                     onClick={() => handleChangePaymentMethodType(PaymentMethodType.CASH)}
                   >
-                    <img
-                      src={
-                        process.env.PUBLIC_URL +
-                        (paymentMethodType === PaymentMethodType.CASH ? '/images/cash-white.png' : '/images/cash.png')
-                      }
-                      className='img-fluid me-2'
-                      width='20'
-                      alt='card'
-                    />
-                    Cash
+                    <span>Cash</span>
                   </button>
                 </div>
               </div>

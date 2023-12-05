@@ -200,7 +200,6 @@ body {
 .btn-raised.round,
 .btn-stroked.round {
   border-radius: 40px;
-  min-width: 100px;
 }
 
 .btn-stroked.blue {

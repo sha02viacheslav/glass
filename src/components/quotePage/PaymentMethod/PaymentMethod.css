@@ -336,3 +336,45 @@
   margin-top: 16px;
   line-height: 1.5;
 }
+
+.btn-stroked.card span {
+  position: relative;
+  padding-left: 32px;
+}
+
+.btn-stroked.card span::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background: url('../../../../public/images/card.png') no-repeat center;
+  background-size: contain;
+}
+
+.btn-stroked.card.active span::before,
+.btn-stroked.card:hover span::before {
+  background: url('../../../../public/images/card-white.png') no-repeat center;
+  background-size: contain;
+}
+
+.btn-stroked.cash span {
+  position: relative;
+  padding-left: 32px;
+}
+
+.btn-stroked.cash span::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background: url('../../../../public/images/cash.png') no-repeat center;
+  background-size: contain;
+}
+
+.btn-stroked.cash.active span::before,
+.btn-stroked.cash:hover span::before {
+  background: url('../../../../public/images/cash-white.png') no-repeat center;
+  background-size: contain;
+}
