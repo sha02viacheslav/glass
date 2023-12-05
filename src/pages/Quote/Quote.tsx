@@ -78,6 +78,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [preAttachments, setPreAttachments] = useState<Attachment[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [comment, setComment] = useState<string>('')
+  const [emailMissing, setEmailMissing] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -578,8 +579,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 </div>
               </div>
               <div className='edit-btn-container'>
-                <button className='edit-btn' onClick={backToCustomer}>
+                <button className='edit-btn position-relative' onClick={backToCustomer}>
                   EDIT
+                  {emailMissing && <span className='email-missing-error'>Add Email here</span>}
                 </button>
               </div>
             </div>
@@ -672,6 +674,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 PAUrl={PAUrl}
                 method={paymentOptionToParent}
                 onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
+                handleShowEmailMissing={() => {
+                  setEmailMissing(true)
+                  scrollToElementWithOffset('scroll-to-top')
+                }}
               />
             )}
           </div>
