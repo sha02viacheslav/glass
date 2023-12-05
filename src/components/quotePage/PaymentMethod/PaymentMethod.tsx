@@ -22,6 +22,7 @@ export type PaymentMethodProps = {
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
   method?: (value: PaymentOptionDto) => void
+  handleShowEmailMissing: () => void
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
@@ -33,6 +34,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   PADataToParent,
   PAUrl,
   method,
+  handleShowEmailMissing,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentOptionEnum>(PaymentOptionEnum.NONE)
   const [address, setAddress] = useState('')
@@ -51,7 +53,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [startPAProcess, setStartPAProcess] = useState(false)
   const [showPaymentConfirm, setShowPaymentConfirm] = useState<boolean>(false)
   const [showCashConfirm, setShowCashConfirm] = useState<boolean>(false)
-  const [warningMsg, setWarningMsg] = useState<string>('')
+  const [showEmailMissingPopup, setShowEmailMissingPopup] = useState<boolean>(false)
 
   const emptyMonthlyPayments = useMemo<MonthlyPayment | undefined>(() => {
     if (quoteDetails?.date_order) {
@@ -94,6 +96,12 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const handleChangePaymentMethodType = (value: PaymentMethodType) => {
     if (value == paymentMethodType) return
+
+    if (value === PaymentMethodType.STRIPE && (!quoteDetails?.customer_email || quoteDetails?.customer_email == 'na')) {
+      setShowEmailMissingPopup(true)
+      return
+    }
+
     setTempPaymentMethodType(value)
 
     if (value === PaymentMethodType.CASH) {
@@ -543,13 +551,16 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         />
       )}
 
-      {!!warningMsg && (
+      {!!showEmailMissingPopup && (
         <ConfirmDialog
           title='Error'
-          description={warningMsg}
+          description='Add Email. Online payment will not be possible, when Email is missing.'
           showCancel={false}
           confirmStr='Ok'
-          onConfirm={() => setWarningMsg('')}
+          onConfirm={() => {
+            setShowEmailMissingPopup(false)
+            handleShowEmailMissing()
+          }}
         />
       )}
     </div>

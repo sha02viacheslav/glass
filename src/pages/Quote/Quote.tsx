@@ -79,6 +79,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const [preAttachments, setPreAttachments] = useState<Attachment[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [comment, setComment] = useState<string>('')
+  const [emailMissing, setEmailMissing] = useState<boolean>(false)
 
   const { totalPrice, totalUnitPrice } = useCalcPriceSummary(quoteDetails)
 
@@ -631,9 +632,13 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           </div>
 
           <div className='d-flex justify-content-between align-items-center p-3'>
-            <button className='btn-raised round' onClick={backToCustomer}>
-              Edit
-            </button>
+            <div className='d-flex align-items-center gap-3'>
+              <button className='btn-raised round position-relative' onClick={backToCustomer}>
+                Edit
+              </button>
+
+              {emailMissing && <span className='email-missing-error'>Add Email here</span>}
+            </div>
             <button className='btn-icon' onClick={() => setInfoOpen((prev) => !prev)}>
               {quoteInfoOpen ? <KeyboardArrowUp /> : <UnfoldMore />}
             </button>
@@ -693,6 +698,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 PADataToParent={PADataToParent}
                 PAUrl={PAUrl}
                 method={paymentOptionToParent}
+                handleShowEmailMissing={() => {
+                  setEmailMissing(true)
+                  scrollToElementWithOffset('scroll-to-top')
+                }}
               />
             </div>
           )}
