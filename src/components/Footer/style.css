@@ -42,3 +42,38 @@
   background: url(../../../public/images/footer-full.png) no-repeat;
   background-size: cover;
 }
+
+.f-logo {
+  width: 64px;
+}
+
+@media (min-width: 768px) {
+  .f-logo {
+    width: 90px;
+  }
+}
+
+.footer-link {
+  color: var(--white-color);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--white-color);
+  text-decoration: underline;
+}
+
+.social-link {
+  color: var(--white-color);
+  font-size: 24px;
+}
+
+@media (min-width: 768px) {
+  .social-link {
+    font-size: 28px;
+  }
+}
+
+.social-link:hover {
+  color: var(--white-color);
+}
