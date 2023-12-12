@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate } from 'react-router-dom'
 import { AddressInput } from '@glass/components/AddressInput'
+import { PHONE_NUMBER } from '@glass/constants'
 import { CustomerChatState } from '@glass/enums'
 import { Address, QuoteDto } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
@@ -28,6 +29,12 @@ export const Chat: React.FC<ChatProps> = ({ qid }) => {
   const [incorrectFormIndex, setIncorrectFormIndex] = useState(99)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [onSubmitMessage, setOnSubmitMessage] = useState('')
+
+  const handleChatClick = () => {
+    // setIsOpenChat(true)
+    const whatsappUrl = `https://wa.me/${PHONE_NUMBER.replace(' ', '')}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   const patternMatch = () => {
     if (licenseRef.current) {
@@ -90,7 +97,7 @@ export const Chat: React.FC<ChatProps> = ({ qid }) => {
 
   return (
     <>
-      {!qid && <div className='start-chart-btn' onClick={() => setIsOpenChat(true)}></div>}
+      {!qid && <div className='whatsapp-chat' onClick={() => handleChatClick()}></div>}
 
       <Modal
         open={isOpenChat}
