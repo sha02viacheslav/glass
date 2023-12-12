@@ -258,12 +258,6 @@ button.slick-arrow {
 .next-arrow {
   right: -52px;
 }
-button.prev-arrow .fa {
-  transform: translate(-1px, -3px);
-}
-button.next-arrow .fa {
-  transform: translate(1px, -3px);
-}
 
 .main-content {
   font-style: normal;
