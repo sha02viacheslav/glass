@@ -4,6 +4,15 @@
   color: var(--primary-color);
 }
 
+.video-iframe {
+  height: 240px;
+}
+@media (min-width: 768px) {
+  .video-iframe {
+    height: 360px;
+  }
+}
+
 .before-after-img {
   object-fit: cover;
   width: 100%;

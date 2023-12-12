@@ -1,7 +1,6 @@
 import './Ourmethod.css'
 import React from 'react'
 import Slider, { CustomArrowProps } from 'react-slick'
-import { PUBLIC_URL } from '@glass/envs'
 import { BeforeAfter } from '@glass/models'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -65,12 +64,12 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
 
   const videos = [
     {
-      url: PUBLIC_URL + '/images/poster.png',
-      title: 'Video Title #01',
+      videoId: 'E23mQ-SrRpI',
+      title: 'Ford Transit 2015 Windscreen Replacement',
     },
     {
-      url: PUBLIC_URL + '/images/poster.png',
-      title: 'Video Title #01',
+      videoId: 'OsT-qAPEs4Q',
+      title: 'KIA EV6 windscreen replacement',
     },
   ]
 
@@ -112,9 +111,13 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
         <div className='row'>
           {videos.map((item, index) => (
             <div key={index} className='col-md-6 mb-3'>
-              <video width='100%' controls poster={item.url}>
-                <source src='https://media.w3.org/2010/05/sintel/trailer_hd.mp4' type='video/mp4' />
-              </video>
+              <iframe
+                width='100%'
+                className='video-iframe'
+                src={'https://www.youtube.com/embed/' + item.videoId}
+                frameBorder='0'
+                allowFullScreen
+              ></iframe>
               <label className='text-primary fnt-20 fnt-md-28 ms-2 mt-2'>{item.title}</label>
             </div>
           ))}
