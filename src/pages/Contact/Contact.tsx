@@ -26,11 +26,13 @@ export const Contact: React.FC = () => {
       <section className='map'>
         <div className='map-container'>
           <iframe
-            src='https://www.google.com/maps/d/u/0/embed?mid=1fi4ad4nUEY7CBwdBysHnZ5YcoAJzGEU&ehbc=2E312F&noprof=1'
+            src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2378.6136493864597!2d-1.443208026105967!3d53.403850748273264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761fe515112275%3A0x1b7941c93ae64913!2sFixGlass%20Sheffield!5e0!3m2!1sen!2sus!4v1702396416384!5m2!1sen!2sus'
             width='100%'
             height='100%'
             style={{ border: 0 }}
             allowFullScreen
+            loading='lazy'
+            referrerPolicy='no-referrer-when-downgrade'
           ></iframe>
         </div>
       </section>
