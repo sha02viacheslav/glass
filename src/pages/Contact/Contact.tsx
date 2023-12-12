@@ -4,10 +4,8 @@ import { PlantTree } from '@glass/components/PlantTree'
 
 export const Contact: React.FC = () => {
   const workshops = [
-    { name: 'Headquarter', address: '85 Great Portland Street London, W1W 7LT', phone: '07400 400469' },
-    { name: 'Headquarter', address: '85 Great Portland Street London, W1W 7LT', phone: '07400 400469' },
-    { name: 'Headquarter', address: '85 Great Portland Street London, W1W 7LT', phone: '07400 400469' },
-    { name: 'Headquarter', address: '85 Great Portland Street London, W1W 7LT', phone: '07400 400469' },
+    { name: 'Workshop FixGlass Sheffield', address: '1 Petre Drive Sheffield, S4 7PZ', phone: '07400 400469' },
+    { name: 'Head Office', address: '85 Great Portland Street London, W1W 7LT', email: 'hello@fix.glass' },
   ]
 
   const [email, setEmail] = useState<string>('')
@@ -28,7 +26,7 @@ export const Contact: React.FC = () => {
       <section className='map'>
         <div className='map-container'>
           <iframe
-            src='https://maps.google.com/maps?q=manhatan&t=&z=13&ie=UTF8&iwloc=&output=embed'
+            src='https://www.google.com/maps/d/u/0/embed?mid=1fi4ad4nUEY7CBwdBysHnZ5YcoAJzGEU&ehbc=2E312F&noprof=1'
             width='100%'
             height='100%'
             style={{ border: 0 }}
@@ -41,13 +39,20 @@ export const Contact: React.FC = () => {
         <div className='container'>
           <div className='row'>
             {workshops.map((workshop, index) => (
-              <div key={index} className='col-md-3'>
+              <div key={index} className='col-md-4'>
                 <div className='p-4 bg-white mb-3 mb-md-0'>
                   <div className='fnt-20 fnt-md-28 text-primary'>{workshop.name}</div>
                   <div className='fnt-14 fnt-md-16 text-grey mt-3'>{workshop.address}</div>
-                  <div className='fnt-14 fnt-md-16 text-grey mt-3'>
-                    Call <span className='text-primary'>{workshop.phone}</span>
-                  </div>
+                  {!!workshop.phone && (
+                    <div className='fnt-14 fnt-md-16 text-grey mt-3'>
+                      Business mobile: <span className='text-primary'>{workshop.phone}</span>
+                    </div>
+                  )}
+                  {!!workshop.email && (
+                    <div className='fnt-14 fnt-md-16 text-grey mt-3'>
+                      Email: <span className='text-primary'>{workshop.email}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
