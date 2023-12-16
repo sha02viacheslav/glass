@@ -175,6 +175,14 @@ body {
   color: white;
 }
 
+.btn-raised.green {
+  background: var(--green-color);
+}
+
+.btn-raised.green:hover {
+  box-shadow: 0 0 7px 1px var(--green-color);
+}
+
 .btn-stroked {
   display: inline-flex;
   align-items: center;

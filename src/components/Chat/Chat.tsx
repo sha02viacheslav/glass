@@ -6,12 +6,13 @@ import { Helmet } from 'react-helmet'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate } from 'react-router-dom'
 import { AddressInput } from '@glass/components/AddressInput'
-import { PHONE_NUMBER } from '@glass/constants'
+import { INTERNATIONAL_PHONE_NUMBER } from '@glass/constants'
 import { CustomerChatState } from '@glass/enums'
 import { Address, QuoteDto } from '@glass/models'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
+import { startWhatsApp } from '@glass/utils/whats-app/whats-app.util'
 
 export type ChatProps = { qid?: string }
 
@@ -32,8 +33,7 @@ export const Chat: React.FC<ChatProps> = ({ qid }) => {
 
   const handleChatClick = () => {
     // setIsOpenChat(true)
-    const whatsappUrl = `https://wa.me/${PHONE_NUMBER.replace(' ', '')}`
-    window.open(whatsappUrl, '_blank')
+    startWhatsApp(INTERNATIONAL_PHONE_NUMBER)
   }
 
   const patternMatch = () => {
@@ -97,7 +97,15 @@ export const Chat: React.FC<ChatProps> = ({ qid }) => {
 
   return (
     <>
-      {!qid && <div className='whatsapp-chat' onClick={() => handleChatClick()}></div>}
+      {!qid && (
+        <div className='whatsapp-chat'>
+          <button className='btn-raised round green' onClick={() => handleChatClick()}>
+            <div className='d-flex align-items-center'>
+              <i className='fa-brands fa-whatsapp fnt-24 me-2'></i> WhatsApp
+            </div>
+          </button>
+        </div>
+      )}
 
       <Modal
         open={isOpenChat}

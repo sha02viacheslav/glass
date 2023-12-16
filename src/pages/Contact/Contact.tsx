@@ -1,10 +1,11 @@
 import './contact.css'
 import React, { useState } from 'react'
 import { PlantTree } from '@glass/components/PlantTree'
+import { startWhatsApp } from '@glass/utils/whats-app/whats-app.util'
 
 export const Contact: React.FC = () => {
   const workshops = [
-    { name: 'Workshop FixGlass Sheffield', address: '1 Petre Drive Sheffield, S4 7PZ', phone: '07400 400469' },
+    { name: 'Workshop FixGlass Sheffield', address: '1 Petre Drive Sheffield, S4 7PZ', phone: '+44 7400 400469' },
     { name: 'Head Office', address: '85 Great Portland Street London, W1W 7LT', email: 'hello@fix.glass' },
   ]
 
@@ -46,9 +47,19 @@ export const Contact: React.FC = () => {
                   <div className='fnt-20 fnt-md-28 text-primary'>{workshop.name}</div>
                   <div className='fnt-14 fnt-md-16 text-grey mt-3'>{workshop.address}</div>
                   {!!workshop.phone && (
-                    <div className='fnt-14 fnt-md-16 text-grey mt-3'>
-                      Business mobile: <span className='text-primary'>{workshop.phone}</span>
-                    </div>
+                    <>
+                      <div className='fnt-14 fnt-md-16 text-grey mt-3'>
+                        Business mobile: <span className='text-primary'>{workshop.phone}</span>
+                      </div>
+                      <button
+                        className='btn-raised round green mt-3 whats-app-chat'
+                        onClick={() => startWhatsApp(workshop.phone)}
+                      >
+                        <div className='d-flex align-items-center'>
+                          <i className='fa-brands fa-whatsapp fnt-24 me-2'></i> WhatsApp
+                        </div>
+                      </button>
+                    </>
                   )}
                   {!!workshop.email && (
                     <div className='fnt-14 fnt-md-16 text-grey mt-3'>
