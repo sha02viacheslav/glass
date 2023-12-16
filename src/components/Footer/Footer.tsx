@@ -60,7 +60,7 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
 
       <section className='footer-content p-3 p-md-5'>
         <div className='content-box'>
-          <div className='d-md-flex align-items-center justify-content-between'>
+          <div className='d-md-flex justify-content-between'>
             <div>
               <div className='d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-5'>
                 <div className='d-flex align-items-center justify-content-between'>
