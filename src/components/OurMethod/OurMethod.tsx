@@ -1,5 +1,5 @@
 import './Ourmethod.css'
-import React from 'react'
+import React, { useState } from 'react'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { BeforeAfter } from '@glass/models'
 import 'slick-carousel/slick/slick.css'
@@ -51,6 +51,9 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
+    beforeChange: () => {
+      setCurImageIndex(0)
+    },
   }
 
   const imageSliderSettings = {
@@ -60,6 +63,9 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     slidesToScroll: 1,
     nextArrow: <BeforeAfterImageSliderNextArrow />,
     prevArrow: <BeforeAfterImageSliderPrevArrow />,
+    beforeChange: (_currentSlide: number, nextSlide: number) => {
+      setCurImageIndex(nextSlide)
+    },
   }
 
   const videos = [
@@ -76,21 +82,22 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
   const beforeAfterItems: BeforeAfter[] = [
     {
       beforeAfterImages: [
-        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
-      ],
-      title: 'Glass Replacement',
-      description:
-        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
-      extraImages: [
-        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
-      ],
-    },
-    {
-      beforeAfterImages: [
-        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
+        {
+          before: process.env.PUBLIC_URL + '/images/before-after/1-before.JPEG',
+          after: process.env.PUBLIC_URL + '/images/before-after/1-after.jpg',
+        },
+        {
+          before: process.env.PUBLIC_URL + '/images/before-after/2-before.jpg',
+          after: process.env.PUBLIC_URL + '/images/before-after/2-after.jpg',
+        },
+        {
+          before: process.env.PUBLIC_URL + '/images/before-after/3-before.jpg',
+          after: process.env.PUBLIC_URL + '/images/before-after/3-after.jpg',
+        },
+        {
+          before: process.env.PUBLIC_URL + '/images/before-after/4-before.jpg',
+          after: process.env.PUBLIC_URL + '/images/before-after/4-after.jpg',
+        },
       ],
       title: 'Glass Replacement',
       description:
@@ -101,6 +108,8 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
       ],
     },
   ]
+
+  const [curImageIndex, setCurImageIndex] = useState<number>(0)
 
   return (
     <section className='sec-our-method'>
@@ -131,7 +140,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                     <div className='col-12 col-md-8'>
                       <Slider {...imageSliderSettings} className='before-after-slider'>
                         {item.beforeAfterImages.map((beforeAfterImage, beforeAfterImageIdx) => (
-                          <img key={beforeAfterImageIdx} src={beforeAfterImage} className='before-after-img' alt='' />
+                          <div key={beforeAfterImageIdx} className='before-after-img-wrap'>
+                            <img src={beforeAfterImage.before} className='before-after-img' alt='' />
+                            <img src={beforeAfterImage.after} className='before-after-img' alt='' />
+                          </div>
                         ))}
                       </Slider>
                     </div>
@@ -140,9 +152,18 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                         <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.title}</div>
                         <div className='fnt-14 fnt-md-16 text-grey mb-3'>{item.description}</div>
                         <div className='d-flex flex-column gap-3'>
-                          {item.extraImages.map((extraImage, imageIdx) => (
-                            <img key={imageIdx} src={extraImage} className='img-fluid extra-image' alt='' />
-                          ))}
+                          <img
+                            key='before-image'
+                            src={item.beforeAfterImages[curImageIndex]?.before}
+                            className='img-fluid extra-image'
+                            alt=''
+                          />
+                          <img
+                            key='after-image'
+                            src={item.beforeAfterImages[curImageIndex]?.after}
+                            className='img-fluid extra-image'
+                            alt=''
+                          />
                         </div>
                       </div>
                     </div>
