@@ -1,6 +1,6 @@
 export type BeforeAfter = {
-  beforeAfterImages: { before: string; after: string }[]
+  beforeAfterImage: { before: string; after: string }
+  juxtaposeUrl: string
   title: string
   description: string
-  extraImages: string[]
 }

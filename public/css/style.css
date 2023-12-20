@@ -19,11 +19,6 @@ html {
   scroll-behavior: smooth;
 }
 
-
-a,
-button {
-  transition: 1s;
-}
 h2 {
   font-style: normal;
   font-weight: 700;

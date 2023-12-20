@@ -1,9 +1,10 @@
 import './Ourmethod.css'
-import React, { useState } from 'react'
-import Slider, { CustomArrowProps } from 'react-slick'
-import { BeforeAfter } from '@glass/models'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
+import React from 'react'
+import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
+import Slider, { CustomArrowProps } from 'react-slick'
+import { BeforeAfter } from '@glass/models'
 
 function SliderNextArrow(props: CustomArrowProps) {
   const { onClick } = props
@@ -23,24 +24,6 @@ function SliderPrevArrow(props: CustomArrowProps) {
   )
 }
 
-function BeforeAfterImageSliderNextArrow(props: CustomArrowProps) {
-  const { onClick } = props
-  return (
-    <button className='slide-arrow next-arrow before-after-slick-arrow' onClick={onClick}>
-      <i className='fa fa-caret-right' aria-hidden='true'></i>
-    </button>
-  )
-}
-
-function BeforeAfterImageSliderPrevArrow(props: CustomArrowProps) {
-  const { onClick } = props
-  return (
-    <button className='slide-arrow prev-arrow before-after-slick-arrow' onClick={onClick}>
-      <i className='fa fa-caret-left' aria-hidden='true'></i>
-    </button>
-  )
-}
-
 export type OurMethodProps = { showTitle?: boolean }
 
 export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
@@ -51,21 +34,6 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
-    beforeChange: () => {
-      setCurImageIndex(0)
-    },
-  }
-
-  const imageSliderSettings = {
-    dots: false,
-    speed: 300,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    nextArrow: <BeforeAfterImageSliderNextArrow />,
-    prevArrow: <BeforeAfterImageSliderPrevArrow />,
-    beforeChange: (_currentSlide: number, nextSlide: number) => {
-      setCurImageIndex(nextSlide)
-    },
   }
 
   const videos = [
@@ -81,35 +49,50 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
 
   const beforeAfterItems: BeforeAfter[] = [
     {
-      beforeAfterImages: [
-        {
-          before: process.env.PUBLIC_URL + '/images/before-after/1-before.JPEG',
-          after: process.env.PUBLIC_URL + '/images/before-after/1-after.jpg',
-        },
-        {
-          before: process.env.PUBLIC_URL + '/images/before-after/2-before.jpg',
-          after: process.env.PUBLIC_URL + '/images/before-after/2-after.jpg',
-        },
-        {
-          before: process.env.PUBLIC_URL + '/images/before-after/3-before.jpg',
-          after: process.env.PUBLIC_URL + '/images/before-after/3-after.jpg',
-        },
-        {
-          before: process.env.PUBLIC_URL + '/images/before-after/4-before.jpg',
-          after: process.env.PUBLIC_URL + '/images/before-after/4-after.jpg',
-        },
-      ],
+      beforeAfterImage: {
+        before: process.env.PUBLIC_URL + '/images/before-after/1-before.JPEG',
+        after: process.env.PUBLIC_URL + '/images/before-after/1-after.jpg',
+      },
+      juxtaposeUrl:
+        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=4879b18e-9f32-11ee-9ddd-3f41531135b6',
       title: 'Glass Replacement',
       description:
         'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
-      extraImages: [
-        process.env.PUBLIC_URL + '/img/gallery/before1.jpg',
-        process.env.PUBLIC_URL + '/img/gallery/after1.jpg',
-      ],
+    },
+    {
+      beforeAfterImage: {
+        before: process.env.PUBLIC_URL + '/images/before-after/2-before.jpg',
+        after: process.env.PUBLIC_URL + '/images/before-after/2-after.jpg',
+      },
+      juxtaposeUrl:
+        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6d1160f4-9f33-11ee-9ddd-3f41531135b6',
+      title: 'Glass Replacement',
+      description:
+        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
+    },
+    {
+      beforeAfterImage: {
+        before: process.env.PUBLIC_URL + '/images/before-after/3-before.jpg',
+        after: process.env.PUBLIC_URL + '/images/before-after/3-after.jpg',
+      },
+      juxtaposeUrl:
+        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d0944696-9f33-11ee-9ddd-3f41531135b6',
+      title: 'Glass Replacement',
+      description:
+        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
+    },
+    {
+      beforeAfterImage: {
+        before: process.env.PUBLIC_URL + '/images/before-after/4-before.jpg',
+        after: process.env.PUBLIC_URL + '/images/before-after/4-after.jpg',
+      },
+      juxtaposeUrl:
+        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=07f03492-9f34-11ee-9ddd-3f41531135b6',
+      title: 'Glass Replacement',
+      description:
+        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
     },
   ]
-
-  const [curImageIndex, setCurImageIndex] = useState<number>(0)
 
   return (
     <section className='sec-our-method'>
@@ -138,14 +121,12 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                 <div key={index} className='item'>
                   <div className='row g-0'>
                     <div className='col-12 col-md-8'>
-                      <Slider {...imageSliderSettings} className='before-after-slider'>
-                        {item.beforeAfterImages.map((beforeAfterImage, beforeAfterImageIdx) => (
-                          <div key={beforeAfterImageIdx} className='before-after-img-wrap'>
-                            <img src={beforeAfterImage.before} className='before-after-img' alt='' />
-                            <img src={beforeAfterImage.after} className='before-after-img' alt='' />
-                          </div>
-                        ))}
-                      </Slider>
+                      <div className='before-after-img-wrap'>
+                        <ReactCompareSlider
+                          itemOne={<ReactCompareSliderImage src={item.beforeAfterImage.before} alt='Image one' />}
+                          itemTwo={<ReactCompareSliderImage src={item.beforeAfterImage.after} alt='Image two' />}
+                        />
+                      </div>
                     </div>
                     <div className='col-md-4 bg-grey bg-md-white'>
                       <div className='p-3 p-md-5'>
@@ -154,13 +135,13 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                         <div className='d-flex flex-column gap-3'>
                           <img
                             key='before-image'
-                            src={item.beforeAfterImages[curImageIndex]?.before}
+                            src={item.beforeAfterImage.before}
                             className='img-fluid extra-image'
                             alt=''
                           />
                           <img
                             key='after-image'
-                            src={item.beforeAfterImages[curImageIndex]?.after}
+                            src={item.beforeAfterImage.after}
                             className='img-fluid extra-image'
                             alt=''
                           />
