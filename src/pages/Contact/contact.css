@@ -32,18 +32,3 @@
 .whats-app-chat {
   margin-left: 124px;
 }
-
-.contact-page .sec-contact-form {
-  position: relative;
-  padding: 48px;
-  background: url(../../../public/images/contact-form-overlay.png) no-repeat center;
-  background-size: cover;
-  height: 676px;
-}
-
-@media (max-width: 767px) {
-  .contact-page .sec-contact-form {
-    padding: 48px 0 48px;
-    background: var(--dark-color);
-  }
-}

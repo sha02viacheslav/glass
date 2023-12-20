@@ -1,5 +1,5 @@
 import './contact.css'
-import React, { useState } from 'react'
+import React from 'react'
 import { PlantTree } from '@glass/components/PlantTree'
 import { startWhatsApp } from '@glass/utils/whats-app/whats-app.util'
 
@@ -8,13 +8,6 @@ export const Contact: React.FC = () => {
     { name: 'Workshop FixGlass Sheffield', address: '1 Petre Drive Sheffield, S4 7PZ', phone: '+44 7400 400469' },
     { name: 'Head Office', address: '85 Great Portland Street London, W1W 7LT', email: 'hello@fix.glass' },
   ]
-
-  const [email, setEmail] = useState<string>('')
-  const [message, setMessage] = useState<string>('')
-
-  const handleSubmitClick = () => {
-    console.warn(email, message)
-  }
 
   return (
     <div className='contact-page'>
@@ -69,48 +62,6 @@ export const Contact: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className='sec-contact-form'>
-        <div className='h-100 d-flex align-items-center px-4 px-md-5'>
-          <div className='col-md-4 offset-md-3'>
-            <h2 className='fnt-48 fnt-md-60 fw-n text-white mb-2 mb-md-3'>Contact Us</h2>
-            <div className='fnt-16 fnt-md-18 fw-n text-white'>
-              Need to get in touch with us? Fill out the form with your request. We will reply as soon as possible.
-            </div>
-            <div className='row mt-4'>
-              <div className='col-12'>
-                <div className='form-group mb-4'>
-                  <label>Email</label>
-                  <input
-                    type='text'
-                    className='form-control'
-                    placeholder='Email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className='col-12'>
-                <div className='form-group mb-4'>
-                  <label>Message</label>
-                  <textarea
-                    rows={4}
-                    className='form-control h-auto'
-                    placeholder='Message'
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className='col-12'>
-                <button className='btn-raised round' onClick={handleSubmitClick}>
-                  Submit
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
