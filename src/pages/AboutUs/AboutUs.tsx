@@ -1,5 +1,6 @@
 import './AboutUs.css'
 import React from 'react'
+import { Chat } from '@glass/components/Chat'
 import { PlantTree } from '@glass/components/PlantTree'
 
 export const AboutUs: React.FC = () => {
@@ -33,6 +34,8 @@ export const AboutUs: React.FC = () => {
       </section>
 
       <PlantTree />
+
+      <Chat />
     </div>
   )
 }

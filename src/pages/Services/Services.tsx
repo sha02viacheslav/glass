@@ -1,6 +1,7 @@
 import './Services.css'
 import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Chat } from '@glass/components/Chat'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PlantTree } from '@glass/components/PlantTree'
@@ -137,6 +138,8 @@ export const Services: React.FC = () => {
       </section>
 
       <PlantTree />
+
+      <Chat />
 
       {/*Remove for now, will check later*/}
       {/*<CaseStudies />*/}
