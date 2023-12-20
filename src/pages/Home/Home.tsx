@@ -103,7 +103,7 @@ export const Home: React.FC = () => {
 
       <section className='sec-selling'>
         <div className='container'>
-          <div className='col-md-4 offset-md-8 py-4 py-md-5'>
+          <div className='col-lg-4 offset-lg-8 py-4 py-md-5'>
             <p className='fnt-48 fnt-md-60 text-dark ps-md-4 mb-4'>Our Unique Selling Points</p>
             <ul className='selling-points p-0'>
               <li className='fnt-16 fnt-md-18 mb-3 text-primary'>

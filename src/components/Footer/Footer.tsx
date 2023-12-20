@@ -60,9 +60,9 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
 
       <section className='footer-content p-3 p-md-5'>
         <div className='content-box'>
-          <div className='d-md-flex justify-content-between'>
+          <div className='d-lg-flex justify-content-between'>
             <div>
-              <div className='d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-5'>
+              <div className='d-flex flex-column flex-lg-row align-items-lg-center gap-3 gap-md-5'>
                 <div className='d-flex align-items-center justify-content-between'>
                   <div className='f-logo mt-0'>
                     <a href='#'>
@@ -74,11 +74,11 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
                       />
                     </a>
                   </div>
-                  <div className='d-md-none'>
+                  <div className='d-lg-none'>
                     <SocialLinks />
                   </div>
                 </div>
-                <div className='d-flex flex-column flex-md-row gap-3 gap-md-5'>
+                <div className='d-flex flex-column flex-lg-row gap-3 gap-lg-5'>
                   <Link to='/' className='footer-link'>
                     Home
                   </Link>
@@ -97,7 +97,7 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
                 Copyright by © FixGlass Company No.11808031. All rights reserved.
               </p>
             </div>
-            <div className='d-none d-md-block'>
+            <div className='d-none d-lg-block'>
               <SocialLinks />
             </div>
           </div>

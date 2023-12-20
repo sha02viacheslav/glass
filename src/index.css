@@ -73,6 +73,24 @@ body {
   }
 }
 
+@media (min-width: 992px) {
+  .bg-lg-dark {
+    background: var(--dark-color) !important;
+  }
+
+  .bg-lg-grey {
+    background: var(--bg-color) !important;
+  }
+
+  .bg-lg-primary {
+    background: var(--primary-color) !important;
+  }
+
+  .bg-lg-white {
+    background: var(--white-color) !important;
+  }
+}
+
 .fnt-12 {
   font-size: 12px;
 }

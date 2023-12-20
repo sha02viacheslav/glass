@@ -120,7 +120,7 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
               {beforeAfterItems.map((item, index) => (
                 <div key={index} className='item'>
                   <div className='row g-0'>
-                    <div className='col-12 col-md-8'>
+                    <div className='col-lg-8'>
                       <div className='before-after-img-wrap'>
                         <ReactCompareSlider
                           itemOne={<ReactCompareSliderImage src={item.beforeAfterImage.before} alt='Image one' />}
@@ -128,8 +128,8 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                         />
                       </div>
                     </div>
-                    <div className='col-md-4 bg-grey bg-md-white'>
-                      <div className='p-3 p-md-5'>
+                    <div className='col-lg-4 bg-grey bg-md-white'>
+                      <div className='p-3 p-md-4 p-lg-5'>
                         <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.title}</div>
                         <div className='fnt-14 fnt-md-16 text-grey mb-3'>{item.description}</div>
                         <div className='d-flex flex-column gap-3'>

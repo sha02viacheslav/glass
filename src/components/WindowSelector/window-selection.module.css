@@ -55,3 +55,8 @@
   opacity: 0;
   object-fit: cover;
 }
+
+.windowSelectorToggleLabel {
+  width: 220px;
+  text-align: left;
+}

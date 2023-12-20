@@ -318,7 +318,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
       {/* tinted window toggle */}
       <div className='d-flex align-items-center'>
-        <span className='fnt-20 fnt-md-28 text-primary'>Privacy windows: </span>
+        <div className={'fnt-20 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Privacy windows </div>
         <ToggleButtonGroup
           sx={{ ml: isVan ? 0 : '10px' }}
           color='secondary'
@@ -346,13 +346,23 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       </div>
 
       {isVan && (
-        <div>
-          <span className='fs-18 text-blue toggle-van'>Body type: </span>
+        <div className='d-flex align-items-center mt-4'>
+          <div className={'fnt-20 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Body type </div>
           <ToggleButtonGroup color='secondary' value={bodyValue} exclusive aria-label='Platform'>
-            <ToggleButton sx={{ width: 120 }} size='small' value={CarType.BARN} onClick={() => bodyChange(true)}>
+            <ToggleButton
+              sx={{ width: 120, borderRadius: '48px' }}
+              size='small'
+              value={CarType.BARN}
+              onClick={() => bodyChange(true)}
+            >
               Barn door
             </ToggleButton>
-            <ToggleButton sx={{ width: 120 }} size='small' value={CarType.TAILGATER} onClick={() => bodyChange(false)}>
+            <ToggleButton
+              sx={{ width: 120, borderRadius: '48px' }}
+              size='small'
+              value={CarType.TAILGATER}
+              onClick={() => bodyChange(false)}
+            >
               Tailgater
             </ToggleButton>
             \{' '}

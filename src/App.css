@@ -46,12 +46,6 @@ area:hover {
   margin-right: 10px;
 }
 
-.toggle-van {
-  margin-right: 10px;
-  width: 133px;
-  display: inline-block;
-}
-
 /* Tab styling in customer page */
 .tab {
   overflow: hidden;
