@@ -240,8 +240,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [editMode, quoteId])
 
   return (
-    <div className='customer-page px-3 px-md-0'>
-      <section className='sec-title'>
+    <div className='customer-page'>
+      <section className='sec-title bg-grey'>
         <div className='container'>
           <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Get a Quote</h1>
         </div>
@@ -260,7 +260,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         </div>
       </section>
 
-      <section className='sec-customer bg-grey pb-4 pb-md-5'>
+      <section className='sec-customer bg-grey p-3 pb-md-5'>
         <div className='container'>
           <div className='tab-content'>
             <div className='row' id='scroll-to-top'></div>

@@ -16,7 +16,6 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   licenseNumber,
   model = '',
   placeholderVal = '',
-  showEdit = true,
   handleVehInputChange = () => {},
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
@@ -57,11 +56,6 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
           </div>
         )}
       </div>
-      {showEdit && (
-        <div className='mt-3'>
-          <button className='btn-stroked round'>EDIT</button>
-        </div>
-      )}
     </div>
   )
 }

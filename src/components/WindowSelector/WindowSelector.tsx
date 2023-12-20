@@ -318,16 +318,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
       {/* tinted window toggle */}
       <div className='d-flex align-items-center'>
-        <div className={'fnt-20 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Privacy windows </div>
-        <ToggleButtonGroup
-          sx={{ ml: isVan ? 0 : '10px' }}
-          color='secondary'
-          value={tintedValue}
-          exclusive
-          aria-label='Platform'
-        >
+        <div className={'fnt-16 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Privacy windows </div>
+        <ToggleButtonGroup color='secondary' value={tintedValue} exclusive aria-label='Platform'>
           <ToggleButton
-            sx={{ width: isVan ? 120 : 70, borderRadius: '48px' }}
+            className={styles.windowSelectorToggle}
             size='small'
             value='yes'
             onClick={() => tintedButtonHandle('yes')}
@@ -335,7 +329,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             Yes
           </ToggleButton>
           <ToggleButton
-            sx={{ width: isVan ? 120 : 70, borderRadius: '48px' }}
+            className={styles.windowSelectorToggle}
             size='small'
             value='no'
             onClick={() => tintedButtonHandle('no')}
@@ -346,11 +340,11 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       </div>
 
       {isVan && (
-        <div className='d-flex align-items-center mt-4'>
-          <div className={'fnt-20 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Body type </div>
+        <div className='d-flex align-items-center mt-3 mt-md-4'>
+          <div className={'fnt-16 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Body type </div>
           <ToggleButtonGroup color='secondary' value={bodyValue} exclusive aria-label='Platform'>
             <ToggleButton
-              sx={{ width: 120, borderRadius: '48px' }}
+              className={styles.windowSelectorToggle}
               size='small'
               value={CarType.BARN}
               onClick={() => bodyChange(true)}
@@ -358,7 +352,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
               Barn door
             </ToggleButton>
             <ToggleButton
-              sx={{ width: 120, borderRadius: '48px' }}
+              className={styles.windowSelectorToggle}
               size='small'
               value={CarType.TAILGATER}
               onClick={() => bodyChange(false)}

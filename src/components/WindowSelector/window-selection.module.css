@@ -57,6 +57,22 @@
 }
 
 .windowSelectorToggleLabel {
-  width: 220px;
+  width: 130px;
   text-align: left;
+}
+
+@media (min-width: 992px) {
+  .windowSelectorToggleLabel {
+    width: 220px;
+  }
+}
+
+.windowSelectorToggle {
+  width: 100px;
+}
+
+@media (min-width: 992px) {
+  .windowSelectorToggle {
+    width: 120px;
+  }
 }
