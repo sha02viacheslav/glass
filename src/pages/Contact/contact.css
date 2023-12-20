@@ -9,8 +9,9 @@
 }
 
 .map-container {
-  height: 560px;
+  height: 280px;
   width: 100%;
+  margin-top: 24px;
 }
 
 @media (max-width: 767px) {
