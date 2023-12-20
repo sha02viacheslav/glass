@@ -40,7 +40,6 @@ export const App: React.FC = () => {
   return (
     <>
       <div className='main-content'>
-        <div className='empty-test'>-</div>
         <LoadingIndicator />
         <Header showMenu={showMenu} />
         <Routes>

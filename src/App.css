@@ -126,12 +126,6 @@ area:hover {
 
 /* ----------- */
 
-.empty-test {
-  font-family: 'UKNumberPlate';
-  visibility: hidden;
-  height: 1px;
-}
-
 .transparent-element {
   display: none;
 }
