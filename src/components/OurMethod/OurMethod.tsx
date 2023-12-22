@@ -94,6 +94,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     },
   ]
 
+  const handleTouchStartSlider = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+  }
+
   return (
     <section className='sec-our-method'>
       <div className='container p-0'>
@@ -121,7 +125,7 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                 <div key={index} className='item'>
                   <div className='row g-0'>
                     <div className='col-lg-8'>
-                      <div className='before-after-img-wrap'>
+                      <div className='before-after-img-wrap' onTouchStart={(e) => handleTouchStartSlider(e)}>
                         <ReactCompareSlider
                           itemOne={<ReactCompareSliderImage src={item.beforeAfterImage.before} alt='Image one' />}
                           itemTwo={<ReactCompareSliderImage src={item.beforeAfterImage.after} alt='Image two' />}
