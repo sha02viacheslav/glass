@@ -1,7 +1,7 @@
 import './Ourmethod.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-import React from 'react'
+import React, { useState } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { BeforeAfter } from '@glass/models'
@@ -34,6 +34,9 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
+    beforeChange: () => {
+      setShowDetails(undefined)
+    },
   }
 
   const videos = [
@@ -94,6 +97,8 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     },
   ]
 
+  const [showDetails, setShowDetails] = useState<number>()
+
   const handleTouchStartSlider = (e: React.TouchEvent<HTMLDivElement>) => {
     e.stopPropagation()
   }
@@ -132,7 +137,11 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                         />
                       </div>
                     </div>
-                    <div className='col-lg-4 bg-grey bg-md-white'>
+                    <div
+                      className={
+                        'col-lg-4 bg-grey bg-md-white repair-details' + (showDetails === index ? ' fadeIn' : '')
+                      }
+                    >
                       <div className='p-3 p-md-4 p-lg-5'>
                         <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.title}</div>
                         <div className='fnt-14 fnt-md-16 text-grey mb-3'>{item.description}</div>
@@ -151,6 +160,19 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                           />
                         </div>
                       </div>
+                    </div>
+                    <div className='d-flex d-lg-none justify-content-center p-4'>
+                      {showDetails === index ? (
+                        <button className='btn-stroked round transparent' onClick={() => setShowDetails(undefined)}>
+                          Hide Repair Details
+                          <i className='fa-solid fa-caret-up ms-2 mt-1 fnt-20'></i>
+                        </button>
+                      ) : (
+                        <button className='btn-stroked round transparent' onClick={() => setShowDetails(index)}>
+                          Repair Details
+                          <i className='fa-solid fa-caret-down ms-2 fnt-20'></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
