@@ -255,6 +255,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             placeholderVal={'NU71 REG'}
             licenseNumber={licenseSearchVal}
             model={!!vehData ? vehData.Make + ' ' + vehData.Model : 'Make & Model'}
+            debounceTime={2000}
             handleVehInputChange={handleVehInputChange}
           />
         </div>

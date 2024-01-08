@@ -9,6 +9,7 @@ export type LicensePlateProps = {
   model?: string
   placeholderVal?: string
   showEdit?: boolean
+  debounceTime?: number
   handleVehInputChange?: (value: string | undefined) => void
 }
 
@@ -16,11 +17,12 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   licenseNumber,
   model = '',
   placeholderVal = '',
+  debounceTime = 0,
   handleVehInputChange = () => {},
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
 
-  const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, 2000), [])
+  const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, debounceTime), [])
 
   const handleInputLicenseNum = (val: string) => {
     const licenseNum = formatLicenseNumber(val)
