@@ -48,10 +48,8 @@ export const Services: React.FC = () => {
   }
 
   const directToCustomer = () => {
-    if (licenseSearchVal) {
-      navigate('/customer/' + licenseSearchVal)
-      setLicense('')
-    }
+    navigate('/customer/' + licenseSearchVal)
+    setLicense('')
   }
 
   return (

@@ -20,10 +20,8 @@ export const Footer: React.FC<FooterProps> = ({ showReg = true }) => {
   }
 
   const directToCustomer = () => {
-    if (licenseSearchVal) {
-      navigate('/customer/' + licenseSearchVal)
-      setLicense('')
-    }
+    navigate('/customer/' + licenseSearchVal)
+    setLicense('')
   }
 
   return (

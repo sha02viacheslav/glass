@@ -21,10 +21,8 @@ export const Home: React.FC = () => {
   }
 
   const directToCustomer = () => {
-    if (licenseSearchVal) {
-      navigate('/customer/' + licenseSearchVal)
-      setLicense('')
-    }
+    navigate('/customer/' + licenseSearchVal)
+    setLicense('')
   }
 
   const goToServicePage = (key: string) => {
