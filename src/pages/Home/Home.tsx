@@ -101,7 +101,7 @@ export const Home: React.FC = () => {
 
       <section className='sec-selling'>
         <div className='container'>
-          <div className='col-lg-4 offset-lg-8 py-4 py-md-5'>
+          <div className='col-xl-4 offset-xl-7 offset-xxl-8 py-4 py-md-5'>
             <p className='fnt-48 fnt-md-60 text-dark ps-md-4 mb-4'>Our Unique Selling Points</p>
             <ul className='selling-points p-0'>
               <li className='fnt-16 fnt-md-18 mb-3 text-primary'>
@@ -125,14 +125,25 @@ export const Home: React.FC = () => {
               <GetQuoteOrCall showRegInput={false} />
             </div>
           </div>
+
+          <img
+            src={PUBLIC_URL + '/images/home-selling-overlay.png'}
+            className='img-fluid sec-selling-overlay d-none d-xl-block'
+            alt=''
+          />
         </div>
       </section>
 
       <section className='sec-review'>
         <div className='container p-0'>
-          <div className='px-4 px-md-5'>
+          <div className='px-4 px-lg-5 mx-lg-5'>
             <h2 className='fnt-48 fnt-md-60 fw-n text-white mb-4 mb-md-5'>Testimonials</h2>
           </div>
+          <img
+            src={PUBLIC_URL + '/images/review-overlay.png'}
+            className='img-fluid sec-review-overlay d-none d-lg-block'
+            alt=''
+          />
           <GoogleReviews />
         </div>
       </section>

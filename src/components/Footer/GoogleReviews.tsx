@@ -41,7 +41,7 @@ const settingsTestimonials = {
 
 export const GoogleReviews: React.FC = () => {
   return (
-    <section className='bg-grey position-relative'>
+    <section className='bg-white position-relative'>
       <Slider {...settingsTestimonials}>
         {GOOGLE_REVIEWS.map((item, index) => (
           <div key={index} className='item h-100'>
