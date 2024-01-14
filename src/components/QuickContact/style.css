@@ -1,0 +1,9 @@
+.footer-top {
+  background: url(../../../public/images/footer.png) no-repeat;
+  background-size: cover;
+}
+
+.footer-full {
+  background: url(../../../public/images/footer-full.png) no-repeat;
+  background-size: cover;
+}

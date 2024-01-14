@@ -18,6 +18,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   model = '',
   placeholderVal = '',
   debounceTime = 0,
+  showEdit = false,
   handleVehInputChange = () => {},
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
@@ -27,7 +28,13 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   const handleInputLicenseNum = (val: string) => {
     const licenseNum = formatLicenseNumber(val)
     setLocalLicenseNum(licenseNum)
-    debouncedChangeHandler(licenseNum)
+    if (!showEdit) {
+      debouncedChangeHandler(licenseNum)
+    }
+  }
+
+  const handleClickGetVehicle = () => {
+    debouncedChangeHandler(localLicenseNum)
   }
 
   useEffect(() => {
@@ -58,6 +65,13 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
           </div>
         )}
       </div>
+      {showEdit && (
+        <div className='mt-3'>
+          <button className='btn-stroked round' onClick={() => handleClickGetVehicle()}>
+            Edit
+          </button>
+        </div>
+      )}
     </div>
   )
 }

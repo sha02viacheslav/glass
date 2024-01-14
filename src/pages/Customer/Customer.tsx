@@ -252,10 +252,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       <section className='sec-quote py-3'>
         <div className='d-flex flex-column align-items-center p-3'>
           <LicensePlate
-            placeholderVal={'NU71 REG'}
+            placeholderVal={'ENTER REG'}
             licenseNumber={licenseSearchVal}
             model={!!vehData ? vehData.Make + ' ' + vehData.Model : 'Make & Model'}
             debounceTime={2000}
+            showEdit={true}
             handleVehInputChange={handleVehInputChange}
           />
         </div>

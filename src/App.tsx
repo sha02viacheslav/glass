@@ -7,6 +7,7 @@ import { Footer } from '@glass/components/Footer'
 import { Header } from '@glass/components/Header'
 import { Loader } from '@glass/components/Loader'
 import { PaymentAssist } from '@glass/components/PaymentAssist'
+import { QuickContact } from '@glass/components/QuickContact'
 import { AboutUs } from '@glass/pages/AboutUs'
 import { Contact } from '@glass/pages/Contact'
 import { Customer } from '@glass/pages/Customer'
@@ -26,9 +27,13 @@ export const LoadingIndicator: React.FC = () => {
 export const App: React.FC = () => {
   const location = useLocation()
   const [showMenu, setShowMenu] = useState<boolean>(true)
+  const [showQuickContact, setShowQuickContact] = useState<boolean>(true)
+  const [showFooter, setShowFooter] = useState<boolean>(true)
 
   useEffect(() => {
     setShowMenu(!location.pathname.startsWith('/quote') && !location.pathname.startsWith('/customer'))
+    setShowQuickContact(!location.pathname.startsWith('/quote'))
+    setShowFooter(!location.pathname.startsWith('/quote') && !location.pathname.startsWith('/customer'))
 
     if (location.pathname === '/' && location.search) {
       setRequestedURL(window.location.href)
@@ -58,7 +63,8 @@ export const App: React.FC = () => {
           <Route path='/quote/in/:id' element={<QuotePage />} />
           <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
         </Routes>
-        <Footer showReg={showMenu} />
+        {showQuickContact && <QuickContact showReg={showMenu} />}
+        {showFooter && <Footer />}
         <ToastContainer position='bottom-right' />
       </div>
     </>

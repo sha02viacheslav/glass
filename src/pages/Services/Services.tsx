@@ -73,7 +73,7 @@ export const Services: React.FC = () => {
               <label className='text-grey fnt-14 mb-2 ms-5'>Insert your Vehicle Registration Number</label>
               <div className='d-flex flex-column flex-md-row align-items-center gap-4'>
                 <LicensePlate
-                  placeholderVal={'NU71 REG'}
+                  placeholderVal={'ENTER REG'}
                   licenseNumber={licenseSearchVal}
                   showEdit={false}
                   handleVehInputChange={handleVehInputChange}
