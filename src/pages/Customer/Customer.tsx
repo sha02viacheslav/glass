@@ -425,7 +425,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                 </div>
               )}
 
-              <div className='col-md-7 mx-auto'>
+              <div className='submit-quote-button'>
                 <div className='submit-request-msg'>{onSubmitMessage}</div>
                 <button className='btn-raised round w-100 mb-3' type='button' onClick={handleSubmitClick}>
                   {editMode ? 'Save Quote' : 'Submit Request'}

@@ -27,3 +27,12 @@
     padding: 24px;
   }
 }
+
+.submit-quote-button {
+  position: fixed;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 400px;
+  z-index: 100;
+}
