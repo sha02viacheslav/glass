@@ -333,6 +333,10 @@ input.form-control.round {
   box-sizing: border-box;
   height: unset;
 }
+.glass-form-control.MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-input {
+  background: #e9ecef;
+  border-radius: 48px;
+}
 
 .form-error {
   display: block;

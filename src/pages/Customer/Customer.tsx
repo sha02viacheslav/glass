@@ -75,11 +75,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     initialValues: {
       registrationNumber: licenseNum || '',
       glassLocation: [],
-      firstName: quoteDetails?.customer_f_name || '',
-      lastName: quoteDetails?.customer_s_name || '',
-      email: quoteDetails?.customer_email || '',
-      phone: quoteDetails?.customer_phone || '',
-      invoiceAddress: quoteDetails?.invoice_address?.postcode || '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      invoiceAddress: '',
     },
     validationSchema: validationSchema,
     onSubmit: async () => {
@@ -147,8 +147,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }
 
   const submit = (values: CustomerForm) => {
-    console.warn(values)
-
     // post data
     const firstName = (values.firstName || '').trim()
     const lastName = (values.lastName || '').trim()
@@ -250,6 +248,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       handleChangeBillingAddres(quoteDetails.invoice_address)
       setFixingAddressText(formatAddress(quoteDetails.delivery_address))
       setComments(quoteDetails.customer_comments?.reverse() || [])
+      formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails?.customer_f_name)
+      formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails?.customer_s_name)
+      formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails?.customer_email)
+      formik.setFieldValue(FormFieldIds.PHONE, quoteDetails?.customer_phone)
 
       // send previously selected windows to window selection component
       const selectedWindows: string[] = []
@@ -476,12 +478,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           />
                         )}
                       </div>
-                      <input
+                      <OutlinedInput
                         id='deliveryAddress'
-                        type='text'
-                        className='form-control round'
-                        placeholder='Fixing address'
                         value={fixingAddressText || ''}
+                        fullWidth
+                        className='glass-form-control round'
+                        placeholder='Fixing address'
                         disabled={true}
                       />
                     </div>
