@@ -30,7 +30,7 @@
 
 .submit-quote-button {
   position: fixed;
-  bottom: 10vh;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   max-width: 400px;

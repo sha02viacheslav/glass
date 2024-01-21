@@ -1,6 +1,6 @@
 import './AddressInput.css'
-import React, { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
-import { Box } from '@mui/material'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { Box, OutlinedInput } from '@mui/material'
 import { autocomplete } from 'getaddress-autocomplete'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address } from '@glass/models'
@@ -8,7 +8,7 @@ import { formatAddress } from '@glass/utils/format-address/format-address.util'
 
 export type ChangeAddressProps = {
   address: Address | undefined
-  formError: boolean
+  formError: boolean | undefined
   disabled?: boolean
   onChange: (value: Address | undefined) => void
 }
@@ -17,7 +17,6 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
   const uniqueId = useMemo(() => {
     return `address-input-${parseInt((Math.random() * 1000).toString())}`
   }, [])
-  const addressRef = useRef<HTMLInputElement>(null)
   const [addressText, setAddressText] = useState<string>(formatAddress(address))
 
   const handlePCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -52,14 +51,14 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
 
   return (
     <Box>
-      <input
+      <OutlinedInput
         id={uniqueId}
-        ref={addressRef}
-        type='text'
-        placeholder='Please enter postcode and select your address'
-        className={formError ? 'form-control round form-not-filled' : 'form-control round'}
-        onChange={handlePCodeChange}
         value={addressText}
+        fullWidth
+        className='glass-form-control round'
+        placeholder='Please enter postcode and select your address'
+        onChange={handlePCodeChange}
+        error={formError}
         disabled={disabled}
       />
     </Box>

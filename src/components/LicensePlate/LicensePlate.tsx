@@ -1,8 +1,8 @@
+import './license-plate.css'
 import React, { useCallback, useEffect, useState } from 'react'
 import { debounce } from 'lodash'
 import flag from '@glass/assets/icons/uk-flag.png'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
-import './license-plate.css'
 
 export type LicensePlateProps = {
   licenseNumber: string
@@ -42,7 +42,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }, [licenseNumber])
 
   return (
-    <div className='license-plate'>
+    <div className='d-flex flex-column flex-md-row align-items-center align-items-md-start gap-md-3'>
       <div className='left-container'>
         <div className='yellow-box'>
           <div className='blue-box d-flex justify-content-center align-items-center'>
@@ -66,9 +66,9 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
         )}
       </div>
       {showEdit && (
-        <div className='mt-3'>
-          <button className='btn-stroked round' onClick={() => handleClickGetVehicle()}>
-            Edit
+        <div className='mt-3 w-100'>
+          <button type='button' className='btn-stroked round w-100' onClick={() => handleClickGetVehicle()}>
+            Get Vehicle Data
           </button>
         </div>
       )}

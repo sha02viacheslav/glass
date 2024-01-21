@@ -16,6 +16,7 @@
   --white-color: #ffffff;
   --bg-color: #efefef;
   --black-color: #000;
+  --red-color: #d23c33;
 }
 
 body {
@@ -322,6 +323,27 @@ input.form-control.round {
   border-radius: 48px;
 }
 
+.glass-form-control .MuiOutlinedInput-notchedOutline {
+  border-radius: 48px;
+  border: solid 1px var(--primary-color);
+}
+.glass-form-control.MuiOutlinedInput-root .MuiOutlinedInput-input {
+  padding-block: 12.5px 14px;
+  width: 100%;
+  box-sizing: border-box;
+  height: unset;
+}
+
+.form-error {
+  display: block;
+  color: var(--red-color);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  margin-left: 12px;
+  margin-top: 4px;
+}
+
 .form-group label {
   display: block;
   text-align: left;
@@ -330,7 +352,14 @@ input.form-control.round {
   margin-left: 12px;
   color: var(--primary-color);
 }
+.form-group label.error {
+  color: var(--red-color);
+}
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.getAddress_autocomplete_container {
+  width: 100%;
 }
