@@ -56,44 +56,28 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
         before: process.env.PUBLIC_URL + '/images/before-after/1-before.JPEG',
         after: process.env.PUBLIC_URL + '/images/before-after/1-after.jpg',
       },
-      juxtaposeUrl:
-        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=4879b18e-9f32-11ee-9ddd-3f41531135b6',
       title: 'Glass Replacement',
-      description:
-        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
     },
     {
       beforeAfterImage: {
         before: process.env.PUBLIC_URL + '/images/before-after/2-before.jpg',
         after: process.env.PUBLIC_URL + '/images/before-after/2-after.jpg',
       },
-      juxtaposeUrl:
-        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6d1160f4-9f33-11ee-9ddd-3f41531135b6',
       title: 'Glass Replacement',
-      description:
-        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
     },
     {
       beforeAfterImage: {
         before: process.env.PUBLIC_URL + '/images/before-after/3-before.jpg',
         after: process.env.PUBLIC_URL + '/images/before-after/3-after.jpg',
       },
-      juxtaposeUrl:
-        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d0944696-9f33-11ee-9ddd-3f41531135b6',
       title: 'Glass Replacement',
-      description:
-        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
     },
     {
       beforeAfterImage: {
         before: process.env.PUBLIC_URL + '/images/before-after/4-before.jpg',
         after: process.env.PUBLIC_URL + '/images/before-after/4-after.jpg',
       },
-      juxtaposeUrl:
-        'https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=07f03492-9f34-11ee-9ddd-3f41531135b6',
       title: 'Glass Replacement',
-      description:
-        'Sa que con comniatur, aut facep ipsum fugiam volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreperum faci volupta tibus. Sa que con comniatur, aut facep volorerum nost dignis sin etume con experspernat abo. Dus erovid modiorum rerferibus. Voloreper faci volupta tibus.',
     },
   ]
 
@@ -144,7 +128,6 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                     >
                       <div className='p-3 p-md-4 p-lg-5'>
                         <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.title}</div>
-                        <div className='fnt-14 fnt-md-16 text-grey mb-3'>{item.description}</div>
                         <div className='d-flex flex-column gap-3'>
                           <img
                             key='before-image'
