@@ -4,7 +4,10 @@ import 'slick-carousel/slick/slick-theme.css'
 import React, { useState } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import Slider, { CustomArrowProps } from 'react-slick'
+import { BeforeAfterType } from '@glass/enums'
+import { REACT_APP_API_DOMAIN_URL } from '@glass/envs'
 import { BeforeAfter } from '@glass/models'
+import { beforeAfterService } from '@glass/services/apis/before-after.service'
 
 function SliderNextArrow(props: CustomArrowProps) {
   const { onClick } = props
@@ -50,42 +53,22 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
     },
   ]
 
-  const beforeAfterItems: BeforeAfter[] = [
-    {
-      beforeAfterImage: {
-        before: process.env.PUBLIC_URL + '/images/before-after/1-before.JPEG',
-        after: process.env.PUBLIC_URL + '/images/before-after/1-after.jpg',
-      },
-      title: 'Glass Replacement',
-    },
-    {
-      beforeAfterImage: {
-        before: process.env.PUBLIC_URL + '/images/before-after/2-before.jpg',
-        after: process.env.PUBLIC_URL + '/images/before-after/2-after.jpg',
-      },
-      title: 'Glass Replacement',
-    },
-    {
-      beforeAfterImage: {
-        before: process.env.PUBLIC_URL + '/images/before-after/3-before.jpg',
-        after: process.env.PUBLIC_URL + '/images/before-after/3-after.jpg',
-      },
-      title: 'Glass Replacement',
-    },
-    {
-      beforeAfterImage: {
-        before: process.env.PUBLIC_URL + '/images/before-after/4-before.jpg',
-        after: process.env.PUBLIC_URL + '/images/before-after/4-after.jpg',
-      },
-      title: 'Glass Replacement',
-    },
-  ]
-
   const [showDetails, setShowDetails] = useState<number>()
+  const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
 
   const handleTouchStartSlider = (e: React.TouchEvent<HTMLDivElement>) => {
     e.stopPropagation()
   }
+
+  const getBeforeAfterImages = () => {
+    beforeAfterService(BeforeAfterType.ALL).then((res) => {
+      if (res.success) {
+        setBeforeAfterItems(res.data)
+      }
+    })
+  }
+
+  getBeforeAfterImages()
 
   return (
     <section className='sec-our-method'>
@@ -116,8 +99,18 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                     <div className='col-lg-8'>
                       <div className='before-after-img-wrap' onTouchStart={(e) => handleTouchStartSlider(e)}>
                         <ReactCompareSlider
-                          itemOne={<ReactCompareSliderImage src={item.beforeAfterImage.before} alt='Image one' />}
-                          itemTwo={<ReactCompareSliderImage src={item.beforeAfterImage.after} alt='Image two' />}
+                          itemOne={
+                            <ReactCompareSliderImage
+                              src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
+                              alt='Image one'
+                            />
+                          }
+                          itemTwo={
+                            <ReactCompareSliderImage
+                              src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
+                              alt='Image two'
+                            />
+                          }
                         />
                       </div>
                     </div>
@@ -127,17 +120,17 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
                       }
                     >
                       <div className='p-3 p-md-4 p-lg-5'>
-                        <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.title}</div>
+                        <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.description}</div>
                         <div className='d-flex flex-column gap-3'>
                           <img
                             key='before-image'
-                            src={item.beforeAfterImage.before}
+                            src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
                             className='img-fluid extra-image'
                             alt=''
                           />
                           <img
                             key='after-image'
-                            src={item.beforeAfterImage.after}
+                            src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
                             className='img-fluid extra-image'
                             alt=''
                           />

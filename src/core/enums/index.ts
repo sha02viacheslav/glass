@@ -1,4 +1,5 @@
 export * from './address-type.enum'
+export * from './before-after-type.enum'
 export * from './booking-occupy.enum'
 export * from './car-type.enum'
 export * from './customer-chat-state.enum'

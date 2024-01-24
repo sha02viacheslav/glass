@@ -1,4 +1,5 @@
 export type BeforeAfter = {
-  beforeAfterImage: { before: string; after: string }
-  title: string
+  before_880_url: string
+  after_880_url: string
+  description: string
 }
