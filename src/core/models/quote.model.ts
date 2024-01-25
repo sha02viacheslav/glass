@@ -1,5 +1,6 @@
 import { OrderState, PaymentMethodType, WorkingPlace } from '@glass/enums'
 import { Address } from './address.model'
+import { BeforeAfter } from './before-after.model'
 import { Comment } from './comment.model'
 import { Invoice } from './invoice.model'
 import { Offer } from './offer.model'
@@ -46,4 +47,5 @@ export type Quote = {
   working_place: WorkingPlace
   workshop_address: string
   workshop: Workshop
+  images_gallery: BeforeAfter[]
 }

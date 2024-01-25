@@ -9,6 +9,7 @@ import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PlantTree } from '@glass/components/PlantTree'
 import { SERVICES } from '@glass/constants'
+import { BeforeAfterType } from '@glass/enums'
 import { PUBLIC_URL } from '@glass/envs'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
@@ -75,7 +76,7 @@ export const Home: React.FC = () => {
         </section>
       </div>
 
-      <OurMethod />
+      <OurMethod beforeAfterType={BeforeAfterType.ALL} />
 
       <section className='sec-services'>
         <div className='container'>

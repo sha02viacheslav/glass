@@ -107,7 +107,7 @@ export const Services: React.FC = () => {
         </div>
       </section>
 
-      <OurMethod showTitle={false} />
+      <OurMethod beforeAfterType={service.beforeAfterType} showTitle={false} />
 
       <section className='sec-install-film'>
         <div className='container p-0'>

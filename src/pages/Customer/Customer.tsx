@@ -10,10 +10,12 @@ import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
 import { LicensePlate } from '@glass/components/LicensePlate'
+import { OurMethod } from '@glass/components/OurMethod'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { AddressType, CarType } from '@glass/enums'
+import { AddressType, BeforeAfterType, CarType } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
+import { Address, Attachment, BeforeAfter, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
+import { beforeAfterService } from '@glass/services/apis/before-after.service'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
@@ -58,6 +60,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
   const [fixingAddressText, setFixingAddressText] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
+  const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
 
   const validationSchema = object({
     registrationNumber: string()
@@ -242,6 +245,26 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     setLicense(formatedNumber)
     fetchVehData(formatedNumber)
   }
+
+  const getBeforeAfterImages = () => {
+    if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
+      beforeAfterService(
+        BeforeAfterType.NEW_INQUIRY,
+        formik.values.registrationNumber,
+        formik.values?.glassLocation,
+      ).then((res) => {
+        if (res.success) {
+          setBeforeAfterItems(res.data)
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
+      getBeforeAfterImages()
+    }
+  }, [formik.values])
 
   useEffect(() => {
     if (quoteDetails) {
@@ -504,6 +527,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           </div>
         </section>
       </form>
+
+      {!!beforeAfterItems?.length && (
+        <OurMethod beforeAfterImages={beforeAfterItems} showTitle={false} showVideos={false} />
+      )}
     </div>
   )
 }

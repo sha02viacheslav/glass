@@ -800,7 +800,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       )}
 
       <div className='mt-5'>
-        <OurMethod showTitle={false} />
+        <OurMethod beforeAfterImages={quoteDetails?.images_gallery} showTitle={false} />
       </div>
 
       {!!warningMsg && (

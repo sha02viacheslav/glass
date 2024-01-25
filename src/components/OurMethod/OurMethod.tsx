@@ -1,7 +1,7 @@
 import './Ourmethod.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { BeforeAfterType } from '@glass/enums'
@@ -27,9 +27,19 @@ function SliderPrevArrow(props: CustomArrowProps) {
   )
 }
 
-export type OurMethodProps = { showTitle?: boolean }
+export type OurMethodProps = {
+  beforeAfterType?: BeforeAfterType
+  beforeAfterImages?: BeforeAfter[]
+  showTitle?: boolean
+  showVideos?: boolean
+}
 
-export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
+export const OurMethod: React.FC<OurMethodProps> = ({
+  beforeAfterType,
+  beforeAfterImages,
+  showTitle = true,
+  showVideos = true,
+}) => {
   const settings = {
     dots: false,
     speed: 300,
@@ -61,14 +71,22 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
   }
 
   const getBeforeAfterImages = () => {
-    beforeAfterService(BeforeAfterType.ALL).then((res) => {
-      if (res.success) {
-        setBeforeAfterItems(res.data)
-      }
-    })
+    if (beforeAfterType) {
+      beforeAfterService(beforeAfterType).then((res) => {
+        if (res.success) {
+          setBeforeAfterItems(res.data)
+        }
+      })
+    }
   }
 
-  getBeforeAfterImages()
+  useEffect(() => {
+    if (beforeAfterImages?.length) {
+      setBeforeAfterItems(beforeAfterImages)
+    } else if (beforeAfterType) {
+      getBeforeAfterImages()
+    }
+  }, [beforeAfterType, beforeAfterImages])
 
   return (
     <section className='sec-our-method'>
@@ -76,20 +94,21 @@ export const OurMethod: React.FC<OurMethodProps> = ({ showTitle = true }) => {
         {showTitle && (
           <h1 className='fnt-48 fnt-md-60 fw-n text-dark px-4 px-md-5 pt-3 pt-md-0 mb-4 mb-md-5'>Our Method</h1>
         )}
-        <div className='row'>
-          {videos.map((item, index) => (
-            <div key={index} className='col-md-6 mb-3'>
-              <iframe
-                width='100%'
-                className='video-iframe'
-                src={'https://www.youtube.com/embed/' + item.videoId}
-                frameBorder='0'
-                allowFullScreen
-              ></iframe>
-              <label className='text-primary fnt-20 fnt-md-28 ms-2 mt-2'>{item.title}</label>
-            </div>
-          ))}
-        </div>
+        {showVideos && (
+          <div className='row'>
+            {videos.map((item, index) => (
+              <div key={index} className='col-md-6 mb-3'>
+                <iframe
+                  width='100%'
+                  className='video-iframe'
+                  src={'https://www.youtube.com/embed/' + item.videoId}
+                  allowFullScreen
+                ></iframe>
+                <label className='text-primary fnt-20 fnt-md-28 ms-2 mt-2'>{item.title}</label>
+              </div>
+            ))}
+          </div>
+        )}
         <div className='mt-2 mt-md-5'>
           <div className='position-relative'>
             <Slider {...settings}>
