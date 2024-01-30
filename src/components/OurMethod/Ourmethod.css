@@ -43,14 +43,3 @@
     z-index: 1;
   }
 }
-
-@media (max-width: 991px) {
-  .repair-details {
-    height: 0;
-    overflow: hidden;
-  }
-
-  .repair-details.fadeIn {
-    height: unset;
-  }
-}

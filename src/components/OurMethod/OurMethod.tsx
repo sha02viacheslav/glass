@@ -47,9 +47,6 @@ export const OurMethod: React.FC<OurMethodProps> = ({
     slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
-    beforeChange: () => {
-      setShowDetails(undefined)
-    },
   }
 
   const videos = [
@@ -63,7 +60,6 @@ export const OurMethod: React.FC<OurMethodProps> = ({
     },
   ]
 
-  const [showDetails, setShowDetails] = useState<number>()
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
 
   const handleTouchStartSlider = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -143,14 +139,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({
                         />
                       </div>
                     </div>
-                    <div
-                      className={
-                        'col-lg-4 bg-grey bg-md-white repair-details' + (showDetails === index ? ' fadeIn' : '')
-                      }
-                    >
+                    <div className={'col-lg-4 bg-grey bg-md-white'}>
                       <div className='p-3 p-md-4 p-lg-5'>
-                        <div className='fnt-20 fnt-md-28 text-primary mb-3'>{item.description}</div>
-                        <div className='d-flex flex-column gap-3'>
+                        <div className='fnt-20 fnt-md-28 text-primary'>{item.description}</div>
+                        <div className='d-none d-lg-flex flex-column gap-3 mt-3'>
                           <img
                             key='before-image'
                             src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
@@ -165,19 +157,6 @@ export const OurMethod: React.FC<OurMethodProps> = ({
                           />
                         </div>
                       </div>
-                    </div>
-                    <div className='d-flex d-lg-none justify-content-center p-4'>
-                      {showDetails === index ? (
-                        <button className='btn-stroked round transparent' onClick={() => setShowDetails(undefined)}>
-                          Hide Repair Details
-                          <i className='fa-solid fa-caret-up ms-2 mt-1 fnt-20'></i>
-                        </button>
-                      ) : (
-                        <button className='btn-stroked round transparent' onClick={() => setShowDetails(index)}>
-                          Repair Details
-                          <i className='fa-solid fa-caret-down ms-2 fnt-20'></i>
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

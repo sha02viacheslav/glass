@@ -24,17 +24,19 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
 
   return (
     <header id='navbar-main'>
-      <div className='bg-primary d-md-none p-2'>
-        <div className='d-flex align-items-center justify-content-center gap-3'>
-          <button className='btn-stroked round' onClick={directToCustomer}>
-            Get a Quote
-          </button>
-          <div className='header-or-call text-white'>or call</div>
-          <a href={`tel:${PHONE_NUMBER}`} className='header-phone-number text-white'>
-            {PHONE_NUMBER}
-          </a>
+      {showMenu && (
+        <div className='bg-primary d-md-none p-2'>
+          <div className='d-flex align-items-center justify-content-center gap-3'>
+            <button className='btn-stroked round' onClick={directToCustomer}>
+              Get a Quote
+            </button>
+            <div className='header-or-call text-white'>or call</div>
+            <a href={`tel:${PHONE_NUMBER}`} className='header-phone-number text-white'>
+              {PHONE_NUMBER}
+            </a>
+          </div>
         </div>
-      </div>
+      )}
 
       <nav id='navbar_top' className='navbar navbar-expand-lg navbar-light py-3 py-md-0'>
         <div className='container'>

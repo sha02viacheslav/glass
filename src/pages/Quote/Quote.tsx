@@ -568,9 +568,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               <div className='client-info-blink'>-</div>
             </Tooltip>
           )}
-          <div id='scroll-to-top' className='info-container'>
-            <div className='fnt-28 fnt-md-34 text-primary p-3'>Customer Details</div>
-
+          <div id='scroll-to-top' className='d-flex flex-column'>
             <div className='w-100 p-3 bg-grey'>
               <div className='fnt-20 fnt-md-28 text-primary'>Registry</div>
               <div className='fnt-14 fnt-md-16 text-grey mt-2'>
@@ -583,7 +581,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             </div>
 
             <div className='w-100 p-3'>
-              <div className='fnt-20 fnt-md-28 text-primary mb-2'>Vehicle Details</div>
               <LicensePlate
                 placeholderVal={'ENTER REG'}
                 licenseNumber={tempLicenseNum}

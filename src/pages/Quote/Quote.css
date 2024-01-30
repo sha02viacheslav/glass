@@ -65,15 +65,6 @@
   text-align: center;
 }
 
-.info-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  background-color: rgb(255, 255, 255);
-}
-
 .edit-btn-container {
   height: 100%;
   width: 120px;
