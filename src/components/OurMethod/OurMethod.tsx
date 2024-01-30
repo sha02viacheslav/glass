@@ -54,11 +54,11 @@ export const OurMethod: React.FC<OurMethodProps> = ({
 
   const videos = [
     {
-      videoId: 'E23mQ-SrRpI',
+      videoId: '1750125599635468648',
       title: 'Ford Transit 2015 Windscreen Replacement',
     },
     {
-      videoId: 'OsT-qAPEs4Q',
+      videoId: '1750125069769056477',
       title: 'KIA EV6 windscreen replacement',
     },
   ]
@@ -88,6 +88,17 @@ export const OurMethod: React.FC<OurMethodProps> = ({
     }
   }, [beforeAfterType, beforeAfterImages])
 
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://platform.twitter.com/widgets.js'
+    script.async = true
+    document.body.appendChild(script)
+
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
+
   return (
     <section className='sec-our-method'>
       <div className='container p-0'>
@@ -98,12 +109,11 @@ export const OurMethod: React.FC<OurMethodProps> = ({
           <div className='row'>
             {videos.map((item, index) => (
               <div key={index} className='col-md-6 mb-3'>
-                <iframe
-                  width='100%'
-                  className='video-iframe'
-                  src={'https://www.youtube.com/embed/' + item.videoId}
-                  allowFullScreen
-                ></iframe>
+                <div>
+                  <blockquote className='twitter-tweet' data-media-max-width='648'>
+                    <a href={'https://twitter.com/fix_glass_/status/' + item.videoId + '?ref_src=twsrc%5Etfw'}></a>
+                  </blockquote>
+                </div>
                 <label className='text-primary fnt-20 fnt-md-28 ms-2 mt-2'>{item.title}</label>
               </div>
             ))}
