@@ -21,7 +21,7 @@ export const Contact: React.FC = () => {
               </p>
               <div className='row'>
                 <div className='col-md-6'>
-                  <h5 className='text-blue fw-normal mt-mob-h'>Registered office</h5>
+                  <h5 className='text-blue fw-normal mt-mob-h'>Registered Office</h5>
                   <p>
                     85 Great Portland Street
                     <br />
