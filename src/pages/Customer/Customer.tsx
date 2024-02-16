@@ -1,6 +1,6 @@
 import './Customer.css'
 import React, { useEffect, useState } from 'react'
-import { OutlinedInput } from '@mui/material'
+import { FormControl, FormControlLabel, OutlinedInput, Radio, RadioGroup } from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -12,7 +12,7 @@ import { ChangeAddress } from '@glass/components/ChangeAddress'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { AddressType, BeforeAfterType, CarType } from '@glass/enums'
+import { AddressType, BeforeAfterType, CarType, WorkingPlace } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, Attachment, BeforeAfter, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
@@ -37,7 +37,7 @@ export type CustomerForm = {
 
 export enum FormFieldIds {
   REGISTRATION_NUMBER = 'registrationNumber',
-  GLASS_LLOCATION = 'glassLocation',
+  GLASS_LOCATION = 'glassLocation',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
   EMAIL = 'email',
@@ -61,6 +61,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [fixingAddressText, setFixingAddressText] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
+  const [workingPlace, setWorkingPlace] = useState<WorkingPlace>(WorkingPlace.MOBILE)
 
   const validationSchema = object({
     registrationNumber: string()
@@ -107,7 +108,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const brokenWindowsToCustomer = (windows: string[]) => {
     setSelectedBrokenWindows(windows)
     formik.setFieldValue(
-      FormFieldIds.GLASS_LLOCATION,
+      FormFieldIds.GLASS_LOCATION,
       (selectedBrokenWindows || []).map((item) => item.toLowerCase()),
     )
   }
@@ -135,7 +136,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (formik.errors.registrationNumber) {
       scrollToElementWithOffset(FormFieldIds.REGISTRATION_NUMBER, 100)
     } else if (formik.errors.glassLocation) {
-      scrollToElementWithOffset(FormFieldIds.GLASS_LLOCATION, 100)
+      scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
     } else if (formik.errors.firstName) {
       scrollToElementWithOffset(FormFieldIds.FIRST_NAME, 100)
     } else if (formik.errors.lastName) {
@@ -179,6 +180,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       glass_location: values.glassLocation,
       customer_comment: comment,
       customer_attachments: attachments,
+      working_place: workingPlace,
     }
 
     if (quoteDetails) {
@@ -271,6 +273,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       handleChangeBillingAddres(quoteDetails.invoice_address)
       setFixingAddressText(formatAddress(quoteDetails.delivery_address))
       setComments(quoteDetails.customer_comments?.reverse() || [])
+      setWorkingPlace(quoteDetails.working_place)
       formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails?.customer_f_name)
       formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails?.customer_s_name)
       formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails?.customer_email)
@@ -335,7 +338,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <div className='row mt-4 mt-md-5 text-center'>
                 <div className='col-md-9 mx-auto'>
                   <div>
-                    <div id={FormFieldIds.GLASS_LLOCATION}>
+                    <div id={FormFieldIds.GLASS_LOCATION}>
                       <h2 className='fnt-48 fnt-md-60 fw-n text-primary'>Select Glasses </h2>
                       <div className='fnt-20 fnt-md-28 text-primary'>Tap directly or select below</div>
                     </div>
@@ -354,6 +357,41 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       />
 
                       <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Place of Invervention</div>
+
+                      <div className='invervention-wrap'>
+                        <FormControl>
+                          <RadioGroup
+                            row
+                            value={workingPlace}
+                            onChange={(_, value) => setWorkingPlace(value as WorkingPlace)}
+                          >
+                            <FormControlLabel
+                              value={WorkingPlace.MOBILE}
+                              control={
+                                <Radio
+                                  sx={{
+                                    color: '#9a73dd',
+                                    '&.Mui-checked': { color: '#9a73dd' },
+                                  }}
+                                />
+                              }
+                              label='At your home / work'
+                            />
+                            <FormControlLabel
+                              value={WorkingPlace.WORKSHOP}
+                              control={
+                                <Radio
+                                  sx={{
+                                    color: '#9a73dd',
+                                    '&.Mui-checked': { color: '#9a73dd' },
+                                  }}
+                                />
+                              }
+                              label='Our Workshop'
+                            />
+                          </RadioGroup>
+                        </FormControl>
+                      </div>
 
                       <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Your comments (optional)</div>
                       {comments.map((item, index) => (

@@ -1,4 +1,4 @@
-import { CustomerChatState } from '@glass/enums'
+import { CustomerChatState, WorkingPlace } from '@glass/enums'
 
 export type CommentAttachment = {
   name: string
@@ -32,4 +32,5 @@ export type QuoteDto = {
   customer_attachments?: CommentAttachment[]
   customer_chat_state?: CustomerChatState
   fe_requested_url?: string
+  working_place?: WorkingPlace
 }
