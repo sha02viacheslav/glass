@@ -34,8 +34,7 @@ export type Quote = {
   model: string
   customer_comments: Comment[]
   payment_transaction: {
-    assist_4_payment: PaTransaction[]
-    stripe: PaTransaction[]
+    [key: string]: PaTransaction[]
   }
   customer_chat_state: string
   live_chat_url: string

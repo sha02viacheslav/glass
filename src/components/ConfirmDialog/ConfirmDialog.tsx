@@ -1,3 +1,4 @@
+import './ConfirmDialog.css'
 import React, { ReactNode } from 'react'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Box, Modal, Typography } from '@mui/material'
@@ -70,11 +71,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             }}
           >
             {showCancel && (
-              <button className='btn-stroked round' onClick={onCancel}>
+              <button className='btn-stroked round confirm-button' onClick={onCancel}>
                 {cancelStr}
               </button>
             )}
-            <button className='btn-raised round' onClick={onConfirm}>
+            <button className='btn-raised round confirm-button' onClick={onConfirm}>
               {confirmStr}
             </button>
           </Box>
