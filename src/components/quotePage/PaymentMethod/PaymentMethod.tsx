@@ -4,12 +4,19 @@ import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { Checkout } from '@glass/components/quotePage/Checkout'
-import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from '@glass/enums'
+import {
+  FixglassPaymentMethodTyp,
+  PaymentMethodType,
+  PaymentOptionEnum,
+  PaymentStatus,
+  QuoteAction,
+} from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
-import { Address, MonthlyPayment, PaymentOptionDto, PaymentSchedule, Quote } from '@glass/models'
+import { Address, MonthlyPayment, PaTransaction, PaymentOptionDto, PaymentSchedule, Quote } from '@glass/models'
 import { customerLogService } from '@glass/services/apis/customer-log.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
+import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
 import { paymentMethodButton } from '@glass/utils/payment-method-button/payment-method-button.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 
@@ -21,7 +28,7 @@ export type PaymentMethodProps = {
   refetchQuote: () => void
   PADataToParent?: (value: (string | undefined)[]) => void
   PAUrl?: string
-  method?: (value: PaymentOptionDto) => void
+  handleChangePaymentMethod?: (value: PaymentOptionDto) => void
   handleShowEmailMissing: () => void
 }
 
@@ -33,7 +40,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   refetchQuote,
   PADataToParent,
   PAUrl,
-  method,
+  handleChangePaymentMethod,
   handleShowEmailMissing,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentOptionEnum>(PaymentOptionEnum.NONE)
@@ -55,10 +62,18 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [showCashConfirm, setShowCashConfirm] = useState<boolean>(false)
   const [showEmailMissingPopup, setShowEmailMissingPopup] = useState<boolean>(false)
 
+  const months = useMemo<number>(() => {
+    return isFourMonths(totalPrice) ? 4 : 6
+  }, [totalPrice])
+
+  const transactions = useMemo<PaTransaction[]>(() => {
+    return quoteDetails?.payment_transaction?.[quoteDetails?.payment_method_type] || []
+  }, [quoteDetails])
+
   const emptyMonthlyPayments = useMemo<MonthlyPayment | undefined>(() => {
     if (quoteDetails?.date_order) {
       const schedules: PaymentSchedule[] = []
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < months; i++) {
         schedules.push({ date: moment(quoteDetails?.date_order).add(i, 'months').format('YYYY-MM-DD'), amount: 0 })
       }
       return {
@@ -71,7 +86,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       }
     }
     return undefined
-  }, [quoteDetails?.date_order])
+  }, [quoteDetails?.date_order, months])
 
   const updateExcess = () => {
     if (excessRef?.current?.value) setExcess(Number(excessRef.current.value))
@@ -162,11 +177,16 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       qid &&
       quoteDetails?.is_published &&
       paymentStatus !== PaymentStatus.PAID &&
-      selectedMethod === PaymentOptionEnum.FOUR_MONTH &&
+      selectedMethod === PaymentOptionEnum.MONTH_INSTALLMENT &&
       !monthlyPayments
     ) {
       // retrieve payment assist plan data
-      getPaymentAssistPlanService(qid).then((res) => {
+      getPaymentAssistPlanService(
+        qid,
+        isFourMonths(totalPrice)
+          ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
+          : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
+      ).then((res) => {
         if (res.success) {
           setMonthlyPayments(res.data)
         }
@@ -176,8 +196,10 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const handleChangePaymentOption = (method: PaymentOptionEnum) => {
     setSelectedMethod(method)
-    if (method === PaymentOptionEnum.FOUR_MONTH) {
-      handleChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)
+    if (method === PaymentOptionEnum.MONTH_INSTALLMENT) {
+      handleChangePaymentMethodType(
+        isFourMonths(totalPrice) ? PaymentMethodType.ASSIST_FOUR_PAYMENT : PaymentMethodType.ASSIST_SIX_PAYMENT,
+      )
     }
     scrollToElementWithOffset('quote-card', -16)
   }
@@ -190,8 +212,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (quoteDetails?.payment_method_type) {
       setPaymentMethodType(quoteDetails.payment_method_type)
       switch (quoteDetails.payment_method_type) {
-        case PaymentMethodType.ASSIST_FOUR_PAYMENT: {
-          setSelectedMethod(PaymentOptionEnum.FOUR_MONTH)
+        case PaymentMethodType.ASSIST_FOUR_PAYMENT:
+        case PaymentMethodType.ASSIST_SIX_PAYMENT: {
+          setSelectedMethod(PaymentOptionEnum.MONTH_INSTALLMENT)
           break
         }
         case PaymentMethodType.STRIPE:
@@ -233,7 +256,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     } else if (!startPAProcess) {
       msg = QuoteAction.GO_PAYMENT
     }
-    if (method) method({ p_option: selectedMethod, detail: msg })
+    if (handleChangePaymentMethod) handleChangePaymentMethod({ p_option: selectedMethod, detail: msg })
   }, [selectedMethod, startPAProcess, PAUrl])
 
   return (
@@ -245,11 +268,11 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             <div className='col-md-6'>
               <button
                 className={
-                  'btn-stroked round w-100' + (selectedMethod === PaymentOptionEnum.FOUR_MONTH ? ' active' : '')
+                  'btn-stroked round w-100' + (selectedMethod === PaymentOptionEnum.MONTH_INSTALLMENT ? ' active' : '')
                 }
-                onClick={() => handleChangePaymentOption(PaymentOptionEnum.FOUR_MONTH)}
+                onClick={() => handleChangePaymentOption(PaymentOptionEnum.MONTH_INSTALLMENT)}
               >
-                4 Month £ {(totalPrice / 4).toFixed(2)}
+                {months} Month £ {(totalPrice / months).toFixed(2)}
               </button>
             </div>
             {/*<button*/}
@@ -275,11 +298,11 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       {paymentStatus !== PaymentStatus.PAID && (
         <div className='PM-payment-option bg-grey'>
-          {selectedMethod === PaymentOptionEnum.FOUR_MONTH && (
+          {selectedMethod === PaymentOptionEnum.MONTH_INSTALLMENT && (
             <div>
-              <p className='text-purple mb-2'>4-Month</p>
+              <p className='text-purple mb-2'>{months}-Month</p>
               <div>
-                <p>{(monthlyPayments || emptyMonthlyPayments)?.summary}</p>
+                <p className='mb-3'>{(monthlyPayments || emptyMonthlyPayments)?.summary}</p>
                 <div className='PA-plan-container'>
                   {(monthlyPayments || emptyMonthlyPayments)?.schedule.map((element) => (
                     <div className='PA-plan-element' key={element.date}>
@@ -292,9 +315,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 </div>
               </div>
 
-              {!!quoteDetails?.payment_transaction?.assist_4_payment?.length && (
+              {!!transactions?.length && (
                 <div className='pt-4 pb-4'>
-                  {quoteDetails?.payment_transaction?.assist_4_payment?.map((transaction) => (
+                  {transactions?.map((transaction) => (
                     <div key={transaction.id} className='d-flex justify-content-between align-items-center mt-2'>
                       <a className='transaction-name' href={transaction.url} rel='noopener noreferrer' target='_blank'>
                         {transaction.token}

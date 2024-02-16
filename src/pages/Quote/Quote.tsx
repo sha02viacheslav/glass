@@ -18,7 +18,15 @@ import { OrderInformation } from '@glass/components/quotePage/OrderInformation'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
-import { OrderState, PaymentOptionEnum, PaymentStatus, QuoteAction, QuoteStep, WorkingPlace } from '@glass/enums'
+import {
+  FixglassPaymentMethodTyp,
+  OrderState,
+  PaymentOptionEnum,
+  PaymentStatus,
+  QuoteAction,
+  QuoteStep,
+  WorkingPlace,
+} from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import {
   Address,
@@ -41,6 +49,7 @@ import { updateDeliveryAddressService } from '@glass/services/apis/update-delive
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 
@@ -173,7 +182,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     // create payment API call
     if (id) {
       trackPromise(
-        beginPaymentAssistService(id).then((res) => {
+        beginPaymentAssistService(
+          id,
+          isFourMonths(totalPrice)
+            ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
+            : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
+        ).then((res) => {
           if (res.success) {
             window.open(res.data.url, '_blank', 'noreferrer')
             setPAUrl(res.data.url)
@@ -326,7 +340,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     setDeliveryAddress(data)
   }
 
-  const paymentOptionToParent = (pOption: PaymentOptionDto) => {
+  const handleChangePaymentMethod = (pOption: PaymentOptionDto) => {
     setPaymentOption(pOption)
   }
 
@@ -495,7 +509,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       acceptSelector?.classList.remove('quote-accept')
     } else if (snapValue === QuoteStep.TIMESLOT) {
       if (quoteDetails?.invoice_data?.payment_state !== PaymentStatus.PAID) {
-        if (paymentOption.p_option === PaymentOptionEnum.FOUR_MONTH) {
+        if (paymentOption.p_option === PaymentOptionEnum.MONTH_INSTALLMENT) {
           setAcceptBtn(paymentOption.detail)
         } else {
           setAcceptBtn(QuoteAction.GO_PAYMENT)
@@ -694,7 +708,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                 refetchQuote={getQuote}
                 PADataToParent={PADataToParent}
                 PAUrl={PAUrl}
-                method={paymentOptionToParent}
+                handleChangePaymentMethod={handleChangePaymentMethod}
                 handleShowEmailMissing={() => {
                   setEmailMissing(true)
                   scrollToElementWithOffset('scroll-to-top')
