@@ -30,6 +30,11 @@ export const Home: React.FC = () => {
     navigate(`/services?serviceKey=${key}`)
   }
 
+  const scrollDown = () => {
+    console.warn(window.innerHeight)
+    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+  }
+
   useEffect(() => {
     localStorage.setItem('development version', JSON.stringify('1.1.7'))
   }, [])
@@ -37,35 +42,57 @@ export const Home: React.FC = () => {
   return (
     <div className='home'>
       <section className='sec-banner'>
-        <div className='container'>
-          <h2 className='fnt-48 fnt-md-60 fw-n text-white px-5'>
-            We <img src={PUBLIC_URL + '/images/heart.png'} className='img-fluid heart' alt='' /> to replace glasses.
-            <br />
-            At your home or work!
-          </h2>
+        <div className='px-3 mt-auto'>
+          <div>
+            <div>
+              <div className='d-flex align-items-center'>
+                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                <div className='lh-15 text-white ms-1'>5.0</div>
+                <img src={process.env.PUBLIC_URL + '/images/google.png'} className='img-fluid ms-1' alt='' />
+                <div className='lh-15 text-white ms-2'>reviews</div>
+              </div>
+            </div>
+            <h2 className='fnt-30 fnt-md-60 fw-n lh-12 text-white mt-3'>
+              New OEM and OEE glass replacement with crash tested glue
+            </h2>
+            <div className='lh-16 text-gray-400 text-uppercase mt-25'>Done where you are</div>
+          </div>
+
+          <div className='d-flex flex-column align-items-center mt-5'>
+            <LicensePlate
+              placeholderVal={'ENTER REG.'}
+              licenseNumber={licenseSearchVal}
+              showEdit={false}
+              handleVehInputChange={handleVehInputChange}
+            />
+            <button onClick={directToCustomer} className='btn-raised fnt-18 col-12 col-md-auto py-3 mt-25'>
+              Get a Quote
+            </button>
+            <div className='d-flex gap-3 mt-2'>
+              <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
+              <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
+              <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
+              <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
+              <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
+              <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
+            </div>
+            <div className='d-flex justify-content-center mt-35'>
+              <img
+                src={process.env.PUBLIC_URL + '/images/scroll-down.svg'}
+                className='img-fluid cursor-pointer'
+                alt=''
+                onClick={scrollDown}
+              />
+            </div>
+          </div>
         </div>
       </section>
 
       <div className='d-flex flex-column flex-md-column-reverse'>
-        <section className='sec-quote'>
-          <div className='d-flex flex-column align-items-center p-3'>
-            <div>
-              <label className='text-grey fnt-14 mb-2 ms-5'>Insert your Vehicle Registration Number</label>
-              <div className='d-flex flex-column flex-md-row align-items-center gap-4'>
-                <LicensePlate
-                  placeholderVal={'ENTER REG'}
-                  licenseNumber={licenseSearchVal}
-                  showEdit={false}
-                  handleVehInputChange={handleVehInputChange}
-                />
-                <button onClick={directToCustomer} className='btn-raised round col-12 col-md-auto'>
-                  Get a Quote
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className='sec-description'>
           <div className='container'>
             <p className='text-primary fnt-20 fnt-md-32 px-md-5'>

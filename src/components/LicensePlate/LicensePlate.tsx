@@ -1,7 +1,6 @@
 import './license-plate.css'
 import React, { useCallback, useEffect, useState } from 'react'
 import { debounce } from 'lodash'
-import flag from '@glass/assets/icons/uk-flag.png'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type LicensePlateProps = {
@@ -45,9 +44,9 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
     <div className='d-flex flex-column flex-md-row align-items-center align-items-md-start gap-md-3'>
       <div className='left-container'>
         <div className='yellow-box'>
-          <div className='blue-box d-flex justify-content-center align-items-center'>
-            <img className='flag' src={flag} alt='' />
-            <div className='gb fw-b'>UK</div>
+          <div className='blue-box d-flex flex-column justify-content-end align-items-center'>
+            <img src={process.env.PUBLIC_URL + '/images/uk-flag.svg'} className='img-fluid' alt='' />
+            <div className='gb'>UK</div>
           </div>
           <input
             className='license-input'

@@ -74,23 +74,11 @@ p {
 .bg-purple {
   background: #9557e8;
 }
-nav#navbar_top {
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 16%);
-  background: #fff;
-}
 .fixed-top {
   top: -40px;
   transform: translateY(40px);
   transition: transform 0.3s;
   transition: 0.3s;
-}
-.navbar-light .navbar-nav .nav-link {
-  font-weight: 600;
-  font-size: 17px;
-  color: #461a81;
-  margin-right: 40px;
-  position: relative;
-  padding: 16px 0;
 }
 
 .navbar .navbar-nav .nav-link:before {
@@ -271,12 +259,6 @@ button.slick-arrow {
   right: -52px;
 }
 
-.main-content {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 22px;
-  color: #484848;
-}
 .text-justify {
   text-align: justify;
 }
@@ -869,51 +851,16 @@ button.btn.btn-submit {
 }
 
 /*================mobile nav===================*/
-@media (min-width: 320px) and (max-width: 767px) {
-  .toggle-button {
-    display: block !important;
-  }
-  button.navbar-toggler {
-    display: none;
-  }
-}
-
 .toggle-active .top {
   -webkit-transform: translateY(6px) translateX(0) rotate(45deg);
 }
 
-.toggle-active .bar {
-  background-color: #66d3df;
-}
 .toggle-active .middle {
   opacity: 0;
 }
 
 .toggle-active .bottom {
   -webkit-transform: translateY(-12px) translateX(0) rotate(-45deg);
-}
-
-.toggle-active .bar {
-  background-color: #66d3df;
-}
-
-.bar {
-  background-color: var(--primary-color);
-  display: block;
-  width: 100%;
-  height: 4px;
-  border: 0;
-  -webkit-transition: all 0.35s ease;
-  transition: all 0.35s ease;
-}
-.toggle-button {
-  display: none;
-  top: 58px;
-  right: 6px;
-  height: 17px;
-  width: 35px;
-  cursor: pointer;
-  z-index: 30;
 }
 
 .code-content .form-control {
@@ -963,12 +910,6 @@ Media Queries
     line-height: 30px;
     text-align: center;
 
-    color: #484848;
-  }
-  .main-content {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 24px;
     color: #484848;
   }
   .c-content {
@@ -1022,22 +963,8 @@ Media Queries
   }
 }
 @media (max-width: 767px) {
-  .toggle-button {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: space-between;
-  }
   .testmon-box {
     width: 300px;
-  }
-  div#navbarSupportedContent {
-    position: absolute;
-    top: 99%;
-    width: inherit;
-    background: #fff;
-    left: 0px;
-    padding: 20px 20px;
-    z-index: 1;
   }
   .navbar-light .navbar-nav .nav-link {
     font-weight: 600;
@@ -1187,13 +1114,6 @@ Media Queries
     width: 100%;
     padding: 30px 20px;
     text-align: center;
-  }
-  .main-content {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 17px;
-    color: #484848;
-    margin-bottom: 0px !important;
   }
   .order-change {
     order: 2;

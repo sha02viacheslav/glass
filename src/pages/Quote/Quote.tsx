@@ -51,6 +51,7 @@ import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
+import { setQuoteId } from '@glass/utils/session/session.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 
 export type QuoteProps = {
@@ -110,6 +111,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   const getQuote = () => {
     if (id) {
+      setQuoteId(id)
       trackPromise(
         getQuoteService(id, quoteCount).then((res) => {
           if (res.success) {

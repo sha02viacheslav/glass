@@ -2,24 +2,15 @@
   position: relative;
   background: url(../../../public/images/home-banner.png) no-repeat;
   background-size: cover;
-  height: 560px;
+  height: 100vh;
   display: flex;
   align-items: center;
-  z-index: -1;
-}
-
-.home .sec-banner .heart {
-  margin-top: -8px;
 }
 
 .home .sec-description {
   padding: 32px;
   background: var(--bg-color);
   color: var(--primary-color);
-}
-
-.home .sec-quote {
-  background: var(--white-color);
 }
 
 .home .sec-services {
@@ -99,17 +90,9 @@
 }
 
 @media (max-width: 767px) {
-  .home .sec-banner {
-    height: 240px;
-  }
-
   .home .sec-description {
     padding: 24px 4px;
     background: var(--white-color);
-  }
-
-  .home .sec-quote {
-    background: var(--bg-color);
   }
 
   .home .sec-services {

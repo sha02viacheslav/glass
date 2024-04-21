@@ -1,14 +1,11 @@
 .yellow-box {
   display: flex;
   overflow: hidden;
-  background-color: #fdd835;
-  width: 312px;
-  height: 80px;
-  border-radius: 4px;
+  min-width: 312px;
+  border-radius: 2px;
   text-align: center;
   vertical-align: middle;
   box-shadow: 0 0 5px rgb(0 0 0 / 0.6);
-  padding: 8px;
 }
 
 .license-number {
@@ -16,13 +13,8 @@
 }
 
 .blue-box {
-  width: 28px;
-  margin-right: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 7px;
+  padding: 0px 8px 4px;
+  background: #1165b3;
 }
 
 .flag {
@@ -30,22 +22,26 @@
 }
 
 .gb {
-  display: inline-block;
   margin-top: 4px;
   font-size: 14px;
-  color: var(--dark-color);
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--white-color);
 }
 
 .license-input {
-  background: none;
-  border: solid 1px var(--black-color);
-  border-radius: 8px;
+  background: #fff;
+  border: none;
   width: 100%;
-  font-weight: 400;
-  font-size: 50px;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 1;
   font-family: 'UKNumberPlate';
-  margin-left: 5px;
   padding: 8px;
+  color: var(--Gray-800, #14151f);
+}
+.license-input::placeholder {
+  color: #cfcfcf;
 }
 
 .edit-btn {
