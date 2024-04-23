@@ -92,16 +92,14 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      <div className='d-flex flex-column flex-md-column-reverse'>
-        <section className='sec-description'>
-          <div className='container'>
-            <p className='text-primary fnt-20 fnt-md-32 px-md-5'>
-              Wherever you are, whichever model you drive, we got you covered. We offer windscreen repairs and
-              replacements for passenger vehicles and vans. All jobs are done by professionals at your home or work.
-            </p>
-          </div>
-        </section>
-      </div>
+      <section className='sec-description'>
+        <div className='title'>All Brands From Mini Cooper to Range Rover, we got you covered</div>
+        <div className='description mt-3'>
+          We offer glass replacement for passenger vehicles and vans.
+          <br />
+          All jobs are done by professionals at your home, workplace or at our workshop, wherever you please.
+        </div>
+      </section>
 
       <OurMethod beforeAfterType={BeforeAfterType.ALL} />
 

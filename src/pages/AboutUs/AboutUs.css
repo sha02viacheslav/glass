@@ -12,7 +12,7 @@
   z-index: -1;
 }
 
-.sec-description {
+.about-us .sec-description {
   padding: 32px;
   background: var(--bg-color);
   color: var(--primary-color);
