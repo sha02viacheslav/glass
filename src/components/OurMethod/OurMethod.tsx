@@ -54,10 +54,10 @@ export const OurMethod: React.FC<OurMethodProps> = ({
       videoId: '1750125599635468648',
       title: 'Ford Transit 2015 Windscreen Replacement',
     },
-    {
-      videoId: '1750125069769056477',
-      title: 'KIA EV6 windscreen replacement',
-    },
+    // {
+    //   videoId: '1750125069769056477',
+    //   title: 'KIA EV6 windscreen replacement',
+    // },
   ]
 
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
@@ -98,29 +98,37 @@ export const OurMethod: React.FC<OurMethodProps> = ({
   return (
     <section className='sec-our-method'>
       <div className='container p-0'>
-        {showTitle && (
-          <h1 className='fnt-48 fnt-md-60 fw-n text-dark px-4 px-md-5 pt-3 pt-md-0 mb-4 mb-md-5'>Our Method</h1>
-        )}
-        {showVideos && (
-          <div className='row'>
-            {videos.map((item, index) => (
-              <div key={index} className='col-md-6 mb-3'>
-                <div>
-                  <blockquote className='twitter-tweet' data-media-max-width='648'>
-                    <a href={'https://twitter.com/fix_glass_/status/' + item.videoId + '?ref_src=twsrc%5Etfw'}></a>
-                  </blockquote>
-                </div>
-                <label className='text-primary fnt-20 fnt-md-28 ms-2 mt-2'>{item.title}</label>
-              </div>
-            ))}
-          </div>
-        )}
+        {showTitle && <h1 className='title'>Examples of our work</h1>}
+
         <div className='mt-2 mt-md-5'>
-          <div className='position-relative'>
+          <div className='example-work-container'>
             <Slider {...settings}>
               {beforeAfterItems.map((item, index) => (
                 <div key={index} className='item'>
-                  <div className='row g-0'>
+                  <div className='row g-0 example-work-card'>
+                    <div className={'col-lg-4 bg-grey bg-md-white'}>
+                      <div className='mb-3'>
+                        <div className='d-flex align-items-center justify-content-between'>
+                          <div className='example-work-title'>BMW 1 Series mk2</div>
+                          <div className='model'>Model year 2011</div>
+                        </div>
+                        <div className='description'>{item.description}</div>
+                        <div className='d-none d-lg-flex flex-column gap-3 mt-3'>
+                          <img
+                            key='before-image'
+                            src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
+                            className='img-fluid extra-image'
+                            alt=''
+                          />
+                          <img
+                            key='after-image'
+                            src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
+                            className='img-fluid extra-image'
+                            alt=''
+                          />
+                        </div>
+                      </div>
+                    </div>
                     <div className='col-lg-8'>
                       <div className='before-after-img-wrap' onTouchStart={(e) => handleTouchStartSlider(e)}>
                         <ReactCompareSlider
@@ -139,33 +147,33 @@ export const OurMethod: React.FC<OurMethodProps> = ({
                         />
                       </div>
                     </div>
-                    <div className={'col-lg-4 bg-grey bg-md-white'}>
-                      <div className='p-3 p-md-4 p-lg-5'>
-                        <div className='fnt-20 fnt-md-28 text-primary'>{item.description}</div>
-                        <div className='d-none d-lg-flex flex-column gap-3 mt-3'>
-                          <img
-                            key='before-image'
-                            src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
-                            className='img-fluid extra-image'
-                            alt=''
-                          />
-                          <img
-                            key='after-image'
-                            src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
-                            className='img-fluid extra-image'
-                            alt=''
-                          />
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))}
             </Slider>
 
-            <div className='fnt-20 text-primary prev-next d-md-none'>Prev // Next</div>
+            {/* <div className='fnt-20 text-primary prev-next d-md-none'>Prev // Next</div> */}
           </div>
         </div>
+
+        {showVideos && (
+          <div className='row sec-video'>
+            <div className='sec-video-title'>Glass replacement in action</div>
+            <div className='sec-video-description'>
+              Watch as our skilled technicians expertly replace windshields with precision and care.
+            </div>
+            {videos.map((item, index) => (
+              <div key={index} className='col-md-6 mb-3 video-card'>
+                <label className='video-card-title'>{item.title}</label>
+                <div>
+                  <blockquote className='twitter-tweet' data-media-max-width='648'>
+                    <a href={'https://twitter.com/fix_glass_/status/' + item.videoId + '?ref_src=twsrc%5Etfw'}></a>
+                  </blockquote>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

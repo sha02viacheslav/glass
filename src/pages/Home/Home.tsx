@@ -101,6 +101,67 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
+      <section className='sec-work'>
+        <div className='title'>How we work</div>
+        <div className='d-flex flex-column gap-2'>
+          <div className='work-card'>
+            <div className='card-content'>
+              <div className='title'>STEP 1</div>
+              <div className='description'>
+                Fill out the short quote form <a>here</a>
+              </div>
+            </div>
+            <div className='img-wrap'>
+              <img src={process.env.PUBLIC_URL + '/images/step1.png'} />
+            </div>
+          </div>
+          <div className='work-card'>
+            <div className='card-content'>
+              <div className='title'>STEP 2</div>
+              <div className='description'>
+                We find correct brand new OEM or OEE glass and update your online quote link ASAP, most cases in
+                minutes.
+              </div>
+            </div>
+            <div className='img-wrap'>
+              <img src={process.env.PUBLIC_URL + '/images/step2.png'} />
+            </div>
+          </div>
+          <div className='work-card'>
+            <div className='card-content'>
+              <div className='title'>STEP 3</div>
+              <div className='description'>
+                Pay upfront cost of the monthly instalment plan or full credit card payment, then confirm your booking
+                date and location. Everything is done online.
+              </div>
+            </div>
+            <div className='img-wrap'>
+              <img src={process.env.PUBLIC_URL + '/images/step3.png'} />
+              <div className='payment-options'>
+                <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
+                <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
+              </div>
+            </div>
+          </div>
+          <div className='work-card'>
+            <div className='card-content'>
+              <div className='title'>STEP 4</div>
+              <div className='description'>
+                You&apos;ll see booking confirmation from your link with Live tracking, our technician will keep you
+                updated when job is done and you can drive your car.
+              </div>
+            </div>
+            <div className='img-wrap'>
+              <img src={process.env.PUBLIC_URL + '/images/step4.png'} />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <OurMethod beforeAfterType={BeforeAfterType.ALL} />
 
       <section className='sec-services'>

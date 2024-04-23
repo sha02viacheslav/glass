@@ -240,17 +240,16 @@ p {
 }
 
 button.slick-arrow {
-  background: #9557e8;
-  border-radius: 50px;
+  background: var(--Gray-800, #14151F);
   border: 0px;
   z-index: 1;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   margin-top: -15px;
   position: absolute;
   top: 50%;
-  color: var(--white-color);
-  font-size: 25px;
+  color: #fafafa;
+  font-size: 24px;
 }
 .prev-arrow {
   left: -52px;
@@ -1034,15 +1033,16 @@ Media Queries
   }
   .next-arrow {
     top: unset !important;
-    bottom: -58px;
-    right: 50%;
-    transform: translateX(calc(50% + 96px));
+    bottom: -8px;
+    right: 0;
+    transform: translateY(100%);
   }
   .prev-arrow {
     top: unset !important;
-    bottom: -58px;
-    left: 50%;
-    transform: translateX(calc(-50% - 96px));
+    bottom: -8px;
+    left: unset;
+    right: 0;
+    transform: translate(-100%, 100%);
   }
   section.sec-about.section {
     padding-top: 110px;
