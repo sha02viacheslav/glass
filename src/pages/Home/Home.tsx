@@ -12,6 +12,8 @@ import { SERVICES } from '@glass/constants'
 import { BeforeAfterType } from '@glass/enums'
 import { PUBLIC_URL } from '@glass/envs'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { InstallmentBenefits } from './InstallmentBenefits'
+import { PaymentOptions } from './PaymentOptions'
 
 export const Home: React.FC = () => {
   const navigate = useNavigate()
@@ -164,42 +166,11 @@ export const Home: React.FC = () => {
 
       <OurMethod beforeAfterType={BeforeAfterType.ALL} />
 
-      <section className='sec-payment-options'>
-        <div className='title'>Our payment options</div>
-        <div>
-          <div className='payment-options-wrap'>
-            <div className='header'>
-              <img src={process.env.PUBLIC_URL + '/images/payment-options-monthly.svg'} className='img-fluid' alt='' />
-              <div>Monthly payments</div>
-            </div>
-            <ul>
-              <li>fast and easy setup with your debit card</li>
-              <li>0% interest installment plan </li>
-              <li>Pay a small deposit to secure your booking</li>
-            </ul>
-          </div>
-          <div className='payment-options-wrap'>
-            <div className='header'>
-              <img src={process.env.PUBLIC_URL + '/images/payment-options-card.svg'} className='img-fluid' alt='' />
-              <div>Debit or credit card online payment</div>
-            </div>
-            <ul>
-              <li>We accept all major credit and debit cards</li>
-            </ul>
-            <div className='cards d-flex gap-3 mt-1'>
-              <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
-            </div>
-          </div>
-        </div>
-        <div className='description'>
-          If you want to find out more, don&apos;t hesitate to call sales at <span className='phone'>07400 400469</span>
-        </div>
-      </section>
+      <PaymentOptions />
+
+      <div className='padding-64'></div>
+
+      <InstallmentBenefits />
 
       <section className='sec-services'>
         <div className='container'>
