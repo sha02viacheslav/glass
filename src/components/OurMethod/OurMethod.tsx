@@ -163,7 +163,7 @@ export const OurMethod: React.FC<OurMethodProps> = ({
               Watch as our skilled technicians expertly replace windshields with precision and care.
             </div>
             {videos.map((item, index) => (
-              <div key={index} className='col-md-6 mb-3 video-card'>
+              <div key={index} className='col-md-6 video-card'>
                 <label className='video-card-title'>{item.title}</label>
                 <div>
                   <blockquote className='twitter-tweet' data-media-max-width='648'>
