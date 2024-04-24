@@ -1,0 +1,62 @@
+.home .sec-life-time {
+  margin: 0 16px;
+  border-radius: 2px;
+  box-shadow: 0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07),
+    0px 1px 7px 0px rgba(147, 147, 147, 0.09);
+}
+
+.home .sec-life-time .sec-header {
+  height: 197px;
+  background: url(../../../public/images/high-angle-man-driving.png) lightgray center / cover no-repeat;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 2px 2px 0 0;
+}
+
+.home .sec-life-time .title {
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+  background: linear-gradient(90deg, #e8f0fe -5.37%, #bad1f7 106.22%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.home .sec-life-time .description {
+  color: var(--Gray-100, #f2f2f3);
+  font-feature-settings: 'calt' off;
+  font-family: 'Nunito Sans';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  max-width: 230px;
+  margin-top: 12px;
+}
+
+.home .sec-life-time .sec-content {
+  display: flex;
+  padding: var(--24, 24px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--32, 32px);
+  background: #fff;
+}
+
+.home .sec-life-time .sec-content .sec-content-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--Gray-800, #14151f);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.16px;
+}
