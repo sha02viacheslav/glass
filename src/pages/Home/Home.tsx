@@ -14,6 +14,7 @@ import { PUBLIC_URL } from '@glass/envs'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { InstallmentBenefits } from './InstallmentBenefits'
 import { LifeTime } from './LifeTime'
+import { Partners } from './Partners'
 import { PaymentOptions } from './PaymentOptions'
 
 export const Home: React.FC = () => {
@@ -176,6 +177,10 @@ export const Home: React.FC = () => {
       <div className='padding-64'></div>
 
       <LifeTime />
+
+      <div className='padding-64'></div>
+
+      <Partners />
 
       <div className='padding-64'></div>
 

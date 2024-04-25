@@ -1,0 +1,50 @@
+.home .sec-partners {
+  padding: 24px 0px;
+  background: #f7f5ff;
+}
+
+.home .sec-partners .title {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+}
+
+.home .sec-partners .title .bold {
+  font-weight: 800;
+}
+
+.home .sec-partners .description {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 160%;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+.home .sec-partners .premier-partners {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 160%; /* 19.2px */
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  margin-top: 48px;
+}
+
+.home .sec-partners .premier-partners-wrap {
+  display: flex;
+  align-items: center;
+  overflow: scroll;
+  padding-left: 16px;
+  width: 100%;
+}
