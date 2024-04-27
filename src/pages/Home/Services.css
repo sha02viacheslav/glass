@@ -1,0 +1,27 @@
+.home .sec-services {
+  padding: 64px;
+}
+
+@media (max-width: 767px) {
+  .home .sec-services {
+    padding: 24px;
+    background: var(--bg-color);
+  }
+}
+
+.discover-more {
+  position: relative;
+  padding-right: 60px;
+  line-height: 24px;
+}
+
+.discover-more::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 24px;
+  width: 54px;
+  background: url(../../../public/images/discover-more.png) no-repeat right;
+  background-size: contain;
+}

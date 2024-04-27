@@ -1,0 +1,73 @@
+.reviews-container {
+  margin: 12px -8px 16px;
+  position: relative;
+}
+
+.review-box {
+  margin: 0 8px;
+  height: calc(100% - 16px);
+  width: calc(100vw - 48px);
+  padding: 16px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07),
+    0px 1px 7px 0px rgba(147, 147, 147, 0.09);
+}
+
+.review-box .review-author-img {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+}
+
+.review-box .name-wrap {
+  display: flex;
+  gap: 14px;
+}
+
+.review-box .review-content {
+  color: var(--Gray-800, #14151f);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  letter-spacing: -0.16px;
+  padding-top: 12px;
+  margin-top: 16px;
+  border-top: solid 1px #f2f2f3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 180px;
+}
+
+.review-box .name {
+  color: var(--Gray-700, #474747);
+  font-feature-settings: 'calt' off;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.16px;
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+
+.review-box .date {
+  color: var(--WF-Base-600, #717d96);
+  font-feature-settings: 'calt' off;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 20px;
+  letter-spacing: -0.12px;
+  margin-top: 4px;
+}
+
+.reviews-container .slide-arrow {
+  display: none;
+}

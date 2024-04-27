@@ -29,6 +29,7 @@ body {
   color: var(--dark-color);
   font-size: 16px;
   line-height: 1.25;
+  background-color: #fafafa;
 }
 
 /* Button Styles */

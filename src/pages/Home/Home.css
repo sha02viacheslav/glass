@@ -110,10 +110,6 @@
   gap: 4px;
 }
 
-.home .sec-services {
-  padding: 64px;
-}
-
 .home .sec-payment-options .description {
   color: var(--Gray-200, #eaeaeb);
   font-size: 16px;
@@ -125,23 +121,6 @@
 
 .home .sec-payment-options .description .phone {
   font-weight: 800;
-}
-
-.discover-more {
-  position: relative;
-  padding-right: 60px;
-  line-height: 24px;
-}
-
-.discover-more::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 24px;
-  width: 54px;
-  background: url(../../../public/images/discover-more.png) no-repeat right;
-  background-size: contain;
 }
 
 .sec-selling {
@@ -184,30 +163,6 @@
   background: url(../../../public/images/list-dot.png) no-repeat left 4px;
   padding-left: 24px;
   line-height: 24px;
-}
-
-.sec-review {
-  background: var(--dark-color);
-  position: relative;
-  padding: 48px;
-}
-
-.sec-review-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 12%;
-}
-
-@media (max-width: 767px) {
-  .home .sec-services {
-    padding: 24px;
-    background: var(--bg-color);
-  }
-
-  .sec-review {
-    padding: 24px 0 80px;
-  }
 }
 
 * {
