@@ -1,0 +1,47 @@
+.home .sec-live-service {
+  display: flex;
+  padding-right: 16px;
+  margin: 0 16px;
+  align-items: stretch;
+  gap: 24px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07),
+    0px 1px 7px 0px rgba(147, 147, 147, 0.09);
+}
+
+.home .sec-live-service .sec-image {
+  width: 146px;
+  background: url(../../../public/images/live-service-bg.png) lightgray center / cover no-repeat;
+  border-radius: 2px 0 0 2px;
+}
+
+.home .sec-live-service .sec-content {
+  display: flex;
+  padding: var(--16, 16px) 0px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--8, 8px);
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.home .sec-live-service .sec-content .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 22.4px */
+  text-transform: uppercase;
+}
+
+.home .sec-live-service .sec-content .description {
+  color: var(--Gray-600, #6a6b71);
+  font-feature-settings: 'calt' off;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%; /* 27.2px */
+  letter-spacing: -0.16px;
+  margin-top: 8px;
+}
