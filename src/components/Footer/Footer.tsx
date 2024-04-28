@@ -1,4 +1,4 @@
-import './style.css'
+import './Footer.css'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { SocialLinks } from '@glass/components/Footer/SocialLinks'
@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
             <div>
               <div className='d-flex flex-column flex-lg-row align-items-lg-center'>
                 <div className='d-flex align-items-center justify-content-between mb-3'>
-                  <div className='f-logo mt-0'>
+                  <div>
                     <a href='#'>
                       <img src={process.env.PUBLIC_URL + '/images/logo.svg'} className='img-fluid' alt='' />
                     </a>

@@ -23,6 +23,7 @@ export const QuickContact: React.FC<FooterProps> = ({ showReg = true }) => {
 
   return (
     <section className='footer-top'>
+      <div className='footer-logo' />
       <div className='row'>
         <div className='col-lg-7 offset-lg-5'>
           <div className='title'>Get a Free Quote Now</div>

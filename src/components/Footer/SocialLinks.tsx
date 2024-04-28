@@ -1,4 +1,4 @@
-import './style.css'
+import './SocialLinks.css'
 import React from 'react'
 
 export const SocialLinks: React.FC = () => {

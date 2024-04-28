@@ -1,7 +1,11 @@
 .footer-top {
+  position: relative;
   padding: 48px 16px 32px;
   border-top: 1px solid var(--Light-Blue---Primary-600, #133f85);
   background: var(--Light-Blue---Primary-800, #020e21);
+}
+.footer-top .row {
+  position: inherit;
 }
 
 .footer-top .title {
@@ -26,4 +30,15 @@
 .footer-top .btn-raised {
   padding: 16px 24px;
   font-size: 18px;
+}
+
+.footer-logo {
+  width: 260px;
+  height: 64px;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(calc(-50% - 8px));
+  background: linear-gradient(180deg, rgba(2, 14, 33, 0) 0%, rgba(2, 14, 33, 1) 55%, rgba(2, 14, 33, 1) 100%),
+    url(../../../public/images/footer-logo.svg) center / contain no-repeat;
 }

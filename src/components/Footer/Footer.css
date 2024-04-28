@@ -111,28 +111,3 @@
 .sec-tree {
   position: relative;
 }
-
-.f-logo {
-  width: 64px;
-}
-
-@media (min-width: 768px) {
-  .f-logo {
-    width: 90px;
-  }
-}
-
-.social-link {
-  color: var(--white-color);
-  font-size: 24px;
-}
-
-@media (min-width: 768px) {
-  .social-link {
-    font-size: 28px;
-  }
-}
-
-.social-link:hover {
-  color: var(--white-color);
-}
