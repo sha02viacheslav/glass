@@ -188,6 +188,10 @@ export const Home: React.FC = () => {
 
       <PlantTree />
 
+      <div className='padding-64'></div>
+      <div className='padding-64'></div>
+      <div className='padding-64'></div>
+
       <Chat />
     </div>
   )

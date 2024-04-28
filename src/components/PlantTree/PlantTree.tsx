@@ -6,17 +6,12 @@ export type PlantTreeProps = {}
 export const PlantTree: React.FC<PlantTreeProps> = ({}) => {
   return (
     <section className='sec-tree'>
-      <div className='container'>
-        <div className='col-md-4 py-4 py-md-5'>
-          <p className='text-primary fnt-20 fnt-md-28'>With every glass replacement</p>
-          <p className='fnt-48 fnt-md-60 mb-3'>We plant a tree</p>
-          <p className='text-primary fnt-20 fnt-md-28 mb-2'>Trees are vital</p>
-          <p className='text-grey mb-4'>
-            As the biggest plants on the planet, they give us oxygen, store carbon, stabilize the soil and give life to
-            the world’s wildlife. Trees regulate the water cycle.
-          </p>
-          <p className='text-primary fnt-20 fnt-md-28'>All used glass will be collected and recycled</p>
-        </div>
+      <div className='title'>We Care about nature</div>
+      <div className='number'>100+</div>
+      <div className='description'>Trees planted by Fixglass.</div>
+      <div className='sec-content'>
+        Trees are vital for our planet, giving oxygen, storing carbon, and supporting wildlife. With each replacement,
+        we donate to plant new trees, helping create a greener future.
       </div>
     </section>
   )

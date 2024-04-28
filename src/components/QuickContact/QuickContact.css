@@ -1,0 +1,29 @@
+.footer-top {
+  padding: 48px 16px 32px;
+  border-top: 1px solid var(--Light-Blue---Primary-600, #133f85);
+  background: var(--Light-Blue---Primary-800, #020e21);
+}
+
+.footer-top .title {
+  color: var(--Light-Blue---Primary-000, #e8f0fe);
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.footer-top .description {
+  color: var(--Gray-100, #f2f2f3);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  margin-top: 8px;
+}
+
+.footer-top .btn-raised {
+  padding: 16px 24px;
+  font-size: 18px;
+}
