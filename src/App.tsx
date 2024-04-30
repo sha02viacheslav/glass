@@ -18,6 +18,7 @@ import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
 import { setRequestedURL } from '@glass/utils/session/session.util'
 import 'react-toastify/dist/ReactToastify.css'
+import { Comparison } from './pages/Comparison'
 import { Installments } from './pages/Installments'
 
 export const LoadingIndicator: React.FC = () => {
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
           <Route path='/services' element={<Services />} />
           <Route path='/aboutus' element={<AboutUs />} />
           <Route path='/installments' element={<Installments />} />
+          <Route path='/comparison' element={<Comparison />} />
           <Route path='/pricing' element={<Pricing />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/customer' element={<Customer />} />

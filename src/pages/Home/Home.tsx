@@ -160,7 +160,11 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
+      <div className='padding-64'></div>
+
       <OurMethod beforeAfterType={BeforeAfterType.ALL} />
+
+      <div className='padding-64'></div>
 
       <PaymentOptions />
 

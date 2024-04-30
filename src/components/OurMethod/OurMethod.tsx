@@ -106,7 +106,7 @@ export const OurMethod: React.FC<OurMethodProps> = ({
               {beforeAfterItems.map((item, index) => (
                 <div key={index} className='item'>
                   <div className='row g-0 example-work-card'>
-                    <div className={'col-lg-4 bg-grey bg-md-white'}>
+                    <div className={'col-lg-4'}>
                       <div className='mb-3'>
                         <div className='d-flex align-items-center justify-content-between'>
                           <div className='example-work-title'>BMW 1 Series mk2</div>

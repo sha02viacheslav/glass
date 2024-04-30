@@ -108,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
               <CustomLink to='/installments' onClick={() => menuToggleRef.current?.click()}>
                 Loosing money with insurance, saving with installments. How?
               </CustomLink>
-              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/comparison' onClick={() => menuToggleRef.current?.click()}>
                 FixGlass vs. others comparison
               </CustomLink>
               <CustomLink to='/contact' onClick={() => menuToggleRef.current?.click()}>
