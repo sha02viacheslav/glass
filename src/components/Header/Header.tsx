@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
               <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
                 How our repair process works?
               </CustomLink>
-              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/installments' onClick={() => menuToggleRef.current?.click()}>
                 Loosing money with insurance, saving with installments. How?
               </CustomLink>
               <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>

@@ -44,14 +44,14 @@
   margin-top: 32px;
 }
 
-.workshop-wrap {
+.contact-page .workshop-wrap {
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.workshop-wrap .list-item {
+.contact-page .workshop-wrap .list-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -62,7 +62,7 @@
   line-height: 24px;
 }
 
-.workshop-wrap .list-item .blue-link {
+.contact-page .workshop-wrap .list-item .blue-link {
   color: var(--Light-Blue---Primary-500, #225fc2);
   font-size: 16px;
   font-style: normal;

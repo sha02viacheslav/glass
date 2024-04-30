@@ -1,0 +1,110 @@
+.installments-page {
+  padding-top: 116px;
+}
+
+.installments-page .page-header {
+  padding: 0 16px 24px;
+  border-bottom: solid 1px #f2f2f2;
+}
+
+.installments-page .page-header .category {
+  color: var(--Light-Blue---Primary-600, #133f85);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+  letter-spacing: 0.84px;
+  text-transform: uppercase;
+}
+
+.installments-page .page-header .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  margin-top: 16px;
+}
+
+.installments-page .page-header .clock {
+  display: inline-flex;
+  padding: var(--4, 4px) var(--8, 8px);
+  align-items: center;
+  gap: var(--12, 12px);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--Gray-600, #6a6b71);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 12px;
+}
+
+.installments-page .summary {
+  padding: var(--16, 16px) var(--24, 24px);
+  border-radius: 0px 2px 2px 0px;
+  border-left: 3px solid var(--Light-Blue---Primary-500, #225fc2);
+  background: #fff;
+  box-shadow: 0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07),
+    0px 1px 7px 0px rgba(147, 147, 147, 0.09);
+  color: var(--Gray-800, #14151f);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 180%;
+  letter-spacing: -0.16px;
+  margin: 32px 16px;
+}
+
+.installments-page .in-this-article {
+  display: flex;
+  padding: var(--16, 16px) var(--16, 16px) var(--24, 24px) var(--16, 16px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--24, 24px);
+  background: var(--Light-Blue---Primary-000, #e8f0fe);
+  margin-top: 48px;
+}
+
+.installments-page .in-this-article .category {
+  color: var(--Gray-700, #474747);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.installments-page .in-this-article .title {
+  color: var(--Light-Blue---Primary-500, #225fc2);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  cursor: pointer;
+}
+
+.installments-page .article {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 16px;
+}
+
+.installments-page .article .title {
+  display: flex;
+  gap: 8px;
+  color: var(--Gray-800, #14151f);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+}
+
+.installments-page .article .article-content {
+  color: var(--Gray-700, #474747);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+}
