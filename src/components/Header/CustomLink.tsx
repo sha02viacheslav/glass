@@ -7,9 +7,16 @@ export type CustomLinkProps = {
   to: string
   children: ReactNode
   dropdownItems?: DropdownMenuItem[]
+  onClick?: () => void
 }
 
-export const CustomLink: React.FC<CustomLinkProps> = ({ to, children, dropdownItems, ...props }) => {
+export const CustomLink: React.FC<CustomLinkProps> = ({
+  to,
+  children,
+  dropdownItems,
+  onClick = () => {},
+  ...props
+}) => {
   const navigate = useNavigate()
   const generatedUuid = uuidv4()
   const resolvedPath = useResolvedPath(to)
@@ -32,11 +39,18 @@ export const CustomLink: React.FC<CustomLinkProps> = ({ to, children, dropdownIt
           role='button'
           data-bs-toggle='dropdown'
           aria-expanded='false'
+          onClick={() => onClick()}
         >
           {children}
         </Link>
       ) : (
-        <Link id={generatedUuid} to={to} {...props} className={isActive ? 'nav-link active' : 'nav-link'}>
+        <Link
+          id={generatedUuid}
+          to={to}
+          {...props}
+          className={isActive ? 'nav-link active' : 'nav-link'}
+          onClick={() => onClick()}
+        >
           {children}
         </Link>
       )}

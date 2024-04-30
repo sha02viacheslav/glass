@@ -1,9 +1,9 @@
-.home .sec-partners {
+.sec-partners {
   padding: 24px 0px;
   background: #f7f5ff;
 }
 
-.home .sec-partners .title {
+.sec-partners .title {
   color: var(--Gray-800, #14151f);
   text-align: center;
   font-size: 24px;
@@ -12,11 +12,11 @@
   line-height: 140%;
 }
 
-.home .sec-partners .title .bold {
+.sec-partners .title .bold {
   font-weight: 800;
 }
 
-.home .sec-partners .description {
+.sec-partners .description {
   color: var(--Gray-800, #14151f);
   text-align: center;
   font-size: 12px;
@@ -29,7 +29,7 @@
   margin-bottom: 12px;
 }
 
-.home .sec-partners .premier-partners {
+.sec-partners .premier-partners {
   color: var(--Gray-800, #14151f);
   text-align: center;
   font-size: 12px;
@@ -41,7 +41,7 @@
   margin-top: 48px;
 }
 
-.home .sec-partners .premier-partners-wrap {
+.sec-partners .premier-partners-wrap {
   display: flex;
   align-items: center;
   overflow: scroll;

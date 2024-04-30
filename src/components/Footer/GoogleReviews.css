@@ -1,10 +1,10 @@
 .reviews-container {
-  margin: 12px -8px 16px;
+  margin: -8px -8px -8px;
   position: relative;
 }
 
 .review-box {
-  margin: 0 8px;
+  margin: 8px 8px;
   height: calc(100% - 16px);
   width: calc(100vw - 48px);
   padding: 16px;

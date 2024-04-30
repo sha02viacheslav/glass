@@ -1,33 +1,183 @@
-.about-us .sec-title {
-  padding: 32px;
+.about-us {
+  padding-top: 116px;
 }
 
-.about-us .sec-banner {
+.about-us .about-us-card {
+  padding: 0 16px;
+}
+
+.about-us .about-us-card .category {
+  color: var(--Light-Blue---Primary-600, #133f85);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+  letter-spacing: 0.84px;
+  text-transform: uppercase;
+}
+
+.about-us .about-us-card .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  margin-top: 16px;
+}
+
+.about-us .about-us-card .description {
+  color: var(--Gray-600, #6a6b71);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 12px;
+}
+
+.about-us .about-us-card .card-image-wrap {
+  margin-top: 32px;
   position: relative;
-  background: url(../../../public/images/aboutus-banner.png) no-repeat;
-  background-size: cover;
-  height: 560px;
+}
+
+.about-us .about-us-card .card-image-wrap.show-logo::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: url(../../../public/images/logo.svg) center / contain no-repeat;
+}
+
+.about-us .about-us-card .services-container {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.about-us .about-us-card .service-wrap {
+  padding-left: 24px;
+  position: relative;
+}
+
+.about-us .about-us-card .service-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 24px;
+  border-left: 2px solid var(--Light-Blue---Primary-600, #133f85);
+}
+
+.about-us .about-us-card .service-wrap .service-title {
+  color: var(--Gray-700, #474747);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+}
+
+.about-us .about-us-card .service-wrap .service-description {
+  color: var(--Gray-600, #6a6b71);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 150%;
+  margin-top: 8px;
+}
+
+.our-vision-card {
+  padding: 24px 16px 32px 16px;
+  background: url(../../../public/images/our-vision.png) center / cover no-repeat;
+}
+
+.our-vision-card .category {
+  color: var(--Light-Blue---Primary-100, #bad2f7);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
+
+.our-vision-card .title {
+  color: #f4f0fe;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  margin-top: 16px;
+}
+
+.our-story-card {
+  margin: 0 16px;
+  border-radius: 2px;
+  box-shadow: 0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07),
+    0px 1px 7px 0px rgba(147, 147, 147, 0.09);
+}
+
+.our-story-card .card-header {
+  padding: 85px 24px 16px 16px;
+  background: url(../../../public/images/our-story.png) center / cover no-repeat;
+}
+
+.our-story-card .card-header .category {
+  color: var(--Light-Blue---Primary-000, #e8f0fe);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 160%;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
+
+.our-story-card .card-header .title {
+  color: var(--Light-Blue---Primary-000, #e8f0fe);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+}
+
+.our-story-card .card-content {
+  padding: var(--16, 16px) var(--12, 12px) var(--32, 32px) var(--12, 12px);
+}
+
+.our-story-card .card-content .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 170%;
+}
+
+.our-story-card .card-content .description {
+  color: var(--Gray-700, #474747);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 4px;
+}
+
+.our-story-card button {
+  width: 100%;
   display: flex;
   align-items: center;
-  z-index: -1;
-}
-
-.about-us .sec-description {
-  padding: 32px;
-  background: var(--bg-color);
-  color: var(--primary-color);
-}
-
-@media (max-width: 767px) {
-  .about-us .sec-title {
-    padding: 24px;
-  }
-
-  .about-us .sec-banner {
-    height: 200px;
-  }
-
-  .about-us .sec-description {
-    padding: 24px 4px;
-  }
+  justify-content: center;
+  padding: var(--12, 12px) 20px;
+  gap: var(--8, 8px);
+  border-radius: 2px;
+  background: var(--Light-Blue---Primary-000, #e8f0fe);
+  color: var(--Light-Blue---Primary-700, #081f44);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.16px;
+  border: none;
 }

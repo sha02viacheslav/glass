@@ -1,4 +1,4 @@
-.home .sec-live-service {
+.sec-live-service {
   display: flex;
   padding-right: 16px;
   margin: 0 16px;
@@ -10,13 +10,14 @@
     0px 1px 7px 0px rgba(147, 147, 147, 0.09);
 }
 
-.home .sec-live-service .sec-image {
+.sec-live-service .sec-image {
   width: 146px;
-  background: url(../../../public/images/live-service-bg.png) lightgray center / cover no-repeat;
+  object-fit: cover;
+  object-position: center;
   border-radius: 2px 0 0 2px;
 }
 
-.home .sec-live-service .sec-content {
+.sec-live-service .sec-content {
   display: flex;
   padding: var(--16, 16px) 0px;
   flex-direction: column;
@@ -26,7 +27,7 @@
   align-self: stretch;
 }
 
-.home .sec-live-service .sec-content .title {
+.sec-live-service .sec-content .title {
   color: var(--Gray-800, #14151f);
   font-size: 16px;
   font-style: normal;
@@ -35,7 +36,7 @@
   text-transform: uppercase;
 }
 
-.home .sec-live-service .sec-content .description {
+.sec-live-service .sec-content .description {
   color: var(--Gray-600, #6a6b71);
   font-feature-settings: 'calt' off;
   font-size: 16px;

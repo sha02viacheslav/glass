@@ -1,8 +1,9 @@
-import { BeforeAfterType } from '@glass/enums'
-
 export type Service = {
   key: string
+  background: string
   title: string
   desp: string
-  beforeAfterType: BeforeAfterType
+  glass: string
+  quality: string
+  time: string
 }

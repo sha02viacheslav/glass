@@ -1,8 +1,8 @@
 import './Header.css'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
-import { PHONE_NUMBER, SERVICES } from '@glass/constants'
+import { PHONE_NUMBER } from '@glass/constants'
 import { Quote } from '@glass/models'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getNotificationChecked, getQuoteId, setNotificationChecked } from '@glass/utils/session/session.util'
@@ -16,9 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const quoteId = getQuoteId()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [showNotification, setShowNotification] = useState<boolean>(!getNotificationChecked())
-  const servicesMenuItems = SERVICES.map((item) => {
-    return { label: item.title, link: `/services?serviceKey=${item.key}` }
-  })
+  const menuToggleRef = useRef<HTMLDivElement>(null)
 
   const directToCustomer = () => {
     navigate('/customer')
@@ -66,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
                   {!!quoteDetails ? 'New quote' : 'Get a quote'}
                 </button>
                 <div
+                  ref={menuToggleRef}
                   className='menu-icon'
                   onClick={handleToggleClick}
                   data-bs-toggle='collapse'
@@ -97,14 +96,24 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
         {showMenu && (
           <div className='collapse navbar-collapse' id='navbarSupportedContent'>
             <ul className='navbar-nav et-nav'>
-              <CustomLink to='/services' dropdownItems={servicesMenuItems}>
+              <CustomLink to='/services' onClick={() => menuToggleRef.current?.click()}>
                 Services
               </CustomLink>
-              <CustomLink to='/aboutus'>About us</CustomLink>
-              <CustomLink to='/aboutus'>How our repair process works?</CustomLink>
-              <CustomLink to='/aboutus'>Loosing money with insurance, saving with installments. How?</CustomLink>
-              <CustomLink to='/aboutus'>FixGlass vs. others comparison</CustomLink>
-              <CustomLink to='/contact'>Contact us</CustomLink>
+              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+                About us
+              </CustomLink>
+              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+                How our repair process works?
+              </CustomLink>
+              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+                Loosing money with insurance, saving with installments. How?
+              </CustomLink>
+              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+                FixGlass vs. others comparison
+              </CustomLink>
+              <CustomLink to='/contact' onClick={() => menuToggleRef.current?.click()}>
+                Contact us
+              </CustomLink>
             </ul>
             {!!quoteDetails && (
               <div className='service-status-bar'>

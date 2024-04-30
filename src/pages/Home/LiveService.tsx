@@ -1,10 +1,14 @@
 import './LiveService.css'
 import React from 'react'
 
-export const LiveService: React.FC = () => {
+export type LiveServiceProps = {
+  image?: string
+}
+
+export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-bg.png' }) => {
   return (
     <section className='sec-live-service'>
-      <div className='sec-image'></div>
+      <img src={process.env.PUBLIC_URL + '/images/' + image} className='sec-image' alt='' />
       <div className='sec-content'>
         <div className='title'>Live Service Tracking</div>
         <div className='description'>
