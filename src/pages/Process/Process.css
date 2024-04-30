@@ -1,0 +1,52 @@
+.process-page {
+  padding-top: 116px;
+}
+
+.process-page .page-header {
+  padding: 0 16px;
+}
+
+.process-page .page-header .category {
+  color: var(--Light-Blue---Primary-600, #133f85);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+  letter-spacing: 0.84px;
+  text-transform: uppercase;
+}
+
+.process-page .page-header .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  margin-top: 16px;
+}
+
+.process-page .page-header .description {
+  color: var(--Gray-600, #6a6b71);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 12px;
+}
+
+.process-page .process-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.process-page .process-group .process-group-title {
+  color: var(--Gray-800, #14151f);
+  font-family: 'Nunito Sans';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  margin-bottom: 8px;
+}

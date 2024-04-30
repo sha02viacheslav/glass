@@ -20,6 +20,7 @@ import { setRequestedURL } from '@glass/utils/session/session.util'
 import 'react-toastify/dist/ReactToastify.css'
 import { Comparison } from './pages/Comparison'
 import { Installments } from './pages/Installments'
+import { Process } from './pages/Process'
 
 export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress } = usePromiseTracker()
@@ -56,6 +57,7 @@ export const App: React.FC = () => {
           <Route path='/installments' element={<Installments />} />
           <Route path='/comparison' element={<Comparison />} />
           <Route path='/pricing' element={<Pricing />} />
+          <Route path='/process' element={<Process />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/customer' element={<Customer />} />
           <Route path='/customer/:licenseNum' element={<Customer />} />

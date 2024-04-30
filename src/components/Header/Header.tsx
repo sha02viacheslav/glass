@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
               <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
                 About us
               </CustomLink>
-              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/process' onClick={() => menuToggleRef.current?.click()}>
                 How our repair process works?
               </CustomLink>
               <CustomLink to='/installments' onClick={() => menuToggleRef.current?.click()}>
