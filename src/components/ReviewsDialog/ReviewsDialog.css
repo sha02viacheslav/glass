@@ -1,0 +1,56 @@
+.reviews-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 32px);
+  height: auto;
+  background-color: #fff;
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 760px;
+}
+
+.reviews-modal-header {
+  position: relative;
+}
+
+.reviews-dialog .reviews-modal-header .close-btn {
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+}
+
+.reviews-modal-header .title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--Gray-700, #474747);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.reviews-modal-header .stars {
+  display: flex;
+  align-items: center;
+  color: var(--Gray-800, #14151f);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  margin-top: 18px;
+}
+
+.reviews-modal-header .description {
+  color: var(--Gray-700, #474747);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  margin-top: 8px;
+}

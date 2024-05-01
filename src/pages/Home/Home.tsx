@@ -7,6 +7,7 @@ import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
 import { PlantTree } from '@glass/components/PlantTree'
+import { ReviewsDialog } from '@glass/components/ReviewsDialog'
 import { BeforeAfterType } from '@glass/enums'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { InstallmentBenefits } from './InstallmentBenefits'
@@ -18,6 +19,7 @@ import { Testimonials } from './Testimonials'
 export const Home: React.FC = () => {
   const navigate = useNavigate()
   const [licenseSearchVal, setLicense] = useState('')
+  const [showReviewDialog, setShowReviewDialog] = useState<boolean>(false)
 
   const handleVehInputChange = (data: string | undefined) => {
     setLicense(formatLicenseNumber(data))
@@ -43,7 +45,10 @@ export const Home: React.FC = () => {
         <div className='px-3 mt-auto'>
           <div>
             <div>
-              <div className='d-flex align-items-center'>
+              <div
+                className='d-inline-flex align-items-center cursor-pointer'
+                onClick={() => setShowReviewDialog(true)}
+              >
                 <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
                 <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
                 <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
@@ -54,6 +59,9 @@ export const Home: React.FC = () => {
                 <div className='lh-15 text-white ms-2'>reviews</div>
               </div>
             </div>
+
+            {showReviewDialog && <ReviewsDialog onClose={() => setShowReviewDialog(false)} />}
+
             <h2 className='fnt-30 fnt-md-60 fw-n lh-12 text-white mt-3'>
               New OEM and OEE glass replacement with crash tested glue
             </h2>

@@ -6,7 +6,7 @@
 .review-box {
   margin: 8px 8px;
   height: calc(100% - 16px);
-  width: calc(100vw - 48px);
+  width: 280px;
   padding: 16px;
   border-radius: 2px;
   background: #fff;
@@ -20,9 +20,13 @@
   cursor: pointer;
 }
 
-.review-box .name-wrap {
+.review-box .header-wrap {
   display: flex;
   gap: 14px;
+}
+
+.review-box .header-wrap .name-wrap {
+  flex: 1;
 }
 
 .review-box .review-content {
@@ -37,11 +41,11 @@
   border-top: solid 1px #f2f2f3;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 180px;
+  height: 232px;
 }
 
 .review-box .name {
