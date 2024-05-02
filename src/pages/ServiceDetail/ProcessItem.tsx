@@ -1,5 +1,6 @@
 import './ProcessItem.css'
 import React from 'react'
+import { Typography } from '@mui/material'
 
 export type ProcessItemProps = {
   title: string
@@ -43,7 +44,18 @@ export const ProcessItem: React.FC<ProcessItemProps> = ({
             )}
           </div>
         )}
-        <div className='description'>{description}</div>
+        <Typography
+          sx={{
+            color: 'var(--Gray-700, #474747)',
+            fontSize: '14px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: '170%',
+            flex: '1',
+          }}
+        >
+          {description}
+        </Typography>
       </div>
 
       {!!video && (

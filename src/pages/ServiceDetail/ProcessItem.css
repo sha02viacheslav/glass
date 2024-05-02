@@ -106,12 +106,3 @@
   width: 16px !important;
   height: 16px !important;
 }
-
-.process-item .description {
-  color: var(--Gray-700, #474747);
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 170%;
-  flex: 1;
-}
