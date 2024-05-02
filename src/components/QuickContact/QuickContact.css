@@ -4,9 +4,6 @@
   border-top: 1px solid var(--Light-Blue---Primary-600, #133f85);
   background: var(--Light-Blue---Primary-800, #020e21);
 }
-.footer-top .row {
-  position: inherit;
-}
 
 .footer-top .title {
   color: var(--Light-Blue---Primary-000, #e8f0fe);
@@ -15,6 +12,7 @@
   font-style: normal;
   font-weight: 600;
   line-height: 28px;
+  position: inherit;
 }
 
 .footer-top .description {
@@ -27,9 +25,17 @@
   margin-top: 8px;
 }
 
-.footer-top .btn-raised {
-  padding: 16px 24px;
+.footer-top .call-btn {
+  display: inline-flex;
+  gap: 8px;
+  color: var(--Light-Blue---Primary-400, #4285f4);
   font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.18px;
+  cursor: pointer;
+  margin-top: 24px;
 }
 
 .footer-logo {

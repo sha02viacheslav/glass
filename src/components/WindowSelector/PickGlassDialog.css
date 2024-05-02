@@ -1,0 +1,8 @@
+.pick-glass-confirm {
+  color: var(--Light-Blue---Primary-500, #225fc2);
+}
+
+.pick-glass-confirm:hover,
+.pick-glass-confirm.active {
+  color: var(--Light-Blue---Primary-500, #225fc2);
+}

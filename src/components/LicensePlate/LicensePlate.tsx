@@ -1,39 +1,71 @@
 import './license-plate.css'
-import React, { useCallback, useEffect, useState } from 'react'
-import { debounce } from 'lodash'
+import React, { useEffect, useMemo, useState } from 'react'
+import { VehicleData } from '@glass/models'
+import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type LicensePlateProps = {
-  licenseNumber: string
-  model?: string
+  licenseNumber?: string
   placeholderVal?: string
-  showEdit?: boolean
+  showSearch?: boolean
+  showModel?: boolean
   debounceTime?: number
-  handleVehInputChange?: (value: string | undefined) => void
+  handleVehInputChange?: (value: string) => void
+  handleVehicleDataChange?: (value: VehicleData | undefined) => void
 }
 
 export const LicensePlate: React.FC<LicensePlateProps> = ({
-  licenseNumber,
-  model = '',
+  licenseNumber = '',
   placeholderVal = '',
-  debounceTime = 0,
-  showEdit = false,
+  showSearch = false,
+  showModel = false,
   handleVehInputChange = () => {},
+  handleVehicleDataChange = () => {},
 }) => {
   const [localLicenseNum, setLocalLicenseNum] = useState('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [invalid, setInvalid] = useState<boolean>(false)
+  const [vehData, setVehData] = useState<VehicleData | undefined>()
 
-  const debouncedChangeHandler = useCallback(debounce(handleVehInputChange, debounceTime), [])
+  const model = useMemo(() => (!!vehData ? vehData.Make + ' ' + vehData.Model : ''), [vehData])
+  const vehicleImageUrl = useMemo(() => vehData?.vehicle_image_url || '', [vehData])
 
   const handleInputLicenseNum = (val: string) => {
     const licenseNum = formatLicenseNumber(val)
     setLocalLicenseNum(licenseNum)
-    if (!showEdit) {
-      debouncedChangeHandler(licenseNum)
+
+    if (handleVehInputChange) {
+      handleVehInputChange(licenseNum)
     }
   }
 
-  const handleClickGetVehicle = () => {
-    debouncedChangeHandler(localLicenseNum)
+  const handleClickSearch = () => {
+    fetchVehData(localLicenseNum)
+  }
+
+  const fetchVehData = (license: string | undefined) => {
+    if (!!license && !isLoading) {
+      // fetch vehicle data
+      setInvalid(false)
+      setIsLoading(true)
+      setTimeout(() => {
+        getVehicleService(license)
+          .then((res) => {
+            if (res.success && res.data?.Model) {
+              handleVehicleDataChange(res.data)
+              setVehData(res.data)
+            } else {
+              setInvalid(true)
+              handleVehicleDataChange(undefined)
+              setVehData(undefined)
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            setIsLoading(false)
+          })
+      })
+    }
   }
 
   useEffect(() => {
@@ -41,34 +73,60 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }, [licenseNumber])
 
   return (
-    <div className='d-flex flex-column flex-md-row align-items-center align-items-md-start gap-md-3'>
-      <div className='left-container'>
-        <div className='yellow-box'>
-          <div className='blue-box d-flex flex-column justify-content-end align-items-center'>
-            <img src={process.env.PUBLIC_URL + '/images/uk-flag.svg'} className='img-fluid' alt='' />
-            <div className='gb'>UK</div>
-          </div>
-          <input
-            className='license-input'
-            type='text'
-            placeholder={placeholderVal}
-            maxLength={8}
-            value={localLicenseNum}
-            onChange={(e) => handleInputLicenseNum(e.target.value)}
-          />
+    <div className={'license-plate' + (invalid ? ' invalid' : '')}>
+      <div className='yellow-box'>
+        <div className='blue-box'>
+          <img src={process.env.PUBLIC_URL + '/images/uk-flag.svg'} className='flag' alt='' />
+          <div className='gb'>UK</div>
         </div>
-        {!!model && (
-          <div className='fnt-14 fnt-md-16 text-grey mt-1'>
-            <img src={process.env.PUBLIC_URL + '/img/car-sv.svg'} className='img-fluid me-2' alt='' />
-            {model}
-          </div>
+        <input
+          className={'license-input' + (showSearch ? ' with-search' : '')}
+          type='text'
+          placeholder={placeholderVal}
+          maxLength={8}
+          value={localLicenseNum}
+          onChange={(e) => handleInputLicenseNum(e.target.value)}
+          disabled={isLoading}
+        />
+
+        {showSearch && (
+          <button className='search-button' onClick={() => handleClickSearch()} disabled={isLoading}>
+            <img src={process.env.PUBLIC_URL + '/images/search.svg'} className='img-fluid' alt='' />
+          </button>
         )}
       </div>
-      {showEdit && (
-        <div className='mt-3 w-100'>
-          <button type='button' className='btn-stroked round w-100' onClick={() => handleClickGetVehicle()}>
-            Get Vehicle Data
-          </button>
+
+      {!!showModel && (
+        <div>
+          <div className='model'>
+            <img
+              src={process.env.PUBLIC_URL + '/images/' + (invalid ? 'car-red.svg' : 'car.svg')}
+              className='img-fluid'
+              alt=''
+            />
+            <div>
+              {invalid
+                ? 'We did not find your car'
+                : isLoading
+                ? 'Searching for your car'
+                : !!model
+                ? model
+                : 'Car make and model will be shown here '}
+            </div>
+          </div>
+          <div className='d-flex justify-content-between gap-3'>
+            <div className='search-hint'>
+              {!!model
+                ? 'We found your car model and make.'
+                : invalid
+                ? 'Please make sure you entered the correct registration number.'
+                : isLoading
+                ? 'Hang tight while we find your model.'
+                : 'Needs few seconds to find your car after you type your registration number.'}
+            </div>
+
+            {!!vehicleImageUrl && <img src={vehicleImageUrl} className='car-image' alt='' />}
+          </div>
         </div>
       )}
     </div>

@@ -43,21 +43,38 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           width: '90%',
           height: 'auto',
           backgroundColor: '#EEF4F8',
-          borderRadius: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'column',
+          borderRadius: '12px',
           maxWidth: subDescription ? '550px' : '450px',
           p: { xs: 3, md: 4 },
         }}
       >
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography marginTop={description ? 0 : 4} variant='h5' fontWeight={'bold'}>
+        <Box>
+          <Typography
+            sx={{
+              color: 'var(--Gray-800, #14151F)',
+              fontFamily: 'Inter',
+              fontSize: '18px',
+              fontWeight: '700',
+              lineHeight: '140%',
+            }}
+          >
             {title}
           </Typography>
           {showIcon && <ErrorOutlineIcon sx={{ fontSize: 50, margin: '20px 0px' }} />}
           {description ? (
-            <Typography marginTop={showIcon ? 0 : 4}>{description}</Typography>
+            <Typography
+              marginTop={showIcon ? 0 : 3}
+              sx={{
+                color: 'var(--Gray-800, #14151F)',
+                fontFamily: 'Nunito Sans',
+                fontSize: '14px',
+                fontWeight: '400',
+                lineHeight: '20px',
+                letterSpacing: '0.25px',
+              }}
+            >
+              {description}
+            </Typography>
           ) : (
             <Box marginTop={showIcon ? 0 : 7}></Box>
           )}
@@ -66,16 +83,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              marginTop: '30px',
+              marginTop: 4,
               gap: { xs: '24px', md: '40px' },
             }}
           >
             {showCancel && (
-              <button className='btn-stroked round confirm-button' onClick={onCancel}>
+              <button className='btn-stroked confirm-button' onClick={onCancel}>
                 {cancelStr}
               </button>
             )}
-            <button className='btn-raised round confirm-button' onClick={onConfirm}>
+            <button className='btn-stroked transparent confirm-button' onClick={onConfirm}>
               {confirmStr}
             </button>
           </Box>

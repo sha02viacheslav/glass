@@ -50,24 +50,28 @@ export const ChangeAddress: React.FC<ChangeAddressProps> = ({
   }
 
   const handleDeleteAddress = (address: Address) => {
-    trackPromise(
-      deleteAddressService(customerId, addressType, address.address_id).then((res) => {
-        if (res.success) {
-          getAddresses()
-        }
-      }),
-    )
+    if (address.address_id) {
+      trackPromise(
+        deleteAddressService(customerId, addressType, address.address_id).then((res) => {
+          if (res.success) {
+            getAddresses()
+          }
+        }),
+      )
+    }
   }
 
   const handleChangeAddress = () => {
-    trackPromise(
-      updateQuoteAddressService(qid, addressType, selectedAddress.address_id).then((res) => {
-        if (res.success) {
-          onChangeAddress(selectedAddress)
-          setIsOpen(false)
-        }
-      }),
-    )
+    if (selectedAddress.address_id) {
+      trackPromise(
+        updateQuoteAddressService(qid, addressType, selectedAddress.address_id).then((res) => {
+          if (res.success) {
+            onChangeAddress(selectedAddress)
+            setIsOpen(false)
+          }
+        }),
+      )
+    }
   }
 
   useEffect(() => {

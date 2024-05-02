@@ -16,16 +16,18 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const quoteId = getQuoteId()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [showNotification, setShowNotification] = useState<boolean>(!getNotificationChecked())
+  const [opened, setOpened] = useState<boolean>(false)
   const menuToggleRef = useRef<HTMLDivElement>(null)
 
   const directToCustomer = () => {
-    navigate('/customer')
+    navigate('/inquiry-intro')
   }
 
   const handleToggleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setNotificationChecked()
     setShowNotification(false)
     event.currentTarget.classList.toggle('toggle-active')
+    setOpened((prev) => !prev)
   }
 
   const goToQuote = () => {
@@ -49,18 +51,18 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   }, [quoteId])
 
   return (
-    <header id='navbar_main'>
+    <header className={'navbar-main' + (showMenu ? ' float' : '')}>
       {showMenu && <div className='top-bar d-md-none'>From £83 monthly</div>}
 
       <nav id='navbar_top' className='navbar navbar-expand-lg navbar-light'>
         <div className='mobile-nav d-sm-block d-md-block d-lg-none w-100'>
           <div className='d-flex align-items-center justify-content-between'>
-            <Link to='/'>
+            <Link to='/' onClick={() => opened && menuToggleRef.current?.click()}>
               <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid d-block' alt='' />
             </Link>
             {showMenu && (
               <div className='text-end d-flex align-items-center gap-4'>
-                <button className={!!quoteDetails ? 'btn-link' : 'btn-raised'} onClick={directToCustomer}>
+                <button className={!!quoteDetails ? 'btn-link' : 'btn-raised small'} onClick={directToCustomer}>
                   {!!quoteDetails ? 'New quote' : 'Get a quote'}
                 </button>
                 <div
@@ -89,29 +91,33 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
           </div>
         )}
 
-        <Link className='navbar-brand d-none d-lg-flex d-md-none d-sm-none' to='/'>
+        <Link
+          className='navbar-brand d-none d-lg-flex d-md-none d-sm-none'
+          to='/'
+          onClick={() => opened && menuToggleRef.current?.click()}
+        >
           <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid' alt='' />
         </Link>
 
         {showMenu && (
           <div className='collapse navbar-collapse' id='navbarSupportedContent'>
             <ul className='navbar-nav et-nav'>
-              <CustomLink to='/services' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/services' onClick={() => opened && menuToggleRef.current?.click()}>
                 Services
               </CustomLink>
-              <CustomLink to='/aboutus' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/about-us' onClick={() => opened && menuToggleRef.current?.click()}>
                 About us
               </CustomLink>
-              <CustomLink to='/process' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/process' onClick={() => opened && menuToggleRef.current?.click()}>
                 How our repair process works?
               </CustomLink>
-              <CustomLink to='/installments' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/installments' onClick={() => opened && menuToggleRef.current?.click()}>
                 Loosing money with insurance, saving with installments. How?
               </CustomLink>
-              <CustomLink to='/comparison' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/comparison' onClick={() => opened && menuToggleRef.current?.click()}>
                 FixGlass vs. others comparison
               </CustomLink>
-              <CustomLink to='/contact' onClick={() => menuToggleRef.current?.click()}>
+              <CustomLink to='/contact' onClick={() => opened && menuToggleRef.current?.click()}>
                 Contact us
               </CustomLink>
             </ul>

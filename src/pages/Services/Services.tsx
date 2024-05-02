@@ -1,5 +1,6 @@
 import './Services.css'
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Chat } from '@glass/components/Chat'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
@@ -11,12 +12,14 @@ import { LiveService } from '../Home/LiveService'
 import { Testimonials } from '../Home/Testimonials'
 
 export const Services: React.FC = () => {
+  const navigate = useNavigate()
+
   return (
     <div className='services-page'>
       <div className='padding-32'></div>
 
       <div className='page-header'>
-        <div className='category'>Our services</div>
+        <div className='breadcrumb'>Our services</div>
         <div className='title'>Premium Glass Replacement at Your Place</div>
         <div className='description'>
           We source high-quality glass exceeding all safety standards. All existing sensors and heating elements will be
@@ -26,13 +29,13 @@ export const Services: React.FC = () => {
 
       <div className='service-card-container'>
         {SERVICES.map((service, index) => (
-          <div key={index} className='service-card'>
+          <div key={index} className='service-card' onClick={() => navigate('/service-detail/' + service.key)}>
             <div className='card-header'>
               <img src={process.env.PUBLIC_URL + '/images/' + service.background} className='img-fluid' alt='' />
               <div className='title'>{service.title}</div>
             </div>
             <div className='card-content'>
-              <div className='description'>{service.desp}</div>
+              <div className='description'>{service.description}</div>
               <div className='card-content-items'>
                 <div className='card-content-item'>
                   <img src={process.env.PUBLIC_URL + '/images/car-windshield.svg'} className='img-fluid' alt='' />

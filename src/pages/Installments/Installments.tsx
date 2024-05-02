@@ -8,7 +8,7 @@ export const Installments: React.FC = () => {
       <div className='padding-32'></div>
 
       <div className='page-header'>
-        <div className='category'>Benefits of installments</div>
+        <div className='breadcrumb'>Benefits of installments</div>
         <div className='title'>Losing money with insurance claim, but saving money with installments. How?</div>
         <div className='clock'>
           <img src={process.env.PUBLIC_URL + '/images/clock.svg'} className='img-fluid' alt='' />

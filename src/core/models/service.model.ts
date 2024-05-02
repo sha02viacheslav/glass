@@ -1,9 +1,14 @@
+import { ServiceKey } from '../enums/service-key.enum'
+
 export type Service = {
-  key: string
+  key: ServiceKey
   background: string
   title: string
-  desp: string
+  description: string
   glass: string
   quality: string
   time: string
+  detailTitle: string
+  processTitle: string
+  processDescription: string
 }

@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
 
                   <div className='footer-link-wrap'>
                     <div className='title'>Other information</div>
-                    <Link to='/aboutus' className='footer-link'>
+                    <Link to='/about-us' className='footer-link'>
                       About Us
                     </Link>
                     <Link to='/contact' className='footer-link'>

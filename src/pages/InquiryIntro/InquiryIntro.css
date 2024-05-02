@@ -1,0 +1,104 @@
+.inquiry-intro-page {
+  padding-top: 112px;
+}
+
+.inquiry-intro-page .about-your-car {
+  padding: 0 16px;
+  margin: auto;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inquiry-intro-page .about-your-car img {
+  max-width: 270px;
+}
+
+.inquiry-intro-page .about-your-car .title {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+  margin-top: 24px;
+}
+
+.inquiry-intro-page .about-your-car .description {
+  color: var(--Gray-600, #6a6b71);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  margin-top: 12px;
+}
+
+.inquiry-intro-page .lets-start {
+  padding: 0 16px;
+}
+
+.inquiry-intro-page .lets-start .process-link {
+  color: var(--Gray-700, #474747);
+  font-family: 'Nunito Sans';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.inquiry-intro-page .lets-start .process-link a {
+  color: var(--Light-Blue---Primary-500, #225fc2);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.inquiry-intro-page .know-more-service {
+  padding: 0 16px;
+}
+
+.inquiry-intro-page .know-more-service .title {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 120%;
+  letter-spacing: -0.3px;
+}
+
+.inquiry-intro-page .know-more-service .description {
+  color: var(--Gray-700, #474747);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 24px;
+}
+
+.inquiry-intro-page .after-installation {
+  padding: 0 16px;
+}
+
+.inquiry-intro-page .after-installation .title {
+  color: var(--Gray-800, #14151f);
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+.inquiry-intro-page .after-installation .description {
+  color: var(--Gray-700, #474747);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 170%;
+  margin-top: 24px;
+}

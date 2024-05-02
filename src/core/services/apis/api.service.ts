@@ -48,8 +48,8 @@ export const fetchApi = async (url: string) => {
 
     return {
       success: true,
-      data: response.result,
-      message: response.status,
+      data: response,
+      message: 'Success',
     }
   } catch (error) {
     return {

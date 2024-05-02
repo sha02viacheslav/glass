@@ -22,7 +22,7 @@ export const Services: React.FC = () => {
                 onClick={() => goToServicePage(service.key)}
               >
                 <div className='fnt-20 fnt-md-28 text-primary mb-3'>{service.title}</div>
-                <p className='fnt-14 fnt-md-16 text-grey flex-fill mb-3'>{service.desp}</p>
+                <p className='fnt-14 fnt-md-16 text-grey flex-fill mb-3'>{service.description}</p>
                 <div className='d-flex justify-content-end'>
                   <div className='fnt-18 fnt-md-20 text-dark discover-more'>Discover more</div>
                 </div>

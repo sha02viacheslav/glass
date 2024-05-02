@@ -1,9 +1,15 @@
-#navbar_main {
+.navbar-main {
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1001;
+}
+
+.navbar-main.float {
   top: 16px;
   left: 16px;
   width: calc(100vw - 32px);
-  z-index: 1001;
 }
 
 #navbar_top {

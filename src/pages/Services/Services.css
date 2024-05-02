@@ -6,7 +6,7 @@
   padding: 0 16px;
 }
 
-.services-page .page-header .category {
+.services-page .page-header .breadcrumb {
   color: var(--Light-Blue---Primary-600, #133f85);
   font-size: 12px;
   font-style: normal;

@@ -6,7 +6,7 @@
   padding: 0 16px 24px;
 }
 
-.installments-page .page-header .category {
+.installments-page .page-header .breadcrumb {
   color: var(--Light-Blue---Primary-600, #133f85);
   font-size: 12px;
   font-style: normal;

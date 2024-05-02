@@ -12,7 +12,7 @@ export const Comparison: React.FC = () => {
       <div className='padding-32'></div>
 
       <div className='page-header'>
-        <div className='category'>Fixglass vs. others</div>
+        <div className='breadcrumb'>Fixglass vs. others</div>
         <div className='title'>FixGlass vs Cheap Providers</div>
         <div className='description'>How our service stands out from other cheap alternatives.</div>
       </div>

@@ -26,7 +26,7 @@ export const Home: React.FC = () => {
   }
 
   const directToCustomer = () => {
-    navigate('/customer/' + licenseSearchVal)
+    navigate('/inquiry-intro/' + licenseSearchVal)
     setLicense('')
   }
 
@@ -72,10 +72,10 @@ export const Home: React.FC = () => {
             <LicensePlate
               placeholderVal={'ENTER REG.'}
               licenseNumber={licenseSearchVal}
-              showEdit={false}
+              showSearch={false}
               handleVehInputChange={handleVehInputChange}
             />
-            <button onClick={directToCustomer} className='btn-raised fnt-18 col-12 col-md-auto py-3 mt-25'>
+            <button onClick={directToCustomer} className='btn-raised col-12 col-md-auto mt-25'>
               Get a Quote
             </button>
             <div className='d-flex gap-3 mt-2'>

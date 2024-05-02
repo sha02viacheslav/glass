@@ -1,0 +1,76 @@
+.custom-address-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background-color: #fff;
+  padding: 24px;
+}
+
+.custom-address-modal-header {
+  position: relative;
+}
+
+.custom-address-dialog .custom-address-modal-header .close-btn {
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+}
+
+.custom-address-modal-header .title {
+  color: var(--Gray-800, #14151f);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+  padding-top: 32px;
+}
+
+.custom-address-modal-header .description {
+  color: var(--Gray-700, #474747);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.16px;
+  padding-top: 8px;
+}
+
+.custom-address-modal-header .postcode {
+  color: var(--Gray-800, #14151f);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: -0.16px;
+  margin-top: 28px;
+}
+
+.custom-address-modal-header .postcode .gray {
+  color: var(--Gray-600, #6a6b71);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.16px;
+}
+
+.custom-address-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.custom-address-modal-footer .full-address {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--8, 8px);
+  color: var(--Gray-800, #14151f);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 8px;
+}

@@ -1,6 +1,6 @@
 import './Customer.css'
 import React, { useEffect, useState } from 'react'
-import { FormControl, FormControlLabel, OutlinedInput, Radio, RadioGroup } from '@mui/material'
+import { FormControl, FormControlLabel, OutlinedInput, Radio, RadioGroup, Step, StepIcon, Stepper } from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -18,31 +18,31 @@ import { Address, Attachment, BeforeAfter, Comment, Quote, QuoteDto, VehicleData
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
-import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
-import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
 import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
 
 export type CustomerForm = {
   registrationNumber: string
+  invoiceAddress: string
+  workingPlace: WorkingPlace
   glassLocation: string[]
   firstName: string
   lastName: string
   email: string
   phone: string
-  invoiceAddress: string
 }
 
 export enum FormFieldIds {
   REGISTRATION_NUMBER = 'registrationNumber',
+  INVOICE_ADDRESS = 'invoiceAddress',
+  WORKING_PLACE = 'workingPlace',
   GLASS_LOCATION = 'glassLocation',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
   EMAIL = 'email',
   PHONE = 'phone',
-  INVOICE_ADDRESS = 'invoiceAddress',
 }
 
 export type CustomerProps = {
@@ -54,6 +54,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   const { licenseNum, quoteId } = useParams()
 
+  const steps = [
+    { index: 1, title: 'Reg. number and Repair location' },
+    { index: 2, title: 'Pick the broken glass' },
+    { index: 3, title: 'Your comment and images' },
+    { index: 4, title: 'Your personal info' },
+    { index: 5, title: 'Repair date and time' },
+  ]
+
+  const [activeStep, setActiveStep] = React.useState(1)
+
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [vehData, setVehData] = useState<VehicleData | undefined>()
@@ -61,12 +71,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [fixingAddressText, setFixingAddressText] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
-  const [workingPlace, setWorkingPlace] = useState<WorkingPlace>(WorkingPlace.MOBILE)
 
   const validationSchema = object({
     registrationNumber: string()
       .required('Invalid vehicle registration number. Please review and correct it.')
       .nullable(),
+    workingPlace: string().required('Required').nullable(),
     glassLocation: array().of(string()).required().min(1, 'Select windows that need replacing'),
     firstName: string().required('Required').nullable(),
     lastName: string().required('Required').nullable(),
@@ -78,12 +88,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const formik = useFormik({
     initialValues: {
       registrationNumber: licenseNum || '',
+      invoiceAddress: '',
+      workingPlace: WorkingPlace.NONE,
       glassLocation: [],
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
-      invoiceAddress: '',
     },
     validationSchema: validationSchema,
     onSubmit: async () => {
@@ -131,23 +142,70 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useRetrieveVehData(vehData, retrieveVehData)
 
-  function handleSubmitClick() {
-    formik.handleSubmit()
-    if (formik.errors.registrationNumber) {
-      scrollToElementWithOffset(FormFieldIds.REGISTRATION_NUMBER, 100)
-    } else if (formik.errors.glassLocation) {
-      scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
-    } else if (formik.errors.firstName) {
-      scrollToElementWithOffset(FormFieldIds.FIRST_NAME, 100)
-    } else if (formik.errors.lastName) {
-      scrollToElementWithOffset(FormFieldIds.LAST_NAME, 100)
-    } else if (formik.errors.email) {
-      scrollToElementWithOffset(FormFieldIds.EMAIL, 100)
-    } else if (formik.errors.phone) {
-      scrollToElementWithOffset(FormFieldIds.PHONE, 100)
-    } else if (formik.errors.invoiceAddress) {
-      scrollToElementWithOffset(FormFieldIds.INVOICE_ADDRESS, 100)
+  const handleContinueClick = () => {
+    switch (activeStep) {
+      case 0: {
+        formik.setFieldTouched(FormFieldIds.REGISTRATION_NUMBER, true, true)
+        formik.setFieldTouched(FormFieldIds.INVOICE_ADDRESS, true, true)
+        formik.setFieldTouched(FormFieldIds.WORKING_PLACE, true, true)
+        if (formik.errors.registrationNumber) {
+          scrollToElementWithOffset(FormFieldIds.REGISTRATION_NUMBER, 100)
+          return
+        } else if (formik.errors.invoiceAddress) {
+          scrollToElementWithOffset(FormFieldIds.INVOICE_ADDRESS, 100)
+          return
+        } else if (formik.errors.workingPlace) {
+          scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, 100)
+          return
+        }
+        break
+      }
+      case 1: {
+        formik.setFieldTouched(FormFieldIds.GLASS_LOCATION, true, true)
+        if (formik.errors.glassLocation) {
+          scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
+          return
+        }
+        break
+      }
+      case 3: {
+        formik.setFieldTouched(FormFieldIds.FIRST_NAME, true, true)
+        formik.setFieldTouched(FormFieldIds.LAST_NAME, true, true)
+        formik.setFieldTouched(FormFieldIds.EMAIL, true, true)
+        formik.setFieldTouched(FormFieldIds.PHONE, true, true)
+        if (formik.errors.firstName) {
+          scrollToElementWithOffset(FormFieldIds.FIRST_NAME, 100)
+          return
+        } else if (formik.errors.lastName) {
+          scrollToElementWithOffset(FormFieldIds.LAST_NAME, 100)
+          return
+        } else if (formik.errors.email) {
+          scrollToElementWithOffset(FormFieldIds.EMAIL, 100)
+          return
+        } else if (formik.errors.phone) {
+          scrollToElementWithOffset(FormFieldIds.PHONE, 100)
+          return
+        }
+        break
+      }
+      case 4: {
+        formik.handleSubmit()
+      }
     }
+
+    setActiveStep((prev) => prev + 1)
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
+  const handlePreviousClick = () => {
+    setActiveStep((prev) => prev - 1)
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
   }
 
   const submit = (values: CustomerForm) => {
@@ -180,7 +238,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       glass_location: values.glassLocation,
       customer_comment: comment,
       customer_attachments: attachments,
-      working_place: workingPlace,
+      working_place: values.workingPlace,
     }
 
     if (quoteDetails) {
@@ -217,35 +275,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     }
   }
 
-  const fetchVehData = (license: string | undefined) => {
-    if (!!license) {
-      // fetch vehicle data
-      trackPromise(
-        getVehicleService(license)
-          .then((res) => {
-            if (res.success && res.data?.Model) {
-              setVehData(res.data)
-              formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, license)
-            }
-          })
-          .catch(() => {}),
-      )
-    }
-  }
-
-  const handleChangeBillingAddres = (address: Address | undefined) => {
+  const handleChangeBillingAddress = (address: Address | undefined) => {
     formik.setFieldValue(FormFieldIds.INVOICE_ADDRESS, address?.postcode)
     setBillingAddress(address)
   }
 
   const handleChangeFiles = (files: Attachment[]) => {
     setAttachments(files)
-  }
-
-  const handleVehInputChange = (data: string | undefined) => {
-    const formatedNumber = formatLicenseNumber(data)
-    setLicense(formatedNumber)
-    fetchVehData(formatedNumber)
   }
 
   const getBeforeAfterImages = () => {
@@ -270,10 +306,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useEffect(() => {
     if (quoteDetails) {
-      handleChangeBillingAddres(quoteDetails.invoice_address)
+      handleChangeBillingAddress(quoteDetails.invoice_address)
       setFixingAddressText(formatAddress(quoteDetails.delivery_address))
       setComments(quoteDetails.customer_comments?.reverse() || [])
-      setWorkingPlace(quoteDetails.working_place)
+      formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails?.working_place)
       formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails?.customer_f_name)
       formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails?.customer_s_name)
       formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails?.customer_email)
@@ -293,8 +329,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [quoteDetails])
 
   useEffect(() => {
-    fetchVehData(licenseNum)
-  }, [licenseNum])
+    if (vehData) {
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
+    } else {
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
+    }
+  }, [vehData])
 
   useEffect(() => {
     if (editMode && quoteId) {
@@ -305,265 +345,285 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   return (
     <div className='customer-page'>
       <form onSubmit={formik.handleSubmit}>
-        <section className='sec-title bg-grey'>
-          <div className='container'>
-            <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Get a Quote</h1>
+        <div className='step-wrapper'>
+          <div className='title'>
+            <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
           </div>
-        </section>
+          <Stepper activeStep={activeStep} sx={{ margin: '0 -4px' }}>
+            {steps.map((step, index) => {
+              const stepProps: { completed?: boolean } = {}
 
-        <section className='sec-banner d-none d-md-block'></section>
+              return (
+                <Step key={step.index} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                  <StepIcon icon={step.index} active={index === activeStep} completed={index < activeStep}></StepIcon>
+                </Step>
+              )
+            })}
+          </Stepper>
+        </div>
 
-        <section className='sec-quote py-3'>
-          <div className='d-flex flex-column align-items-center p-3'>
-            <div id={FormFieldIds.REGISTRATION_NUMBER}>
-              <LicensePlate
-                placeholderVal={'ENTER REG'}
-                licenseNumber={licenseSearchVal}
-                model={!!vehData ? vehData.Make + ' ' + vehData.Model : ''}
-                debounceTime={2000}
-                showEdit={true}
-                handleVehInputChange={handleVehInputChange}
-              />
-              <small className='form-error ms-0 mt-3'>
+        <div className='padding-48'></div>
+
+        {activeStep === 0 && (
+          <>
+            <section className='tab-content'>
+              <div className='title'>CAR REGISTRATION NUMBER</div>
+              <div className='description'>Enter your car&apos;s registration and hit the search.</div>
+              <div
+                id={FormFieldIds.REGISTRATION_NUMBER}
+                className={
+                  'reg-card' + (formik.touched.registrationNumber && formik.errors.registrationNumber ? ' invalid' : '')
+                }
+              >
+                <LicensePlate
+                  placeholderVal='Enter reg'
+                  licenseNumber={licenseSearchVal}
+                  showSearch={true}
+                  showModel={true}
+                  handleVehInputChange={(val) => {
+                    setLicense(val)
+                  }}
+                  handleVehicleDataChange={(data) => setVehData(data)}
+                />
+              </div>
+              <small className='form-error'>
                 {formik.touched.registrationNumber && formik.errors.registrationNumber}
               </small>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        <section className='sec-customer bg-grey p-3 pb-md-5'>
-          <div className='container'>
-            <div className='tab-content'>
-              <div className='row' id='scroll-to-top'></div>
-              <div className='row mt-4 mt-md-5 text-center'>
-                <div className='col-md-9 mx-auto'>
-                  <div>
-                    <div id={FormFieldIds.GLASS_LOCATION}>
-                      <h2 className='fnt-48 fnt-md-60 fw-n text-primary'>Select Glasses </h2>
-                      <div className='fnt-20 fnt-md-28 text-primary'>Tap directly or select below</div>
-                    </div>
+            <div className='padding-48'></div>
 
-                    <small className='form-error ms-0 mt-3'>
-                      {formik.touched.glassLocation && formik.errors.glassLocation}
-                    </small>
+            <section className='tab-content'>
+              <div className='title'>YOUR LOCATION</div>
+              <div className='description'>
+                We need your location to suggest closest workshop or see if we can do mobile service.
+              </div>
+              <div id={FormFieldIds.INVOICE_ADDRESS} className='form-group mb-4'>
+                <div className='d-flex justify-content-between'>
+                  {!!quoteDetails?.customer_id && !!quoteId && editMode && (
+                    <ChangeAddress
+                      qid={quoteId}
+                      customerId={quoteDetails.customer_id}
+                      addressType={AddressType.INVOICE}
+                      initialAddress={quoteDetails.invoice_address}
+                      onChangeAddress={(event) => {
+                        handleChangeBillingAddress(event)
+                      }}
+                    />
+                  )}
+                </div>
+                <AddressInput
+                  address={billingAddress}
+                  formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+                  onChange={handleChangeBillingAddress}
+                  disabled={editMode}
+                />
+              </div>
+            </section>
 
-                    <div className='parent mt-4 mt-md-5'>
-                      {/* car image display */}
-                      <WindowSelector
-                        carType={selectedCarType}
-                        setCarType={setSelectedCarType}
-                        brokenWindowsToCustomer={brokenWindowsToCustomer}
-                        brokenWindowsToComponent={brokenWindowsToComponent}
-                      />
+            <div className='padding-48'></div>
 
-                      <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Place of Invervention</div>
+            <section className={'tab-content' + (!!formik.errors.invoiceAddress ? 'disabled' : '')}>
+              <div className='title'>REPAIR LOCATION</div>
+              <div className='description'>Where would you like to get repair done?</div>
+              <FormControl
+                id={FormFieldIds.WORKING_PLACE}
+                disabled={!!formik.errors.invoiceAddress}
+                error={formik.touched.workingPlace && !!formik.errors.workingPlace}
+              >
+                <RadioGroup
+                  row
+                  value={formik.values.workingPlace}
+                  onChange={(_, value) => formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)}
+                >
+                  <FormControlLabel value={WorkingPlace.WORKSHOP} control={<Radio />} label='Workshop service' />
+                  <FormControlLabel value={WorkingPlace.MOBILE} control={<Radio />} label='Mobile service' />
+                </RadioGroup>
+              </FormControl>
+              <small className='form-error'>
+                {!formik.errors.invoiceAddress && formik.touched.workingPlace && formik.errors.workingPlace}
+              </small>
+            </section>
+          </>
+        )}
 
-                      <div className='invervention-wrap'>
-                        <FormControl>
-                          <RadioGroup
-                            row
-                            value={workingPlace}
-                            onChange={(_, value) => setWorkingPlace(value as WorkingPlace)}
-                          >
-                            <FormControlLabel
-                              value={WorkingPlace.MOBILE}
-                              control={
-                                <Radio
-                                  sx={{
-                                    color: '#9a73dd',
-                                    '&.Mui-checked': { color: '#9a73dd' },
-                                  }}
-                                />
-                              }
-                              label='At your home / work'
-                            />
-                            <FormControlLabel
-                              value={WorkingPlace.WORKSHOP}
-                              control={
-                                <Radio
-                                  sx={{
-                                    color: '#9a73dd',
-                                    '&.Mui-checked': { color: '#9a73dd' },
-                                  }}
-                                />
-                              }
-                              label='Our Workshop'
-                            />
-                          </RadioGroup>
-                        </FormControl>
-                      </div>
+        {activeStep === 1 && (
+          <>
+            <section className='tab-content'>
+              <div id={FormFieldIds.GLASS_LOCATION}>
+                <WindowSelector
+                  carType={selectedCarType}
+                  setCarType={setSelectedCarType}
+                  brokenWindowsToCustomer={brokenWindowsToCustomer}
+                  brokenWindowsToComponent={brokenWindowsToComponent}
+                />
 
-                      <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Your comments (optional)</div>
-                      {comments.map((item, index) => (
-                        <div key={index} className='text-left'>
-                          <p>
-                            <strong>Comment {index + 1}: </strong>
-                            {item.comment}
-                          </p>
-                          <AddPictures disabled={true} attachments={item.attachments} />
+                <div className='no-glass'>No glass selected</div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeStep === 2 && (
+          <>
+            <section>
+              <div className='container'>
+                <div className='tab-content'>
+                  <div className='row mt-4 mt-md-5 text-center'>
+                    <div className='col-md-9 mx-auto'>
+                      <div>
+                        <div className='parent mt-4 mt-md-5'>
+                          <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>
+                            Your comments (optional)
+                          </div>
+                          {comments.map((item, index) => (
+                            <div key={index} className='text-left'>
+                              <p>
+                                <strong>Comment {index + 1}: </strong>
+                                {item.comment}
+                              </p>
+                              <AddPictures disabled={true} attachments={item.attachments} />
+                            </div>
+                          ))}
+
+                          <div className='form-group mb-4'>
+                            <textarea
+                              name=''
+                              id=''
+                              rows={4}
+                              className='form-control round h-auto'
+                              placeholder='Details for glass or any other comment.'
+                              value={comment}
+                              onChange={(e) => setComment(e.target.value)}
+                            ></textarea>
+                          </div>
+
+                          <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
+                          <small className='fnt-12 fnt-md-14 text-grey mt-2'>* Optional (Recommended)</small>
                         </div>
-                      ))}
-
-                      <div className='form-group mb-4'>
-                        <textarea
-                          name=''
-                          id=''
-                          rows={4}
-                          className='form-control round h-auto'
-                          placeholder='Details for glass or any other comment.'
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                        ></textarea>
                       </div>
-
-                      <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
-                      <small className='fnt-12 fnt-md-14 text-grey mt-2'>* Optional (Recommended)</small>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        <section className='sec-form'>
-          <div className='row justify-content-center'>
-            <div className='col-md-8 p-0'>
-              <div className='fnt-20 fnt-md-28 text-primary mb-2'>Fill your personal details</div>
-              <div className='row'>
-                <div className='col-md-6'>
-                  <div id={FormFieldIds.FIRST_NAME} className='form-group mb-4'>
-                    <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
-                      First name
-                    </label>
-                    <OutlinedInput
-                      value={formik.values.firstName}
-                      fullWidth
-                      className='glass-form-control round'
-                      placeholder='First name'
-                      onChange={(e) => formik.setFieldValue('firstName', e.target.value)}
-                      error={formik.touched.firstName && !!formik.errors.firstName}
-                    />
-                    <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
-                  </div>
-                </div>
-                <div className='col-md-6'>
-                  <div id={FormFieldIds.LAST_NAME} className='form-group mb-4'>
-                    <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
-                      Last name
-                    </label>
-                    <OutlinedInput
-                      value={formik.values.lastName}
-                      fullWidth
-                      className='glass-form-control round'
-                      placeholder='Last name'
-                      onChange={(e) => formik.setFieldValue('lastName', e.target.value)}
-                      error={formik.touched.lastName && !!formik.errors.lastName}
-                    />
-                    <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
-                  </div>
-                </div>
-                <div className='col-md-6'>
-                  <div id={FormFieldIds.EMAIL} className='form-group mb-4'>
-                    <label className={formik.touched.email && !!formik.errors.email ? ' error' : ''}>Email</label>
-                    <OutlinedInput
-                      value={formik.values.email}
-                      fullWidth
-                      className='glass-form-control round'
-                      placeholder='Email'
-                      onChange={(e) => formik.setFieldValue('email', e.target.value)}
-                      error={formik.touched.email && !!formik.errors.email}
-                    />
-                    <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
-                  </div>
-                </div>
-                <div className='col-md-6'>
-                  <div id={FormFieldIds.PHONE} className='form-group mb-4'>
-                    <label className={formik.touched.phone && !!formik.errors.phone ? ' error' : ''}>Phone</label>
-                    <OutlinedInput
-                      value={formik.values.phone}
-                      fullWidth
-                      className='glass-form-control round'
-                      placeholder='Phone'
-                      onChange={(e) => formik.setFieldValue('phone', e.target.value)}
-                      error={formik.touched.phone && !!formik.errors.phone}
-                    />
-                    <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
-                  </div>
-                </div>
-                <div className='col-md-12'>
-                  <div id={FormFieldIds.INVOICE_ADDRESS} className='form-group mb-4'>
-                    <div className='d-flex justify-content-between'>
-                      <label
-                        className={formik.touched.invoiceAddress && !!formik.errors.invoiceAddress ? ' error' : ''}
-                      >
-                        Postcode
-                      </label>
-                      {!!quoteDetails?.customer_id && !!quoteId && editMode && (
-                        <ChangeAddress
-                          qid={quoteId}
-                          customerId={quoteDetails.customer_id}
-                          addressType={AddressType.INVOICE}
-                          initialAddress={quoteDetails.invoice_address}
-                          onChangeAddress={(event) => {
-                            handleChangeBillingAddres(event)
-                          }}
+            <section className='sec-form'>
+              <div className='row justify-content-center'>
+                <div className='col-md-8 p-0'>
+                  <div className='fnt-20 fnt-md-28 text-primary mb-2'>Fill your personal details</div>
+                  <div className='row'>
+                    <div className='col-md-6'>
+                      <div id={FormFieldIds.FIRST_NAME} className='form-group mb-4'>
+                        <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
+                          First name
+                        </label>
+                        <OutlinedInput
+                          value={formik.values.firstName}
+                          fullWidth
+                          className='glass-form-control round'
+                          placeholder='First name'
+                          onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
+                          error={formik.touched.firstName && !!formik.errors.firstName}
                         />
-                      )}
-                    </div>
-                    <AddressInput
-                      address={billingAddress}
-                      formError={formik.touched.invoiceAddress && !!formik.errors.invoiceAddress}
-                      onChange={handleChangeBillingAddres}
-                      disabled={editMode}
-                    />
-                    <small className='form-error'>
-                      {formik.touched.invoiceAddress && formik.errors.invoiceAddress}
-                    </small>
-                  </div>
-                </div>
-                {editMode && (
-                  <div className='col-md-12'>
-                    <div className='form-group mb-4'>
-                      <div className='d-flex justify-content-between'>
-                        <div className='h6 text-left text-black-50'>Fixing address</div>
-                        {!!quoteDetails?.customer_id && !!quoteId && (
-                          <ChangeAddress
-                            qid={quoteId}
-                            customerId={quoteDetails.customer_id}
-                            addressType={AddressType.DELIVERY}
-                            initialAddress={quoteDetails.delivery_address}
-                            onChangeAddress={(event) => {
-                              setFixingAddressText(formatAddress(event))
-                            }}
-                          />
-                        )}
+                        <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
                       </div>
-                      <OutlinedInput
-                        id='deliveryAddress'
-                        value={fixingAddressText || ''}
-                        fullWidth
-                        className='glass-form-control round'
-                        placeholder='Fixing address'
-                        disabled={true}
-                      />
                     </div>
+                    <div className='col-md-6'>
+                      <div id={FormFieldIds.LAST_NAME} className='form-group mb-4'>
+                        <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
+                          Last name
+                        </label>
+                        <OutlinedInput
+                          value={formik.values.lastName}
+                          fullWidth
+                          className='glass-form-control round'
+                          placeholder='Last name'
+                          onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
+                          error={formik.touched.lastName && !!formik.errors.lastName}
+                        />
+                        <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
+                      </div>
+                    </div>
+                    <div className='col-md-6'>
+                      <div id={FormFieldIds.EMAIL} className='form-group mb-4'>
+                        <label className={formik.touched.email && !!formik.errors.email ? ' error' : ''}>Email</label>
+                        <OutlinedInput
+                          value={formik.values.email}
+                          fullWidth
+                          className='glass-form-control round'
+                          placeholder='Email'
+                          onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
+                          error={formik.touched.email && !!formik.errors.email}
+                        />
+                        <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
+                      </div>
+                    </div>
+                    <div className='col-md-6'>
+                      <div id={FormFieldIds.PHONE} className='form-group mb-4'>
+                        <label className={formik.touched.phone && !!formik.errors.phone ? ' error' : ''}>Phone</label>
+                        <OutlinedInput
+                          value={formik.values.phone}
+                          fullWidth
+                          className='glass-form-control round'
+                          placeholder='Phone'
+                          onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
+                          error={formik.touched.phone && !!formik.errors.phone}
+                        />
+                        <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
+                      </div>
+                    </div>
+                    {editMode && (
+                      <div className='col-md-12'>
+                        <div className='form-group mb-4'>
+                          <div className='d-flex justify-content-between'>
+                            <div className='h6 text-left text-black-50'>Fixing address</div>
+                            {!!quoteDetails?.customer_id && !!quoteId && (
+                              <ChangeAddress
+                                qid={quoteId}
+                                customerId={quoteDetails.customer_id}
+                                addressType={AddressType.DELIVERY}
+                                initialAddress={quoteDetails.delivery_address}
+                                onChangeAddress={(event) => {
+                                  setFixingAddressText(formatAddress(event))
+                                }}
+                              />
+                            )}
+                          </div>
+                          <OutlinedInput
+                            id='deliveryAddress'
+                            value={fixingAddressText || ''}
+                            fullWidth
+                            className='glass-form-control round'
+                            placeholder='Fixing address'
+                            disabled={true}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                <div className='submit-quote-button'>
-                  <button
-                    className={'btn-raised round w-100 mb-3' + (formik.isValid ? ' green' : '')}
-                    type='button'
-                    onClick={handleSubmitClick}
-                  >
-                    {editMode ? 'Save Quote' : 'Submit Request'}
-                  </button>
                 </div>
               </div>
-            </div>
+            </section>
+          </>
+        )}
+
+        <div className='padding-64'></div>
+        <div className='padding-64'></div>
+
+        <div className='continue-wrap'>
+          <div>
+            {!!activeStep && (
+              <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
+                <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
+                Previous
+              </button>
+            )}
           </div>
-        </section>
+          <button className='btn-raised' type='button' onClick={handleContinueClick}>
+            Continue
+          </button>
+        </div>
       </form>
 
       {!!beforeAfterItems?.length && (

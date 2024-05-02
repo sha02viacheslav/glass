@@ -8,7 +8,7 @@ export const Process: React.FC = () => {
       <div className='padding-32'></div>
 
       <div className='page-header'>
-        <div className='category'>More about our process</div>
+        <div className='breadcrumb'>More about our process</div>
         <div className='title'>Explore Our Glass Repair Process: Learn About How We Work!</div>
         <div className='description'>
           Below, we&apos;ve simplified our approach into bite-sized answers to common questions. Tap each question to

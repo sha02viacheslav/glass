@@ -1,4 +1,4 @@
-.home .sec-installment-benefits {
+.sec-installment-benefits {
   display: flex;
   padding: 24px 24px 32px 24px;
   flex-direction: column;
@@ -7,7 +7,7 @@
   background-blend-mode: normal, darken;
 }
 
-.home .sec-installment-benefits .title {
+.sec-installment-benefits .title {
   color: var(--Gray-100, #f2f2f3);
   font-size: 12px;
   font-style: normal;
@@ -18,7 +18,7 @@
   margin-bottom: 12px;
 }
 
-.home .sec-installment-benefits .description {
+.sec-installment-benefits .description {
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
@@ -30,7 +30,7 @@
   margin-bottom: 32px;
 }
 
-.home .sec-installment-benefits button {
+.sec-installment-benefits button {
   padding: 16px 24px;
   font-size: 18px;
 }

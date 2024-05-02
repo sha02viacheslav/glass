@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import {
+  Box,
+  FormControlLabel,
+  Link,
+  Radio,
+  RadioGroup,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material'
 import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
@@ -10,10 +19,10 @@ import {
   getAskedTint,
   getAskedVan,
   getVanBodyType,
-  setAskedTint,
   setAskedVan,
   setVanBodyType,
 } from '@glass/utils/session/session.util'
+import { PickGlassDialog } from './PickGlassDialog'
 import styles from './window-selection.module.css'
 
 export type WindowSelectorProps = {
@@ -30,10 +39,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   brokenWindowsToComponent,
 }) => {
   // display popup
+  const [showSelectGlassGuide, setShowSelectGlassGuide] = useState<boolean>(true)
   const [showTintedConfirm, setShowTintedConfirm] = useState<boolean>(false)
   // determine if back windows are tinted
   const [tinted, setTinted] = useState(false)
-  const [tintedValue, setTintedValue] = useState('no')
 
   // determine if body is tailgater or barn door for the vans
   const [bodyValue, setBodyValue] = useState(getVanBodyType())
@@ -47,6 +56,25 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
   const [selectedWindows, setSelectedWindows] = useState<string[]>([])
+
+  const frontWindscreenTop = useMemo(() => {
+    switch (carType) {
+      case CarType.THREE_DOOR:
+        return '96px'
+      case CarType.FIVE_DOOR:
+        return '96px'
+      case CarType.COUPE:
+        return '96px'
+      case CarType.ESTATE:
+        return '102px'
+      case CarType.SEDAN:
+        return '112px'
+      case CarType.BARN:
+        return '44px'
+      case CarType.TAILGATER:
+        return '44px'
+    }
+  }, [carType])
 
   // handle window selection
   const selectWindow = (windowClicked: WinLoc) => {
@@ -108,30 +136,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     })
   }
 
-  const handlePopup = (answer: boolean) => {
-    setTinted(answer)
-    setShowTintedConfirm(false)
-    setTintedConfirmed(true)
-    if (answer) {
-      if (carType == CarType.BARN || carType == CarType.TAILGATER) {
-        tintedButtonHandle('yes')
-      } else {
-        setTintedValue('yes')
-      }
-    } else {
-      if (carType == CarType.BARN || carType == CarType.TAILGATER) {
-        tintedButtonHandle('no')
-      } else {
-        setTintedValue('no')
-      }
-    }
-    setAskedTint()
-  }
-
   // handle tinted toggle button
-  const tintedButtonHandle = (newValue: string) => {
-    if (newValue === 'no') {
-      setTinted(false)
+  const tintedButtonHandle = (newValue: boolean) => {
+    setTinted(newValue)
+    if (!newValue) {
       // update tinted windows in brokenWindows array as not tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy').replace('privacy', 'non-privacy')
@@ -139,7 +147,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       // update tinted windows in selectedWindows array as not tinted
       setSelectedWindows(selectedWindows.slice())
     } else {
-      setTinted(true)
       // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy')
@@ -147,7 +154,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       // update tinted windows in selectedWindows array as tinted
       setSelectedWindows(selectedWindows.slice())
     }
-    setTintedValue(newValue)
     setTintedConfirmed(true)
     setBrokenWindows(brokenWindows.slice())
   }
@@ -222,7 +228,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const checkIfPreviouslySelected = (selection: string) => {
     // currently not working with tinted windows
     if (selection.includes(' privacy')) {
-      tintedButtonHandle('yes')
+      tintedButtonHandle(true)
     }
     const index = brokenWindows.findIndex(
       (element) => element.name === selection.replace(' non-privacy', '').replace(' privacy', ''),
@@ -264,80 +270,241 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [brokenWindowsToComponent])
 
   return (
-    <div className={styles.container}>
-      {/* display popup */}
+    <div>
+      <div className={styles.container}>
+        {/* display popup */}
+
+        {/* body type popup for vans */}
+        {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
+          <ConfirmDialog
+            title='Rear Windows'
+            description='Do you have one or two rear windows?'
+            confirmStr='Two'
+            cancelStr='One'
+            onConfirm={() => handleBodyPopup(true)}
+            onCancel={() => handleBodyPopup(false)}
+          />
+        )}
+
+        <div className={styles.imgContainer}>
+          {/* display either car with tinted windows or normal */}
+          <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_IMAGES[carType]} alt='' />
+          <img
+            className={tinted ? styles.baseImage : styles.baseImageInactive}
+            src={CAR_TINTED_IMAGES[carType]}
+            alt=''
+          />
+
+          {showSelectGlassGuide && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: frontWindscreenTop,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: '100',
+              }}
+            >
+              <img src={process.env.PUBLIC_URL + '/images/hand.svg'} />
+              <PickGlassDialog
+                title='Picking glass'
+                description='You can select multiple glasses.'
+                onConfirm={() => setShowSelectGlassGuide(false)}
+              />
+            </Box>
+          )}
+
+          {/* broken glass displays */}
+          {brokenWindows
+            .filter((element) => element.broken)
+            .map((element) => (
+              <img
+                key={element.window}
+                className={carType == CarType.COUPE ? styles.brokenGlassAlt : styles.brokenGlass}
+                src={tinted && element.hasTinted ? element.tintedSource : element.source}
+                alt=''
+              />
+            ))}
+
+          {/* transparent layer on top of all car-related images to maintain image map */}
+          {/* You should create instances for all car types so that the image-map-resizer is working */}
+          {CAR_TYPES.map((item, index) =>
+            item == carType ? (
+              <WindowMap key={index} carType={item} selectWindow={selectWindow} />
+            ) : (
+              <div key={index} className='d-none'></div>
+            ),
+          )}
+        </div>
+      </div>
+
+      <Typography
+        sx={{
+          color: 'var(--Gray-800, #14151F)',
+          fontSize: '14px',
+          fontWeight: '400',
+          lineHeight: '150%',
+          letterSpacing: '-0.14px',
+          marginTop: '16px',
+        }}
+      >
+        Not sure how to pick broken glass?{' '}
+        <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
+          Tap here
+        </Link>
+      </Typography>
 
       {showTintedConfirm && (
-        <ConfirmDialog
-          title='Tinted Back Window'
-          description='Are your back windows tinted?'
-          onConfirm={() => handlePopup(true)}
-          onCancel={() => handlePopup(false)}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '4px',
+            padding: '12px 16px',
+            border: '1px solid var(--Gray-100, #F2F2F3)',
+            background: '#fff',
+            marginTop: '24px',
+          }}
+        >
+          <Typography
+            sx={{
+              color: 'var(--Gray-800, #14151F)',
+              fontSize: '12px',
+              fontWeight: '600',
+              lineHeight: '150%',
+              letterSpacing: '0.84px',
+              textTransform: 'uppercase',
+            }}
+          >
+            PRIVACY WINDOWS?
+          </Typography>
+
+          <RadioGroup row value={tinted} onChange={(_, value) => tintedButtonHandle(value === 'true')}>
+            <FormControlLabel value={true} control={<Radio />} label='Yes' />
+            <FormControlLabel value={false} control={<Radio />} label='No' />
+          </RadioGroup>
+        </Box>
       )}
 
-      {/* body type popup for vans */}
-      {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
-        <ConfirmDialog
-          title='Rear Windows'
-          description='Do you have one or two rear windows?'
-          confirmStr='Two'
-          cancelStr='One'
-          onConfirm={() => handleBodyPopup(true)}
-          onCancel={() => handleBodyPopup(false)}
-        />
-      )}
-
-      <div className={styles.imgContainer}>
-        {/* display either car with tinted windows or normal */}
-        <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_IMAGES[carType]} alt='' />
-        <img className={tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_TINTED_IMAGES[carType]} alt='' />
-
-        {/* broken glass displays */}
-        {brokenWindows
-          .filter((element) => element.broken)
-          .map((element) => (
-            <img
-              key={element.window}
-              className={carType == CarType.COUPE ? styles.brokenGlassAlt : styles.brokenGlass}
-              src={tinted && element.hasTinted ? element.tintedSource : element.source}
-              alt=''
-            />
-          ))}
-
-        {/* transparent layer on top of all car-related images to maintain image map */}
-        {/* You should create instances for all car types so that the image-map-resizer is working */}
-        {CAR_TYPES.map((item, index) =>
-          item == carType ? (
-            <WindowMap key={index} carType={item} selectWindow={selectWindow} />
-          ) : (
-            <div key={index} className='d-none'></div>
-          ),
-        )}
-      </div>
-
-      {/* tinted window toggle */}
-      <div className='d-flex align-items-center'>
-        <div className={'fnt-16 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Privacy windows </div>
-        <ToggleButtonGroup color='secondary' value={tintedValue} exclusive aria-label='Platform'>
-          <ToggleButton
-            className={styles.windowSelectorToggle}
-            size='small'
-            value='yes'
-            onClick={() => tintedButtonHandle('yes')}
-          >
-            Yes
-          </ToggleButton>
-          <ToggleButton
-            className={styles.windowSelectorToggle}
-            size='small'
-            value='no'
-            onClick={() => tintedButtonHandle('no')}
-          >
-            No
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </div>
+      {brokenWindows
+        .filter((item) => item.broken)
+        .map((item, index) => (
+          <Box key={index} sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: '16px' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+                marginTop: '16px',
+              }}
+            >
+              QUESTIONS ABOUT {item.name}
+            </Typography>
+            <Typography
+              sx={{
+                color: 'var(--Gray-800, #14151F)',
+                fontSize: '16px',
+                fontWeight: '400',
+                lineHeight: '150%',
+                letterSpacing: '-0.16px',
+                marginTop: '16px',
+              }}
+            >
+              We need some additional information related to your {item.name}{' '}
+              <Typography
+                sx={{
+                  display: 'inline',
+                  color: 'var(--Gray-600, #6A6B71)',
+                }}
+              >
+                (Just {item.name.length} fast questions).
+              </Typography>
+              <Box
+                sx={{
+                  padding: '12px 16px',
+                  borderRadius: '2px',
+                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                  marginTop: '24px',
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: 'var(--Dark-Blue---Accent-800, #090221)',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    lineHeight: '150%',
+                    letterSpacing: '0.8px',
+                    display: 'flex',
+                    gap: '8px',
+                  }}
+                >
+                  <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
+                  IMPORTANT
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'var(--Light-Blue---Primary-700, #081F44)',
+                    fontSize: '16px',
+                    fontWeight: '400',
+                    lineHeight: '170%',
+                    marginTop: '4px',
+                  }}
+                >
+                  Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  lineHeight: '24px',
+                  letterSpacing: '-0.16px',
+                  marginTop: '16px',
+                }}
+              >
+                Question <Typography sx={{ display: 'inline', color: 'var(--Gray-800, #14151F)' }}>1</Typography>/5
+              </Typography>
+              <Box
+                sx={{
+                  padding: '12px',
+                  borderRadius: '2px',
+                  boxShadow:
+                    '0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07), 0px 1px 7px 0px rgba(147, 147, 147, 0.09)',
+                  background: '#fff',
+                  marginTop: '8px',
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: 'ar(--Gray-800, #14151F)',
+                    fontSize: '16px',
+                    fontWeight: '400',
+                    lineHeight: '150%',
+                    letterSpacing: '-0.16px',
+                  }}
+                >
+                  Does your vehicle have rain/light sensors that automatically adjust wiper speed or headlight?
+                </Typography>
+                <RadioGroup
+                  row
+                  value={tinted}
+                  onChange={(_, value) => tintedButtonHandle(value === 'true')}
+                  sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}
+                >
+                  <FormControlLabel value={true} control={<Radio />} label='Yes' />
+                  <FormControlLabel value={true} control={<Radio />} label='No' />
+                  <FormControlLabel value={false} control={<Radio />} label="I don't know" />
+                </RadioGroup>
+              </Box>
+            </Typography>
+          </Box>
+        ))}
 
       {isVan && (
         <div className='d-flex align-items-center mt-3 mt-md-4'>
@@ -363,19 +530,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           </ToggleButtonGroup>
         </div>
       )}
-
-      {/* buttons for broken windows */}
-      <div className='btns my-4'>
-        {brokenWindows.map((element, index) => (
-          <a
-            key={index}
-            className={element.broken ? 'btn btn-gray-active' : 'btn btn-gray'}
-            onClick={() => selectWindow(element.window)}
-          >
-            {element.hasTinted ? (tinted ? element.name + ' privacy' : element.name + ' non-privacy') : element.name}
-          </a>
-        ))}
-      </div>
     </div>
   )
 }

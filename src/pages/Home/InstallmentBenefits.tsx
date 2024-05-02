@@ -11,7 +11,7 @@ export const InstallmentBenefits: React.FC = () => {
       <div className='description'>
         An insurance claim can end up costing you far more than our monthly installments
       </div>
-      <button className='btn-raised' onClick={() => navigate('/installment-benefits')}>
+      <button className='btn-raised' onClick={() => navigate('/installments')}>
         See how
         <img src={process.env.PUBLIC_URL + '/images/arrow-right.svg'} className='img-fluid' alt='' />
       </button>

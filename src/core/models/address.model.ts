@@ -1,8 +1,8 @@
 import { AddressType } from '@glass/enums'
 
 export type Address = {
-  address_id: number
-  address_type: AddressType
+  address_id?: number
+  address_type?: AddressType
   line_1: string
   line_2: string
   line_3: string
@@ -16,4 +16,13 @@ export type Address = {
   district: string
   country: string
   formatted_address: string[]
+}
+
+export type ManualAddress = {
+  flatNumber: string
+  buildingNumber: string
+  buildingName: string
+  street: string
+  city: string
+  county: string
 }

@@ -17,7 +17,7 @@ export const Contact: React.FC = () => {
       <div className='padding-32'></div>
 
       <div className='page-header'>
-        <div className='category'>HOW can we help you?</div>
+        <div className='breadcrumb'>HOW can we help you?</div>
         <div className='title'>Contact us</div>
         <div className='description'>
           We&apos;re here to help and answer any questions you have. We&apos;re excited to hear from you and assist you

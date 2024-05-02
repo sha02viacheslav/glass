@@ -691,10 +691,6 @@ input[type='text']:focus {
   color: #000000;
 }
 
-.btns a {
-  margin-bottom: 9px;
-  display: inline-block;
-}
 .submit-btn {
   position: absolute;
   top: 45%;
@@ -1218,15 +1214,6 @@ Media Queries
     font-size: 15px;
     padding: 10px 80px;
     width: auto;
-  }
-  .btns.my-4 {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: scroll;
-    align-items: center;
-  }
-  .btns.my-4 .btn-gray {
-    white-space: nowrap;
   }
   .recycle-content.text-start.phn-content {
     top: 14%;

@@ -7,7 +7,7 @@
   border-bottom: solid 1px #f2f2f2;
 }
 
-.contact-page .page-header .category {
+.contact-page .page-header .breadcrumb {
   color: var(--Light-Blue---Primary-600, #133f85);
   font-size: 12px;
   font-style: normal;

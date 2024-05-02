@@ -597,12 +597,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             </div>
 
             <div className='w-100 p-3'>
-              <LicensePlate
-                placeholderVal={'ENTER REG'}
-                licenseNumber={tempLicenseNum}
-                model={quoteDetails?.make + ' ' + quoteDetails?.model}
-                showEdit={false}
-              />
+              <LicensePlate placeholderVal={'ENTER REG'} licenseNumber={tempLicenseNum} showSearch={false} />
             </div>
 
             {quoteInfoOpen && (
