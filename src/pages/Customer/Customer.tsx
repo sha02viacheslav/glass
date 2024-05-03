@@ -62,7 +62,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     { index: 5, title: 'Repair date and time' },
   ]
 
-  const [activeStep, setActiveStep] = React.useState(1)
+  const [activeStep, setActiveStep] = React.useState(0)
 
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')

@@ -13,6 +13,7 @@
 .process-card .process-card-header {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: var(--24, 24px);
   align-self: stretch;
 }
