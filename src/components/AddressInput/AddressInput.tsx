@@ -81,7 +81,11 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
   const debouncedChangeHandler = useCallback(debounce(searchAddresses, 1000), [])
 
   useEffect(() => {
-    setAddressText(formatAddress(address))
+    if (address) {
+      setPostcode(address.postcode)
+      searchAddresses(address.postcode)
+      setAddressText(formatAddress(address))
+    }
   }, [address])
 
   return (

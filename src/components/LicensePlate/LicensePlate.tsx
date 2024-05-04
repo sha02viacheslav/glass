@@ -1,7 +1,8 @@
 import './license-plate.css'
 import React, { useEffect, useMemo, useState } from 'react'
-import { VehicleData } from '@glass/models'
-import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
+import { Box } from '@mui/material'
+import { Inquiry } from '@glass/models'
+import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type LicensePlateProps = {
@@ -11,7 +12,7 @@ export type LicensePlateProps = {
   showModel?: boolean
   debounceTime?: number
   handleVehInputChange?: (value: string) => void
-  handleVehicleDataChange?: (value: VehicleData | undefined) => void
+  handleVehicleDataChange?: (value: Inquiry | undefined) => void
 }
 
 export const LicensePlate: React.FC<LicensePlateProps> = ({
@@ -25,10 +26,10 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   const [localLicenseNum, setLocalLicenseNum] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [invalid, setInvalid] = useState<boolean>(false)
-  const [vehData, setVehData] = useState<VehicleData | undefined>()
+  const [inquiry, setInquiry] = useState<Inquiry | undefined>()
 
-  const model = useMemo(() => (!!vehData ? vehData.Make + ' ' + vehData.Model : ''), [vehData])
-  const vehicleImageUrl = useMemo(() => vehData?.vehicle_image_url || '', [vehData])
+  const model = useMemo(() => (!!inquiry ? inquiry.Make + ' ' + inquiry.Model : ''), [inquiry])
+  const vehicleImageUrl = useMemo(() => inquiry?.step_1?.vehicle_image_url || '', [inquiry])
 
   const handleInputLicenseNum = (val: string) => {
     const licenseNum = formatLicenseNumber(val)
@@ -49,15 +50,15 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
       setInvalid(false)
       setIsLoading(true)
       setTimeout(() => {
-        getVehicleService(license)
+        getInquiryService(license)
           .then((res) => {
             if (res.success && res.data?.Model) {
               handleVehicleDataChange(res.data)
-              setVehData(res.data)
+              setInquiry(res.data)
             } else {
               setInvalid(true)
               handleVehicleDataChange(undefined)
-              setVehData(undefined)
+              setInquiry(undefined)
             }
           })
           .catch(() => {})
@@ -69,16 +70,52 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }
 
   useEffect(() => {
-    setLocalLicenseNum(formatLicenseNumber(licenseNumber))
+    const formattedLicenseNumber = formatLicenseNumber(licenseNumber)
+    if (formattedLicenseNumber !== localLicenseNum) {
+      fetchVehData(formattedLicenseNumber)
+      setLocalLicenseNum(formattedLicenseNumber)
+    }
   }, [licenseNumber])
 
   return (
     <div className={'license-plate' + (invalid ? ' invalid' : '')}>
-      <div className='yellow-box'>
-        <div className='blue-box'>
-          <img src={process.env.PUBLIC_URL + '/images/uk-flag.svg'} className='flag' alt='' />
-          <div className='gb'>UK</div>
-        </div>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'stretch',
+          overflow: 'hidden',
+          minWidth: '312px',
+          borderRadius: '2px',
+          textAlign: 'center',
+          verticalAlign: 'middle',
+          border: invalid ? '1px solid var(--Red---Semantic-500, #c22222)' : '1px solid #000',
+        }}
+      >
+        <Box
+          sx={{
+            padding: '4px 8px',
+            borderRadius: '2px 0 0 2px',
+            background: '#1165b3',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+          }}
+        >
+          <img src={process.env.PUBLIC_URL + '/images/uk-flag.svg'} width='20' alt='' />
+          <Box
+            sx={{
+              fontSize: '14px',
+              lineHeight: '24px',
+              fontWeight: '700',
+              letterSpacing: '-0.14px',
+              color: 'var(--white-color)',
+            }}
+          >
+            UK
+          </Box>
+        </Box>
         <input
           className={'license-input' + (showSearch ? ' with-search' : '')}
           type='text'
@@ -94,7 +131,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
             <img src={process.env.PUBLIC_URL + '/images/search.svg'} className='img-fluid' alt='' />
           </button>
         )}
-      </div>
+      </Box>
 
       {!!showModel && (
         <div>

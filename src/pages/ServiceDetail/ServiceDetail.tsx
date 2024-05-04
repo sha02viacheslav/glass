@@ -8,13 +8,13 @@ import { OurMethod } from '@glass/components/OurMethod'
 import { QuickContact } from '@glass/components/QuickContact'
 import { SERVICES } from '@glass/constants'
 import { BeforeAfterType, ServiceKey } from '@glass/enums'
-import { VehicleData } from '@glass/models'
+import { Inquiry } from '@glass/models'
 import { ProcessItem } from './ProcessItem'
 
 export const ServiceDetail: React.FC = () => {
   const { serviceKey } = useParams()
   const service = SERVICES.find((item) => item.key === serviceKey)
-  const [vehData, setVehData] = useState<VehicleData | undefined>()
+  const [inquiry, setInquiry] = useState<Inquiry | undefined>()
 
   return (
     <div className='service-detail-page'>
@@ -40,7 +40,7 @@ export const ServiceDetail: React.FC = () => {
             placeholderVal='Enter reg'
             showSearch={true}
             showModel={true}
-            handleVehicleDataChange={(data) => setVehData(data)}
+            handleVehicleDataChange={(data) => setInquiry(data)}
           />
         </div>
       </div>
@@ -53,7 +53,7 @@ export const ServiceDetail: React.FC = () => {
 
         <div className='padding-40'></div>
 
-        {!!vehData && (
+        {!!inquiry && (
           <div className='process-items-container'>
             {serviceKey === ServiceKey.WINDSCREEN && (
               <>
@@ -128,7 +128,7 @@ export const ServiceDetail: React.FC = () => {
         )}
       </div>
 
-      {!!vehData && (
+      {!!inquiry && (
         <>
           <div className='padding-64'></div>
 

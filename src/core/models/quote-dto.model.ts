@@ -33,5 +33,5 @@ export type QuoteDto = {
   customer_chat_state?: CustomerChatState
   fe_requested_url?: string
   working_place?: WorkingPlace
-  workshop_id?: number
+  workshop_id?: boolean | number
 }

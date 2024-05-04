@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { CarType } from '@glass/enums'
-import { VehicleData } from '@glass/models'
+import { Inquiry } from '@glass/models'
 import { getVanBodyType } from '@glass/utils/session/session.util'
 
 const vehTypes = [
@@ -52,10 +52,10 @@ const mapBodyType = [
   CarType.TAILGATER,
 ]
 
-export const useRetrieveVehData = (vehData: VehicleData | undefined, dataToCustomer: (value: CarType) => void) => {
+export const useRetrieveVehData = (inquiry: Inquiry | undefined, dataToCustomer: (value: CarType) => void) => {
   useEffect(() => {
-    if (vehData) {
-      const vehClass = vehData.DoorPlanLiteral
+    if (inquiry) {
+      const vehClass = inquiry.DoorPlanLiteral
       let body: CarType | undefined
 
       for (let i = 0; i < vehTypes.length; i++) {
@@ -68,5 +68,5 @@ export const useRetrieveVehData = (vehData: VehicleData | undefined, dataToCusto
         dataToCustomer(body === CarType.BARN ? getVanBodyType() : body)
       }
     }
-  }, [vehData])
+  }, [inquiry])
 }
