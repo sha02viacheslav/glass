@@ -49,6 +49,13 @@ const theme = createTheme({
     ].join(','),
   },
   components: {
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          color: 'var(--Gray-800, #14151F)',
+        },
+      },
+    },
     MuiLink: {
       styleOverrides: {
         root: {

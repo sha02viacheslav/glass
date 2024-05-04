@@ -1,6 +1,17 @@
 import './Customer.css'
 import React, { useEffect, useState } from 'react'
-import { FormControl, FormControlLabel, OutlinedInput, Radio, RadioGroup, Step, StepIcon, Stepper } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  FormControlLabel,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+  Step,
+  StepIcon,
+  Stepper,
+  Typography,
+} from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -14,19 +25,22 @@ import { OurMethod } from '@glass/components/OurMethod'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { AddressType, BeforeAfterType, CarType, WorkingPlace } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import { Address, Attachment, BeforeAfter, Comment, Quote, QuoteDto, VehicleData } from '@glass/models'
+import { Address, Attachment, BeforeAfter, Comment, Quote, QuoteDto, VehicleData, Workshop } from '@glass/models'
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
+import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
 import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
+import { WorkshopCard } from './WorkshopCard'
 
 export type CustomerForm = {
   registrationNumber: string
   invoiceAddress: string
   workingPlace: WorkingPlace
+  workshopId: number
   glassLocation: string[]
   firstName: string
   lastName: string
@@ -38,6 +52,7 @@ export enum FormFieldIds {
   REGISTRATION_NUMBER = 'registrationNumber',
   INVOICE_ADDRESS = 'invoiceAddress',
   WORKING_PLACE = 'workingPlace',
+  WORKSHOP_ID = 'workshopId',
   GLASS_LOCATION = 'glassLocation',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
@@ -71,6 +86,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [fixingAddressText, setFixingAddressText] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
+  const [workshops, setWorkshops] = useState<Workshop[]>([])
 
   const validationSchema = object({
     registrationNumber: string()
@@ -90,6 +106,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       registrationNumber: licenseNum || '',
       invoiceAddress: '',
       workingPlace: WorkingPlace.NONE,
+      workshopId: 0,
       glassLocation: [],
       firstName: '',
       lastName: '',
@@ -134,6 +151,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }),
       )
     }
+  }
+
+  const getWorkshop = () => {
+    trackPromise(
+      getWorkshopService().then((res) => {
+        if (res.success) {
+          setWorkshops(res.data)
+        }
+      }),
+    )
   }
 
   const retrieveVehData = (data: CarType) => {
@@ -239,6 +266,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       customer_comment: comment,
       customer_attachments: attachments,
       working_place: values.workingPlace,
+      workshop_id: formik.values.workshopId,
     }
 
     if (quoteDetails) {
@@ -301,6 +329,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   useEffect(() => {
     if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
       getBeforeAfterImages()
+    }
+
+    if (formik.values?.workingPlace === WorkingPlace.WORKSHOP && !workshops.length) {
+      getWorkshop()
     }
   }, [formik.values])
 
@@ -443,6 +475,29 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <small className='form-error'>
                 {!formik.errors.invoiceAddress && formik.touched.workingPlace && formik.errors.workingPlace}
               </small>
+
+              {formik.values.workingPlace === WorkingPlace.WORKSHOP && (
+                <Box sx={{ marginTop: '24px' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+                    <Typography sx={{ lineHeight: '140%' }}>Choose a repair workshop from the list below. </Typography>
+                    <button className='btn-stroked'>
+                      <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
+                      Map view
+                    </button>
+                  </Box>
+
+                  <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', paddingTop: '16px', marginTop: '8px' }}>
+                    {workshops.map((workshop, index) => (
+                      <WorkshopCard
+                        key={index}
+                        workshop={workshop}
+                        selected={formik.values.workshopId === workshop.id}
+                        onSelect={() => formik.setFieldValue(FormFieldIds.WORKSHOP_ID, workshop.id)}
+                      ></WorkshopCard>
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </section>
           </>
         )}
@@ -613,6 +668,32 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
         <div className='continue-wrap'>
           <div>
+            {activeStep === 0 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (
+              <>
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-600, #6A6B71)',
+                    fontSize: '14px',
+                    fontWeight: '300',
+                    lineHeight: '24px',
+                    letterSpacing: '-0.14px',
+                  }}
+                >
+                  Workshop picked
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-800, #14151F)',
+                    fontSize: '16px',
+                    fontWeight: '400',
+                    lineHeight: '24px',
+                    letterSpacing: '-0.16px',
+                  }}
+                >
+                  You did not pick{' '}
+                </Typography>
+              </>
+            )}
             {!!activeStep && (
               <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
                 <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
