@@ -1,5 +1,6 @@
 import './Services.css'
 import React from 'react'
+import { Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Chat } from '@glass/components/Chat'
 import { OurMethod } from '@glass/components/OurMethod'
@@ -69,7 +70,9 @@ export const Services: React.FC = () => {
 
       <div className='padding-64'></div>
 
-      <LiveService image='live-service-bg1.png' />
+      <Box sx={{ margin: '0 16px' }}>
+        <LiveService image='live-service-bg1.png' />
+      </Box>
 
       <div className='padding-64'></div>
 

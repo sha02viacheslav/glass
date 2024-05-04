@@ -5,8 +5,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
 import { BeforeAfterType } from '@glass/enums'
-import { VehicleData } from '@glass/models'
-import { getVehicleService } from '@glass/services/apis/get-vehicle.service'
+import { Inquiry } from '@glass/models'
+import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { InstallmentBenefits } from '../Home/InstallmentBenefits'
 import { Testimonials } from '../Home/Testimonials'
 
@@ -14,16 +14,16 @@ export const InquiryIntro: React.FC = () => {
   const navigate = useNavigate()
   const { licenseNum } = useParams()
 
-  const [vehData, setVehData] = useState<VehicleData | undefined>()
+  const [inquiry, setInquiry] = useState<Inquiry | undefined>()
 
   const fetchVehData = (license: string | undefined) => {
     if (!!license) {
       // fetch vehicle data
       trackPromise(
-        getVehicleService(license)
+        getInquiryService(license)
           .then((res) => {
-            if (res.success && res.data?.Model) {
-              setVehData(res.data)
+            if (res.success) {
+              setInquiry(res.data)
             }
           })
           .catch(() => {}),
@@ -43,9 +43,12 @@ export const InquiryIntro: React.FC = () => {
     <div className='inquiry-intro-page'>
       <div className='about-your-car'>
         <img
-          src={vehData?.vehicle_logo_url || process.env.PUBLIC_URL + '/images/mechanics-checking-planning-workshop.png'}
+          src={
+            inquiry?.step_1?.vehicle_logo_url ||
+            process.env.PUBLIC_URL + '/images/mechanics-checking-planning-workshop.png'
+          }
         />
-        <div className='title'>We need to ask few details about your {vehData?.Make || 'car'}</div>
+        <div className='title'>We need to ask few details about your {inquiry?.Make || 'car'}</div>
         <div className='description'>It&apos;ll take less than 5 minutes of your time</div>
       </div>
 

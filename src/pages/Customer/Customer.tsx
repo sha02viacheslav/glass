@@ -47,6 +47,7 @@ import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
 import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
 import { WorkshopCard } from './WorkshopCard'
+import { LiveService } from '../Home/LiveService'
 
 export type CustomerForm = {
   registrationNumber: string
@@ -554,6 +555,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                     ></WorkshopCard>
                   ))}
                 </Box>
+              </Box>
+            )}
+
+            {formik.values.workingPlace === WorkingPlace.MOBILE && (
+              <Box sx={{ marginTop: '24px' }}>
+                <LiveService image='live-service-bg1.png' />
               </Box>
             )}
           </section>

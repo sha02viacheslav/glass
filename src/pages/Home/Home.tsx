@@ -1,6 +1,7 @@
 import './Home.css'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
+import { Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Chat } from '@glass/components/Chat'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -190,7 +191,9 @@ export const Home: React.FC = () => {
 
       <div className='padding-64'></div>
 
-      <LiveService />
+      <Box sx={{ margin: '0 16px' }}>
+        <LiveService />
+      </Box>
 
       <div className='padding-64'></div>
 
