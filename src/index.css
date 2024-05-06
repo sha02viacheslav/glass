@@ -233,7 +233,11 @@ body {
 }
 
 .text-gray-400 {
-  color: var(--Gray-400, #c1c1c3);
+  color: var(--Gray-400, #c1c1c3) !important;
+}
+
+.text-gray-700 {
+  color: var(--Gray-700, #474747) !important;
 }
 
 .bg-dark {

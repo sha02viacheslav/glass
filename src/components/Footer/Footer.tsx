@@ -61,7 +61,9 @@ export const Footer: React.FC = () => {
                   <div className='dot'></div>
                   <div className='footer-link'>Privacy Policy</div>
                   <div className='dot'></div>
-                  <div className='footer-link'>Terms & Conditions</div>
+                  <Link to='/terms-conditions' className='footer-link'>
+                    Terms & Conditions
+                  </Link>
                 </div>
 
                 <div className='copy-right'>Copyright by © FixGlass Company No.11808031. All rights reserved.</div>

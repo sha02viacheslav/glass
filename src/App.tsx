@@ -25,6 +25,7 @@ import { InquiryIntro } from './pages/InquiryIntro'
 import { Installments } from './pages/Installments'
 import { Process } from './pages/Process'
 import { ServiceDetail } from './pages/ServiceDetail'
+import TermsConditions from './pages/TermsConditions'
 
 export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress } = usePromiseTracker()
@@ -32,6 +33,7 @@ export const LoadingIndicator: React.FC = () => {
 }
 
 const theme = createTheme({
+  spacing: 4,
   typography: {
     fontFamily: [
       'Nunito Sans',
@@ -54,6 +56,9 @@ const theme = createTheme({
         root: {
           color: 'var(--Gray-800, #14151F)',
         },
+        h3: {
+          fontWeight: '700',
+        },
       },
     },
     MuiLink: {
@@ -75,6 +80,14 @@ const theme = createTheme({
           '&.Mui-checked': {
             color: 'var(--Light-Blue---Primary-400)',
           },
+        },
+      },
+    },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          display: 'list-item',
+          paddingLeft: 0,
         },
       },
     },
@@ -122,6 +135,7 @@ export const App: React.FC = () => {
             <Route path='/services' element={<Services />} />
             <Route path='/service-detail/:serviceKey' element={<ServiceDetail />} />
             <Route path='/about-us' element={<AboutUs />} />
+            <Route path='/terms-conditions' element={<TermsConditions />} />
             <Route path='/installments' element={<Installments />} />
             <Route path='/comparison' element={<Comparison />} />
             <Route path='/pricing' element={<Pricing />} />
