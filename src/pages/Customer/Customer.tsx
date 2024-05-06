@@ -30,9 +30,11 @@ import {
   Address,
   Attachment,
   BeforeAfter,
+  Characteristic,
   Comment,
   Inquiry,
   InquiryStep1Dto,
+  InquiryStep2Dto,
   Quote,
   QuoteDto,
   Workshop,
@@ -42,6 +44,7 @@ import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
+import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
@@ -55,6 +58,7 @@ export type CustomerForm = {
   workingPlace: WorkingPlace
   workshopId: boolean | number
   glassLocation: string[]
+  characteristics: Characteristic[]
   firstName: string
   lastName: string
   email: string
@@ -67,6 +71,7 @@ export enum FormFieldIds {
   WORKING_PLACE = 'workingPlace',
   WORKSHOP_ID = 'workshopId',
   GLASS_LOCATION = 'glassLocation',
+  CHARACTERISTICS = 'characteristics',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
   EMAIL = 'email',
@@ -121,6 +126,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       workingPlace: WorkingPlace.NONE,
       workshopId: false,
       glassLocation: [],
+      characteristics: [],
       firstName: '',
       lastName: '',
       email: '',
@@ -205,6 +211,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
           return
         }
+        updateInquiryStep2(formik.values)
         break
       }
       case InquiryStep.STEP4: {
@@ -274,6 +281,26 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
     trackPromise(
       updateInquiryStep1Service(postData).then((res) => {
+        if (res.success) {
+          goNext()
+        } else {
+          toast(res.message)
+        }
+      }),
+    )
+  }
+
+  const updateInquiryStep2 = (values: CustomerForm) => {
+    if (!inquiry) return
+
+    const postData: InquiryStep2Dto = {
+      fe_token: inquiry.fe_token,
+      glass_location: values.glassLocation,
+      inquiry_characteristics: values.characteristics,
+    }
+
+    trackPromise(
+      updateInquiryStep2Service(postData).then((res) => {
         if (res.success) {
           goNext()
         } else {
@@ -415,6 +442,17 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       if (inquiry.step_1.delivery_address?.postcode) handleChangeBillingAddress(inquiry.step_1.delivery_address)
       formik.setFieldValue(FormFieldIds.WORKING_PLACE, inquiry.step_1.working_place)
       formik.setFieldValue(FormFieldIds.WORKSHOP_ID, inquiry.step_1.workshop_id)
+      // send previously selected windows to window selection component
+      const selectedWindows: string[] = []
+      const selected = inquiry.step_2.glass_location || []
+      if (selected.length > 0) {
+        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, inquiry.step_2.glass_location)
+        for (let i = 0; i < selected.length; i++) {
+          // capitalize first letter to match window name
+          selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1))
+        }
+        setBrokenWindowsToComponent(selectedWindows)
+      }
     } else {
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
     }
@@ -564,6 +602,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               </Box>
             )}
           </section>
+          <div className='padding-64'></div>
         </Box>
 
         <Box
@@ -575,6 +614,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             <div id={FormFieldIds.GLASS_LOCATION}>
               <WindowSelector
                 carType={selectedCarType}
+                registrationNumber={formik.values.registrationNumber}
+                onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
                 setCarType={setSelectedCarType}
                 brokenWindowsToCustomer={brokenWindowsToCustomer}
                 brokenWindowsToComponent={brokenWindowsToComponent}
@@ -583,6 +624,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <div className='no-glass'>No glass selected</div>
             </div>
           </section>
+          <div className='padding-64'></div>
         </Box>
 
         <Box
@@ -727,9 +769,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               </div>
             </div>
           </section>
+          <div className='padding-64'></div>
         </Box>
 
-        <div className='padding-64'></div>
         <div className='padding-64'></div>
 
         <div className='continue-wrap'>

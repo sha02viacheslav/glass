@@ -1,20 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Box,
-  FormControlLabel,
-  Link,
-  Radio,
-  RadioGroup,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material'
+import { Box, FormControlLabel, Link, Radio, RadioGroup, Typography } from '@mui/material'
 import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
-import { WindowSelection } from '@glass/models'
+import { Characteristic, WindowSelection } from '@glass/models'
+import { getCharacteristicService } from '@glass/services/apis/get-characteristic.service'
 import {
   getAskedTint,
   getAskedVan,
@@ -23,10 +15,13 @@ import {
   setVanBodyType,
 } from '@glass/utils/session/session.util'
 import { PickGlassDialog } from './PickGlassDialog'
+import { Questions } from './Questions'
 import styles from './window-selection.module.css'
 
 export type WindowSelectorProps = {
   carType: CarType
+  registrationNumber: string
+  onChangeCharacteristics: (value: Characteristic[]) => void
   setCarType: (value: CarType) => void
   brokenWindowsToCustomer?: (value: string[]) => void
   brokenWindowsToComponent?: string[]
@@ -34,6 +29,8 @@ export type WindowSelectorProps = {
 
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
   carType,
+  registrationNumber,
+  onChangeCharacteristics,
   setCarType,
   brokenWindowsToCustomer,
   brokenWindowsToComponent,
@@ -56,6 +53,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
   const [selectedWindows, setSelectedWindows] = useState<string[]>([])
+
+  const [characteristics, setCharacteristics] = useState<{ [key: string]: Characteristic[] }>({})
 
   const frontWindscreenTop = useMemo(() => {
     switch (carType) {
@@ -238,6 +237,31 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     }
   }
 
+  const getCharacteristics = () => {
+    getCharacteristicService(registrationNumber, selectedWindows).then((res) => {
+      if (res.success) {
+        setCharacteristics(res.data)
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (registrationNumber && selectedWindows?.length) {
+      getCharacteristics()
+    }
+  }, [registrationNumber, selectedWindows])
+
+  useEffect(() => {
+    const characteristicsResult: Characteristic[] = []
+    Object.keys(characteristics).forEach((key) => {
+      characteristics[key].forEach((characteristic) => {
+        characteristicsResult.push({ ...characteristic })
+      })
+    })
+
+    onChangeCharacteristics(characteristicsResult)
+  }, [characteristics])
+
   useEffect(() => {
     if (brokenWindowsToCustomer) brokenWindowsToCustomer(selectedWindows)
   }, [selectedWindows, brokenWindows])
@@ -387,23 +411,59 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         </Box>
       )}
 
-      {brokenWindows
-        .filter((item) => item.broken)
-        .map((item, index) => (
-          <Box key={index} sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: '16px' }}>
-            <Typography
-              sx={{
-                color: 'var(--Gray-600, #6A6B71)',
-                fontSize: '12px',
-                fontWeight: '700',
-                lineHeight: '150%',
-                letterSpacing: '0.84px',
-                textTransform: 'uppercase',
-                marginTop: '16px',
-              }}
-            >
-              QUESTIONS ABOUT {item.name}
-            </Typography>
+      {isVan && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '4px',
+            padding: '12px 16px',
+            border: '1px solid var(--Gray-100, #F2F2F3)',
+            background: '#fff',
+            marginTop: '24px',
+          }}
+        >
+          <Typography
+            sx={{
+              color: 'var(--Gray-800, #14151F)',
+              fontSize: '12px',
+              fontWeight: '600',
+              lineHeight: '150%',
+              letterSpacing: '0.84px',
+              textTransform: 'uppercase',
+            }}
+          >
+            Body type?
+          </Typography>
+
+          <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
+            <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' />
+            <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' />
+          </RadioGroup>
+        </Box>
+      )}
+
+      {Object.keys(characteristics).map((key) => (
+        <Box key={key} sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: '16px' }}>
+          <Typography
+            sx={{
+              color: 'var(--Gray-600, #6A6B71)',
+              fontSize: '12px',
+              fontWeight: '700',
+              lineHeight: '150%',
+              letterSpacing: '0.84px',
+              textTransform: 'uppercase',
+              marginTop: '16px',
+            }}
+          >
+            QUESTIONS ABOUT {key}
+          </Typography>
+          <Box
+            sx={{
+              marginTop: '16px',
+            }}
+          >
             <Typography
               sx={{
                 color: 'var(--Gray-800, #14151F)',
@@ -411,125 +471,66 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
                 fontWeight: '400',
                 lineHeight: '150%',
                 letterSpacing: '-0.16px',
-                marginTop: '16px',
               }}
             >
-              We need some additional information related to your {item.name}{' '}
+              We need some additional information related to your {key}{' '}
               <Typography
                 sx={{
                   display: 'inline',
                   color: 'var(--Gray-600, #6A6B71)',
                 }}
               >
-                (Just {item.name.length} fast questions).
+                (Just {characteristics[key].length} fast questions).
               </Typography>
-              <Box
-                sx={{
-                  padding: '12px 16px',
-                  borderRadius: '2px',
-                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                  marginTop: '24px',
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: 'var(--Dark-Blue---Accent-800, #090221)',
-                    fontSize: '16px',
-                    fontWeight: '700',
-                    lineHeight: '150%',
-                    letterSpacing: '0.8px',
-                    display: 'flex',
-                    gap: '8px',
-                  }}
-                >
-                  <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
-                  IMPORTANT
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'var(--Light-Blue---Primary-700, #081F44)',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    lineHeight: '170%',
-                    marginTop: '4px',
-                  }}
-                >
-                  Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
-                </Typography>
-              </Box>
+            </Typography>
+
+            <Box
+              sx={{
+                padding: '12px 16px',
+                borderRadius: '2px',
+                border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                marginTop: '24px',
+              }}
+            >
               <Typography
                 sx={{
-                  color: 'var(--Gray-600, #6A6B71)',
+                  color: 'var(--Dark-Blue---Accent-800, #090221)',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  lineHeight: '150%',
+                  letterSpacing: '0.8px',
+                  display: 'flex',
+                  gap: '8px',
+                }}
+              >
+                <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
+                IMPORTANT
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'var(--Light-Blue---Primary-700, #081F44)',
                   fontSize: '16px',
                   fontWeight: '400',
-                  lineHeight: '24px',
-                  letterSpacing: '-0.16px',
-                  marginTop: '16px',
+                  lineHeight: '170%',
+                  marginTop: '4px',
                 }}
               >
-                Question <Typography sx={{ display: 'inline', color: 'var(--Gray-800, #14151F)' }}>1</Typography>/5
+                Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
               </Typography>
-              <Box
-                sx={{
-                  padding: '12px',
-                  borderRadius: '2px',
-                  boxShadow:
-                    '0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07), 0px 1px 7px 0px rgba(147, 147, 147, 0.09)',
-                  background: '#fff',
-                  marginTop: '8px',
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: 'ar(--Gray-800, #14151F)',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    lineHeight: '150%',
-                    letterSpacing: '-0.16px',
-                  }}
-                >
-                  Does your vehicle have rain/light sensors that automatically adjust wiper speed or headlight?
-                </Typography>
-                <RadioGroup
-                  row
-                  value={tinted}
-                  onChange={(_, value) => tintedButtonHandle(value === 'true')}
-                  sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label='Yes' />
-                  <FormControlLabel value={true} control={<Radio />} label='No' />
-                  <FormControlLabel value={false} control={<Radio />} label="I don't know" />
-                </RadioGroup>
-              </Box>
-            </Typography>
+            </Box>
+            <Questions
+              characteristics={characteristics[key]}
+              onChange={(value) => {
+                setCharacteristics((prev) => {
+                  prev[key] = value
+                  return { ...prev }
+                })
+              }}
+            ></Questions>
           </Box>
-        ))}
-
-      {isVan && (
-        <div className='d-flex align-items-center mt-3 mt-md-4'>
-          <div className={'fnt-16 fnt-md-28 text-primary ' + styles.windowSelectorToggleLabel}>Body type </div>
-          <ToggleButtonGroup color='secondary' value={bodyValue} exclusive aria-label='Platform'>
-            <ToggleButton
-              className={styles.windowSelectorToggle}
-              size='small'
-              value={CarType.BARN}
-              onClick={() => bodyChange(true)}
-            >
-              Barn door
-            </ToggleButton>
-            <ToggleButton
-              className={styles.windowSelectorToggle}
-              size='small'
-              value={CarType.TAILGATER}
-              onClick={() => bodyChange(false)}
-            >
-              Tailgater
-            </ToggleButton>
-            \{' '}
-          </ToggleButtonGroup>
-        </div>
-      )}
+        </Box>
+      ))}
     </div>
   )
 }
