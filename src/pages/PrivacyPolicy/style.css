@@ -1,0 +1,7 @@
+[id].anchor::before {
+  content: '';
+  display: block;
+  height: 120px;
+  margin-top: -120px;
+  visibility: hidden;
+}

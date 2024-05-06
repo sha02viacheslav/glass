@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 const TermsConditions: React.FC = () => {
   return (
-    <Box sx={{ px: 4, py: 40 }}>
+    <Box sx={{ px: 4, py: 40, maxWidth: '1000px', margin: '0 auto' }}>
       <Typography variant='h3' sx={{ fontSize: 24, mb: 4 }}>
         Terms & Conditions
       </Typography>

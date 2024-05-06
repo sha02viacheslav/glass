@@ -240,6 +240,14 @@ body {
   color: var(--Gray-700, #474747) !important;
 }
 
+.text-base-700 {
+  color: #4a5468 !important;
+}
+
+.text-base-800 {
+  color: #2d3648 !important;
+}
+
 .bg-dark {
   background: var(--dark-color) !important;
 }

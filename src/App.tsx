@@ -23,6 +23,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { Comparison } from './pages/Comparison'
 import { InquiryIntro } from './pages/InquiryIntro'
 import { Installments } from './pages/Installments'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import { Process } from './pages/Process'
 import { ServiceDetail } from './pages/ServiceDetail'
 import TermsConditions from './pages/TermsConditions'
@@ -57,6 +58,12 @@ const theme = createTheme({
           color: 'var(--Gray-800, #14151F)',
         },
         h3: {
+          fontWeight: '700',
+        },
+        h4: {
+          fontWeight: '700',
+        },
+        h5: {
           fontWeight: '700',
         },
       },
@@ -136,6 +143,7 @@ export const App: React.FC = () => {
             <Route path='/service-detail/:serviceKey' element={<ServiceDetail />} />
             <Route path='/about-us' element={<AboutUs />} />
             <Route path='/terms-conditions' element={<TermsConditions />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
             <Route path='/installments' element={<Installments />} />
             <Route path='/comparison' element={<Comparison />} />
             <Route path='/pricing' element={<Pricing />} />
