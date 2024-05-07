@@ -1,5 +1,5 @@
 import { Address } from './address.model'
-import { CommentAttachment } from './quote-dto.model'
+import { Attachment } from './attachment.model'
 import { InquiryStep } from '../enums/inquiry-step.enum'
 import { WorkingPlace } from '../enums/working-place.enum'
 
@@ -32,8 +32,8 @@ export type Inquiry = {
     inquiry_characteristics?: Characteristic[]
   }
   step_3: {
-    customer_comment?: string
-    customer_attachments?: CommentAttachment[]
+    customer_comment: string
+    customer_attachments: Attachment[]
   }
   step_4: {
     customer_id: string

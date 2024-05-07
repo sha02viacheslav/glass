@@ -1,6 +1,5 @@
-import './AddressInput.css'
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import { FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent } from '@mui/material'
+import { Box, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent } from '@mui/material'
 import { debounce } from 'lodash'
 import { toast } from 'react-toastify'
 import { Address, ManualAddress, SearchAddress } from '@glass/models'
@@ -89,8 +88,8 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
   }, [address])
 
   return (
-    <div className='address-input-wrap'>
-      <div className='d-flex gap-3'>
+    <Box>
+      <Box sx={{ display: 'flex', gap: 4 }}>
         <FormControl sx={{ width: '140px' }}>
           <InputLabel id='postcode-input'>Postcode</InputLabel>
           <OutlinedInput
@@ -114,27 +113,71 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
             onChange={handleAddressChange}
             error={!!suggestions?.length && !!formError}
           >
-            <div className='address-dropdown-header'>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                padding: 'var(--4, 4px) var(--16, 16px) var(--12, 12px) var(--16, 16px)',
+                gap: '10px',
+                borderBottom: '1px solid var(--Gray-200, #eaeaeb)',
+                color: 'var(--Gray-600, #6a6b71)',
+                fontFamily: 'Inter',
+                fontSize: '14px',
+                fontWeight: '400',
+                lineHeight: 'normal',
+                letterSpacing: '-0.14px',
+              }}
+            >
               <img src={process.env.PUBLIC_URL + '/images/information.svg'} className='img-fluid' alt='' />
               <div>Please pick your exact address from the list below or edit manually at the bottom</div>
-            </div>
+            </Box>
             {suggestions.map((item, index) => (
               <MenuItem key={index} value={item.id}>
                 {item.address}
               </MenuItem>
             ))}
-            <div className='address-dropdown-button' onClick={() => setManualMode(true)}>
+            <Box
+              sx={{
+                display: 'flex',
+                padding: '12px 24px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px',
+                alignSelf: 'stretch',
+                borderRadius: '2px',
+                background: 'var(--Light-Blue---Primary-000, #e8f0fe)',
+                color: 'var(--Light-Blue---Primary-500, #225fc2)',
+                fontSize: '18px',
+                fontWeight: '700',
+                lineHeight: '24px',
+                letterSpacing: '-0.18px',
+                cursor: 'pointer',
+              }}
+              onClick={() => setManualMode(true)}
+            >
               Enter address manually
-            </div>
+            </Box>
           </Select>
           <small className='form-error'>{!!suggestions?.length && formError}</small>
         </FormControl>
-      </div>
+      </Box>
+
       {!!addressText && (
-        <div className='address-text'>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: '8px',
+            color: 'var(--Gray-600, #6a6b71)',
+            fontSize: '14px',
+            fontWeight: '400',
+            lineHeight: '140%',
+            letterSpacing: '-0.14px',
+            marginTop: '4px',
+          }}
+        >
           <img src={process.env.PUBLIC_URL + '/images/map-marker-light.svg'} className='img-fluid' alt='' />
           {addressText}
-        </div>
+        </Box>
       )}
 
       {manualMode && (
@@ -149,6 +192,6 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
           }}
         />
       )}
-    </div>
+    </Box>
   )
 }

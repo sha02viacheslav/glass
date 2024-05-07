@@ -424,7 +424,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         ))}
 
         <div className='text-left'>
-          <AddPictures size='small' disabled={true} attachments={preAttachments} />
+          <AddPictures disabled={true} attachments={preAttachments} />
         </div>
 
         <div className='form-group mb-4'>
@@ -441,7 +441,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
         {!preAttachments.length && !attachments.length && <div className='no-pictures'>No Pictures Added</div>}
         <AddPictures
-          size='small'
           showUpload={true}
           attachments={attachments}
           onChangeFiles={handleChangeFiles}

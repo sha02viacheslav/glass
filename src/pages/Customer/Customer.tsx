@@ -4,6 +4,7 @@ import {
   Box,
   FormControl,
   FormControlLabel,
+  Link,
   OutlinedInput,
   Radio,
   RadioGroup,
@@ -35,6 +36,7 @@ import {
   Inquiry,
   InquiryStep1Dto,
   InquiryStep2Dto,
+  InquiryStep3Dto,
   Quote,
   QuoteDto,
   Workshop,
@@ -45,6 +47,7 @@ import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
 import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
+import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-step3.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
@@ -59,6 +62,7 @@ export type CustomerForm = {
   workshopId: boolean | number
   glassLocation: string[]
   characteristics: Characteristic[]
+  comment: string
   firstName: string
   lastName: string
   email: string
@@ -72,6 +76,7 @@ export enum FormFieldIds {
   WORKSHOP_ID = 'workshopId',
   GLASS_LOCATION = 'glassLocation',
   CHARACTERISTICS = 'characteristics',
+  COMMENT = 'comment',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
   EMAIL = 'email',
@@ -127,6 +132,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       workshopId: false,
       glassLocation: [],
       characteristics: [],
+      comment: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -138,7 +144,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     },
   })
 
-  const [comment, setComment] = useState<string>('')
   const [attachments, setAttachments] = useState<Attachment[]>([])
 
   // temporary things for car selection menu - Rainer
@@ -212,6 +217,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           return
         }
         updateInquiryStep2(formik.values)
+        break
+      }
+      case InquiryStep.STEP3: {
+        updateInquiryStep3(formik.values)
         break
       }
       case InquiryStep.STEP4: {
@@ -310,6 +319,31 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     )
   }
 
+  const updateInquiryStep3 = (values: CustomerForm) => {
+    if (!inquiry) return
+
+    const removeAttachmentIds = inquiry.step_3.customer_attachments
+      .filter((attachment) => attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0)
+      .map((attachment) => attachment.attachment_id)
+
+    const postData: InquiryStep3Dto = {
+      fe_token: inquiry.fe_token,
+      customer_comment: values.comment,
+      customer_attachments: attachments.filter((item) => !item.attachment_id),
+      remove_attachment_ids: removeAttachmentIds,
+    }
+
+    trackPromise(
+      updateInquiryStep3Service(postData).then((res) => {
+        if (res.success) {
+          goNext()
+        } else {
+          toast(res.message)
+        }
+      }),
+    )
+  }
+
   const submit = (values: CustomerForm) => {
     // post data
     const firstName = (values.firstName || '').trim()
@@ -338,7 +372,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       },
       registration_number: values.registrationNumber,
       glass_location: values.glassLocation,
-      customer_comment: comment,
+      customer_comment: values.comment,
       customer_attachments: attachments,
       working_place: values.workingPlace,
       workshop_id: formik.values.workshopId,
@@ -453,6 +487,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         setBrokenWindowsToComponent(selectedWindows)
       }
+      formik.setFieldValue(FormFieldIds.COMMENT, inquiry.step_3.customer_comment)
+      setAttachments([...inquiry.step_3.customer_attachments])
     } else {
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
     }
@@ -633,44 +669,86 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         >
           <div className='padding-48'></div>
           <section>
-            <div className='container'>
-              <div className='tab-content'>
-                <div className='row mt-4 mt-md-5 text-center'>
-                  <div className='col-md-9 mx-auto'>
-                    <div>
-                      <div className='parent mt-4 mt-md-5'>
-                        <div className='fnt-20 fnt-md-28 text-primary mb-2 mt-4 mt-md-5'>Your comments (optional)</div>
-                        {comments.map((item, index) => (
-                          <div key={index} className='text-left'>
-                            <p>
-                              <strong>Comment {index + 1}: </strong>
-                              {item.comment}
-                            </p>
-                            <AddPictures disabled={true} attachments={item.attachments} />
-                          </div>
-                        ))}
+            <Box
+              sx={{
+                paddingX: 4,
+                paddingY: 3,
+                borderRadius: '2px',
+                border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+              }}
+            >
+              <Typography
+                sx={{
+                  color: 'var(--Dark-Blue---Accent-800, #090221)',
+                  fontWeight: '700',
+                  lineHeight: '150%',
+                  letterSpacing: '0.8px',
+                }}
+              >
+                IMPORTANT
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'var(--Light-Blue---Primary-700, #081F44)',
+                  lineHeight: '170%',
+                  marginTop: 1,
+                }}
+              >
+                Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later as
+                well.
+              </Typography>
+            </Box>
+            <Box sx={{ marginTop: 6 }}>
+              <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
 
-                        <div className='form-group mb-4'>
-                          <textarea
-                            name=''
-                            id=''
-                            rows={4}
-                            className='form-control round h-auto'
-                            placeholder='Details for glass or any other comment.'
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                          ></textarea>
-                        </div>
-
-                        <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
-                        <small className='fnt-12 fnt-md-14 text-grey mt-2'>* Optional (Recommended)</small>
-                      </div>
-                    </div>
-                  </div>
+              {comments.map((item, index) => (
+                <div key={index} className='text-left'>
+                  <p>
+                    <strong>Comment {index + 1}: </strong>
+                    {item.comment}
+                  </p>
+                  <AddPictures disabled={true} attachments={item.attachments} />
                 </div>
-              </div>
-            </div>
+              ))}
+
+              <Typography
+                sx={{
+                  color: 'var(--WF-Base-800, #2D3648)',
+                  fontSize: 12,
+                  lineHeight: '24px',
+                  marginTop: 2,
+                }}
+              >
+                To see examples of excellent taken photo{' '}
+                <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
+                  tap here
+                </Link>
+              </Typography>
+
+              <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
+              <FormControl fullWidth>
+                <OutlinedInput
+                  value={formik.values.comment}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  placeholder='Any info you think that can help...'
+                  sx={{ fontSize: 14, paddingY: 0 }}
+                  onChange={(e) => formik.setFieldValue(FormFieldIds.COMMENT, e.target.value)}
+                  error={formik.touched.comment && !!formik.errors.comment}
+                />
+              </FormControl>
+            </Box>
           </section>
+          <div className='padding-64'></div>
+        </Box>
+
+        <Box
+          className='tab-content'
+          sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
+        >
+          <div className='padding-48'></div>
 
           <section className='sec-form'>
             <div className='row justify-content-center'>
@@ -685,7 +763,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <OutlinedInput
                         value={formik.values.firstName}
                         fullWidth
-                        className='glass-form-control round'
                         placeholder='First name'
                         onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
                         error={formik.touched.firstName && !!formik.errors.firstName}
@@ -701,7 +778,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <OutlinedInput
                         value={formik.values.lastName}
                         fullWidth
-                        className='glass-form-control round'
                         placeholder='Last name'
                         onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
                         error={formik.touched.lastName && !!formik.errors.lastName}
@@ -715,7 +791,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <OutlinedInput
                         value={formik.values.email}
                         fullWidth
-                        className='glass-form-control round'
                         placeholder='Email'
                         onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
                         error={formik.touched.email && !!formik.errors.email}
@@ -729,7 +804,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       <OutlinedInput
                         value={formik.values.phone}
                         fullWidth
-                        className='glass-form-control round'
                         placeholder='Phone'
                         onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
                         error={formik.touched.phone && !!formik.errors.phone}
@@ -758,7 +832,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                           id='deliveryAddress'
                           value={fixingAddressText || ''}
                           fullWidth
-                          className='glass-form-control round'
                           placeholder='Fixing address'
                           disabled={true}
                         />

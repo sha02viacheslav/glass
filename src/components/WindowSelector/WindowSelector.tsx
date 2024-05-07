@@ -479,6 +479,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
                   display: 'inline',
                   color: 'var(--Gray-600, #6A6B71)',
                 }}
+                component='span'
               >
                 (Just {characteristics[key].length} fast questions).
               </Typography>

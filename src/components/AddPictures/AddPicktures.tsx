@@ -1,11 +1,10 @@
-import './style.css'
 import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
+import { Box, CardMedia, Typography } from '@mui/material'
 import { Attachment } from '@glass/models'
 import { isBase64PDF } from '@glass/utils/check-type-base64/check-type-base64.util'
 
 type AddPicturesProps = {
-  size?: 'small' | 'medium'
   disabled?: boolean
   showUpload?: boolean
   attachments: Attachment[]
@@ -20,7 +19,6 @@ type ValidateFileResponse = {
 }
 
 export const AddPictures: React.FC<AddPicturesProps> = ({
-  size = 'medium',
   disabled = false,
   showUpload = false,
   attachments,
@@ -91,7 +89,6 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
           const reader = new FileReader()
           reader.readAsDataURL(file)
           reader.onload = () => {
-            console.warn(reader.result)
             const newAttachment: Attachment = {
               attachment_id: 0,
               name: file.name,
@@ -127,60 +124,99 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   }, [attachments])
 
   const renderFiles = () => (
-    <div className='row'>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--4, 4px)',
+        height: '100px',
+        padding: '6px',
+        borderRadius: 'var(--4, 4px)',
+        border: '1px solid var(--Gray-100, #F2F2F3)',
+        background: '#FFF',
+        marginTop: 2,
+        overflow: 'auto',
+      }}
+    >
       {validFiles.map((file, idx) => (
-        <div key={idx} className={(size === 'small' ? 'col-4 col-lg-3' : 'col-6 col-lg-4') + ' broken-image-wrap my-3'}>
-          <div className='square'>
-            <div>
-              {isBase64PDF(file.datas) ? (
-                <img src={process.env.PUBLIC_URL + '/images/pdf.png'} className='pdf-icon' alt='PDF Image' />
-              ) : (
-                <img src={file.datas} className='broken-image' alt='Broken Image' />
-              )}
+        <Box key={idx} sx={{ height: '100%', position: 'relative' }} className={'broken-image-wrap'}>
+          {isBase64PDF(file.datas) ? (
+            <CardMedia
+              component='img'
+              sx={{
+                width: '80%',
+                maxWidth: '80px',
+                objectFit: 'contain',
+              }}
+              image={process.env.PUBLIC_URL + '/images/pdf.png'}
+              alt='PDF Image'
+            />
+          ) : (
+            <CardMedia
+              component='img'
+              sx={{
+                width: 'auto',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '2px',
+              }}
+              image={file.datas}
+              alt='Broken Image'
+            />
+          )}
 
-              {size !== 'small' && <div className='title'>{file.name}</div>}
-              {!disabled && (
-                <button className='btn-stroked-icon' onClick={() => deleteFile(idx)}>
-                  <CloseIcon />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+          {!disabled && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+              }}
+            >
+              <button type='button' className='btn-stroked-icon' onClick={() => deleteFile(idx)}>
+                <CloseIcon />
+              </button>
+            </Box>
+          )}
+        </Box>
       ))}
-    </div>
+    </Box>
   )
 
   return (
-    <div>
-      {renderFiles()}
-
+    <Box>
       {!disabled && (
-        <div>
-          <button className='btn-stroked round' onClick={btnOnClick}>
-            <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
-              <input
-                ref={inputRef}
-                type='file'
-                className='d-none'
-                onChange={filesSelected}
-                multiple
-                accept={VALID_FILE_TYPES.join(', ')}
-                onClick={(event) => event.stopPropagation()}
-                disabled={disabled}
-              />
-              Add Pictures or PDF Documents
-            </label>
-          </button>
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ lineHeight: '150%' }}>Broken glass pictures or videos</Typography>
+            <button className='btn-link' onClick={btnOnClick}>
+              <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
+                <input
+                  ref={inputRef}
+                  type='file'
+                  className='d-none'
+                  onChange={filesSelected}
+                  multiple
+                  accept={VALID_FILE_TYPES.join(', ')}
+                  onClick={(event) => event.stopPropagation()}
+                  disabled={disabled}
+                />
+                + Upload
+              </label>
+            </button>
+          </Box>
+
           {showUpload && !!validFiles?.length && (
             <button className='btn-stroked round ms-3' onClick={handleClickUpload}>
               <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>Confirm Upload</label>
             </button>
           )}
-        </div>
+        </Box>
       )}
 
+      {renderFiles()}
+
       <div>{errorMessage}</div>
-    </div>
+    </Box>
   )
 }
