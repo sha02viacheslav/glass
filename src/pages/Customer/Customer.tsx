@@ -2,8 +2,10 @@ import './Customer.css'
 import React, { useEffect, useState } from 'react'
 import {
   Box,
+  CardMedia,
   FormControl,
   FormControlLabel,
+  InputLabel,
   Link,
   OutlinedInput,
   Radio,
@@ -37,6 +39,7 @@ import {
   InquiryStep1Dto,
   InquiryStep2Dto,
   InquiryStep3Dto,
+  InquiryStep4Dto,
   Quote,
   QuoteDto,
   Workshop,
@@ -48,6 +51,7 @@ import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
 import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
 import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-step3.service'
+import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-step4.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
@@ -241,6 +245,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.PHONE, 100)
           return
         }
+        updateInquiryStep4(formik.values)
         break
       }
       case InquiryStep.STEP5: {
@@ -335,6 +340,28 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
     trackPromise(
       updateInquiryStep3Service(postData).then((res) => {
+        if (res.success) {
+          goNext()
+        } else {
+          toast(res.message)
+        }
+      }),
+    )
+  }
+
+  const updateInquiryStep4 = (values: CustomerForm) => {
+    if (!inquiry) return
+
+    const postData: InquiryStep4Dto = {
+      fe_token: inquiry.fe_token,
+      customer_f_name: (values.firstName || '').trim(),
+      customer_s_name: (values.lastName || '').trim(),
+      customer_phone: (values.phone || '').trim(),
+      customer_email: (values.email || '').trim(),
+    }
+
+    trackPromise(
+      updateInquiryStep4Service(postData).then((res) => {
         if (res.success) {
           goNext()
         } else {
@@ -471,12 +498,14 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useEffect(() => {
     if (inquiry) {
+      // Step 1
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
       setActiveStep(inquiry.order_state)
       if (inquiry.step_1.delivery_address?.postcode) handleChangeBillingAddress(inquiry.step_1.delivery_address)
       formik.setFieldValue(FormFieldIds.WORKING_PLACE, inquiry.step_1.working_place)
       formik.setFieldValue(FormFieldIds.WORKSHOP_ID, inquiry.step_1.workshop_id)
-      // send previously selected windows to window selection component
+
+      // Step 2
       const selectedWindows: string[] = []
       const selected = inquiry.step_2.glass_location || []
       if (selected.length > 0) {
@@ -487,8 +516,15 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         setBrokenWindowsToComponent(selectedWindows)
       }
+      // Step 3
       formik.setFieldValue(FormFieldIds.COMMENT, inquiry.step_3.customer_comment)
       setAttachments([...inquiry.step_3.customer_attachments])
+
+      // Step 4
+      formik.setFieldValue(FormFieldIds.FIRST_NAME, inquiry.step_4.customer_f_name)
+      formik.setFieldValue(FormFieldIds.LAST_NAME, inquiry.step_4.customer_s_name)
+      formik.setFieldValue(FormFieldIds.PHONE, inquiry.step_4.customer_phone)
+      formik.setFieldValue(FormFieldIds.EMAIL, inquiry.step_4.customer_email)
     } else {
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
     }
@@ -749,99 +785,120 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
         >
           <div className='padding-48'></div>
+          <section>
+            <Box className='row'>
+              <Box sx={{ display: 'flex', gap: 2, marginBottom: 12 }}>
+                <CardMedia
+                  component='img'
+                  sx={{ width: 20, height: 20 }}
+                  image={process.env.PUBLIC_URL + '/images/account.svg'}
+                  alt='Account'
+                />
+                <Box>
+                  <FormControl id={FormFieldIds.FIRST_NAME} fullWidth sx={{ marginBottom: 6 }}>
+                    <InputLabel>First name*</InputLabel>
+                    <OutlinedInput
+                      value={formik.values.firstName}
+                      label='First name*'
+                      placeholder='First name*'
+                      onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
+                      error={formik.touched.firstName && !!formik.errors.firstName}
+                    />
+                    <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
+                  </FormControl>
 
-          <section className='sec-form'>
-            <div className='row justify-content-center'>
-              <div className='col-md-8 p-0'>
-                <div className='fnt-20 fnt-md-28 text-primary mb-2'>Fill your personal details</div>
-                <div className='row'>
-                  <div className='col-md-6'>
-                    <div id={FormFieldIds.FIRST_NAME} className='form-group mb-4'>
-                      <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
-                        First name
-                      </label>
-                      <OutlinedInput
-                        value={formik.values.firstName}
-                        fullWidth
-                        placeholder='First name'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
-                        error={formik.touched.firstName && !!formik.errors.firstName}
-                      />
-                      <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
-                    </div>
-                  </div>
-                  <div className='col-md-6'>
-                    <div id={FormFieldIds.LAST_NAME} className='form-group mb-4'>
-                      <label className={formik.touched.firstName && !!formik.errors.firstName ? ' error' : ''}>
-                        Last name
-                      </label>
-                      <OutlinedInput
-                        value={formik.values.lastName}
-                        fullWidth
-                        placeholder='Last name'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
-                        error={formik.touched.lastName && !!formik.errors.lastName}
-                      />
-                      <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
-                    </div>
-                  </div>
-                  <div className='col-md-6'>
-                    <div id={FormFieldIds.EMAIL} className='form-group mb-4'>
-                      <label className={formik.touched.email && !!formik.errors.email ? ' error' : ''}>Email</label>
-                      <OutlinedInput
-                        value={formik.values.email}
-                        fullWidth
-                        placeholder='Email'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
-                        error={formik.touched.email && !!formik.errors.email}
-                      />
-                      <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
-                    </div>
-                  </div>
-                  <div className='col-md-6'>
-                    <div id={FormFieldIds.PHONE} className='form-group mb-4'>
-                      <label className={formik.touched.phone && !!formik.errors.phone ? ' error' : ''}>Phone</label>
-                      <OutlinedInput
-                        value={formik.values.phone}
-                        fullWidth
-                        placeholder='Phone'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
-                        error={formik.touched.phone && !!formik.errors.phone}
-                      />
-                      <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
-                    </div>
-                  </div>
-                  {editMode && (
-                    <div className='col-md-12'>
-                      <div className='form-group mb-4'>
-                        <div className='d-flex justify-content-between'>
-                          <div className='h6 text-left text-black-50'>Fixing address</div>
-                          {!!quoteDetails?.customer_id && !!quoteId && (
-                            <ChangeAddress
-                              qid={quoteId}
-                              customerId={quoteDetails.customer_id}
-                              addressType={AddressType.DELIVERY}
-                              initialAddress={quoteDetails.delivery_address}
-                              onChangeAddress={(event) => {
-                                setFixingAddressText(formatAddress(event))
-                              }}
-                            />
-                          )}
-                        </div>
-                        <OutlinedInput
-                          id='deliveryAddress'
-                          value={fixingAddressText || ''}
-                          fullWidth
-                          placeholder='Fixing address'
-                          disabled={true}
+                  <FormControl id={FormFieldIds.LAST_NAME} fullWidth>
+                    <InputLabel>Last name*</InputLabel>
+                    <OutlinedInput
+                      value={formik.values.lastName}
+                      label='Last name*'
+                      placeholder='Last name*'
+                      onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
+                      error={formik.touched.lastName && !!formik.errors.lastName}
+                    />
+                    <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
+                  </FormControl>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
+                <CardMedia
+                  component='img'
+                  sx={{ width: 20, height: 20 }}
+                  image={process.env.PUBLIC_URL + '/images/phone-blue.svg'}
+                  alt='Account'
+                />
+                <FormControl id={FormFieldIds.PHONE} fullWidth>
+                  <InputLabel>Phone number*</InputLabel>
+                  <OutlinedInput
+                    value={formik.values.phone}
+                    label='Phone number*'
+                    placeholder='Phone number*'
+                    onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
+                    error={formik.touched.phone && !!formik.errors.phone}
+                  />
+                  <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
+                </FormControl>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
+                <CardMedia
+                  component='img'
+                  sx={{ width: 20, height: 20 }}
+                  image={process.env.PUBLIC_URL + '/images/email-blue.svg'}
+                  alt='Account'
+                />
+                <FormControl id={FormFieldIds.EMAIL} fullWidth>
+                  <InputLabel>E-mail*</InputLabel>
+                  <OutlinedInput
+                    value={formik.values.email}
+                    label='E-mail*'
+                    placeholder='E-mail*'
+                    onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
+                    error={formik.touched.email && !!formik.errors.email}
+                  />
+                  <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
+                </FormControl>
+              </Box>
+
+              {editMode && (
+                <div className='col-md-12'>
+                  <div className='form-group mb-4'>
+                    <div className='d-flex justify-content-between'>
+                      <div className='h6 text-left text-black-50'>Fixing address</div>
+                      {!!quoteDetails?.customer_id && !!quoteId && (
+                        <ChangeAddress
+                          qid={quoteId}
+                          customerId={quoteDetails.customer_id}
+                          addressType={AddressType.DELIVERY}
+                          initialAddress={quoteDetails.delivery_address}
+                          onChangeAddress={(event) => {
+                            setFixingAddressText(formatAddress(event))
+                          }}
                         />
-                      </div>
+                      )}
                     </div>
-                  )}
+                    <OutlinedInput
+                      id='deliveryAddress'
+                      value={fixingAddressText || ''}
+                      fullWidth
+                      placeholder='Fixing address'
+                      disabled={true}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </Box>
           </section>
+          <div className='padding-64'></div>
+        </Box>
+
+        <Box
+          className='tab-content'
+          sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
+        >
+          <div className='padding-48'></div>
+
           <div className='padding-64'></div>
         </Box>
 
