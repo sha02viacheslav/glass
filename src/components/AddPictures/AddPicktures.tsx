@@ -1,5 +1,4 @@
 import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
-import CloseIcon from '@mui/icons-material/Close'
 import { Box, CardMedia, Typography } from '@mui/material'
 import { Attachment } from '@glass/models'
 import { isBase64PDF } from '@glass/utils/check-type-base64/check-type-base64.util'
@@ -173,9 +172,22 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
                 right: '10px',
               }}
             >
-              <button type='button' className='btn-stroked-icon' onClick={() => deleteFile(idx)}>
-                <CloseIcon />
-              </button>
+              <Box
+                sx={{
+                  width: '16px',
+                  height: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  background: 'var(--Red---Semantic-500, #C22222)',
+                  boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0px 2px 4px 0px rgba(0, 0, 0, 0.20)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => deleteFile(idx)}
+              >
+                <CardMedia component='img' sx={{}} image={process.env.PUBLIC_URL + '/images/minus.svg'} alt='Minus' />
+              </Box>
             </Box>
           )}
         </Box>
