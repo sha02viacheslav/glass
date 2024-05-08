@@ -231,8 +231,6 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
   const directionsCallback = useCallback(
     (result: google.maps.DirectionsResult | null, status: google.maps.DirectionsStatus) => {
       if (result !== null) {
-        console.log(result, 'result')
-
         if (status === 'OK') {
           const route = result.routes[0]
           const leg = route.legs[0]
