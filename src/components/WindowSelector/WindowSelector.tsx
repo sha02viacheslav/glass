@@ -14,11 +14,11 @@ import {
   setAskedVan,
   setVanBodyType,
 } from '@glass/utils/session/session.util'
-import { HelpWhatDifference } from './HelpWhatDifference'
-import { HowToPick } from './HowToPick'
 import { PickGlassDialog } from './PickGlassDialog'
 import { Questions } from './Questions'
 import styles from './window-selection.module.css'
+import { HowToPick } from '../Help/HowToPick'
+import { WhatDifference } from '../Help/WhatDifference'
 
 export type WindowSelectorProps = {
   disabled?: boolean
@@ -544,7 +544,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       ))}
       {needHelp && (
         <Box pt={4}>
-          <HelpWhatDifference />
+          <WhatDifference />
         </Box>
       )}
     </div>

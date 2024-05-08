@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Typography, Box, Link } from '@mui/material'
 import { CustomModal } from '../Modal/CustomModal'
 
-export const HelpWhatDifference = () => {
+export const WhatDifference = () => {
   const [open, setOpen] = useState(false)
   const helpItems = useMemo(
     () => [

@@ -25,6 +25,7 @@ import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
 import MobileService from '@glass/components/GoogleMap/MobileService'
 import { Workshops } from '@glass/components/GoogleMap/Workshops'
+import { HowToTakePic } from '@glass/components/Help/HowToTakePic'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
@@ -860,19 +861,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                 </div>
               ))}
 
-              <Typography
-                sx={{
-                  color: 'var(--WF-Base-800, #2D3648)',
-                  fontSize: 12,
-                  lineHeight: '24px',
-                  marginTop: 2,
-                }}
-              >
-                To see examples of excellent taken photo{' '}
-                <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
-                  tap here
-                </Link>
-              </Typography>
+              <HowToTakePic />
 
               <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
               <FormControl fullWidth>
