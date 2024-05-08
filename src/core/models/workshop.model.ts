@@ -6,3 +6,8 @@ export type Workshop = {
   longitude: string
   workshop_image_url: string
 }
+
+export type WorkshopMap = Workshop & {
+  lat: number
+  lng: number
+}

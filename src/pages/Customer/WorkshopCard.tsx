@@ -5,11 +5,17 @@ import { Workshop } from '@glass/models'
 
 export type WorkshopCardProps = {
   workshop: Workshop
-  selected: boolean
-  onSelect: () => void
+  selectable?: boolean
+  selected?: boolean
+  onSelect?: () => void
 }
 
-export const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, selected, onSelect }) => {
+export const WorkshopCard: React.FC<WorkshopCardProps> = ({
+  workshop,
+  selectable = true,
+  selected = false,
+  onSelect = () => undefined,
+}) => {
   return (
     <Box
       sx={{
@@ -24,11 +30,13 @@ export const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, selected, 
     >
       <CardMedia component='img' sx={{ width: 129 }} image={workshop.workshop_image_url} alt='Workshop' />
 
-      <Box sx={{ position: 'absolute', left: '12px', top: '12px', cursor: 'pointer' }} onClick={() => onSelect()}>
-        <img
-          src={process.env.PUBLIC_URL + '/images/' + (selected ? 'workshop-radio-checked.svg' : 'workshop-radio.svg')}
-        />
-      </Box>
+      {selectable && (
+        <Box sx={{ position: 'absolute', left: '12px', top: '12px', cursor: 'pointer' }} onClick={() => onSelect()}>
+          <img
+            src={process.env.PUBLIC_URL + '/images/' + (selected ? 'workshop-radio-checked.svg' : 'workshop-radio.svg')}
+          />
+        </Box>
+      )}
 
       <Box sx={{ width: 'calc(100% - 129px)', padding: '12px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>

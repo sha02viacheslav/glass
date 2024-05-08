@@ -51,6 +51,7 @@
     "@mui/material": "^5.11.2",
     "@mui/system": "^5.10.14",
     "@mui/x-date-pickers": "^5.0.8",
+    "@react-google-maps/api": "^2.19.3",
     "@stripe/react-stripe-js": "^1.16.5",
     "@stripe/stripe-js": "^1.47.0",
     "@testing-library/jest-dom": "^5.16.5",
@@ -87,6 +88,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@types/google.maps": "^3.55.8",
     "@types/jest": "^29.5.0",
     "@types/lodash": "^4.14.192",
     "@types/node": "^18.15.10",

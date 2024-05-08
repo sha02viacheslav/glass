@@ -23,6 +23,7 @@ import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
+import { Workshops } from '@glass/components/GoogleMap/Workshops'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
@@ -173,6 +174,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [modalMap, setModalMap] = useState(false)
 
   // temporary things for car selection menu - Rainer
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
@@ -753,7 +755,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <Box sx={{ marginTop: '24px' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
                   <Typography sx={{ lineHeight: '140%' }}>Choose a repair workshop from the list below. </Typography>
-                  <button className='btn-stroked'>
+                  <button className='btn-stroked' onClick={() => setModalMap(true)}>
                     <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
                     Map view
                   </button>
@@ -1114,6 +1116,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       {!!beforeAfterItems?.length && (
         <OurMethod beforeAfterImages={beforeAfterItems} showTitle={false} showVideos={false} />
       )}
+      {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
     </div>
   )
 }

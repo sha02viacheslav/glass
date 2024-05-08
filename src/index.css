@@ -253,6 +253,14 @@ body {
   color: #2d3648 !important;
 }
 
+.text-green-600 {
+  color: #138531 !important;
+}
+
+.text-red-500 {
+  color: #c22222 !important;
+}
+
 .bg-dark {
   background: var(--dark-color) !important;
 }
