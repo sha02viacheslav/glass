@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Box, FormControlLabel, Link, Radio, RadioGroup, Typography } from '@mui/material'
+import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
@@ -14,6 +14,7 @@ import {
   setAskedVan,
   setVanBodyType,
 } from '@glass/utils/session/session.util'
+import { HowToPick } from './HowToPick'
 import { PickGlassDialog } from './PickGlassDialog'
 import { Questions } from './Questions'
 import styles from './window-selection.module.css'
@@ -365,23 +366,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         </div>
       </div>
 
-      {!disabled && (
-        <Typography
-          sx={{
-            color: 'var(--Gray-800, #14151F)',
-            fontSize: '14px',
-            fontWeight: '400',
-            lineHeight: '150%',
-            letterSpacing: '-0.14px',
-            marginTop: 4,
-          }}
-        >
-          Not sure how to pick broken glass?{' '}
-          <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
-            Tap here
-          </Link>
-        </Typography>
-      )}
+      {!disabled && <HowToPick />}
 
       {showTintedConfirm && (
         <Box

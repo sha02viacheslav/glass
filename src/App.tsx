@@ -66,6 +66,9 @@ const theme = createTheme({
         h5: {
           fontWeight: '700',
         },
+        h6: {
+          fontWeight: '700',
+        },
       },
     },
     MuiLink: {
