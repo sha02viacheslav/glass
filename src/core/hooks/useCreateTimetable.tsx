@@ -24,36 +24,36 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
     return schedules
   }
   const createTimetable = () => {
+    const firstDay = moment().startOf('week').toDate()
     // initialize with today's entry
     const newTimetable: TimeRow[] = [
       {
-        date: moment().format('YYYY-MM-DD'),
+        date: moment(firstDay).format('YYYY-MM-DD'),
         schedules: createEmptySchedules(),
       },
     ]
 
     // set correct dates for following CALENDAR_LENGTH days from current date
-    const tomorrow = new Date()
     for (let i = 1; i < CALENDAR_LENGTH; i++) {
-      tomorrow.setDate(tomorrow.getDate() + 1)
+      firstDay.setDate(firstDay.getDate() + 1)
       newTimetable.push({
-        date: moment(tomorrow).format('YYYY-MM-DD'),
+        date: moment(firstDay).format('YYYY-MM-DD'),
         schedules: createEmptySchedules(),
       })
     }
-    retrieveBookings(tomorrow, newTimetable)
+    retrieveBookings(firstDay, newTimetable)
   }
 
   const retrieveBookings = (nextDate: Date, timetable: TimeRow[]) => {
     // get past bookings
-    getCalendarService(new Date(), nextDate).then((res) => {
+    getCalendarService(moment().startOf('week').toDate(), nextDate).then((res) => {
       if (res.success && res.data) {
-        fillTimeslots(timetable, res.data)
+        fillTimeSlots(timetable, res.data)
       }
     })
   }
 
-  const fillTimeslots = (times: TimeRow[], bookingData: { [key: string]: BookingDate }) => {
+  const fillTimeSlots = (times: TimeRow[], bookingData: { [key: string]: BookingDate }) => {
     // find indexes of booked slots
     times.forEach((row) => {
       const booking = bookingData[moment(row.date).format('YYYY-MM-DD')]

@@ -6,4 +6,5 @@ export const INQUIRY_STEPS = [
   InquiryStep.STEP3,
   InquiryStep.STEP4,
   InquiryStep.STEP5,
+  InquiryStep.FINAL_CHECK,
 ]

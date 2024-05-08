@@ -4,4 +4,5 @@ export enum InquiryStep {
   STEP3 = 'step_3',
   STEP4 = 'step_4',
   STEP5 = 'step_5',
+  FINAL_CHECK = 'final_check',
 }

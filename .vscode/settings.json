@@ -18,5 +18,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true
+  },
+  "search.exclude": {
+    "public/js": true
   }
 }

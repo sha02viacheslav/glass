@@ -17,7 +17,7 @@ import { LocationSelection } from '@glass/components/quotePage/LocationSelection
 import { OrderInformation } from '@glass/components/quotePage/OrderInformation'
 import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
-import { BOOKING_DATE_FORMAT, EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
+import { EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
 import {
   FixglassPaymentMethodTyp,
   OrderState,
@@ -333,10 +333,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     navigate(`/customer/edit/${licenseReg}/${id}`)
   }
 
-  const timeSlotToParent = (data: TimeSlot) => {
-    setTimeSlot(data)
-    setWarningMsg('')
-  }
+  // const onChangeTimeSlot = (data: TimeSlot) => {
+  //   setTimeSlot(data)
+  //   setWarningMsg('')
+  // }
 
   const deliveryAddressToParent = (data: Address | undefined) => {
     setDeliveryAddress(data)
@@ -370,12 +370,14 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const initTimeSlot = () => {
     if (quoteDetails?.booking_date) {
       setTimeSlot({
+        id: 0,
         booking_date: quoteDetails.booking_date,
         time_slot: quoteDetails.time_slot,
         isFull: false,
       })
     } else if (quoteDetails?.request_booking_date) {
       setTimeSlot({
+        id: 0,
         booking_date: quoteDetails.request_booking_date,
         time_slot: quoteDetails.request_time_slot,
         isFull: true,
@@ -677,19 +679,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               />
 
               {((!quoteDetails?.booking_date && !quoteDetails.request_booking_date) || editBooking) && (
-                <TimeSelection
-                  timeSlotToParent={timeSlotToParent}
-                  liveBooking={false}
-                  bookingStartDate={
-                    quoteDetails?.booking_date
-                      ? moment(quoteDetails?.booking_date)
-                          .add(quoteDetails.time_slot.split('_')?.[0], 'hours')
-                          .format(BOOKING_DATE_FORMAT)
-                      : moment(quoteDetails?.request_booking_date)
-                          .add(quoteDetails.request_time_slot.split('_')?.[0], 'hours')
-                          .format(BOOKING_DATE_FORMAT)
-                  }
-                />
+                <TimeSelection />
               )}
 
               <PaymentMethod

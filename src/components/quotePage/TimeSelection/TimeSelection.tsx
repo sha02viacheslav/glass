@@ -1,26 +1,14 @@
+import './time-select-new.css'
 import React, { useEffect, useState } from 'react'
-import { Button, Menu, TextField } from '@mui/material'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
+import { Box, CardMedia, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import moment from 'moment'
-import arrowIcon from '@glass/assets/icons/down-arrow.png'
-import stripes from '@glass/assets/icons/stripes_s.png'
-import {
-  BOOKING_DATE_FORMAT,
-  CALENDAR_DAYS,
-  CALENDAR_LENGTH,
-  CALENDAR_TIME_INTERVAL,
-  CALENDAR_TIME_SLOTS,
-  SLOT_LABELS,
-} from '@glass/constants'
+import { BOOKING_DATE_FORMAT, CALENDAR_DAYS, CALENDAR_TIME_INTERVAL, SLOT_LABELS } from '@glass/constants'
 import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
-import './time-select-new.css'
-import { TimeRow, TimeSlot } from '@glass/models'
+import { RequestBooking, TimeRow, TimeSlot } from '@glass/models'
 import { formatSlotId } from '@glass/utils/format-slot-id/format-slot-id.util'
+import { slotStartTime, slotTimeIndex } from '@glass/utils/index'
 
-const timeHeaders = ['08:00', '12:00', '16:00', '20:00']
 const passedSlots = [12, 16, 20]
 const fullMonthValues = [
   'January',
@@ -38,44 +26,56 @@ const fullMonthValues = [
 ]
 
 export type TimeSelectionProps = {
-  timeSlotToParent?: (value: TimeSlot) => void
-  onChangeSlotId?: (value: string) => void
-  liveBooking: boolean
-  bookingStartDate: string | undefined
+  bookingEnabled?: boolean
+  onChangeBookingEnabled?: (value: boolean) => void
+  onChangeTimeSlot?: (value: RequestBooking[]) => void
+  requestBookings?: RequestBooking[]
+  formError?: string | string[] | never[] | undefined
 }
 
 export const TimeSelection: React.FC<TimeSelectionProps> = ({
-  timeSlotToParent,
-  onChangeSlotId,
-  liveBooking,
-  bookingStartDate,
+  bookingEnabled = true,
+  onChangeBookingEnabled = () => {},
+  onChangeTimeSlot = () => {},
+  requestBookings = [],
+  formError,
 }) => {
+  const [showCalendar, setShowCalendar] = useState<boolean>(true)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedSlot, setSelectedSlot] = useState('')
-  const [slotChanged, setSlotChanged] = useState(false)
+  const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([])
   const [timeData, setTimeData] = useState<TimeRow[]>([])
   const [slots, setSlots] = useState<TimeRow[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [pages, setPages] = useState<number[]>([])
-  const [pastIds, setPastIds] = useState<string[]>([])
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
+  const legends = [
+    {
+      icon: 'morning.svg',
+      title: 'morning',
+      abbreviation: 'M',
+      description: 'Morning hours',
+      time: '(8 am - 12 am)',
+    },
+    {
+      icon: 'afternoon.svg',
+      title: 'afternoon',
+      abbreviation: 'A',
+      description: 'Afternoon hours',
+      time: '(12 am - 4 pm)',
+    },
+    {
+      icon: 'evening.svg',
+      title: 'evening',
+      abbreviation: 'E',
+      description: 'Evening hours',
+      time: '(4 pm - 7 pm)',
+    },
+  ]
 
   useCreateTimetable(getTimeData)
-
-  function handleMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
-    setMenuOpen(!menuOpen)
-    setAnchorEl(event.currentTarget)
-  }
-
-  function handleMenuClose(newDate: Date) {
-    setMenuOpen(false)
-    setAnchorEl(null)
-    setSelectedDate(newDate)
-  }
 
   function getTimeData(data: TimeRow[]) {
     setTimeData(data)
@@ -83,22 +83,6 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
 
   // function to select a given time slot
   const selectSlot = (monthSelected: string, daySelected: string, timeSelected: number, occupy: BookingOccupy) => {
-    const currentSelection = document.getElementById(selectedSlot)
-    const idTag = monthSelected.concat(daySelected).concat(timeSelected.toString())
-    const newSelection = document.getElementById(idTag)
-    if (currentSelection != null) {
-      // remove active classname from previously selected timeslot
-      currentSelection.classList.remove('ts-td-active')
-    }
-    // if statement to avoid errors
-    if (newSelection != null) {
-      // check if timeslot has passed
-      const timeCheck = passedSlots[Number(timeSelected)] - currentHour
-      if (timeCheck <= 0 && moment().format('DD') == daySelected) {
-        return
-      }
-      newSelection.classList.add('ts-td-active')
-    }
     // save the data
     let odooDay = daySelected
     if (odooDay.length === 1) {
@@ -108,31 +92,32 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     const startDate = moment(
       `${monthSelected} ${odooDay}, ${currentYear} ${8 + timeSelected * CALENDAR_TIME_INTERVAL}:00:00`,
     ).format(BOOKING_DATE_FORMAT)
-    setSelectedSlot(idTag)
-    setSlotChanged(true)
-    if (!liveBooking) {
-      // send data to parent page to enable next btn
-      if (timeSlotToParent) {
-        timeSlotToParent({
-          booking_date: moment(startDate).format('YYYY-MM-DD'),
-          time_slot: `${moment(startDate).format('HH')}_${moment(startDate)
-            .add(CALENDAR_TIME_INTERVAL, 'hours')
-            .format('HH')}`,
-          isFull: occupy === BookingOccupy.FULL,
-        })
-      }
-    }
-  }
 
-  // function only runs in live booking tab
-  const confirmSelection = () => {
-    // save the slot selection and push to past slots
-    sessionStorage.setItem('selectedSlot', JSON.stringify(selectedSlot))
-    const pastSlots: string[] = JSON.parse(sessionStorage.getItem('pastSlots') || '[]')
-    pastSlots.push(selectedSlot)
-    sessionStorage.setItem('pastSlots', JSON.stringify(pastSlots))
-    // send data to parent page to enable next btn
-    if (onChangeSlotId) onChangeSlotId(selectedSlot)
+    const existingIndex = selectedSlots.findIndex(
+      (item) => slotStartTime(item.booking_date, item.time_slot) === startDate,
+    )
+    if (existingIndex > -1) {
+      selectedSlots.splice(existingIndex, 1)
+    } else {
+      selectedSlots.push({
+        id: 0,
+        booking_date: moment(startDate).format('YYYY-MM-DD'),
+        time_slot: `${moment(startDate).format('HH')}_${moment(startDate)
+          .add(CALENDAR_TIME_INTERVAL, 'hours')
+          .format('HH')}`,
+        isFull: occupy === BookingOccupy.FULL,
+      })
+    }
+
+    setSelectedSlots([...selectedSlots])
+
+    onChangeTimeSlot(
+      selectedSlots.map((item) => ({
+        request_booking_id: item.id,
+        request_booking_date: item.booking_date,
+        request_time_slot: item.time_slot,
+      })),
+    )
   }
 
   const changePage = (navValue: string) => {
@@ -145,6 +130,30 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
     }
   }
 
+  const handleChangeBookingAvailable = (value: boolean) => {
+    onChangeBookingEnabled(value)
+    setShowCalendar(value)
+    if (!value && onChangeTimeSlot) {
+      onChangeTimeSlot([])
+    }
+  }
+
+  const isActive = (element: TimeRow, timeIndex: number) => {
+    return (
+      selectedSlots.findIndex(
+        (item) =>
+          formatSlotId(slotStartTime(item.booking_date, item.time_slot)) ===
+          moment(element.date).format('MMMDD') + timeIndex.toString(),
+      ) > -1
+    )
+  }
+
+  const isPast = (element: TimeRow, timeIndex: number) => {
+    const timeCheck = passedSlots[timeIndex] - currentHour
+    if (moment(element.date).format('YYYY-MM-DD') < moment().format('YYYY-MM-DD')) return true
+    return moment(element.date).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') && timeCheck <= 0
+  }
+
   useEffect(() => {
     setCurrentPage(Math.floor(moment(selectedDate).startOf('date').diff(moment().startOf('date'), 'days') / 3 + 1))
   }, [selectedDate])
@@ -155,24 +164,23 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }, [currentPage, timeData])
 
   useEffect(() => {
-    if (!!bookingStartDate) {
-      if (moment(bookingStartDate).add(CALENDAR_TIME_INTERVAL, 'hours').isAfter(moment())) {
-        // only set prev selected slot if it has not passed
-        setSelectedSlot(formatSlotId(bookingStartDate))
-      }
+    if (requestBookings.length) {
+      setSelectedSlots(
+        requestBookings.map((item) => ({
+          id: item.request_booking_id,
+          booking_date: item.request_booking_date,
+          time_slot: item.request_time_slot,
+          isFull: false,
+        })),
+      )
     }
-    // find which slots have passed
-    const past: string[] = []
-    if (timeData.length > 0) {
-      for (let i = 0; i < CALENDAR_TIME_SLOTS; i++) {
-        const idTag = moment(timeData[0].date).format('MMMDD').concat(i.toString())
-        const timeCheck = passedSlots[i] - currentHour
-        if (timeCheck <= 0) {
-          past.push(idTag)
-        }
-      }
-    }
-    setPastIds(past)
+  }, [requestBookings])
+
+  useEffect(() => {
+    setShowCalendar(bookingEnabled)
+  }, [bookingEnabled])
+
+  useEffect(() => {
     // determine if table is viewed in mobile view and set cols in display accordingly
     const pageCount = []
     setSlots(timeData.slice(0, CALENDAR_DAYS))
@@ -183,144 +191,360 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }, [timeData])
 
   return (
-    <div className='bg-grey'>
-      <div className='fnt-28 fnt-md-34 text-primary p-3'>Set Date And Time</div>
-      <div className='time-select-main'>
-        <div className='date-pick-container'>
-          <Button
-            id='basic-button'
-            sx={{
-              width: 'fit-content',
-              height: 40,
-              color: '#484848',
-              fontSize: 23,
-              textTransform: 'none',
-              mb: 3,
-              '&:hover': { backgroundColor: '#9a73dd1c' },
-            }}
-            aria-controls={menuOpen ? 'basic-menu' : undefined}
-            aria-haspopup='true'
-            aria-expanded={menuOpen ? 'true' : undefined}
-            onClick={handleMenuClick}
-          >
-            <span className='time-select-month'>{currentMonth}</span>
-            <img className='date-picker-icon' src={arrowIcon} alt='' />
-          </Button>
-          <div className='date-nav-container'>
-            <button className='date-nav-btn' onClick={() => changePage('prev')}>
-              <img className='nav-right' src={arrowIcon} alt='' />
-            </button>
-            <button className='date-nav-btn' onClick={() => changePage('next')}>
-              <img className='nav-left' src={arrowIcon} alt='' />
-            </button>
-          </div>
-        </div>
-        <Menu
-          id='basic-menu'
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={() => handleMenuClose(selectedDate)}
-          MenuListProps={{
-            'aria-labelledby': 'basic-button',
+    <Box>
+      <Box>
+        <Typography
+          sx={{
+            fontWeight: '600',
+            lineHeight: '150%',
+            letterSpacing: '-0.16px',
           }}
         >
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <StaticDatePicker
-              displayStaticWrapperAs='desktop'
-              openTo='day'
-              minDate={new Date()}
-              maxDate={moment()
-                .add(CALENDAR_LENGTH - 1, 'days')
-                .toDate()}
-              value={selectedDate}
-              onChange={(newValue) => {
-                if (newValue) handleMenuClose(newValue)
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
-        </Menu>
-        {timeData.length > 0 && (
-          <table className='ts-table' id='calendar'>
-            {/* map time headers on left side */}
-            <tbody>
-              <tr>
-                {timeHeaders.map((element) => (
-                  <td key={element}>
-                    <div className='ts-time'>{element}</div>
-                  </td>
-                ))}
-              </tr>
-              {/* map slots and dates */}
-              {slots.map((element, index) => (
-                <tr key={index}>
-                  {/* first row maps dates */}
-                  <td className='ts-date-container'>
-                    <div className='d-flex align-items-center justify-content-center'>
-                      <div
-                        className={
-                          moment(element.date).format('YYYY-MM-DD') != moment().format('YYYY-MM-DD')
-                            ? 'ts-date-day text-primary'
-                            : 'ts-date-today text-primary'
-                        }
-                      >
-                        {moment(element.date).format('DD')}
-                      </div>
-                      <div className='text-primary ms-2'>{moment(element.date).format('ddd')}</div>
-                    </div>
-                  </td>
-                  {/* subsequent rows map timeslots */}
-                  {element.schedules.map((schedule, time) => (
-                    <td
-                      id={moment(element.date).format('MMMDD') + time.toString()}
-                      onClick={() =>
-                        selectSlot(
-                          moment(element.date).format('MMM'),
-                          moment(element.date).format('DD'),
-                          time,
-                          schedule.occupy as BookingOccupy,
-                        )
-                      }
-                      key={time}
-                      className={
-                        `ts-${schedule.occupy}` +
-                        (moment(element.date).format('MMMDD') + time.toString() === selectedSlot
-                          ? ' ts-td-active'
-                          : '') +
-                        (pastIds.includes(moment(element.date).format('MMMDD') + time.toString()) ? ' ts-passed' : '')
-                      }
-                    >
-                      {SLOT_LABELS[time]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+          Would you like to pick to pick your preferred date and time?
+        </Typography>
 
-        <div className='ts-legend-container'>
-          <div className='ts-legend-icon ts-past'>-</div>
-          <span className='ts-legend-text'>Timeslot passed</span>
-          <div className='ts-legend-icon ts-full'>-</div>
-          <span className='ts-legend-text'>Fully booked</span>
-          <img className='ts-legend-icon' src={stripes} alt='' />
-          <span className='ts-legend-text'>Almost Full</span>
-          <div className='ts-legend-icon ts-free'>-</div>
-          <span className='ts-legend-text'>Free</span>
-          {liveBooking && (
-            <div className='ts-confirm-btn-container'>
-              <button
-                id='pay-book-confirm'
-                className={slotChanged ? 'ts-confirm-btn' : 'ts-confirm-btn-disable'}
-                onClick={confirmSelection}
+        <RadioGroup row value={showCalendar} onChange={(_, value) => handleChangeBookingAvailable(value === 'true')}>
+          <FormControlLabel value={true} control={<Radio />} label='Yes, I Would' />
+          <FormControlLabel value={false} control={<Radio />} label="No, I'm flexible" />
+        </RadioGroup>
+      </Box>
+
+      {showCalendar ? (
+        <Box sx={{ marginTop: 10 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              padding: 'var(--12, 12px) var(--16, 16px)',
+              alignItems: 'flex-start',
+              gap: 'var(--8, 8px)',
+              borderRadius: '2px',
+              border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+              background:
+                'linear-gradient(0deg, var(--Dark-Blue---Accent-00, #ECE8FE) 0%, var(--Dark-Blue---Accent-00, #ECE8FE) 100%), #F7F9FC',
+            }}
+          >
+            <CardMedia
+              component='img'
+              sx={{ width: 16, height: 16, marginTop: 1 }}
+              image={process.env.PUBLIC_URL + '/images/information-dark.svg'}
+              alt='Minus'
+            />
+            <Typography
+              sx={{
+                color: 'var(--Light-Blue---Primary-700, #081F44)',
+                fontFamily: 'Inter',
+                fontSize: '14px',
+                fontWeight: '400',
+                lineHeight: '170%',
+                letterSpacing: '-0.14px',
+              }}
+            >
+              Please select multiple dates. Choose a single date only if urgent, as we may be fully booked that day. You
+              pick the date by tapping on it.
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              borderRadius: '4px',
+              background: '#fff',
+              boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+              border: !!formError ? '1px solid var(--Red---Semantic-500, #C22222)' : '',
+              marginTop: 4,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                padding: 'var(--4, 4px) var(--12, 12px) var(--4, 4px) var(--16, 16px)',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                alignSelf: 'stretch',
+                boxShadow: '0px 1px 3px 1px rgba(0, 0, 0, 0.1)',
+                borderRadius: '4px 4px 0 0',
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: '700',
+                  lineHeight: '20px',
+                  letterSpacing: '0.1px',
+                  padding: '10px 8px',
+                }}
               >
-                Confirm
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+                week 9{' '}
+                <Typography sx={{ color: 'var(--Gray-600, #6A6B71)' }} component='span'>
+                  ({currentMonth})
+                </Typography>
+              </Typography>
+
+              <Box sx={{ display: 'flex', gap: 4 }}>
+                <Box sx={{ padding: 2, cursor: 'pointer' }}>
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 24, height: 24 }}
+                    image={process.env.PUBLIC_URL + '/images/chevron-left-gray.svg'}
+                    onClick={() => changePage('prev')}
+                  />
+                </Box>
+                <Box sx={{ padding: 2, cursor: 'pointer' }}>
+                  <CardMedia
+                    sx={{ width: 24, height: 24 }}
+                    component='img'
+                    image={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
+                    onClick={() => changePage('next')}
+                  />
+                </Box>
+              </Box>
+            </Box>
+
+            <Box sx={{ margin: '0 1px', overflow: 'auto' }}>
+              {timeData.length > 0 && (
+                <table className='ts-table' id='calendar'>
+                  {/* map time headers on left side */}
+                  <tbody>
+                    {/* map slots and dates */}
+                    {slots.map((element, index) => (
+                      <tr key={index}>
+                        {/* first row maps dates */}
+                        <td>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 2,
+                              padding: 3,
+                            }}
+                          >
+                            <Typography
+                              sx={{
+                                color:
+                                  moment(element.date).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
+                                    ? 'var(--Dark-Blue---Accent-400, #7255DB)'
+                                    : moment(element.date).format('YYYY-MM-DD') ===
+                                      moment().startOf('week').format('YYYY-MM-DD')
+                                    ? 'var(--Gray-800, #14151F)'
+                                    : 'var(--Gray-600, #6A6B71)',
+                                textAlign: 'center',
+                                lineHeight: '24px',
+                                letterSpacing: '0.5px',
+                              }}
+                            >
+                              {moment(element.date).format('ddd').slice(0, 1)}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                color:
+                                  moment(element.date).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
+                                    ? 'var(--Dark-Blue---Accent-500, #4522C2)'
+                                    : 'var(--Gray-800, #14151F)',
+                                textAlign: 'center',
+                                lineHeight: '24px',
+                                letterSpacing: '0.5px',
+                              }}
+                            >
+                              {moment(element.date).format('D')}
+                            </Typography>
+                          </Box>
+                        </td>
+                        {/* subsequent rows map timeslots */}
+                        {element.schedules.map((schedule, time) => (
+                          <td id={moment(element.date).format('MMMDD') + time.toString()} key={time}>
+                            <Box
+                              key={index}
+                              sx={{
+                                padding: '0 6px',
+                                borderRadius: '4px',
+                                border: isActive(element, time)
+                                  ? '1px solid var(--Light-Blue---Primary-500, #225FC2)'
+                                  : '1px solid var(--Gray-200, #EAEAEB)',
+                                background: isActive(element, time)
+                                  ? 'var(--Light-Blue---Primary-000, #E8F0FE)'
+                                  : '#fff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                margin: '4px 8px',
+                                justifyContent: 'center',
+                                width: '46px',
+                                cursor: isPast(element, time) ? 'not-allowed' : 'pointer',
+                                opacity: isPast(element, time) ? '0.4' : '1',
+                              }}
+                              onClick={() =>
+                                selectSlot(
+                                  moment(element.date).format('MMM'),
+                                  moment(element.date).format('DD'),
+                                  time,
+                                  schedule.occupy as BookingOccupy,
+                                )
+                              }
+                            >
+                              <CardMedia
+                                component='img'
+                                sx={{ width: 24, height: 24 }}
+                                image={process.env.PUBLIC_URL + '/images/' + legends[time].icon}
+                              />
+                              <Typography
+                                sx={{
+                                  color: 'var(--Gray-700, #474747)',
+                                  lineHeight: 'normal',
+                                  letterSpacing: '-0.16px',
+                                }}
+                              >
+                                {SLOT_LABELS[time]}
+                              </Typography>
+                            </Box>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                width: '100%',
+                paddingX: 3,
+                paddingY: 2,
+                boxShadow: '0px -2px 12px 0px rgba(0, 0, 0, 0.08)',
+                borderRadius: '0 0 4px 4px',
+              }}
+            >
+              {legends.map((legend, index) => (
+                <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 24, height: 24 }}
+                    image={process.env.PUBLIC_URL + '/images/' + legend.icon}
+                  />
+                  <Typography
+                    sx={{
+                      color: 'var(--Gray-700, #474747)',
+                      fontSize: '12px',
+                      lineHeight: 'normal',
+                      letterSpacing: '-0.12px',
+                    }}
+                  >
+                    <Typography
+                      component='span'
+                      sx={{
+                        color: 'var(--Gray-700, #474747)',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        lineHeight: 'normal',
+                        letterSpacing: '-0.12px',
+                      }}
+                    >
+                      {legend.abbreviation}
+                    </Typography>{' '}
+                    - {legend.description}{' '}
+                    <Typography
+                      component='span'
+                      sx={{
+                        color: 'var(--Gray-700, #474747)',
+                        fontSize: '12px',
+                        fontWeight: '300',
+                        lineHeight: 'normal',
+                        letterSpacing: '-0.12px',
+                      }}
+                    >
+                      {legend.time}
+                    </Typography>
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+
+          <small className='form-error'>{formError}</small>
+
+          <Box sx={{ marginTop: 6 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--8, 8px)',
+                marginBottom: 3,
+              }}
+            >
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/calendar.svg'}
+                alt='Minus'
+              />
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  lineHeight: '20px',
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Dates selected
+              </Typography>
+            </Box>
+            {!!selectedSlots?.length ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {selectedSlots.map((item, index) => (
+                  <Typography
+                    key={index}
+                    sx={{
+                      lineHeight: '20px',
+                      letterSpacing: '0.8px',
+                    }}
+                  >
+                    {moment(item.booking_date).format('dddd')}{' '}
+                    {legends[slotTimeIndex(slotStartTime(item.booking_date, item.time_slot))].title},{' '}
+                    {moment(item.booking_date).format('Do MMMM')}
+                  </Typography>
+                ))}
+              </Box>
+            ) : (
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  lineHeight: '20px',
+                  letterSpacing: '0.8px',
+                }}
+              >
+                No date selected
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: 'flex',
+            padding: 'var(--24, 24px)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 'var(--4, 4px)',
+            background: '#FFF',
+            marginTop: 10,
+          }}
+        >
+          <Typography
+            sx={{
+              color: 'var(--Gray-700, #474747)',
+              textAlign: 'center',
+              fontSize: '18px',
+              lineHeight: '170%',
+            }}
+          >
+            We will send you some available dates and times for the appointment in the quote.
+          </Typography>
+        </Box>
+      )}
+    </Box>
   )
 }

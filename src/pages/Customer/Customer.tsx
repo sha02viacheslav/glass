@@ -19,12 +19,13 @@ import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { array, object, string } from 'yup'
+import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
+import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { INQUIRY_STEPS } from '@glass/constants'
 import { AddressType, BeforeAfterType, CarType, InquiryStep, WorkingPlace } from '@glass/enums'
@@ -40,8 +41,10 @@ import {
   InquiryStep2Dto,
   InquiryStep3Dto,
   InquiryStep4Dto,
+  InquiryStep5Dto,
   Quote,
   QuoteDto,
+  RequestBooking,
   Workshop,
 } from '@glass/models'
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
@@ -52,6 +55,7 @@ import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-s
 import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
 import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-step3.service'
 import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-step4.service'
+import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset } from '@glass/utils/index'
@@ -71,6 +75,8 @@ export type CustomerForm = {
   lastName: string
   email: string
   phone: string
+  bookingEnabled: boolean
+  requestBookings: RequestBooking[]
 }
 
 export enum FormFieldIds {
@@ -85,6 +91,8 @@ export enum FormFieldIds {
   LAST_NAME = 'lastName',
   EMAIL = 'email',
   PHONE = 'phone',
+  BOOKING_ENABLED = 'bookingEnabled',
+  REQUEST_BOOKINGS = 'requestBookings',
 }
 
 export type CustomerProps = {
@@ -102,6 +110,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     [InquiryStep.STEP3]: { index: 3, title: 'Your comment and images' },
     [InquiryStep.STEP4]: { index: 4, title: 'Your personal info' },
     [InquiryStep.STEP5]: { index: 5, title: 'Repair date and time' },
+    [InquiryStep.FINAL_CHECK]: { index: 6, title: 'Final check' },
   }
 
   const [activeStep, setActiveStep] = React.useState<InquiryStep>(InquiryStep.STEP1)
@@ -119,13 +128,26 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     registrationNumber: string()
       .required('Invalid vehicle registration number. Please review and correct it.')
       .nullable(),
+    invoiceAddress: string().required('Required').nullable(),
     workingPlace: string().required('Required').nullable(),
     glassLocation: array().of(string()).required().min(1, 'Select windows that need replacing'),
     firstName: string().required('Required').nullable(),
     lastName: string().required('Required').nullable(),
     email: string().email('Invalid email').required('Required').nullable(),
     phone: string().required('Required').nullable(),
-    invoiceAddress: string().required('Required').nullable(),
+    bookingEnabled: boolean(),
+    requestBookings: array()
+      .of(
+        object({
+          request_booking_id: number(),
+          request_booking_date: string(),
+          request_time_slot: string(),
+        }),
+      )
+      .when('bookingEnabled', {
+        is: true,
+        then: (s) => s.required().min(1, 'Please pick the dates above'),
+      }),
   })
 
   const formik = useFormik({
@@ -141,10 +163,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       lastName: '',
       email: '',
       phone: '',
+      bookingEnabled: false,
+      requestBookings: [],
     },
     validationSchema: validationSchema,
     onSubmit: async () => {
-      submit(formik.values)
+      handleContinueClick()
     },
   })
 
@@ -249,7 +273,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         break
       }
       case InquiryStep.STEP5: {
-        formik.handleSubmit()
+        formik.setFieldTouched(FormFieldIds.REQUEST_BOOKINGS, true, true)
+        if (formik.errors.requestBookings) {
+          scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, 100)
+          return
+        }
+        updateInquiryStep5(formik.values)
+        break
+      }
+      case InquiryStep.FINAL_CHECK: {
+        submitInquiry(formik.values)
       }
     }
   }
@@ -371,7 +404,34 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     )
   }
 
-  const submit = (values: CustomerForm) => {
+  const updateInquiryStep5 = (values: CustomerForm) => {
+    if (!inquiry) return
+
+    const removeRequestBookingIds = inquiry.step_5.request_booking
+      .filter(
+        (booking) =>
+          values.requestBookings.findIndex((item) => item.request_booking_id === booking.request_booking_id) < 0,
+      )
+      .map((booking) => booking.request_booking_id)
+
+    const postData: InquiryStep5Dto = {
+      fe_token: inquiry.fe_token,
+      request_booking: values.requestBookings.filter((item) => !item.request_booking_id),
+      remove_request_booking_ids: removeRequestBookingIds,
+    }
+
+    trackPromise(
+      updateInquiryStep5Service(postData).then((res) => {
+        if (res.success) {
+          goNext()
+        } else {
+          toast(res.message)
+        }
+      }),
+    )
+  }
+
+  const submitInquiry = (values: CustomerForm) => {
     // post data
     const firstName = (values.firstName || '').trim()
     const lastName = (values.lastName || '').trim()
@@ -446,6 +506,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   const handleChangeFiles = (files: Attachment[]) => {
     setAttachments(files)
+  }
+
+  const handleChangeTimeSlot = (requestBookings: RequestBooking[]) => {
+    formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, requestBookings)
   }
 
   const getBeforeAfterImages = () => {
@@ -525,6 +589,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       formik.setFieldValue(FormFieldIds.LAST_NAME, inquiry.step_4.customer_s_name)
       formik.setFieldValue(FormFieldIds.PHONE, inquiry.step_4.customer_phone)
       formik.setFieldValue(FormFieldIds.EMAIL, inquiry.step_4.customer_email)
+
+      // Step 5
+      formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, !!inquiry.step_5.request_booking.length)
+      formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, inquiry.step_5.request_booking)
     } else {
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
     }
@@ -539,26 +607,30 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   return (
     <div className='customer-page'>
       <form onSubmit={formik.handleSubmit}>
-        <div className='step-wrapper'>
-          <div className='title'>
-            <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
-          </div>
-          <Stepper activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
-            {Object.keys(steps).map((step) => {
-              const stepProps: { completed?: boolean } = {}
+        {activeStep !== InquiryStep.FINAL_CHECK && (
+          <div className='step-wrapper'>
+            <div className='title'>
+              <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
+            </div>
+            <Stepper activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
+              {Object.keys(steps)
+                .slice(0, 5)
+                .map((step) => {
+                  const stepProps: { completed?: boolean } = {}
 
-              return (
-                <Step key={step} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
-                  <StepIcon
-                    icon={steps[step as InquiryStep].index}
-                    active={step === activeStep}
-                    completed={step < activeStep}
-                  ></StepIcon>
-                </Step>
-              )
-            })}
-          </Stepper>
-        </div>
+                  return (
+                    <Step key={step} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                      <StepIcon
+                        icon={steps[step as InquiryStep].index}
+                        active={step === activeStep}
+                        completed={step < activeStep}
+                      ></StepIcon>
+                    </Step>
+                  )
+                })}
+            </Stepper>
+          </div>
+        )}
 
         <Box
           className='tab-content'
@@ -895,53 +967,88 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
         <Box
           className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
+          sx={{ height: activeStep === InquiryStep.STEP5 ? 'auto' : '0px', overflow: 'hidden' }}
         >
-          <div className='padding-48'></div>
+          <div className='padding-32'></div>
+          <section>
+            <TimeSelection
+              bookingEnabled={formik.values.bookingEnabled}
+              requestBookings={formik.values.requestBookings}
+              onChangeBookingEnabled={(value) => formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, value)}
+              onChangeTimeSlot={(value) => handleChangeTimeSlot(value)}
+              formError={formik.touched.requestBookings && formik.errors.requestBookings}
+            />
+          </section>
+          <div className='padding-64'></div>
+        </Box>
 
+        <Box
+          className='tab-content'
+          sx={{ height: activeStep === InquiryStep.FINAL_CHECK ? 'auto' : '0px', overflow: 'hidden' }}
+        >
+          <div className='padding-32'></div>
+          <section>
+            <Typography
+              sx={{
+                fontWeight: '600',
+                lineHeight: '150%',
+                letterSpacing: '-0.16px',
+              }}
+            >
+              Let&apos;s check the information before sending. You will be able to edit all the info later also.
+            </Typography>
+          </section>
           <div className='padding-64'></div>
         </Box>
 
         <div className='padding-64'></div>
 
         <div className='continue-wrap'>
-          <div>
-            {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (
-              <>
-                <Typography
-                  sx={{
-                    color: 'var(--Gray-600, #6A6B71)',
-                    fontSize: '14px',
-                    fontWeight: '300',
-                    lineHeight: '24px',
-                    letterSpacing: '-0.14px',
-                  }}
-                >
-                  Workshop picked
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'var(--Gray-800, #14151F)',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    lineHeight: '24px',
-                    letterSpacing: '-0.16px',
-                  }}
-                >
-                  You did not pick{' '}
-                </Typography>
-              </>
-            )}
-            {activeStep !== InquiryStep.STEP1 && (
-              <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
-                <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
-                Previous
+          {activeStep === InquiryStep.FINAL_CHECK ? (
+            <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+              Submit
+            </button>
+          ) : (
+            <>
+              <div>
+                {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (
+                  <>
+                    <Typography
+                      sx={{
+                        color: 'var(--Gray-600, #6A6B71)',
+                        fontSize: '14px',
+                        fontWeight: '300',
+                        lineHeight: '24px',
+                        letterSpacing: '-0.14px',
+                      }}
+                    >
+                      Workshop picked
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: 'var(--Gray-800, #14151F)',
+                        fontSize: '16px',
+                        fontWeight: '400',
+                        lineHeight: '24px',
+                        letterSpacing: '-0.16px',
+                      }}
+                    >
+                      You did not pick{' '}
+                    </Typography>
+                  </>
+                )}
+                {activeStep !== InquiryStep.STEP1 && (
+                  <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
+                    <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
+                    Previous
+                  </button>
+                )}
+              </div>
+              <button className='btn-raised' type='button' onClick={handleContinueClick}>
+                {activeStep === InquiryStep.STEP5 ? 'Final check' : 'Continue'}
               </button>
-            )}
-          </div>
-          <button className='btn-raised' type='button' onClick={handleContinueClick}>
-            Continue
-          </button>
+            </>
+          )}
         </div>
       </form>
 

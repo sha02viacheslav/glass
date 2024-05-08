@@ -11,6 +11,12 @@ export type Characteristic = {
   answer_not_know: boolean
 }
 
+export type RequestBooking = {
+  request_booking_id: number
+  request_booking_date: string
+  request_time_slot: string
+}
+
 export type Inquiry = {
   DoorPlanLiteral: string
   Make: string
@@ -44,7 +50,6 @@ export type Inquiry = {
     customer_email: string
   }
   step_5: {
-    request_booking_date: boolean
-    request_time_slot: string
+    request_booking: RequestBooking[]
   }
 }

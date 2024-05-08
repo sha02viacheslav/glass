@@ -32,7 +32,6 @@ export const Home: React.FC = () => {
   }
 
   const scrollDown = () => {
-    console.warn(window.innerHeight)
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
   }
 
