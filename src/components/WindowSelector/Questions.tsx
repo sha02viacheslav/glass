@@ -24,7 +24,7 @@ export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange 
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginTop: '16px' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginTop: 4 }}>
         <Typography
           sx={{
             color: 'var(--Gray-600, #6A6B71)',

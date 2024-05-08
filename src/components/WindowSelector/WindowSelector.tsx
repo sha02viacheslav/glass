@@ -19,21 +19,23 @@ import { Questions } from './Questions'
 import styles from './window-selection.module.css'
 
 export type WindowSelectorProps = {
+  disabled?: boolean
   carType: CarType
   registrationNumber: string
-  onChangeCharacteristics: (value: Characteristic[]) => void
-  setCarType: (value: CarType) => void
-  brokenWindowsToCustomer?: (value: string[]) => void
-  brokenWindowsToComponent?: string[]
+  selectedGlasses?: string[]
+  setCarType?: (value: CarType) => void
+  onSelectBrokenGlasses?: (value: string[]) => void
+  onChangeCharacteristics?: (value: Characteristic[]) => void
 }
 
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
+  disabled = false,
   carType,
   registrationNumber,
-  onChangeCharacteristics,
-  setCarType,
-  brokenWindowsToCustomer,
-  brokenWindowsToComponent,
+  selectedGlasses,
+  setCarType = () => {},
+  onSelectBrokenGlasses = () => {},
+  onChangeCharacteristics = () => {},
 }) => {
   // display popup
   const [showSelectGlassGuide, setShowSelectGlassGuide] = useState<boolean>(true)
@@ -263,7 +265,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [characteristics])
 
   useEffect(() => {
-    if (brokenWindowsToCustomer) brokenWindowsToCustomer(selectedWindows)
+    if (onSelectBrokenGlasses) onSelectBrokenGlasses(selectedWindows)
   }, [selectedWindows, brokenWindows])
 
   useEffect(() => {
@@ -282,16 +284,17 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
   useEffect(() => {
     // preselect windows if previously selected
-    if (brokenWindowsToComponent && brokenWindowsToComponent.length > 0) {
-      brokenWindowsToComponent?.forEach((element) => checkIfPreviouslySelected(element))
-      setSelectedWindows(brokenWindowsToComponent)
+    if (selectedGlasses && selectedGlasses.length > 0) {
+      selectedGlasses = selectedGlasses.map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+      selectedGlasses?.forEach((element) => checkIfPreviouslySelected(element))
+      setSelectedWindows(selectedGlasses)
     }
     if (bodyValue === CarType.BARN) {
       setIsBarnDoor(true)
     } else {
       setIsBarnDoor(false)
     }
-  }, [brokenWindowsToComponent])
+  }, [selectedGlasses])
 
   return (
     <div>
@@ -319,7 +322,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             alt=''
           />
 
-          {showSelectGlassGuide && (
+          {!disabled && showSelectGlassGuide && (
             <Box
               sx={{
                 position: 'absolute',
@@ -362,21 +365,23 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         </div>
       </div>
 
-      <Typography
-        sx={{
-          color: 'var(--Gray-800, #14151F)',
-          fontSize: '14px',
-          fontWeight: '400',
-          lineHeight: '150%',
-          letterSpacing: '-0.14px',
-          marginTop: '16px',
-        }}
-      >
-        Not sure how to pick broken glass?{' '}
-        <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
-          Tap here
-        </Link>
-      </Typography>
+      {!disabled && (
+        <Typography
+          sx={{
+            color: 'var(--Gray-800, #14151F)',
+            fontSize: '14px',
+            fontWeight: '400',
+            lineHeight: '150%',
+            letterSpacing: '-0.14px',
+            marginTop: 4,
+          }}
+        >
+          Not sure how to pick broken glass?{' '}
+          <Link sx={{ fontWeight: '700' }} onClick={() => {}}>
+            Tap here
+          </Link>
+        </Typography>
+      )}
 
       {showTintedConfirm && (
         <Box
@@ -411,7 +416,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         </Box>
       )}
 
-      {isVan && (
+      {!disabled && isVan && (
         <Box
           sx={{
             display: 'flex',
@@ -445,91 +450,91 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       )}
 
       {Object.keys(characteristics).map((key) => (
-        <Box key={key} sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: '16px' }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
-              fontWeight: '700',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-              marginTop: '16px',
-            }}
-          >
-            QUESTIONS ABOUT {key}
-          </Typography>
-          <Box
-            sx={{
-              marginTop: '16px',
-            }}
-          >
-            <Typography
-              sx={{
-                color: 'var(--Gray-800, #14151F)',
-                fontSize: '16px',
-                fontWeight: '400',
-                lineHeight: '150%',
-                letterSpacing: '-0.16px',
-              }}
-            >
-              We need some additional information related to your {key}{' '}
+        <Box key={key} sx={{ marginTop: 4 }}>
+          {!disabled && (
+            <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: 4 }}>
               <Typography
                 sx={{
-                  display: 'inline',
                   color: 'var(--Gray-600, #6A6B71)',
-                }}
-                component='span'
-              >
-                (Just {characteristics[key].length} fast questions).
-              </Typography>
-            </Typography>
-
-            <Box
-              sx={{
-                padding: '12px 16px',
-                borderRadius: '2px',
-                border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                marginTop: '24px',
-              }}
-            >
-              <Typography
-                sx={{
-                  color: 'var(--Dark-Blue---Accent-800, #090221)',
-                  fontSize: '16px',
+                  fontSize: '12px',
                   fontWeight: '700',
                   lineHeight: '150%',
-                  letterSpacing: '0.8px',
-                  display: 'flex',
-                  gap: '8px',
+                  letterSpacing: '0.84px',
+                  textTransform: 'uppercase',
                 }}
               >
-                <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
-                IMPORTANT
+                QUESTIONS ABOUT {key}
               </Typography>
+
               <Typography
                 sx={{
-                  color: 'var(--Light-Blue---Primary-700, #081F44)',
+                  color: 'var(--Gray-800, #14151F)',
                   fontSize: '16px',
                   fontWeight: '400',
-                  lineHeight: '170%',
-                  marginTop: '4px',
+                  lineHeight: '150%',
+                  letterSpacing: '-0.16px',
+                  marginTop: 4,
                 }}
               >
-                Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                We need some additional information related to your {key}{' '}
+                <Typography
+                  sx={{
+                    display: 'inline',
+                    color: 'var(--Gray-600, #6A6B71)',
+                  }}
+                  component='span'
+                >
+                  (Just {characteristics[key].length} fast questions).
+                </Typography>
               </Typography>
+
+              <Box
+                sx={{
+                  padding: '12px 16px',
+                  borderRadius: '2px',
+                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                  marginTop: '24px',
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: 'var(--Dark-Blue---Accent-800, #090221)',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    lineHeight: '150%',
+                    letterSpacing: '0.8px',
+                    display: 'flex',
+                    gap: '8px',
+                  }}
+                >
+                  <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
+                  IMPORTANT
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'var(--Light-Blue---Primary-700, #081F44)',
+                    fontSize: '16px',
+                    fontWeight: '400',
+                    lineHeight: '170%',
+                    marginTop: '4px',
+                  }}
+                >
+                  Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                </Typography>
+              </Box>
             </Box>
-            <Questions
-              characteristics={characteristics[key]}
-              onChange={(value) => {
-                setCharacteristics((prev) => {
-                  prev[key] = value
-                  return { ...prev }
-                })
-              }}
-            ></Questions>
-          </Box>
+          )}
+
+          <Questions
+            characteristics={characteristics[key]}
+            onChange={(value) => {
+              setCharacteristics((prev) => {
+                prev[key] = value
+                return { ...prev }
+              })
+            }}
+          ></Questions>
         </Box>
       ))}
     </div>

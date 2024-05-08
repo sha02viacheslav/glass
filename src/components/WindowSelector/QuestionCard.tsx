@@ -56,7 +56,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, onCh
               [value]: true,
             })
           }
-          sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}
+          sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}
         >
           <FormControlLabel value={CharacteristicAnswer.YES} control={<Radio />} label='Yes' />
           <FormControlLabel value={CharacteristicAnswer.NO} control={<Radio />} label='No' />

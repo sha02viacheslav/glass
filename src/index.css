@@ -216,6 +216,11 @@ body {
   background: transparent;
 }
 
+.btn-link.small {
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .text-white {
   color: var(--white-color) !important;
 }

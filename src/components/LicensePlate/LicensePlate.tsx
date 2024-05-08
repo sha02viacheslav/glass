@@ -41,10 +41,10 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }
 
   const handleClickSearch = () => {
-    fetchVehData(localLicenseNum)
+    getInquiry(localLicenseNum)
   }
 
-  const fetchVehData = (license: string | undefined) => {
+  const getInquiry = (license: string | undefined) => {
     if (!!license && !isLoading) {
       // fetch vehicle data
       setInvalid(false)
@@ -72,7 +72,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   useEffect(() => {
     const formattedLicenseNumber = formatLicenseNumber(licenseNumber)
     if (formattedLicenseNumber !== localLicenseNum) {
-      fetchVehData(formattedLicenseNumber)
+      getInquiry(formattedLicenseNumber)
       setLocalLicenseNum(formattedLicenseNumber)
     }
   }, [licenseNumber])

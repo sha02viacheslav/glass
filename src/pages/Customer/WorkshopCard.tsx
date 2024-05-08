@@ -54,9 +54,7 @@ export const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, selected, 
           <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontSize: '12px', lineHeight: '16px' }}>(62)</Typography>
         </Box>
 
-        <Box
-          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginTop: '16px' }}
-        >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginTop: 4 }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
             <img src={process.env.PUBLIC_URL + '/images/clock-blue.svg'} alt='' />
             <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontSize: '16px', lineHeight: '150%' }}>

@@ -133,7 +133,6 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
         borderRadius: 'var(--4, 4px)',
         border: '1px solid var(--Gray-100, #F2F2F3)',
         background: '#FFF',
-        marginTop: 2,
         overflow: 'auto',
       }}
     >
@@ -198,7 +197,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   return (
     <Box>
       {!disabled && (
-        <Box>
+        <Box sx={{ marginBottom: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography sx={{ lineHeight: '150%' }}>Broken glass pictures or videos</Typography>
             <button className='btn-link' onClick={btnOnClick}>

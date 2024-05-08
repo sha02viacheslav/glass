@@ -1,5 +1,5 @@
 import './Customer.css'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   CardMedia,
@@ -49,6 +49,7 @@ import {
 } from '@glass/models'
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
 import { createQuoteService } from '@glass/services/apis/create-quote.service'
+import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
@@ -58,8 +59,9 @@ import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-s
 import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
-import { scrollToElementWithOffset } from '@glass/utils/index'
+import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
 import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
+import { FinalCheck } from './FinalCheck'
 import { WorkshopCard } from './WorkshopCard'
 import { LiveService } from '../Home/LiveService'
 
@@ -113,17 +115,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     [InquiryStep.FINAL_CHECK]: { index: 6, title: 'Final check' },
   }
 
-  const [activeStep, setActiveStep] = React.useState<InquiryStep>(InquiryStep.STEP1)
-
-  const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
-  const [licenseSearchVal, setLicense] = useState(licenseNum || '')
-  const [inquiry, setInquiry] = useState<Inquiry | undefined>()
-  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
-  const [fixingAddressText, setFixingAddressText] = useState('')
-  const [comments, setComments] = useState<Comment[]>([])
-  const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
-  const [workshops, setWorkshops] = useState<Workshop[]>([])
-
   const validationSchema = object({
     registrationNumber: string()
       .required('Invalid vehicle registration number. Please review and correct it.')
@@ -172,6 +163,15 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     },
   })
 
+  const [activeStep, setActiveStep] = React.useState<InquiryStep>(InquiryStep.STEP1)
+  const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
+  const [licenseSearchVal, setLicense] = useState(licenseNum || '')
+  const [inquiry, setInquiry] = useState<Inquiry | undefined>()
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
+  const [fixingAddressText, setFixingAddressText] = useState('')
+  const [comments, setComments] = useState<Comment[]>([])
+  const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
+  const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
 
   // temporary things for car selection menu - Rainer
@@ -181,13 +181,31 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [selectedBrokenWindows, setSelectedBrokenWindows] = useState<string[]>([])
 
   // preselect broken windows if editing quote
-  const [brokenWindowsToComponent, setBrokenWindowsToComponent] = useState<string[]>([])
+  const [selectedGlasses, setBrokenWindowsToComponent] = useState<string[]>([])
 
-  const brokenWindowsToCustomer = (windows: string[]) => {
+  const selectedWorkshop = useMemo(() => {
+    const workshopId = formik.values.workshopId
+    return workshops?.find((item) => typeof workshopId === 'number' && item.id === workshopId)
+  }, [workshops, formik.values.workshopId])
+
+  const onSelectBrokenGlasses = (windows: string[]) => {
     setSelectedBrokenWindows(windows)
     formik.setFieldValue(
       FormFieldIds.GLASS_LOCATION,
       (selectedBrokenWindows || []).map((item) => item.toLowerCase()),
+    )
+  }
+
+  const getInquiry = () => {
+    const { registrationNumber } = formik.values
+    return trackPromise(
+      getInquiryService(registrationNumber).then((res) => {
+        if (res.success) {
+          setInquiry(res.data)
+        } else {
+          toast(res.message)
+        }
+      }),
     )
   }
 
@@ -287,6 +305,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     }
   }
 
+  const afterUpdateInquiryStep = () => {
+    getInquiry().then(() => {
+      if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        handleBackToSummaryClick()
+      } else {
+        goNext()
+      }
+    })
+  }
+
   const goNext = () => {
     setActiveStep((prev) => INQUIRY_STEPS[INQUIRY_STEPS.findIndex((item) => item === prev) + 1])
     window.scrollTo({
@@ -297,6 +325,14 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   const handlePreviousClick = () => {
     setActiveStep((prev) => INQUIRY_STEPS[INQUIRY_STEPS.findIndex((item) => item === prev) - 1])
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
+  const handleBackToSummaryClick = () => {
+    setActiveStep(InquiryStep.FINAL_CHECK)
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -329,7 +365,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     trackPromise(
       updateInquiryStep1Service(postData).then((res) => {
         if (res.success) {
-          goNext()
+          afterUpdateInquiryStep()
         } else {
           toast(res.message)
         }
@@ -349,7 +385,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     trackPromise(
       updateInquiryStep2Service(postData).then((res) => {
         if (res.success) {
-          goNext()
+          afterUpdateInquiryStep()
         } else {
           toast(res.message)
         }
@@ -374,7 +410,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     trackPromise(
       updateInquiryStep3Service(postData).then((res) => {
         if (res.success) {
-          goNext()
+          afterUpdateInquiryStep()
         } else {
           toast(res.message)
         }
@@ -396,7 +432,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     trackPromise(
       updateInquiryStep4Service(postData).then((res) => {
         if (res.success) {
-          goNext()
+          afterUpdateInquiryStep()
         } else {
           toast(res.message)
         }
@@ -423,7 +459,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     trackPromise(
       updateInquiryStep5Service(postData).then((res) => {
         if (res.success) {
-          goNext()
+          afterUpdateInquiryStep()
         } else {
           toast(res.message)
         }
@@ -548,13 +584,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       formik.setFieldValue(FormFieldIds.PHONE, quoteDetails?.customer_phone)
 
       // send previously selected windows to window selection component
-      const selectedWindows: string[] = []
-      const selected = editMode ? quoteDetails.glass_location || [] : []
-      if (selected.length > 0) {
-        for (let i = 0; i < selected.length; i++) {
-          // capitalize first letter to match window name
-          selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1))
-        }
+      const selectedWindows = editMode ? quoteDetails.glass_location || [] : []
+      if (selectedWindows.length > 0) {
         setBrokenWindowsToComponent(selectedWindows)
       }
     }
@@ -570,14 +601,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       formik.setFieldValue(FormFieldIds.WORKSHOP_ID, inquiry.step_1.workshop_id)
 
       // Step 2
-      const selectedWindows: string[] = []
-      const selected = inquiry.step_2.glass_location || []
-      if (selected.length > 0) {
+      const selectedWindows = inquiry.step_2.glass_location || []
+      if (selectedWindows.length > 0) {
         formik.setFieldValue(FormFieldIds.GLASS_LOCATION, inquiry.step_2.glass_location)
-        for (let i = 0; i < selected.length; i++) {
-          // capitalize first letter to match window name
-          selectedWindows.push(selected[i].charAt(0).toUpperCase() + selected[i].slice(1))
-        }
         setBrokenWindowsToComponent(selectedWindows)
       }
       // Step 3
@@ -707,8 +733,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                 value={formik.values.workingPlace}
                 onChange={(_, value) => formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)}
               >
-                <FormControlLabel value={WorkingPlace.WORKSHOP} control={<Radio />} label='Workshop service' />
-                <FormControlLabel value={WorkingPlace.MOBILE} control={<Radio />} label='Mobile service' />
+                <FormControlLabel
+                  value={WorkingPlace.WORKSHOP}
+                  control={<Radio />}
+                  label={workingPlaceLabel(WorkingPlace.WORKSHOP)}
+                />
+                <FormControlLabel
+                  value={WorkingPlace.MOBILE}
+                  control={<Radio />}
+                  label={workingPlaceLabel(WorkingPlace.MOBILE)}
+                />
               </RadioGroup>
             </FormControl>
             <small className='form-error'>
@@ -761,8 +795,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                 registrationNumber={formik.values.registrationNumber}
                 onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
                 setCarType={setSelectedCarType}
-                brokenWindowsToCustomer={brokenWindowsToCustomer}
-                brokenWindowsToComponent={brokenWindowsToComponent}
+                onSelectBrokenGlasses={onSelectBrokenGlasses}
+                selectedGlasses={selectedGlasses}
               />
 
               <div className='no-glass'>No glass selected</div>
@@ -988,26 +1022,51 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         >
           <div className='padding-32'></div>
           <section>
-            <Typography
-              sx={{
-                fontWeight: '600',
-                lineHeight: '150%',
-                letterSpacing: '-0.16px',
-              }}
-            >
-              Let&apos;s check the information before sending. You will be able to edit all the info later also.
-            </Typography>
+            {!!inquiry && (
+              <FinalCheck
+                selectedCarType={selectedCarType}
+                inquiry={inquiry}
+                onEdit={(value) => setActiveStep(value)}
+              ></FinalCheck>
+            )}
           </section>
           <div className='padding-64'></div>
         </Box>
 
         <div className='padding-64'></div>
 
-        <div className='continue-wrap'>
-          {activeStep === InquiryStep.FINAL_CHECK ? (
-            <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-              Submit
-            </button>
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100vw',
+            zIndex: '100',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+            background: '#fff',
+          }}
+        >
+          {inquiry?.order_state === InquiryStep.FINAL_CHECK ? (
+            <>
+              {activeStep !== InquiryStep.FINAL_CHECK ? (
+                <>
+                  <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
+                    Back to Summary
+                  </button>
+                  <button className='btn-raised' type='button' onClick={handleContinueClick}>
+                    Save changes
+                  </button>
+                </>
+              ) : (
+                <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                  Submit
+                </button>
+              )}
+            </>
           ) : (
             <>
               <div>
@@ -1033,7 +1092,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                         letterSpacing: '-0.16px',
                       }}
                     >
-                      You did not pick{' '}
+                      {!!selectedWorkshop ? selectedWorkshop.name : 'You did not pick'}
                     </Typography>
                   </>
                 )}
@@ -1049,7 +1108,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               </button>
             </>
           )}
-        </div>
+        </Box>
       </form>
 
       {!!beforeAfterItems?.length && (

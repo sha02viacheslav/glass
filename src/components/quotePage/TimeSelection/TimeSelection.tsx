@@ -2,7 +2,7 @@ import './time-select-new.css'
 import React, { useEffect, useState } from 'react'
 import { Box, CardMedia, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import moment from 'moment'
-import { BOOKING_DATE_FORMAT, CALENDAR_DAYS, CALENDAR_TIME_INTERVAL, SLOT_LABELS } from '@glass/constants'
+import { BOOKING_DATE_FORMAT, CALENDAR_DAYS, CALENDAR_TIME_INTERVAL, SLOT_LABELS, SLOT_LEGENDS } from '@glass/constants'
 import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import { RequestBooking, TimeRow, TimeSlot } from '@glass/models'
@@ -50,30 +50,6 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const currentMonth = fullMonthValues[selectedDate.getMonth()]
   const currentHour = new Date().getHours()
   const currentYear = new Date().getFullYear()
-
-  const legends = [
-    {
-      icon: 'morning.svg',
-      title: 'morning',
-      abbreviation: 'M',
-      description: 'Morning hours',
-      time: '(8 am - 12 am)',
-    },
-    {
-      icon: 'afternoon.svg',
-      title: 'afternoon',
-      abbreviation: 'A',
-      description: 'Afternoon hours',
-      time: '(12 am - 4 pm)',
-    },
-    {
-      icon: 'evening.svg',
-      title: 'evening',
-      abbreviation: 'E',
-      description: 'Evening hours',
-      time: '(4 pm - 7 pm)',
-    },
-  ]
 
   useCreateTimetable(getTimeData)
 
@@ -383,7 +359,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                               <CardMedia
                                 component='img'
                                 sx={{ width: 24, height: 24 }}
-                                image={process.env.PUBLIC_URL + '/images/' + legends[time].icon}
+                                image={process.env.PUBLIC_URL + '/images/' + SLOT_LEGENDS[time].icon}
                               />
                               <Typography
                                 sx={{
@@ -416,7 +392,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                 borderRadius: '0 0 4px 4px',
               }}
             >
-              {legends.map((legend, index) => (
+              {SLOT_LEGENDS.map((legend, index) => (
                 <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CardMedia
                     component='img'
@@ -493,7 +469,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
               </Typography>
             </Box>
             {!!selectedSlots?.length ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {selectedSlots.map((item, index) => (
                   <Typography
                     key={index}
@@ -503,7 +479,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                     }}
                   >
                     {moment(item.booking_date).format('dddd')}{' '}
-                    {legends[slotTimeIndex(slotStartTime(item.booking_date, item.time_slot))].title},{' '}
+                    {SLOT_LEGENDS[slotTimeIndex(slotStartTime(item.booking_date, item.time_slot))].title},{' '}
                     {moment(item.booking_date).format('Do MMMM')}
                   </Typography>
                 ))}
