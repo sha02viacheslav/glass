@@ -4,13 +4,12 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 import { Button, Divider, Modal, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { DirectionsRenderer, DirectionsService, GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import { DISTANCE_ALLOWED, GOOGLE_MAP_API_KEY } from 'src/core/constants'
 import { useMyLocation } from '@glass/hooks/useMyLocation'
 import { Workshop, WorkshopMap } from '@glass/models'
 import { WorkshopCard } from '@glass/pages/Customer/WorkshopCard'
 
-const GOOGLE_MAP_API_KEY = process.env.REACT_APP_GOOGLE_MAP_API_KEY || ''
 const ZOOM = 16
-const DISTANCE_ALLOWED = 5000 // 5000m
 
 type PropComponent = {
   onDismiss?: () => void
@@ -30,8 +29,9 @@ const MapWorkshop: FC<PropComponent> = ({ workshops, onError = () => undefined }
   const { lat, lng } = useMyLocation()
   const myPosition = useMemo(() => {
     if (lat && lng) {
-      // return { lat, lng }
-      return { lat: 53.3992835498545, lng: -1.4479439364725315 }
+      return { lat, lng }
+      // // dev
+      // return { lat: 53.3992835498545, lng: -1.4479439364725315 }
     }
     return undefined
   }, [lat, lng])

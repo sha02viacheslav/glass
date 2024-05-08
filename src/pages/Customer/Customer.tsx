@@ -23,6 +23,7 @@ import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
 import { ChangeAddress } from '@glass/components/ChangeAddress'
+import MobileService from '@glass/components/GoogleMap/MobileService'
 import { Workshops } from '@glass/components/GoogleMap/Workshops'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
@@ -568,11 +569,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
       getBeforeAfterImages()
     }
+  }, [formik.values])
 
-    if (formik.values?.workingPlace === WorkingPlace.WORKSHOP && !workshops.length) {
+  useEffect(() => {
+    if (!workshops.length) {
       getWorkshop()
     }
-  }, [formik.values])
+  }, [workshops])
 
   useEffect(() => {
     if (quoteDetails) {
@@ -778,6 +781,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
             {formik.values.workingPlace === WorkingPlace.MOBILE && (
               <Box sx={{ marginTop: '24px' }}>
+                {!!workshops.length && <MobileService workshops={workshops} />}
                 <LiveService image='live-service-bg1.png' />
               </Box>
             )}
