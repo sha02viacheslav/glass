@@ -14,6 +14,7 @@ import {
   setAskedVan,
   setVanBodyType,
 } from '@glass/utils/session/session.util'
+import { HelpWhatDifference } from './HelpWhatDifference'
 import { HowToPick } from './HowToPick'
 import { PickGlassDialog } from './PickGlassDialog'
 import { Questions } from './Questions'
@@ -56,6 +57,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [brokenWindows, setBrokenWindows] = useState<WindowSelection[]>([])
   // special array for sending selected broken windows to customer page
   const [selectedWindows, setSelectedWindows] = useState<string[]>([])
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState<Record<string, number>>({})
 
   const [characteristics, setCharacteristics] = useState<{ [key: string]: Characteristic[] }>({})
 
@@ -256,12 +258,14 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
   useEffect(() => {
     const characteristicsResult: Characteristic[] = []
+    const initialActives: Record<string, number> = {}
     Object.keys(characteristics).forEach((key) => {
       characteristics[key].forEach((characteristic) => {
         characteristicsResult.push({ ...characteristic })
       })
+      initialActives[key] = 0
     })
-
+    setActiveQuestionIndex(initialActives)
     onChangeCharacteristics(characteristicsResult)
   }, [characteristics])
 
@@ -296,6 +300,21 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       setIsBarnDoor(false)
     }
   }, [selectedGlasses])
+
+  const needHelp = useMemo(() => {
+    let isExistHelpKey = false
+    const keys = Object.keys(characteristics)
+    for (let ii = 0; ii < keys.length; ii++) {
+      const value = characteristics[keys[ii]][activeQuestionIndex[keys[ii]]]
+      if (value) {
+        const questionName = value.name.toLowerCase() || ''
+        isExistHelpKey = questionName.includes('laminated') || questionName.includes('tempered')
+        if (isExistHelpKey) break
+      }
+    }
+
+    return isExistHelpKey
+  }, [activeQuestionIndex, characteristics])
 
   return (
     <div>
@@ -519,9 +538,15 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
                 return { ...prev }
               })
             }}
+            setActiveIndex={(v) => setActiveQuestionIndex({ ...activeQuestionIndex, [key]: v })}
           ></Questions>
         </Box>
       ))}
+      {needHelp && (
+        <Box pt={4}>
+          <HelpWhatDifference />
+        </Box>
+      )}
     </div>
   )
 }

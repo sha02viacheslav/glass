@@ -6,9 +6,10 @@ import { QuestionCard } from './QuestionCard'
 export type QuestionsProps = {
   characteristics: Characteristic[]
   onChange: (value: Characteristic[]) => void
+  setActiveIndex?: (v: number) => void
 }
 
-export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange }) => {
+export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange, setActiveIndex }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
 
   const handleChangeCharacteristic = (value: Characteristic) => {
@@ -44,11 +45,25 @@ export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange 
         <Box sx={{ display: 'flex', gap: 5 }}>
           <img
             src={process.env.PUBLIC_URL + '/images/chevron-left-gray.svg'}
-            onClick={() => setCurrentIndex((prev) => (prev + 1) % characteristics.length)}
+            onClick={() => {
+              const newValue = (currentIndex + 1) % characteristics.length
+              setCurrentIndex(newValue)
+              if (setActiveIndex) {
+                setActiveIndex(newValue)
+              }
+            }}
           />
           <img
             src={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
-            onClick={() => setCurrentIndex((prev) => (characteristics.length + prev - 1) % characteristics.length)}
+            onClick={() =>
+              setCurrentIndex((prev) => {
+                const newValue = (characteristics.length + prev - 1) % characteristics.length
+                if (setActiveIndex) {
+                  setActiveIndex(newValue)
+                }
+                return newValue
+              })
+            }
           />
         </Box>
       </Box>
