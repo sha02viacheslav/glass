@@ -49,11 +49,9 @@ export const Home: React.FC = () => {
                 className='d-inline-flex align-items-center cursor-pointer'
                 onClick={() => setShowReviewDialog(true)}
               >
-                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                {[1, 2, 3, 4, 5].map((index) => (
+                  <img key={index} src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                ))}
                 <div className='lh-15 text-white ms-1'>5.0</div>
                 <img src={process.env.PUBLIC_URL + '/images/google.png'} className='img-fluid ms-1' alt='' />
                 <div className='lh-15 text-white ms-2'>reviews</div>

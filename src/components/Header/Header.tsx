@@ -24,9 +24,13 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
     navigate('/inquiry-intro')
   }
 
-  const handleToggleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const checkNotification = () => {
     setNotificationChecked()
     setShowNotification(false)
+  }
+
+  const handleToggleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    checkNotification()
     event.currentTarget.classList.toggle('toggle-active')
     setOpened((prev) => !prev)
   }
@@ -100,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
         )}
 
         {!!quoteDetails?.is_published && showNotification && (
-          <div className='notification-bar'>
+          <div className='notification-bar' onClick={() => checkNotification()}>
             <div className='notification-title'>Track your service</div>
             <div className='notification-content'>You can access your service timeline in our website menu.</div>
           </div>

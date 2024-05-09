@@ -60,11 +60,14 @@ export const GoogleReviews: React.FC = () => {
                   </div>
                   <div className='d-flex align-items-center justify-content-between'>
                     <div className='d-flex align-items-center'>
-                      <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                      <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                      <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                      <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                      <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+                      {[1, 2, 3, 4, 5].map((index) => (
+                        <img
+                          key={index}
+                          src={process.env.PUBLIC_URL + '/images/star.svg'}
+                          className='img-fluid'
+                          alt=''
+                        />
+                      ))}
                     </div>
 
                     <div className='date'> {pastTime(item.time * 1000)}</div>

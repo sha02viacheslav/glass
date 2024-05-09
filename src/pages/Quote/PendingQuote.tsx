@@ -1,6 +1,5 @@
-import './Quote.css'
 import React, { useState } from 'react'
-import { Box, Button, CardMedia, Link as MuiLink, Typography } from '@mui/material'
+import { Box, Button, CardMedia, Typography } from '@mui/material'
 import moment from 'moment'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
@@ -10,21 +9,24 @@ import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
 import { QuickContact } from '@glass/components/QuickContact'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { PHONE_NUMBER, SLOT_LEGENDS } from '@glass/constants'
+import { SLOT_LEGENDS } from '@glass/constants'
 import { BeforeAfterType, CarType, InquiryStep } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { slotStartTime, slotTimeIndex, workingPlaceLabel } from '@glass/utils/index'
+import { CheckingQuote } from './CheckingQuote'
+import { ReadyQuote } from './ReadyQuote'
 import { InstallmentBenefits } from '../Home/InstallmentBenefits'
 import { LiveService } from '../Home/LiveService'
 import { Testimonials } from '../Home/Testimonials'
 
 export type PendingQuoteProps = {
   quoteDetails: Quote
+  onContinue: () => void
 }
 
-export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails }) => {
+export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onContinue }) => {
   const { id: quoteId } = useParams()
   const navigate = useNavigate()
 
@@ -42,45 +44,13 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails }) => {
   return (
     <>
       <Box sx={{ paddingX: 4, marginBottom: 32 }}>
-        <Box sx={{ paddingX: 3 }}>
-          <Typography sx={{ textAlign: 'center', fontSize: '20px', fontWeight: '700', lineHeight: '130%' }}>
-            {quoteDetails.customer_f_name}, our team is analyzing your inquiry for {quoteDetails.make}{' '}
-            {quoteDetails.model}
-          </Typography>
-          <Box
-            sx={{
-              marginTop: 14,
-              marginBottom: 6,
-              height: 192,
-              overflow: 'hidden',
-            }}
-          >
-            <WindowSelector
-              disabled={true}
-              carType={selectedCarType}
-              registrationNumber={quoteDetails.registration_number}
-              selectedGlasses={quoteDetails.glass_location}
-            />
+        {quoteDetails.is_published ? (
+          <Box sx={{ cursor: 'pointer' }} onClick={() => onContinue()}>
+            <ReadyQuote quoteDetails={quoteDetails} />
           </Box>
-          <Typography sx={{ textAlign: 'center', fontWeight: '700', lineHeight: '170%', letterSpacing: '-0.16px' }}>
-            You will get your quote soon. Thank you for your patience.
-          </Typography>
-          <Typography
-            sx={{
-              color: 'var(--Gray-700, #474747)',
-              textAlign: 'center',
-              fontWeight: '400',
-              lineHeight: '150%',
-              letterSpacing: '-0.16px',
-              marginTop: 4,
-            }}
-          >
-            Need some more details?{' '}
-            <MuiLink href={`tel:${PHONE_NUMBER}`} sx={{ color: 'var(--Light-Blue---Primary-400, #4285F4)' }}>
-              Call us
-            </MuiLink>
-          </Typography>
-        </Box>
+        ) : (
+          <CheckingQuote quoteDetails={quoteDetails} />
+        )}
 
         <Box sx={{ padding: 3, marginTop: 8, marginBottom: 6 }}>
           <Box
@@ -130,11 +100,11 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails }) => {
                 textTransform: 'uppercase',
               }}
             >
-              CAR REGISTRATION NUMBER
+              CAR DETAILS
             </Typography>
 
-            <Box sx={{ width: '124px', marginTop: 3 }}>
-              <Box sx={{ zoom: 0.4 }}>
+            <Box sx={{ width: '94px', marginTop: 3 }}>
+              <Box sx={{ zoom: 0.3 }}>
                 <LicensePlate disabled={true} licenseNumber={quoteDetails.registration_number} />
               </Box>
             </Box>
@@ -491,9 +461,34 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails }) => {
         <Testimonials />
       </Box>
 
-      <QuickContact showReg={false} />
+      {quoteDetails.is_published && (
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100vw',
+            zIndex: '100',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+            background: '#fff',
+          }}
+        >
+          <button className='btn-raised w-100' type='button' onClick={() => onContinue()}>
+            See the Quote
+          </button>
+        </Box>
+      )}
 
-      <Footer />
+      {!quoteDetails.is_published && (
+        <>
+          <QuickContact showReg={false} />
+          <Footer />
+        </>
+      )}
     </>
   )
 }

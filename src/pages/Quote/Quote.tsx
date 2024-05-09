@@ -43,6 +43,7 @@ import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll
 import { setQuoteId } from '@glass/utils/session/session.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 import { PendingQuote } from './PendingQuote'
+import { QuoteOptions } from './QuoteOptions'
 
 export type QuoteProps = {
   quoteCount?: boolean
@@ -52,7 +53,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const showButtons = false
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
-  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PAYMENT)
+  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PENDING)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIME_SLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(false)
@@ -431,12 +432,24 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
   return (
-    <Box sx={{ paddingTop: '102px' }}>
+    <Box sx={{ paddingTop: 22 }}>
       {!!quoteDetails && (
         <>
-          {!quoteDetails?.is_published ? (
-            <PendingQuote quoteDetails={quoteDetails} />
-          ) : (
+          {snapValue === QuoteStep.PENDING && (
+            <PendingQuote quoteDetails={quoteDetails} onContinue={() => setSnapValue(QuoteStep.OPTIONS)} />
+          )}
+
+          {snapValue === QuoteStep.OPTIONS && (
+            <QuoteOptions
+              quoteDetails={quoteDetails}
+              refetch={() => {
+                getQuote()
+              }}
+              onContinue={() => setSnapValue(QuoteStep.PAYMENT)}
+            />
+          )}
+
+          {snapValue === QuoteStep.PAYMENT && (
             <div className='quote-page px-3 px-md-0'>
               <section className='sec-title'>
                 <div className='container'>
@@ -464,7 +477,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                     </div>
 
                     <div className='w-100 p-3'>
-                      <LicensePlate placeholderVal={'ENTER REG'} licenseNumber={tempLicenseNum} showSearch={false} />
+                      <LicensePlate
+                        disabled={true}
+                        placeholderVal={'ENTER REG'}
+                        licenseNumber={tempLicenseNum}
+                        showSearch={false}
+                      />
                     </div>
 
                     {quoteInfoOpen && (

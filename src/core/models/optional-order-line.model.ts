@@ -7,4 +7,5 @@ export type OptionalOrderLine = {
   product: string
   product_uom: string
   product_uom_qty: number
+  product_image_url: string
 }

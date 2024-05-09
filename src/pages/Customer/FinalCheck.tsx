@@ -46,8 +46,8 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           CAR REGISTRATION NUMBER
         </Typography>
 
-        <Box sx={{ width: '124px', marginTop: 3 }}>
-          <Box sx={{ zoom: 0.4 }}>
+        <Box sx={{ width: '94px', marginTop: 3 }}>
+          <Box sx={{ zoom: 0.3 }}>
             <LicensePlate disabled={true} licenseNumber={inquiry.step_1.registration_number} />
           </Box>
         </Box>

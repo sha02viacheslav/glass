@@ -53,11 +53,9 @@ export const WorkshopCard: React.FC<WorkshopCardProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
           <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontSize: '12px', lineHeight: '16px' }}>5.0</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+            {[1, 2, 3, 4, 5].map((index) => (
+              <img key={index} src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
+            ))}
           </Box>
           <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontSize: '12px', lineHeight: '16px' }}>(62)</Typography>
         </Box>

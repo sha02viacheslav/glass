@@ -661,35 +661,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [workshops])
 
   useEffect(() => {
-    if (quoteDetails) {
-      // Step 1
-      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
-      handleChangeBillingAddress(quoteDetails.delivery_address)
-      formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails.working_place)
-      formik.setFieldValue(FormFieldIds.WORKSHOP_ID, quoteDetails.workshop.id)
-
-      // Step 2
-      const selectedWindows = quoteDetails.glass_location || []
-      if (selectedWindows.length > 0) {
-        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, selectedWindows)
-      }
-      // Step 3
-      formik.setFieldValue(FormFieldIds.COMMENT, quoteDetails.customer_comment)
-      formik.setFieldValue(FormFieldIds.ATTACHMENTS, quoteDetails.customer_attachments)
-
-      // Step 4
-      formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails.customer_f_name)
-      formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails.customer_s_name)
-      formik.setFieldValue(FormFieldIds.PHONE, quoteDetails.customer_phone)
-      formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails.customer_email)
-
-      // Step 5
-      formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, !!quoteDetails.request_booking.length)
-      formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, quoteDetails.request_booking)
-    }
-  }, [quoteDetails])
-
-  useEffect(() => {
     if (inquiry) {
       // Step 1
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
@@ -724,6 +695,33 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   useEffect(() => {
     if (!quoteDetails && editMode && quoteId) {
       getQuote()
+    }
+
+    if (quoteDetails) {
+      // Step 1
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
+      handleChangeBillingAddress(quoteDetails.delivery_address)
+      formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails.working_place)
+      formik.setFieldValue(FormFieldIds.WORKSHOP_ID, quoteDetails.workshop.id)
+
+      // Step 2
+      const selectedWindows = quoteDetails.glass_location || []
+      if (selectedWindows.length > 0) {
+        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, selectedWindows)
+      }
+      // Step 3
+      formik.setFieldValue(FormFieldIds.COMMENT, quoteDetails.customer_comment)
+      formik.setFieldValue(FormFieldIds.ATTACHMENTS, quoteDetails.customer_attachments)
+
+      // Step 4
+      formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails.customer_f_name)
+      formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails.customer_s_name)
+      formik.setFieldValue(FormFieldIds.PHONE, quoteDetails.customer_phone)
+      formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails.customer_email)
+
+      // Step 5
+      formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, !!quoteDetails.request_booking.length)
+      formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, quoteDetails.request_booking)
     }
   }, [quoteDetails])
 
