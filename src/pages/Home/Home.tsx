@@ -7,6 +7,7 @@ import { Chat } from '@glass/components/Chat'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
+import { PaymentCards } from '@glass/components/PaymentCards'
 import { PlantTree } from '@glass/components/PlantTree'
 import { ReviewsDialog } from '@glass/components/ReviewsDialog'
 import { BeforeAfterType } from '@glass/enums'
@@ -77,12 +78,7 @@ export const Home: React.FC = () => {
               Get a Quote
             </button>
             <div className='d-flex gap-3 mt-2'>
-              <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
-              <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
+              <PaymentCards />
             </div>
             <div className='d-flex justify-content-center mt-35'>
               <img
@@ -142,12 +138,7 @@ export const Home: React.FC = () => {
             <div className='img-wrap'>
               <img src={process.env.PUBLIC_URL + '/images/step3.png'} />
               <div className='payment-options'>
-                <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
-                <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
+                <PaymentCards />
               </div>
             </div>
           </div>

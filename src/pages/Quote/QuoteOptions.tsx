@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, CardMedia, Link, Typography } from '@mui/material'
+import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
+import { boolean, object } from 'yup'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
+import { PaymentCards } from '@glass/components/PaymentCards'
 import { BookingTimes } from '@glass/components/quotePage/BookingTimes'
 import { OptionalOrderLines } from '@glass/components/quotePage/OptionalOrderLines'
 import { OrderLines } from '@glass/components/quotePage/OrderLines'
@@ -13,8 +16,16 @@ import { addOptionalProductService } from '@glass/services/apis/add-optional-pro
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { sendBookingService } from '@glass/services/apis/send-booking.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
-import { workingPlaceLabel } from '@glass/utils/index'
+import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
 import { Testimonials } from '../Home/Testimonials'
+
+export type QuoteOptionsForm = {
+  bookingDate: boolean
+}
+
+export enum FormFieldIds {
+  BOOKING_DATE = 'bookingDate',
+}
 
 export type QuoteOptionsProps = {
   quoteDetails: Quote
@@ -25,6 +36,18 @@ export type QuoteOptionsProps = {
 export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetch, onContinue }) => {
   const { id: quoteId } = useParams()
   const navigate = useNavigate()
+
+  const validationSchema = object({
+    bookingDate: boolean().isTrue('Please select the date you would like to get repair done').nullable(),
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      bookingDate: false,
+    },
+    validationSchema: validationSchema,
+    onSubmit: async () => {},
+  })
 
   const backToEditQuote = (step: InquiryStep) => {
     const licenseReg = quoteDetails?.registration_number.replace(' ', '')
@@ -62,8 +85,23 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
     )
   }
 
+  const handleContinueClick = () => {
+    formik.setFieldTouched(FormFieldIds.BOOKING_DATE, true, true)
+    if (formik.errors.bookingDate) {
+      scrollToElementWithOffset(FormFieldIds.BOOKING_DATE, 100)
+      return
+    }
+    onContinue()
+  }
+
+  useEffect(() => {
+    if (quoteDetails) {
+      formik.setFieldValue(FormFieldIds.BOOKING_DATE, quoteDetails.booking_date)
+    }
+  }, [quoteDetails])
+
   return (
-    <>
+    <form>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>
         <Box sx={{ padding: 3, marginBottom: 6 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -119,10 +157,13 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
 
         <Box sx={{ p: 4 }}></Box>
 
-        <BookingTimes
-          requestBookings={quoteDetails.request_booking || []}
-          onCheckRequestBooking={handleCheckRequestBooking}
-        />
+        <Box id={FormFieldIds.BOOKING_DATE}>
+          <BookingTimes
+            requestBookings={quoteDetails.request_booking || []}
+            onCheckRequestBooking={handleCheckRequestBooking}
+            formError={formik.touched.bookingDate && formik.errors.bookingDate}
+          />
+        </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 4 }}>
           <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
@@ -182,43 +223,15 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
             background: '#fff',
           }}
         >
-          <button className='btn-raised w-100' type='button' onClick={() => onContinue()}>
+          <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
             Proceed to checkout
           </button>
+
           <Box sx={{ display: 'flex', gap: 3 }}>
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/master-card.svg'}
-            />
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/visa.svg'}
-            />
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/discover.svg'}
-            />
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/amex.svg'}
-            />
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/union-pay.svg'}
-            />
-            <CardMedia
-              component='img'
-              sx={{ height: 16, width: 24 }}
-              image={process.env.PUBLIC_URL + '/images/jcb.svg'}
-            />
+            <PaymentCards />
           </Box>
         </Box>
       )}
-    </>
+    </form>
   )
 }

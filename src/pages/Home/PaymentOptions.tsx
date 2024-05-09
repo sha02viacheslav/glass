@@ -1,5 +1,6 @@
 import './PaymentOptions.css'
 import React from 'react'
+import { PaymentCards } from '@glass/components/PaymentCards'
 
 export const PaymentOptions: React.FC = () => {
   return (
@@ -26,12 +27,7 @@ export const PaymentOptions: React.FC = () => {
             <li>We accept all major credit and debit cards</li>
           </ul>
           <div className='cards d-flex gap-3 mt-1'>
-            <img src={process.env.PUBLIC_URL + '/images/master-card.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/visa.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/discover.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/amex.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/union-pay.svg'} className='img-fluid' alt='' />
-            <img src={process.env.PUBLIC_URL + '/images/jcb.svg'} className='img-fluid' alt='' />
+            <PaymentCards />
           </div>
         </div>
       </div>
