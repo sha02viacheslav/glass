@@ -1,7 +1,8 @@
 import { OrderState, PaymentMethodType, WorkingPlace } from '@glass/enums'
 import { Address } from './address.model'
+import { Attachment } from './attachment.model'
 import { BeforeAfter } from './before-after.model'
-import { Comment } from './comment.model'
+import { RequestBooking } from './inquiry.model'
 import { Invoice } from './invoice.model'
 import { Offer } from './offer.model'
 import { OptionalOrderLine } from './optional-order-line.model'
@@ -34,9 +35,11 @@ export type Quote = {
   payment_method_type: PaymentMethodType
   make: string
   model: string
-  customer_comments: Comment[]
-  customer_comment: Comment[]
-  customer_attachments: Comment[]
+  DoorPlanLiteral: string
+  vehicle_logo_url: string
+  customer_comment: string
+  customer_attachments: Attachment[]
+  request_booking: RequestBooking[]
   payment_transaction: {
     [key: string]: PaTransaction[]
   }

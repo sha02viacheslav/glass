@@ -137,14 +137,7 @@ p {
 .section {
   padding: 80px 0px;
 }
-.sec-banner {
-  background: url(../img/baner.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 625px;
-  display: flex;
-  align-items: center;
-}
+
 .main-heading {
   font-weight: 700;
   font-size: 40px;
@@ -388,14 +381,7 @@ ul.list-f {
   opacity: 0.5;
 }
 
-.sec-banner-s {
-  background: url(../img/bg-s.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  height: 400px;
-  display: flex;
-  align-items: center;
-}
+
 .content-s {
   font-weight: 400;
   font-size: 25px;
@@ -423,14 +409,7 @@ ul.list-f {
 .border-rad {
   border-radius: 15px;
 }
-.sec-banner-p {
-  background: url(../img/bg-pr.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  height: 400px;
-  display: flex;
-  align-items: center;
-}
+
 .title-ls {
   font-weight: 500;
   font-size: 18px;
@@ -954,14 +933,6 @@ Media Queries
     padding-top: 15px;
     padding-bottom: 15px;
   }
-  .sec-banner {
-    background: url(../img/m-bg1.png);
-    background-repeat: no-repeat;
-    background-size: auto;
-    height: 625px;
-    display: flex;
-    align-items: center;
-  }
   .main-heading {
     font-weight: 700;
     font-size: 27px;
@@ -1047,15 +1018,6 @@ Media Queries
   body {
     padding-top: 0px !important;
   }
-  .sec-banner-s {
-    background: url(../img/bg-sv.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    height: 400px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-  }
   .content-s {
     font-weight: 400;
     font-size: 20px;
@@ -1097,15 +1059,6 @@ Media Queries
   }
   .order-change {
     order: 2;
-  }
-  .sec-banner-p {
-    background: url(../img/bg-pricee.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    height: 400px;
-    display: flex;
-    align-items: center;
-    text-align: center;
   }
   section.sec-plan.section {
     background: #f3f3f3;

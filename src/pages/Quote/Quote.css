@@ -8,22 +8,6 @@
   }
 }
 
-.quote-page .sec-banner {
-  position: relative;
-  background: url(../../../public/images/quote-banner.png) no-repeat;
-  background-size: cover;
-  height: 350px;
-  display: flex;
-  align-items: center;
-  z-index: -1;
-}
-
-@media (max-width: 767px) {
-  .quote-page .sec-banner {
-    height: 200px;
-  }
-}
-
 .thank-you-header {
   margin: 50px 0 30px 0;
   color: #9a73dd;

@@ -6,16 +6,17 @@ import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
 
 export type LicensePlateProps = {
+  disabled?: boolean
   licenseNumber?: string
   placeholderVal?: string
   showSearch?: boolean
   showModel?: boolean
-  debounceTime?: number
   handleVehInputChange?: (value: string) => void
   handleVehicleDataChange?: (value: Inquiry | undefined) => void
 }
 
 export const LicensePlate: React.FC<LicensePlateProps> = ({
+  disabled = false,
   licenseNumber = '',
   placeholderVal = '',
   showSearch = false,
@@ -72,7 +73,9 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   useEffect(() => {
     const formattedLicenseNumber = formatLicenseNumber(licenseNumber)
     if (formattedLicenseNumber !== localLicenseNum) {
-      getInquiry(formattedLicenseNumber)
+      if (!disabled) {
+        getInquiry(formattedLicenseNumber)
+      }
       setLocalLicenseNum(formattedLicenseNumber)
     }
   }, [licenseNumber])

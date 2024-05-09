@@ -21,7 +21,6 @@ import { toast } from 'react-toastify'
 import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
-import { ChangeAddress } from '@glass/components/ChangeAddress'
 import MobileService from '@glass/components/GoogleMap/MobileService'
 import { Workshops } from '@glass/components/GoogleMap/Workshops'
 import { HowToTakePic } from '@glass/components/Help/HowToTakePic'
@@ -30,14 +29,13 @@ import { OurMethod } from '@glass/components/OurMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { INQUIRY_STEPS } from '@glass/constants'
-import { AddressType, BeforeAfterType, CarType, InquiryStep, WorkingPlace } from '@glass/enums'
+import { BeforeAfterType, CarType, InquiryStep, WorkingPlace } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import {
   Address,
   Attachment,
   BeforeAfter,
   Characteristic,
-  Comment,
   Inquiry,
   InquiryFinalCheckDto,
   InquiryStep1Dto,
@@ -46,15 +44,15 @@ import {
   InquiryStep4Dto,
   InquiryStep5Dto,
   Quote,
-  QuoteDto,
   RequestBooking,
+  UpdateQuoteDto,
   Workshop,
 } from '@glass/models'
 import { beforeAfterService } from '@glass/services/apis/before-after.service'
-import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
+import { submitInquiryService } from '@glass/services/apis/submit-inquiry.service'
 import { updateInquiryFinalCheckService } from '@glass/services/apis/update-inquiry-final-check.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
 import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
@@ -62,9 +60,7 @@ import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-s
 import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-step4.service'
 import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
-import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
-import { clearRequestedURL, getRequestedURL } from '@glass/utils/session/session.util'
 import { FinalCheck } from './FinalCheck'
 import { WorkshopCard } from './WorkshopCard'
 import { LiveService } from '../Home/LiveService'
@@ -77,6 +73,7 @@ export type CustomerForm = {
   glassLocation: string[]
   characteristics: Characteristic[]
   comment: string
+  attachments: Attachment[]
   firstName: string
   lastName: string
   email: string
@@ -93,6 +90,7 @@ export enum FormFieldIds {
   GLASS_LOCATION = 'glassLocation',
   CHARACTERISTICS = 'characteristics',
   COMMENT = 'comment',
+  ATTACHMENTS = 'attachments',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
   EMAIL = 'email',
@@ -108,7 +106,7 @@ export type CustomerProps = {
 export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const navigate = useNavigate()
 
-  const { licenseNum, quoteId } = useParams()
+  const { licenseNum, quoteId, step } = useParams()
 
   const steps = {
     [InquiryStep.STEP1]: { index: 1, title: 'Reg. number and Repair location' },
@@ -154,6 +152,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       glassLocation: [],
       characteristics: [],
       comment: '',
+      attachments: [],
       firstName: '',
       lastName: '',
       email: '',
@@ -167,39 +166,20 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     },
   })
 
-  const [activeStep, setActiveStep] = React.useState<InquiryStep>(InquiryStep.STEP1)
+  const [activeStep, setActiveStep] = React.useState<InquiryStep>(editMode ? (step as InquiryStep) : InquiryStep.STEP1)
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [inquiry, setInquiry] = useState<Inquiry | undefined>()
   const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
-  const [fixingAddressText, setFixingAddressText] = useState('')
-  const [comments, setComments] = useState<Comment[]>([])
   const [beforeAfterItems, setBeforeAfterItems] = useState<BeforeAfter[]>([])
   const [workshops, setWorkshops] = useState<Workshop[]>([])
-  const [attachments, setAttachments] = useState<Attachment[]>([])
   const [modalMap, setModalMap] = useState(false)
-
-  // temporary things for car selection menu - Rainer
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
-
-  // for getting the array of broken windows
-  const [selectedBrokenWindows, setSelectedBrokenWindows] = useState<string[]>([])
-
-  // preselect broken windows if editing quote
-  const [selectedGlasses, setBrokenWindowsToComponent] = useState<string[]>([])
 
   const selectedWorkshop = useMemo(() => {
     const workshopId = formik.values.workshopId
     return workshops?.find((item) => typeof workshopId === 'number' && item.id === workshopId)
   }, [workshops, formik.values.workshopId])
-
-  const onSelectBrokenGlasses = (windows: string[]) => {
-    setSelectedBrokenWindows(windows)
-    formik.setFieldValue(
-      FormFieldIds.GLASS_LOCATION,
-      (selectedBrokenWindows || []).map((item) => item.toLowerCase()),
-    )
-  }
 
   const getInquiry = () => {
     const { registrationNumber } = formik.values
@@ -236,11 +216,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     )
   }
 
-  const retrieveVehData = (data: CarType) => {
-    setSelectedCarType(data)
-  }
-
-  useRetrieveVehData(inquiry, retrieveVehData)
+  useRetrieveVehData(quoteDetails?.DoorPlanLiteral || inquiry?.DoorPlanLiteral, (data: CarType) =>
+    setSelectedCarType(data),
+  )
 
   const handleContinueClick = () => {
     switch (activeStep) {
@@ -258,7 +236,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, 100)
           return
         }
-        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        if (editMode) {
+          updateQuote(formik.values)
+        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep1(formik.values)
@@ -271,7 +251,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
           return
         }
-        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        if (editMode) {
+          updateQuote(formik.values)
+        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep2(formik.values)
@@ -279,7 +261,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         break
       }
       case InquiryStep.STEP3: {
-        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        if (editMode) {
+          updateQuote(formik.values)
+        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep3(formik.values)
@@ -304,7 +288,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.PHONE, 100)
           return
         }
-        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        if (editMode) {
+          updateQuote(formik.values)
+        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep4(formik.values)
@@ -317,7 +303,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, 100)
           return
         }
-        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        if (editMode) {
+          updateQuote(formik.values)
+        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep5(formik.values)
@@ -325,7 +313,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         break
       }
       case InquiryStep.FINAL_CHECK: {
-        submitInquiry(formik.values)
+        submitInquiry()
       }
     }
   }
@@ -422,13 +410,15 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (!inquiry) return
 
     const removeAttachmentIds = inquiry.step_3.customer_attachments
-      .filter((attachment) => attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0)
+      .filter(
+        (attachment) => values.attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0,
+      )
       .map((attachment) => attachment.attachment_id)
 
     const postData: InquiryStep3Dto = {
       fe_token: inquiry.fe_token,
       customer_comment: values.comment,
-      customer_attachments: attachments.filter((item) => !item.attachment_id),
+      customer_attachments: values.attachments.filter((item) => !item.attachment_id),
       remove_attachment_ids: removeAttachmentIds,
     }
 
@@ -496,7 +486,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (!inquiry) return
 
     const removeAttachmentIds = inquiry.step_3.customer_attachments
-      .filter((attachment) => attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0)
+      .filter(
+        (attachment) => values.attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0,
+      )
       .map((attachment) => attachment.attachment_id)
 
     const removeRequestBookingIds = inquiry.step_5.request_booking
@@ -531,7 +523,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       inquiry_characteristics: values.characteristics,
       // Step 3
       customer_comment: values.comment,
-      customer_attachments: attachments.filter((item) => !item.attachment_id),
+      customer_attachments: values.attachments.filter((item) => !item.attachment_id),
       remove_attachment_ids: removeAttachmentIds,
       // Step 4
       customer_f_name: (values.firstName || '').trim(),
@@ -554,66 +546,76 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     )
   }
 
-  const submitInquiry = (values: CustomerForm) => {
-    // post data
-    const firstName = (values.firstName || '').trim()
-    const lastName = (values.lastName || '').trim()
-    const fullName = `${firstName} ${lastName}`
-
-    const postData: QuoteDto = {
-      customer_name: fullName,
-      customer_f_name: firstName,
-      customer_s_name: lastName,
-      customer_phone: (values.phone || '').trim(),
-      customer_email: (values.email || '').trim(),
-      customer_address: {
-        postcode: billingAddress?.postcode || '',
-        latitude: billingAddress?.latitude || '',
-        longitude: billingAddress?.longitude || '',
-        line_1: billingAddress?.line_1 || '',
-        line_2: billingAddress?.line_2 || '',
-        line_3: billingAddress?.line_3 || '',
-        line_4: billingAddress?.line_4 || '',
-        locality: billingAddress?.locality || '',
-        town_or_city: billingAddress?.town_or_city || '',
-        county: billingAddress?.county || '',
-        district: billingAddress?.district || '',
-        country: billingAddress?.country || '',
-      },
-      registration_number: values.registrationNumber,
-      glass_location: values.glassLocation,
-      customer_comment: values.comment,
-      customer_attachments: attachments,
-      working_place: values.workingPlace,
-      workshop_id: formik.values.workshopId,
-    }
-
-    if (quoteDetails) {
-      if (!postData.customer_comment) {
-        delete postData.customer_comment
-      }
-      if (!postData.customer_attachments?.length) {
-        delete postData.customer_attachments
-      }
-      delete postData.customer_address
+  const submitInquiry = () => {
+    if (inquiry?.fe_token) {
       trackPromise(
-        updateQuoteService({ fe_token: quoteId, ...postData }).then((res) => {
+        submitInquiryService(inquiry.fe_token).then((res) => {
           if (res.success) {
-            navigate(`/quote/${quoteId}`)
+            navigate('/quote/' + inquiry.fe_token)
           } else {
             toast(res.message)
           }
         }),
       )
-    } else {
-      if (getRequestedURL()) {
-        postData.fe_requested_url = getRequestedURL()
+    }
+  }
+
+  const updateQuote = (values: CustomerForm) => {
+    if (editMode && quoteDetails && quoteId) {
+      const removeAttachmentIds = quoteDetails.customer_attachments
+        .filter(
+          (attachment) => values.attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0,
+        )
+        .map((attachment) => attachment.attachment_id)
+
+      const removeRequestBookingIds = quoteDetails.request_booking
+        .filter(
+          (booking) =>
+            values.requestBookings.findIndex((item) => item.request_booking_id === booking.request_booking_id) < 0,
+        )
+        .map((booking) => booking.request_booking_id)
+
+      const postData: UpdateQuoteDto = {
+        fe_token: quoteId,
+        // Step 1
+        customer_address: {
+          address_id: quoteDetails.delivery_address.address_id || 0,
+          postcode: billingAddress?.postcode || '',
+          latitude: billingAddress?.latitude || '',
+          longitude: billingAddress?.longitude || '',
+          line_1: billingAddress?.line_1 || '',
+          line_2: billingAddress?.line_2 || '',
+          line_3: billingAddress?.line_3 || '',
+          line_4: billingAddress?.line_4 || '',
+          locality: billingAddress?.locality || '',
+          town_or_city: billingAddress?.town_or_city || '',
+          county: billingAddress?.county || '',
+          district: billingAddress?.district || '',
+          country: billingAddress?.country || '',
+        },
+        working_place: values.workingPlace,
+        workshop_id: formik.values.workshopId,
+        // Step 2
+        glass_location: values.glassLocation,
+        inquiry_characteristics: values.characteristics,
+        // Step 3
+        customer_comment: values.comment,
+        customer_attachments: values.attachments.filter((item) => !item.attachment_id),
+        remove_attachment_ids: removeAttachmentIds,
+        // Step 4
+        customer_f_name: (values.firstName || '').trim(),
+        customer_s_name: (values.lastName || '').trim(),
+        customer_phone: (values.phone || '').trim(),
+        customer_email: (values.email || '').trim(),
+        // Step 5
+        request_booking: values.requestBookings.filter((item) => !item.request_booking_id),
+        remove_request_booking_ids: removeRequestBookingIds,
       }
+
       trackPromise(
-        createQuoteService(postData).then((res) => {
+        updateQuoteService(postData).then((res) => {
           if (res.success) {
-            navigate('/quote/' + res.data.fe_token)
-            clearRequestedURL()
+            navigate(`/quote/${quoteId}`)
           } else {
             toast(res.message)
           }
@@ -625,10 +627,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const handleChangeBillingAddress = (address: Address | undefined) => {
     formik.setFieldValue(FormFieldIds.INVOICE_ADDRESS, address?.postcode)
     setBillingAddress(address)
-  }
-
-  const handleChangeFiles = (files: Attachment[]) => {
-    setAttachments(files)
   }
 
   const handleChangeTimeSlot = (requestBookings: RequestBooking[]) => {
@@ -650,10 +648,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }
 
   useEffect(() => {
-    if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
+    if (!beforeAfterItems?.length) {
       getBeforeAfterImages()
     }
-  }, [formik.values.registrationNumber, formik.values.glassLocation])
+  }, [beforeAfterItems])
 
   useEffect(() => {
     if (!workshops.length) {
@@ -663,20 +661,30 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useEffect(() => {
     if (quoteDetails) {
-      handleChangeBillingAddress(quoteDetails.invoice_address)
-      setFixingAddressText(formatAddress(quoteDetails.delivery_address))
-      setComments(quoteDetails.customer_comments?.reverse() || [])
-      formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails?.working_place)
-      formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails?.customer_f_name)
-      formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails?.customer_s_name)
-      formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails?.customer_email)
-      formik.setFieldValue(FormFieldIds.PHONE, quoteDetails?.customer_phone)
+      // Step 1
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
+      handleChangeBillingAddress(quoteDetails.delivery_address)
+      formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails.working_place)
+      formik.setFieldValue(FormFieldIds.WORKSHOP_ID, quoteDetails.workshop.id)
 
-      // send previously selected windows to window selection component
-      const selectedWindows = editMode ? quoteDetails.glass_location || [] : []
+      // Step 2
+      const selectedWindows = quoteDetails.glass_location || []
       if (selectedWindows.length > 0) {
-        setBrokenWindowsToComponent(selectedWindows)
+        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, selectedWindows)
       }
+      // Step 3
+      formik.setFieldValue(FormFieldIds.COMMENT, quoteDetails.customer_comment)
+      formik.setFieldValue(FormFieldIds.ATTACHMENTS, quoteDetails.customer_attachments)
+
+      // Step 4
+      formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails.customer_f_name)
+      formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails.customer_s_name)
+      formik.setFieldValue(FormFieldIds.PHONE, quoteDetails.customer_phone)
+      formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails.customer_email)
+
+      // Step 5
+      formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, !!quoteDetails.request_booking.length)
+      formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, quoteDetails.request_booking)
     }
   }, [quoteDetails])
 
@@ -692,12 +700,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       // Step 2
       const selectedWindows = inquiry.step_2.glass_location || []
       if (selectedWindows.length > 0) {
-        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, inquiry.step_2.glass_location)
-        setBrokenWindowsToComponent(selectedWindows)
+        formik.setFieldValue(FormFieldIds.GLASS_LOCATION, selectedWindows)
       }
       // Step 3
       formik.setFieldValue(FormFieldIds.COMMENT, inquiry.step_3.customer_comment)
-      setAttachments([...inquiry.step_3.customer_attachments])
+      formik.setFieldValue(FormFieldIds.ATTACHMENTS, inquiry.step_3.customer_attachments)
 
       // Step 4
       formik.setFieldValue(FormFieldIds.FIRST_NAME, inquiry.step_4.customer_f_name)
@@ -714,15 +721,15 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [inquiry])
 
   useEffect(() => {
-    if (editMode && quoteId) {
+    if (!quoteDetails && editMode && quoteId) {
       getQuote()
     }
-  }, [editMode, quoteId])
+  }, [quoteDetails])
 
   return (
     <div className='customer-page'>
       <form onSubmit={formik.handleSubmit}>
-        {activeStep !== InquiryStep.FINAL_CHECK && (
+        {!editMode && activeStep !== InquiryStep.FINAL_CHECK && (
           <div className='step-wrapper'>
             <div className='title'>
               <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
@@ -762,6 +769,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               }
             >
               <LicensePlate
+                disabled={editMode}
                 placeholderVal='Enter reg'
                 licenseNumber={licenseSearchVal}
                 showSearch={true}
@@ -785,19 +793,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               We need your location to suggest closest workshop or see if we can do mobile service.
             </div>
             <div id={FormFieldIds.INVOICE_ADDRESS} className='form-group mb-4'>
-              <div className='d-flex justify-content-between'>
-                {!!quoteDetails?.customer_id && !!quoteId && editMode && (
-                  <ChangeAddress
-                    qid={quoteId}
-                    customerId={quoteDetails.customer_id}
-                    addressType={AddressType.INVOICE}
-                    initialAddress={quoteDetails.invoice_address}
-                    onChangeAddress={(event) => {
-                      handleChangeBillingAddress(event)
-                    }}
-                  />
-                )}
-              </div>
               <AddressInput
                 address={billingAddress}
                 formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
@@ -883,10 +878,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               <WindowSelector
                 carType={selectedCarType}
                 registrationNumber={formik.values.registrationNumber}
-                onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
+                selectedGlasses={formik.values.glassLocation}
                 setCarType={setSelectedCarType}
-                onSelectBrokenGlasses={onSelectBrokenGlasses}
-                selectedGlasses={selectedGlasses}
+                onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
+                onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
               />
 
               <div className='no-glass'>No glass selected</div>
@@ -932,17 +927,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               </Typography>
             </Box>
             <Box sx={{ marginTop: 6 }}>
-              <AddPictures attachments={attachments} onChangeFiles={handleChangeFiles} />
-
-              {comments.map((item, index) => (
-                <div key={index} className='text-left'>
-                  <p>
-                    <strong>Comment {index + 1}: </strong>
-                    {item.comment}
-                  </p>
-                  <AddPictures disabled={true} attachments={item.attachments} />
-                </div>
-              ))}
+              <AddPictures
+                attachments={formik.values.attachments}
+                onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
+              />
 
               <HowToTakePic />
 
@@ -1044,34 +1032,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
                 </FormControl>
               </Box>
-
-              {editMode && (
-                <div className='col-md-12'>
-                  <div className='form-group mb-4'>
-                    <div className='d-flex justify-content-between'>
-                      <div className='h6 text-left text-black-50'>Fixing address</div>
-                      {!!quoteDetails?.customer_id && !!quoteId && (
-                        <ChangeAddress
-                          qid={quoteId}
-                          customerId={quoteDetails.customer_id}
-                          addressType={AddressType.DELIVERY}
-                          initialAddress={quoteDetails.delivery_address}
-                          onChangeAddress={(event) => {
-                            setFixingAddressText(formatAddress(event))
-                          }}
-                        />
-                      )}
-                    </div>
-                    <OutlinedInput
-                      id='deliveryAddress'
-                      value={fixingAddressText || ''}
-                      fullWidth
-                      placeholder='Fixing address'
-                      disabled={true}
-                    />
-                  </div>
-                </div>
-              )}
             </Box>
           </section>
           <div className='padding-64'></div>
@@ -1128,24 +1088,38 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             background: '#fff',
           }}
         >
-          {inquiry?.order_state === InquiryStep.FINAL_CHECK ? (
+          {/* Update quote details */}
+          {editMode && !!quoteDetails && (
             <>
-              {activeStep !== InquiryStep.FINAL_CHECK ? (
-                <>
-                  <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
-                    Back to Summary
-                  </button>
-                  <button className='btn-raised' type='button' onClick={handleContinueClick}>
-                    Save changes
-                  </button>
-                </>
-              ) : (
-                <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                  Submit
-                </button>
-              )}
+              <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                Save changes
+              </button>
             </>
-          ) : (
+          )}
+
+          {/* Update final check */}
+          {inquiry?.order_state === InquiryStep.FINAL_CHECK && activeStep !== InquiryStep.FINAL_CHECK && (
+            <>
+              <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
+                Back to Summary
+              </button>
+              <button className='btn-raised' type='button' onClick={handleContinueClick}>
+                Save changes
+              </button>
+            </>
+          )}
+
+          {/* Final check */}
+          {activeStep === InquiryStep.FINAL_CHECK && (
+            <>
+              <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                Submit
+              </button>
+            </>
+          )}
+
+          {/* Inquiry is in progress */}
+          {!editMode && inquiry?.order_state !== InquiryStep.FINAL_CHECK && (
             <>
               <div>
                 {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (

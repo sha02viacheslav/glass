@@ -8,7 +8,7 @@ type AddPicturesProps = {
   showUpload?: boolean
   attachments: Attachment[]
   limit?: number
-  onChangeFiles?: (files: Attachment[]) => void
+  onChangeAttachments?: (files: Attachment[]) => void
   onClickUpload?: () => void
 }
 
@@ -22,7 +22,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   showUpload = false,
   attachments,
   limit,
-  onChangeFiles = () => {},
+  onChangeAttachments = () => {},
   onClickUpload = () => {},
 }) => {
   const VALID_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf']
@@ -104,14 +104,14 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
 
     Promise.all(promises).then((files) => {
       setValidFiles((pre) => [...pre, ...files])
-      onChangeFiles([...validFiles, ...files])
+      onChangeAttachments([...validFiles, ...files])
     })
   }
 
   const deleteFile = (idx: number) => {
     validFiles.splice(idx, 1)
     setValidFiles([...validFiles])
-    onChangeFiles([...validFiles])
+    onChangeAttachments([...validFiles])
   }
 
   const handleClickUpload = () => {

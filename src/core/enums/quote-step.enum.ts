@@ -1,4 +1,4 @@
 export enum QuoteStep {
   PAYMENT = 'payment',
-  TIMESLOT = 'timeslot',
+  TIME_SLOT = 'timeslot',
 }

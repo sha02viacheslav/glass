@@ -1,5 +1,6 @@
 import './Header.css'
 import React, { useEffect, useRef, useState } from 'react'
+import { Typography } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
 import { PHONE_NUMBER } from '@glass/constants'
@@ -60,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
             <Link to='/' onClick={() => opened && menuToggleRef.current?.click()}>
               <img src={process.env.PUBLIC_URL + '/img/logo.png'} className='logo-img img-fluid d-block' alt='' />
             </Link>
-            {showMenu && (
+            {showMenu ? (
               <div className='text-end d-flex align-items-center gap-4'>
                 <button className={!!quoteDetails ? 'btn-link' : 'btn-raised small'} onClick={directToCustomer}>
                   {!!quoteDetails ? 'New quote' : 'Get a quote'}
@@ -76,15 +77,29 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
                   aria-label='Toggle navigation'
                 ></div>
               </div>
+            ) : (
+              <>
+                {!!quoteDetails && !quoteDetails?.is_published && (
+                  <Typography
+                    sx={{
+                      color: 'var(--Gray-600, #6A6B71)',
+                      fontWeight: '700',
+                      lineHeight: '140%',
+                    }}
+                  >
+                    Waiting for quote
+                  </Typography>
+                )}
+              </>
             )}
           </div>
         </div>
 
-        {!!quoteDetails && (
+        {!!quoteDetails?.is_published && (
           <img src={process.env.PUBLIC_URL + '/images/ellipse.svg'} className='notification-icon img-fluid' alt='' />
         )}
 
-        {!!quoteDetails && showNotification && (
+        {!!quoteDetails?.is_published && showNotification && (
           <div className='notification-bar'>
             <div className='notification-title'>Track your service</div>
             <div className='notification-content'>You can access your service timeline in our website menu.</div>

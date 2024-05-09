@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { CarType } from '@glass/enums'
-import { Inquiry } from '@glass/models'
 import { getVanBodyType } from '@glass/utils/session/session.util'
 
 const vehTypes = [
@@ -52,15 +51,14 @@ const mapBodyType = [
   CarType.TAILGATER,
 ]
 
-export const useRetrieveVehData = (inquiry: Inquiry | undefined, dataToCustomer: (value: CarType) => void) => {
+export const useRetrieveVehData = (doorPlanLiteral: string | undefined, dataToCustomer: (value: CarType) => void) => {
   useEffect(() => {
-    if (inquiry) {
-      const vehClass = inquiry.DoorPlanLiteral
+    if (doorPlanLiteral) {
       let body: CarType | undefined
 
       for (let i = 0; i < vehTypes.length; i++) {
         const typeArray = vehTypes[i]
-        if (typeArray.includes(vehClass)) {
+        if (typeArray.includes(doorPlanLiteral)) {
           body = mapBodyType[i]
         }
       }
@@ -68,5 +66,5 @@ export const useRetrieveVehData = (inquiry: Inquiry | undefined, dataToCustomer:
         dataToCustomer(body === CarType.BARN ? getVanBodyType() : body)
       }
     }
-  }, [inquiry])
+  }, [doorPlanLiteral])
 }

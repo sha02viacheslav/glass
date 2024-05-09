@@ -156,7 +156,7 @@ export const App: React.FC = () => {
             <Route path='/inquiry-intro/:licenseNum' element={<InquiryIntro />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/customer/:licenseNum' element={<Customer />} />
-            <Route path='/customer/edit/:licenseNum/:quoteId' element={<Customer editMode={true} />} />
+            <Route path='/customer/edit/:licenseNum/:quoteId/:step' element={<Customer editMode={true} />} />
             <Route path='/payment/assist/:status' element={<PaymentAssist />} />
             <Route path='/payment/:status' element={<PaymentAssist />} />
             <Route path='/paid' element={<Paid />} />

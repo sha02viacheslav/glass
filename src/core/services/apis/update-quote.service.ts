@@ -1,6 +1,6 @@
-import { ApiResponse, QuoteDto } from '@glass/models'
+import { ApiResponse, UpdateQuoteDto } from '@glass/models'
 import { postApi } from '@glass/services/apis/api.service'
 
-export const updateQuoteService = async (params: QuoteDto): Promise<ApiResponse<{ fe_token: string }>> => {
+export const updateQuoteService = async (params: UpdateQuoteDto): Promise<ApiResponse<{ fe_token: string }>> => {
   return await postApi('order/update_quotation', params)
 }

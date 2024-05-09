@@ -130,14 +130,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         selectedWindows.push(brokenWindows[index].name)
       }
     }
-    setSelectedWindows((windows) => {
-      return windows.slice()
-    })
-    // change main array
+    setSelectedWindows((windows) => windows.slice())
     brokenWindows[index].broken = !brokenWindows[index].broken
-    setBrokenWindows((windows) => {
-      return windows.slice()
-    })
+    setBrokenWindows((windows) => windows.slice())
+    getCharacteristics()
   }
 
   // handle tinted toggle button
@@ -160,6 +156,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     }
     setTintedConfirmed(true)
     setBrokenWindows(brokenWindows.slice())
+    getCharacteristics()
   }
 
   // switch between barn door and tailgater
@@ -211,9 +208,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         }
       }
     }
-    setSelectedWindows((windows) => {
-      return windows.slice()
-    })
+    setSelectedWindows((windows) => windows.slice())
+    getCharacteristics()
   }
 
   // handle popup for bodyType
@@ -243,18 +239,20 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   const getCharacteristics = () => {
-    getCharacteristicService(registrationNumber, selectedWindows).then((res) => {
-      if (res.success) {
-        setCharacteristics(res.data)
-      }
-    })
+    if (registrationNumber && selectedWindows?.length) {
+      getCharacteristicService(registrationNumber, selectedWindows).then((res) => {
+        if (res.success) {
+          setCharacteristics(res.data)
+        }
+      })
+    }
   }
 
   useEffect(() => {
-    if (registrationNumber && selectedWindows?.length) {
+    if (!characteristics?.length) {
       getCharacteristics()
     }
-  }, [registrationNumber, selectedWindows])
+  }, [characteristics])
 
   useEffect(() => {
     const characteristicsResult: Characteristic[] = []
@@ -270,7 +268,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [characteristics])
 
   useEffect(() => {
-    if (onSelectBrokenGlasses) onSelectBrokenGlasses(selectedWindows)
+    if (onSelectBrokenGlasses) onSelectBrokenGlasses(selectedWindows.map((item) => item.toLowerCase()))
   }, [selectedWindows, brokenWindows])
 
   useEffect(() => {

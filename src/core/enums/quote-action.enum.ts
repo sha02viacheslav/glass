@@ -3,6 +3,6 @@ export enum QuoteAction {
   GO_PAYMENT = 'Select payment method',
   CONTINUE_PA = 'Continue Payment Assist',
   CHECK_ELIGIBILITY = 'Check Eligibility',
-  GO_TIMESLOT = 'Next',
+  GO_TIME_SLOT = 'Next',
   CONFIRM_BOOKING = 'Confirm Booking',
 }
