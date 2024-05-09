@@ -19,8 +19,8 @@ export const WhatDifference = () => {
         title: 'Tempered glass',
         description:
           'Tempered glass is treated with heat to make it stronger and shatter into small, dull pieces to shatter safety in case of breakage. ',
-        image: '/img/help/broken.png',
-        caption: 'Broken laminated glass',
+        image: '/img/help/broken2.png',
+        caption: 'Broken tempered glass',
       },
     ],
     [],
