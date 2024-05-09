@@ -6,7 +6,6 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
-  Link,
   OutlinedInput,
   Radio,
   RadioGroup,
@@ -40,6 +39,7 @@ import {
   Characteristic,
   Comment,
   Inquiry,
+  InquiryFinalCheckDto,
   InquiryStep1Dto,
   InquiryStep2Dto,
   InquiryStep3Dto,
@@ -55,6 +55,7 @@ import { createQuoteService } from '@glass/services/apis/create-quote.service'
 import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
+import { updateInquiryFinalCheckService } from '@glass/services/apis/update-inquiry-final-check.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
 import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
 import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-step3.service'
@@ -257,7 +258,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, 100)
           return
         }
-        updateInquiryStep1(formik.values)
+        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+          updateInquiryFinalCheck(formik.values)
+        } else {
+          updateInquiryStep1(formik.values)
+        }
         break
       }
       case InquiryStep.STEP2: {
@@ -266,11 +271,19 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
           return
         }
-        updateInquiryStep2(formik.values)
+        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+          updateInquiryFinalCheck(formik.values)
+        } else {
+          updateInquiryStep2(formik.values)
+        }
         break
       }
       case InquiryStep.STEP3: {
-        updateInquiryStep3(formik.values)
+        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+          updateInquiryFinalCheck(formik.values)
+        } else {
+          updateInquiryStep3(formik.values)
+        }
         break
       }
       case InquiryStep.STEP4: {
@@ -291,7 +304,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.PHONE, 100)
           return
         }
-        updateInquiryStep4(formik.values)
+        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+          updateInquiryFinalCheck(formik.values)
+        } else {
+          updateInquiryStep4(formik.values)
+        }
         break
       }
       case InquiryStep.STEP5: {
@@ -300,7 +317,11 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, 100)
           return
         }
-        updateInquiryStep5(formik.values)
+        if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+          updateInquiryFinalCheck(formik.values)
+        } else {
+          updateInquiryStep5(formik.values)
+        }
         break
       }
       case InquiryStep.FINAL_CHECK: {
@@ -471,6 +492,68 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     )
   }
 
+  const updateInquiryFinalCheck = (values: CustomerForm) => {
+    if (!inquiry) return
+
+    const removeAttachmentIds = inquiry.step_3.customer_attachments
+      .filter((attachment) => attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0)
+      .map((attachment) => attachment.attachment_id)
+
+    const removeRequestBookingIds = inquiry.step_5.request_booking
+      .filter(
+        (booking) =>
+          values.requestBookings.findIndex((item) => item.request_booking_id === booking.request_booking_id) < 0,
+      )
+      .map((booking) => booking.request_booking_id)
+
+    const postData: InquiryFinalCheckDto = {
+      fe_token: inquiry.fe_token,
+      // Step 1
+      customer_address: {
+        address_id: inquiry.step_1.delivery_address.address_id || 0,
+        postcode: billingAddress?.postcode || '',
+        latitude: billingAddress?.latitude || '',
+        longitude: billingAddress?.longitude || '',
+        line_1: billingAddress?.line_1 || '',
+        line_2: billingAddress?.line_2 || '',
+        line_3: billingAddress?.line_3 || '',
+        line_4: billingAddress?.line_4 || '',
+        locality: billingAddress?.locality || '',
+        town_or_city: billingAddress?.town_or_city || '',
+        county: billingAddress?.county || '',
+        district: billingAddress?.district || '',
+        country: billingAddress?.country || '',
+      },
+      working_place: values.workingPlace,
+      workshop_id: formik.values.workshopId,
+      // Step 2
+      glass_location: values.glassLocation,
+      inquiry_characteristics: values.characteristics,
+      // Step 3
+      customer_comment: values.comment,
+      customer_attachments: attachments.filter((item) => !item.attachment_id),
+      remove_attachment_ids: removeAttachmentIds,
+      // Step 4
+      customer_f_name: (values.firstName || '').trim(),
+      customer_s_name: (values.lastName || '').trim(),
+      customer_phone: (values.phone || '').trim(),
+      customer_email: (values.email || '').trim(),
+      // Step 5
+      request_booking: values.requestBookings.filter((item) => !item.request_booking_id),
+      remove_request_booking_ids: removeRequestBookingIds,
+    }
+
+    trackPromise(
+      updateInquiryFinalCheckService(postData).then((res) => {
+        if (res.success) {
+          afterUpdateInquiryStep()
+        } else {
+          toast(res.message)
+        }
+      }),
+    )
+  }
+
   const submitInquiry = (values: CustomerForm) => {
     // post data
     const firstName = (values.firstName || '').trim()
@@ -570,7 +653,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     if (formik.values?.registrationNumber && formik.values?.glassLocation?.length) {
       getBeforeAfterImages()
     }
-  }, [formik.values])
+  }, [formik.values.registrationNumber, formik.values.glassLocation])
 
   useEffect(() => {
     if (!workshops.length) {

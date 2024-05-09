@@ -9,10 +9,15 @@ export const beforeAfterService = async (
   limit = 0,
   offset = 0,
 ): Promise<ApiResponse<BeforeAfter[]>> => {
-  return await postApi(`image/before_after/${type}`, {
-    limit,
-    offset,
-    registration_number: registrationNumber,
-    glass_locations: glassLocations,
-  })
+  if (type === BeforeAfterType.NEW_INQUIRY) {
+    return await postApi(`image/before_after/${type}`, {
+      registration_number: registrationNumber,
+      glass_locations: glassLocations,
+    })
+  } else {
+    return await postApi(`image/before_after/${type}`, {
+      limit,
+      offset,
+    })
+  }
 }
