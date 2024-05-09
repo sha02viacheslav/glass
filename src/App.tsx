@@ -106,11 +106,13 @@ const theme = createTheme({
 
 export const App: React.FC = () => {
   const location = useLocation()
+  const [showHeader, setShowHeader] = useState<boolean>(true)
   const [showMenu, setShowMenu] = useState<boolean>(true)
   const [showQuickContact, setShowQuickContact] = useState<boolean>(true)
   const [showFooter, setShowFooter] = useState<boolean>(true)
 
   useEffect(() => {
+    setShowHeader(!location.pathname.startsWith('/customer/edit'))
     setShowMenu(
       !location.pathname.startsWith('/quote') &&
         !location.pathname.startsWith('/inquiry-intro') &&
@@ -139,7 +141,7 @@ export const App: React.FC = () => {
       <div className='main-content'>
         <ThemeProvider theme={theme}>
           <LoadingIndicator />
-          <Header showMenu={showMenu} />
+          {showHeader && <Header showMenu={showMenu} />}
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/services' element={<Services />} />

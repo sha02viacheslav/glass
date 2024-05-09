@@ -61,6 +61,7 @@ import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-s
 import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
+import { EditQuoteHeader } from './EditQuoteHeader'
 import { FinalCheck } from './FinalCheck'
 import { WorkshopCard } from './WorkshopCard'
 import { LiveService } from '../Home/LiveService'
@@ -727,446 +728,450 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   }, [quoteDetails])
 
   return (
-    <div className='customer-page'>
-      <form onSubmit={formik.handleSubmit}>
-        {!editMode && activeStep !== InquiryStep.FINAL_CHECK && (
-          <div className='step-wrapper'>
-            <div className='title'>
-              <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
-            </div>
-            <Stepper activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
-              {Object.keys(steps)
-                .slice(0, 5)
-                .map((step) => {
-                  const stepProps: { completed?: boolean } = {}
+    <>
+      {editMode && !!quoteId && <EditQuoteHeader quoteId={quoteId} title={steps[activeStep].title} />}
 
-                  return (
-                    <Step key={step} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
-                      <StepIcon
-                        icon={steps[step as InquiryStep].index}
-                        active={step === activeStep}
-                        completed={step < activeStep}
-                      ></StepIcon>
-                    </Step>
-                  )
-                })}
-            </Stepper>
-          </div>
-        )}
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP1 ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-48'></div>
-          <section>
-            <div className='title'>CAR REGISTRATION NUMBER</div>
-            <div className='description'>Enter your car&apos;s registration and hit the search.</div>
-            <div
-              id={FormFieldIds.REGISTRATION_NUMBER}
-              className={
-                'reg-card' + (formik.touched.registrationNumber && formik.errors.registrationNumber ? ' invalid' : '')
-              }
-            >
-              <LicensePlate
-                disabled={editMode}
-                placeholderVal='Enter reg'
-                licenseNumber={licenseSearchVal}
-                showSearch={true}
-                showModel={true}
-                handleVehInputChange={(val) => {
-                  setLicense(val)
-                }}
-                handleVehicleDataChange={(data) => setInquiry(data)}
-              />
-            </div>
-            <small className='form-error'>
-              {formik.touched.registrationNumber && formik.errors.registrationNumber}
-            </small>
-          </section>
-
-          <div className='padding-48'></div>
-
-          <section>
-            <div className='title'>YOUR LOCATION</div>
-            <div className='description'>
-              We need your location to suggest closest workshop or see if we can do mobile service.
-            </div>
-            <div id={FormFieldIds.INVOICE_ADDRESS} className='form-group mb-4'>
-              <AddressInput
-                address={billingAddress}
-                formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
-                onChange={handleChangeBillingAddress}
-                disabled={editMode}
-              />
-            </div>
-          </section>
-
-          <div className='padding-48'></div>
-
-          <section className={!!formik.errors.invoiceAddress ? 'disabled' : ''}>
-            <div className='title'>REPAIR LOCATION</div>
-            <div className='description'>Where would you like to get repair done?</div>
-            <FormControl
-              id={FormFieldIds.WORKING_PLACE}
-              disabled={!!formik.errors.invoiceAddress}
-              error={formik.touched.workingPlace && !!formik.errors.workingPlace}
-            >
-              <RadioGroup
-                row
-                value={formik.values.workingPlace}
-                onChange={(_, value) => formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)}
-              >
-                <FormControlLabel
-                  value={WorkingPlace.WORKSHOP}
-                  control={<Radio />}
-                  label={workingPlaceLabel(WorkingPlace.WORKSHOP)}
-                />
-                <FormControlLabel
-                  value={WorkingPlace.MOBILE}
-                  control={<Radio />}
-                  label={workingPlaceLabel(WorkingPlace.MOBILE)}
-                />
-              </RadioGroup>
-            </FormControl>
-            <small className='form-error'>
-              {!formik.errors.invoiceAddress && formik.touched.workingPlace && formik.errors.workingPlace}
-            </small>
-
-            {formik.values.workingPlace === WorkingPlace.WORKSHOP && (
-              <Box sx={{ marginTop: '24px' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
-                  <Typography sx={{ lineHeight: '140%' }}>Choose a repair workshop from the list below. </Typography>
-                  <button className='btn-stroked' onClick={() => setModalMap(true)}>
-                    <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
-                    Map view
-                  </button>
-                </Box>
-
-                <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', paddingTop: '16px', marginTop: '8px' }}>
-                  {workshops.map((workshop, index) => (
-                    <WorkshopCard
-                      key={index}
-                      workshop={workshop}
-                      selected={
-                        typeof formik.values.workshopId === 'number' && formik.values.workshopId === workshop.id
-                      }
-                      onSelect={() => formik.setFieldValue(FormFieldIds.WORKSHOP_ID, workshop.id)}
-                    ></WorkshopCard>
-                  ))}
-                </Box>
-              </Box>
-            )}
-
-            {formik.values.workingPlace === WorkingPlace.MOBILE && (
-              <Box sx={{ marginTop: '24px' }}>
-                {!!workshops.length && <MobileService workshops={workshops} />}
-                <LiveService image='live-service-bg1.png' />
-              </Box>
-            )}
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP2 ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-48'></div>
-          <section>
-            <div id={FormFieldIds.GLASS_LOCATION}>
-              <WindowSelector
-                carType={selectedCarType}
-                registrationNumber={formik.values.registrationNumber}
-                selectedGlasses={formik.values.glassLocation}
-                setCarType={setSelectedCarType}
-                onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
-                onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
-              />
-
-              <div className='no-glass'>No glass selected</div>
-            </div>
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP3 ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-48'></div>
-          <section>
-            <Box
-              sx={{
-                paddingX: 4,
-                paddingY: 3,
-                borderRadius: '2px',
-                border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-              }}
-            >
-              <Typography
-                sx={{
-                  color: 'var(--Dark-Blue---Accent-800, #090221)',
-                  fontWeight: '700',
-                  lineHeight: '150%',
-                  letterSpacing: '0.8px',
-                }}
-              >
-                IMPORTANT
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'var(--Light-Blue---Primary-700, #081F44)',
-                  lineHeight: '170%',
-                  marginTop: 1,
-                }}
-              >
-                Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later as
-                well.
-              </Typography>
-            </Box>
-            <Box sx={{ marginTop: 6 }}>
-              <AddPictures
-                attachments={formik.values.attachments}
-                onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
-              />
-
-              <HowToTakePic />
-
-              <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
-              <FormControl fullWidth>
-                <OutlinedInput
-                  value={formik.values.comment}
-                  fullWidth
-                  multiline
-                  rows={4}
-                  placeholder='Any info you think that can help...'
-                  sx={{ fontSize: 14, paddingY: 0 }}
-                  onChange={(e) => formik.setFieldValue(FormFieldIds.COMMENT, e.target.value)}
-                  error={formik.touched.comment && !!formik.errors.comment}
-                />
-              </FormControl>
-            </Box>
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-48'></div>
-          <section>
-            <Box className='row'>
-              <Box sx={{ display: 'flex', gap: 2, marginBottom: 12 }}>
-                <CardMedia
-                  component='img'
-                  sx={{ width: 20, height: 20 }}
-                  image={process.env.PUBLIC_URL + '/images/account.svg'}
-                  alt='Account'
-                />
-                <Box>
-                  <FormControl id={FormFieldIds.FIRST_NAME} fullWidth sx={{ marginBottom: 6 }}>
-                    <InputLabel>First name*</InputLabel>
-                    <OutlinedInput
-                      value={formik.values.firstName}
-                      label='First name*'
-                      placeholder='First name*'
-                      onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
-                      error={formik.touched.firstName && !!formik.errors.firstName}
-                    />
-                    <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
-                  </FormControl>
-
-                  <FormControl id={FormFieldIds.LAST_NAME} fullWidth>
-                    <InputLabel>Last name*</InputLabel>
-                    <OutlinedInput
-                      value={formik.values.lastName}
-                      label='Last name*'
-                      placeholder='Last name*'
-                      onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
-                      error={formik.touched.lastName && !!formik.errors.lastName}
-                    />
-                    <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
-                  </FormControl>
-                </Box>
-              </Box>
-
-              <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                <CardMedia
-                  component='img'
-                  sx={{ width: 20, height: 20 }}
-                  image={process.env.PUBLIC_URL + '/images/phone-blue.svg'}
-                  alt='Account'
-                />
-                <FormControl id={FormFieldIds.PHONE} fullWidth>
-                  <InputLabel>Phone number*</InputLabel>
-                  <OutlinedInput
-                    value={formik.values.phone}
-                    label='Phone number*'
-                    placeholder='Phone number*'
-                    onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
-                    error={formik.touched.phone && !!formik.errors.phone}
-                  />
-                  <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
-                </FormControl>
-              </Box>
-
-              <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                <CardMedia
-                  component='img'
-                  sx={{ width: 20, height: 20 }}
-                  image={process.env.PUBLIC_URL + '/images/email-blue.svg'}
-                  alt='Account'
-                />
-                <FormControl id={FormFieldIds.EMAIL} fullWidth>
-                  <InputLabel>E-mail*</InputLabel>
-                  <OutlinedInput
-                    value={formik.values.email}
-                    label='E-mail*'
-                    placeholder='E-mail*'
-                    onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
-                    error={formik.touched.email && !!formik.errors.email}
-                  />
-                  <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
-                </FormControl>
-              </Box>
-            </Box>
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.STEP5 ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-32'></div>
-          <section>
-            <TimeSelection
-              bookingEnabled={formik.values.bookingEnabled}
-              requestBookings={formik.values.requestBookings}
-              onChangeBookingEnabled={(value) => formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, value)}
-              onChangeTimeSlot={(value) => handleChangeTimeSlot(value)}
-              formError={formik.touched.requestBookings && formik.errors.requestBookings}
-            />
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <Box
-          className='tab-content'
-          sx={{ height: activeStep === InquiryStep.FINAL_CHECK ? 'auto' : '0px', overflow: 'hidden' }}
-        >
-          <div className='padding-32'></div>
-          <section>
-            {!!inquiry && (
-              <FinalCheck
-                selectedCarType={selectedCarType}
-                inquiry={inquiry}
-                onEdit={(value) => setActiveStep(value)}
-              ></FinalCheck>
-            )}
-          </section>
-          <div className='padding-64'></div>
-        </Box>
-
-        <div className='padding-64'></div>
-
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100vw',
-            zIndex: '100',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-            background: '#fff',
-          }}
-        >
-          {/* Update quote details */}
-          {editMode && !!quoteDetails && (
-            <>
-              <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                Save changes
-              </button>
-            </>
-          )}
-
-          {/* Update final check */}
-          {inquiry?.order_state === InquiryStep.FINAL_CHECK && activeStep !== InquiryStep.FINAL_CHECK && (
-            <>
-              <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
-                Back to Summary
-              </button>
-              <button className='btn-raised' type='button' onClick={handleContinueClick}>
-                Save changes
-              </button>
-            </>
-          )}
-
-          {/* Final check */}
-          {activeStep === InquiryStep.FINAL_CHECK && (
-            <>
-              <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                Submit
-              </button>
-            </>
-          )}
-
-          {/* Inquiry is in progress */}
-          {!editMode && inquiry?.order_state !== InquiryStep.FINAL_CHECK && (
-            <>
-              <div>
-                {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (
-                  <>
-                    <Typography
-                      sx={{
-                        color: 'var(--Gray-600, #6A6B71)',
-                        fontSize: '14px',
-                        fontWeight: '300',
-                        lineHeight: '24px',
-                        letterSpacing: '-0.14px',
-                      }}
-                    >
-                      Workshop picked
-                    </Typography>
-                    <Typography
-                      sx={{
-                        color: 'var(--Gray-800, #14151F)',
-                        fontSize: '16px',
-                        fontWeight: '400',
-                        lineHeight: '24px',
-                        letterSpacing: '-0.16px',
-                      }}
-                    >
-                      {!!selectedWorkshop ? selectedWorkshop.name : 'You did not pick'}
-                    </Typography>
-                  </>
-                )}
-                {activeStep !== InquiryStep.STEP1 && (
-                  <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
-                    <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
-                    Previous
-                  </button>
-                )}
+      <div className='customer-page'>
+        <form onSubmit={formik.handleSubmit}>
+          {!editMode && activeStep !== InquiryStep.FINAL_CHECK && (
+            <div className='step-wrapper'>
+              <div className='title'>
+                <span className='gray'>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
               </div>
-              <button className='btn-raised' type='button' onClick={handleContinueClick}>
-                {activeStep === InquiryStep.STEP5 ? 'Final check' : 'Continue'}
-              </button>
-            </>
-          )}
-        </Box>
-      </form>
+              <Stepper activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
+                {Object.keys(steps)
+                  .slice(0, 5)
+                  .map((step) => {
+                    const stepProps: { completed?: boolean } = {}
 
-      {!!beforeAfterItems?.length && (
-        <OurMethod beforeAfterImages={beforeAfterItems} showTitle={false} showVideos={false} />
-      )}
-      {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
-    </div>
+                    return (
+                      <Step key={step} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                        <StepIcon
+                          icon={steps[step as InquiryStep].index}
+                          active={step === activeStep}
+                          completed={step < activeStep}
+                        ></StepIcon>
+                      </Step>
+                    )
+                  })}
+              </Stepper>
+            </div>
+          )}
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.STEP1 ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-48'></div>
+            <section>
+              <div className='title'>CAR REGISTRATION NUMBER</div>
+              <div className='description'>Enter your car&apos;s registration and hit the search.</div>
+              <div
+                id={FormFieldIds.REGISTRATION_NUMBER}
+                className={
+                  'reg-card' + (formik.touched.registrationNumber && formik.errors.registrationNumber ? ' invalid' : '')
+                }
+              >
+                <LicensePlate
+                  disabled={editMode}
+                  placeholderVal='Enter reg'
+                  licenseNumber={licenseSearchVal}
+                  showSearch={true}
+                  showModel={true}
+                  handleVehInputChange={(val) => {
+                    setLicense(val)
+                  }}
+                  handleVehicleDataChange={(data) => setInquiry(data)}
+                />
+              </div>
+              <small className='form-error'>
+                {formik.touched.registrationNumber && formik.errors.registrationNumber}
+              </small>
+            </section>
+
+            <div className='padding-48'></div>
+
+            <section>
+              <div className='title'>YOUR LOCATION</div>
+              <div className='description'>
+                We need your location to suggest closest workshop or see if we can do mobile service.
+              </div>
+              <div id={FormFieldIds.INVOICE_ADDRESS} className='form-group mb-4'>
+                <AddressInput
+                  address={billingAddress}
+                  formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+                  onChange={handleChangeBillingAddress}
+                  disabled={editMode}
+                />
+              </div>
+            </section>
+
+            <div className='padding-48'></div>
+
+            <section className={!!formik.errors.invoiceAddress ? 'disabled' : ''}>
+              <div className='title'>REPAIR LOCATION</div>
+              <div className='description'>Where would you like to get repair done?</div>
+              <FormControl
+                id={FormFieldIds.WORKING_PLACE}
+                disabled={!!formik.errors.invoiceAddress}
+                error={formik.touched.workingPlace && !!formik.errors.workingPlace}
+              >
+                <RadioGroup
+                  row
+                  value={formik.values.workingPlace}
+                  onChange={(_, value) => formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)}
+                >
+                  <FormControlLabel
+                    value={WorkingPlace.WORKSHOP}
+                    control={<Radio />}
+                    label={workingPlaceLabel(WorkingPlace.WORKSHOP)}
+                  />
+                  <FormControlLabel
+                    value={WorkingPlace.MOBILE}
+                    control={<Radio />}
+                    label={workingPlaceLabel(WorkingPlace.MOBILE)}
+                  />
+                </RadioGroup>
+              </FormControl>
+              <small className='form-error'>
+                {!formik.errors.invoiceAddress && formik.touched.workingPlace && formik.errors.workingPlace}
+              </small>
+
+              {formik.values.workingPlace === WorkingPlace.WORKSHOP && (
+                <Box sx={{ marginTop: '24px' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+                    <Typography sx={{ lineHeight: '140%' }}>Choose a repair workshop from the list below. </Typography>
+                    <button className='btn-stroked' onClick={() => setModalMap(true)}>
+                      <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
+                      Map view
+                    </button>
+                  </Box>
+
+                  <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', paddingTop: '16px', marginTop: '8px' }}>
+                    {workshops.map((workshop, index) => (
+                      <WorkshopCard
+                        key={index}
+                        workshop={workshop}
+                        selected={
+                          typeof formik.values.workshopId === 'number' && formik.values.workshopId === workshop.id
+                        }
+                        onSelect={() => formik.setFieldValue(FormFieldIds.WORKSHOP_ID, workshop.id)}
+                      ></WorkshopCard>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {formik.values.workingPlace === WorkingPlace.MOBILE && (
+                <Box sx={{ marginTop: '24px' }}>
+                  {!!workshops.length && <MobileService workshops={workshops} />}
+                  <LiveService image='live-service-bg1.png' />
+                </Box>
+              )}
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.STEP2 ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-48'></div>
+            <section>
+              <div id={FormFieldIds.GLASS_LOCATION}>
+                <WindowSelector
+                  carType={selectedCarType}
+                  registrationNumber={formik.values.registrationNumber}
+                  selectedGlasses={formik.values.glassLocation}
+                  setCarType={setSelectedCarType}
+                  onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
+                  onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
+                />
+
+                <div className='no-glass'>No glass selected</div>
+              </div>
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.STEP3 ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-48'></div>
+            <section>
+              <Box
+                sx={{
+                  paddingX: 4,
+                  paddingY: 3,
+                  borderRadius: '2px',
+                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: 'var(--Dark-Blue---Accent-800, #090221)',
+                    fontWeight: '700',
+                    lineHeight: '150%',
+                    letterSpacing: '0.8px',
+                  }}
+                >
+                  IMPORTANT
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'var(--Light-Blue---Primary-700, #081F44)',
+                    lineHeight: '170%',
+                    marginTop: 1,
+                  }}
+                >
+                  Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later as
+                  well.
+                </Typography>
+              </Box>
+              <Box sx={{ marginTop: 6 }}>
+                <AddPictures
+                  attachments={formik.values.attachments}
+                  onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
+                />
+
+                <HowToTakePic />
+
+                <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
+                <FormControl fullWidth>
+                  <OutlinedInput
+                    value={formik.values.comment}
+                    fullWidth
+                    multiline
+                    rows={4}
+                    placeholder='Any info you think that can help...'
+                    sx={{ fontSize: 14, paddingY: 0 }}
+                    onChange={(e) => formik.setFieldValue(FormFieldIds.COMMENT, e.target.value)}
+                    error={formik.touched.comment && !!formik.errors.comment}
+                  />
+                </FormControl>
+              </Box>
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-48'></div>
+            <section>
+              <Box className='row'>
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: 12 }}>
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 20, height: 20 }}
+                    image={process.env.PUBLIC_URL + '/images/account.svg'}
+                    alt='Account'
+                  />
+                  <Box>
+                    <FormControl id={FormFieldIds.FIRST_NAME} fullWidth sx={{ marginBottom: 6 }}>
+                      <InputLabel>First name*</InputLabel>
+                      <OutlinedInput
+                        value={formik.values.firstName}
+                        label='First name*'
+                        placeholder='First name*'
+                        onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
+                        error={formik.touched.firstName && !!formik.errors.firstName}
+                      />
+                      <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
+                    </FormControl>
+
+                    <FormControl id={FormFieldIds.LAST_NAME} fullWidth>
+                      <InputLabel>Last name*</InputLabel>
+                      <OutlinedInput
+                        value={formik.values.lastName}
+                        label='Last name*'
+                        placeholder='Last name*'
+                        onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
+                        error={formik.touched.lastName && !!formik.errors.lastName}
+                      />
+                      <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
+                    </FormControl>
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 20, height: 20 }}
+                    image={process.env.PUBLIC_URL + '/images/phone-blue.svg'}
+                    alt='Account'
+                  />
+                  <FormControl id={FormFieldIds.PHONE} fullWidth>
+                    <InputLabel>Phone number*</InputLabel>
+                    <OutlinedInput
+                      value={formik.values.phone}
+                      label='Phone number*'
+                      placeholder='Phone number*'
+                      onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
+                      error={formik.touched.phone && !!formik.errors.phone}
+                    />
+                    <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
+                  </FormControl>
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 20, height: 20 }}
+                    image={process.env.PUBLIC_URL + '/images/email-blue.svg'}
+                    alt='Account'
+                  />
+                  <FormControl id={FormFieldIds.EMAIL} fullWidth>
+                    <InputLabel>E-mail*</InputLabel>
+                    <OutlinedInput
+                      value={formik.values.email}
+                      label='E-mail*'
+                      placeholder='E-mail*'
+                      onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
+                      error={formik.touched.email && !!formik.errors.email}
+                    />
+                    <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
+                  </FormControl>
+                </Box>
+              </Box>
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.STEP5 ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-32'></div>
+            <section>
+              <TimeSelection
+                bookingEnabled={formik.values.bookingEnabled}
+                requestBookings={formik.values.requestBookings}
+                onChangeBookingEnabled={(value) => formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, value)}
+                onChangeTimeSlot={(value) => handleChangeTimeSlot(value)}
+                formError={formik.touched.requestBookings && formik.errors.requestBookings}
+              />
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
+            sx={{ height: activeStep === InquiryStep.FINAL_CHECK ? 'auto' : '0px', overflow: 'hidden' }}
+          >
+            <div className='padding-32'></div>
+            <section>
+              {!!inquiry && (
+                <FinalCheck
+                  selectedCarType={selectedCarType}
+                  inquiry={inquiry}
+                  onEdit={(value) => setActiveStep(value)}
+                ></FinalCheck>
+              )}
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <div className='padding-64'></div>
+
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: '0',
+              left: '0',
+              width: '100vw',
+              zIndex: '100',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+              borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+              background: '#fff',
+            }}
+          >
+            {/* Update quote details */}
+            {editMode && !!quoteDetails && (
+              <>
+                <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                  Save changes
+                </button>
+              </>
+            )}
+
+            {/* Update final check */}
+            {inquiry?.order_state === InquiryStep.FINAL_CHECK && activeStep !== InquiryStep.FINAL_CHECK && (
+              <>
+                <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
+                  Back to Summary
+                </button>
+                <button className='btn-raised' type='button' onClick={handleContinueClick}>
+                  Save changes
+                </button>
+              </>
+            )}
+
+            {/* Final check */}
+            {activeStep === InquiryStep.FINAL_CHECK && (
+              <>
+                <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                  Submit
+                </button>
+              </>
+            )}
+
+            {/* Inquiry is in progress */}
+            {!editMode && inquiry?.order_state !== InquiryStep.FINAL_CHECK && (
+              <>
+                <div>
+                  {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (
+                    <>
+                      <Typography
+                        sx={{
+                          color: 'var(--Gray-600, #6A6B71)',
+                          fontSize: '14px',
+                          fontWeight: '300',
+                          lineHeight: '24px',
+                          letterSpacing: '-0.14px',
+                        }}
+                      >
+                        Workshop picked
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: 'var(--Gray-800, #14151F)',
+                          fontSize: '16px',
+                          fontWeight: '400',
+                          lineHeight: '24px',
+                          letterSpacing: '-0.16px',
+                        }}
+                      >
+                        {!!selectedWorkshop ? selectedWorkshop.name : 'You did not pick'}
+                      </Typography>
+                    </>
+                  )}
+                  {activeStep !== InquiryStep.STEP1 && (
+                    <button className='btn-transparent' type='button' onClick={handlePreviousClick}>
+                      <img src={process.env.PUBLIC_URL + '/images/chevron-left.svg'} />
+                      Previous
+                    </button>
+                  )}
+                </div>
+                <button className='btn-raised' type='button' onClick={handleContinueClick}>
+                  {activeStep === InquiryStep.STEP5 ? 'Final check' : 'Continue'}
+                </button>
+              </>
+            )}
+          </Box>
+        </form>
+
+        {!!beforeAfterItems?.length && (
+          <OurMethod beforeAfterImages={beforeAfterItems} showTitle={false} showVideos={false} />
+        )}
+        {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
+      </div>
+    </>
   )
 }
