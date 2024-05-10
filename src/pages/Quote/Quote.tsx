@@ -43,6 +43,7 @@ import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll
 import { setQuoteId } from '@glass/utils/session/session.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 import { PendingQuote } from './PendingQuote'
+import { QuoteCheckout } from './QuoteCheckout'
 import { QuoteOptions } from './QuoteOptions'
 
 export type QuoteProps = {
@@ -53,7 +54,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const showButtons = false
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
-  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.PENDING)
+  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.CHECKOUT)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIME_SLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(false)
@@ -445,7 +446,18 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               refetch={() => {
                 getQuote()
               }}
-              onContinue={() => setSnapValue(QuoteStep.PAYMENT)}
+              onContinue={() => setSnapValue(QuoteStep.CHECKOUT)}
+            />
+          )}
+
+          {snapValue === QuoteStep.CHECKOUT && (
+            <QuoteCheckout
+              quoteDetails={quoteDetails}
+              refetch={() => {
+                getQuote()
+              }}
+              onContinue={() => setSnapValue(QuoteStep.CHECKOUT)}
+              onBack={() => setSnapValue(QuoteStep.OPTIONS)}
             />
           )}
 
