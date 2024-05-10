@@ -26,7 +26,7 @@ export type QuoteCheckoutProps = {
   onBack: () => void
 }
 
-export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, onContinue, onBack }) => {
+export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refetch, onContinue, onBack }) => {
   const validationSchema = object({
     bookingDate: boolean().isTrue('Please select the date you would like to get repair done').nullable(),
   })
@@ -132,7 +132,11 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, onCo
 
         <Box sx={{ p: 4 }}></Box>
 
-        <PaymentMethods paymentMethodType={quoteDetails.payment_method_type} totalPrice={totalPrice} />
+        <PaymentMethods
+          paymentMethodType={quoteDetails.payment_method_type}
+          totalPrice={totalPrice}
+          refetch={refetch}
+        />
 
         <Box sx={{ p: 8 }}></Box>
       </Box>
@@ -163,7 +167,12 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, onCo
               />
               Back to quote
             </button>
-            <button className='btn-raised' type='button' onClick={() => handleContinueClick()}>
+            <button
+              className='btn-raised'
+              type='button'
+              onClick={() => handleContinueClick()}
+              disabled={!quoteDetails.payment_method_type}
+            >
               Go to payment
             </button>
           </Box>

@@ -1,4 +1,3 @@
-import './ConfirmDialog.css'
 import React, { ReactNode } from 'react'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Box, Modal, Typography } from '@mui/material'
@@ -45,33 +44,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           backgroundColor: '#EEF4F8',
           borderRadius: '12px',
           maxWidth: subDescription ? '550px' : '450px',
-          p: { xs: 3, md: 4 },
+          p: 6,
         }}
       >
         <Box>
-          <Typography
-            sx={{
-              color: 'var(--Gray-800, #14151F)',
-              fontFamily: 'Inter',
-              fontSize: '18px',
-              fontWeight: '700',
-              lineHeight: '140%',
-            }}
-          >
-            {title}
-          </Typography>
+          <Typography sx={{ fontSize: '18px', fontWeight: '700', lineHeight: '140%' }}>{title}</Typography>
           {showIcon && <ErrorOutlineIcon sx={{ fontSize: 50, margin: '20px 0px' }} />}
           {description ? (
             <Typography
-              marginTop={showIcon ? 0 : 3}
-              sx={{
-                color: 'var(--Gray-800, #14151F)',
-                fontFamily: 'Nunito Sans',
-                fontSize: '14px',
-                fontWeight: '400',
-                lineHeight: '20px',
-                letterSpacing: '0.25px',
-              }}
+              marginTop={showIcon ? 0 : 4}
+              sx={{ fontSize: '14px', fontWeight: '400', lineHeight: '20px', letterSpacing: '0.25px' }}
             >
               {description}
             </Typography>
@@ -79,20 +61,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             <Box marginTop={showIcon ? 0 : 7}></Box>
           )}
           {subDescription && <Typography>{subDescription}</Typography>}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: 4,
-              gap: { xs: '24px', md: '40px' },
-            }}
-          >
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6, gap: 2 }}>
             {showCancel && (
-              <button className='btn-stroked confirm-button' onClick={onCancel}>
+              <button className='btn-transparent' onClick={onCancel}>
                 {cancelStr}
               </button>
             )}
-            <button className='btn-stroked transparent confirm-button' onClick={onConfirm}>
+            <button className='btn-stroked transparent' onClick={onConfirm}>
               {confirmStr}
             </button>
           </Box>

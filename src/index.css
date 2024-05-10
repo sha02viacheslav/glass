@@ -78,10 +78,10 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 12px 24px;
-  border: solid 1px var(--Light-Blue---Primary-500, #225fc2);
+  border: solid 1px var(--Light-Blue---Primary-400, #4285f4);
   border-radius: 2px;
   background: #fff;
-  color: var(--Light-Blue---Primary-500, #225fc2);
+  color: var(--Light-Blue---Primary-400, #4285f4);
   font-size: 18px;
   font-weight: 700;
   line-height: 24px;
@@ -185,7 +185,7 @@ body {
 .btn-icon:disabled,
 .btn-raised:disabled,
 .btn-stroked:disabled {
-  opacity: 0.8;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
