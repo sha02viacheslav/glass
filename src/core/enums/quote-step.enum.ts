@@ -3,5 +3,6 @@ export enum QuoteStep {
   OPTIONS = 'options',
   CHECKOUT = 'checkout',
   PAYMENT = 'payment',
+  TRACKING = 'tracking',
   TIME_SLOT = 'timeslot',
 }

@@ -20,6 +20,7 @@ import { EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
 import {
   FixglassPaymentMethodTyp,
   OrderState,
+  PaymentMethodType,
   PaymentOptionEnum,
   PaymentStatus,
   QuoteAction,
@@ -45,6 +46,7 @@ import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 import { PendingQuote } from './PendingQuote'
 import { QuoteCheckout } from './QuoteCheckout'
 import { QuoteOptions } from './QuoteOptions'
+import { QuoteTracking } from './QuoteTracking'
 
 export type QuoteProps = {
   quoteCount?: boolean
@@ -54,7 +56,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const showButtons = false
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
-  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.CHECKOUT)
+  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.TRACKING)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIME_SLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(false)
@@ -456,7 +458,38 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               refetch={() => {
                 getQuote()
               }}
-              onContinue={() => setSnapValue(QuoteStep.CHECKOUT)}
+              onContinue={() => {
+                switch (quoteDetails.payment_method_type) {
+                  case PaymentMethodType.CASH: {
+                    setSnapValue(QuoteStep.TRACKING)
+                    break
+                  }
+                  default: {
+                    setSnapValue(QuoteStep.PAYMENT)
+                  }
+                }
+              }}
+              onBack={() => setSnapValue(QuoteStep.OPTIONS)}
+            />
+          )}
+
+          {snapValue === QuoteStep.TRACKING && (
+            <QuoteTracking
+              quoteDetails={quoteDetails}
+              refetch={() => {
+                getQuote()
+              }}
+              onContinue={() => {
+                switch (quoteDetails.payment_method_type) {
+                  case PaymentMethodType.CASH: {
+                    setSnapValue(QuoteStep.TRACKING)
+                    break
+                  }
+                  default: {
+                    setSnapValue(QuoteStep.PAYMENT)
+                  }
+                }
+              }}
               onBack={() => setSnapValue(QuoteStep.OPTIONS)}
             />
           )}

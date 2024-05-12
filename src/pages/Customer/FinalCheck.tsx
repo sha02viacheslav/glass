@@ -83,7 +83,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Service type and location
           </Typography>
-          <button type='button' className='btn-link small' onClick={() => onEdit(InquiryStep.STEP1)}>
+          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP1)}>
             EDIT
           </button>
         </Box>
@@ -121,7 +121,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Broken glass
           </Typography>
-          <button type='button' className='btn-link small' onClick={() => onEdit(InquiryStep.STEP2)}>
+          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP2)}>
             EDIT
           </button>
         </Box>
@@ -156,7 +156,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Your images and comment
           </Typography>
-          <button type='button' className='btn-link small' onClick={() => onEdit(InquiryStep.STEP3)}>
+          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP3)}>
             EDIT
           </button>
         </Box>
@@ -202,7 +202,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Your personal info
           </Typography>
-          <button type='button' className='btn-link small' onClick={() => onEdit(InquiryStep.STEP4)}>
+          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP4)}>
             EDIT
           </button>
         </Box>
@@ -249,7 +249,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Preferred repair dates
           </Typography>
-          <button type='button' className='btn-link small' onClick={() => onEdit(InquiryStep.STEP5)}>
+          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP5)}>
             EDIT
           </button>
         </Box>

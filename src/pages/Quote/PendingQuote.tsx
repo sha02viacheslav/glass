@@ -142,7 +142,7 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
               </Typography>
               <button
                 type='button'
-                className='btn-link small'
+                className='btn-link xs'
                 onClick={() => {
                   backToEditQuote(InquiryStep.STEP1)
                 }}
@@ -186,7 +186,7 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
               </Typography>
               <button
                 type='button'
-                className='btn-link small'
+                className='btn-link xs'
                 onClick={() => {
                   backToEditQuote(InquiryStep.STEP2)
                 }}
@@ -229,7 +229,7 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
               </Typography>
               <button
                 type='button'
-                className='btn-link small'
+                className='btn-link xs'
                 onClick={() => {
                   backToEditQuote(InquiryStep.STEP3)
                 }}
@@ -283,7 +283,7 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
               </Typography>
               <button
                 type='button'
-                className='btn-link small'
+                className='btn-link xs'
                 onClick={() => {
                   backToEditQuote(InquiryStep.STEP4)
                 }}
@@ -336,7 +336,7 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
               </Typography>
               <button
                 type='button'
-                className='btn-link small'
+                className='btn-link xs'
                 onClick={() => {
                   backToEditQuote(InquiryStep.STEP5)
                 }}
