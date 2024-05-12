@@ -1,5 +1,6 @@
 export enum QuoteStep {
-  PENDING = 'pending',
+  NEW = 'new',
+  OPEN = 'open',
   OPTIONS = 'options',
   CHECKOUT = 'checkout',
   PAYMENT = 'payment',

@@ -56,17 +56,17 @@ export type UpdateQuoteDto = {
     district?: string
     country?: string
   }
-  working_place: WorkingPlace
-  workshop_id: boolean | number
+  working_place?: WorkingPlace
+  workshop_id?: boolean | number
 
   // Step 2
-  glass_location: string[]
-  inquiry_characteristics: Characteristic[]
+  glass_location?: string[]
+  inquiry_characteristics?: Characteristic[]
 
   // Step 3
-  customer_comment: string
-  customer_attachments: CommentAttachment[]
-  remove_attachment_ids: number[]
+  customer_comment?: string
+  customer_attachments?: CommentAttachment[]
+  remove_attachment_ids?: number[]
 
   // Step 4
   customer_f_name: string
@@ -75,6 +75,6 @@ export type UpdateQuoteDto = {
   customer_email: string
 
   // Step 5
-  request_booking: { request_booking_date: string; request_time_slot: string }[]
-  remove_request_booking_ids: number[]
+  request_booking?: { request_booking_date: string; request_time_slot: string }[]
+  remove_request_booking_ids?: number[]
 }

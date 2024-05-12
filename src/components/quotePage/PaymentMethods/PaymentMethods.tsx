@@ -6,7 +6,6 @@ import { FullScreenModal } from '@glass/components/FullScreenModal'
 import { PaymentMethodType } from '@glass/enums'
 import { Installments } from '@glass/pages/Installments'
 import { updatePaymentMethod } from '@glass/services/apis/update-payment-method.service'
-import { CashPayment } from './CashPayment'
 import { FourMonthsInstallment } from './FourMonthsInstallment'
 import { FullPayment } from './FullPayment'
 import { SixMonthsInstallment } from './SixMonthsInstallment'
@@ -14,10 +13,16 @@ import { SixMonthsInstallment } from './SixMonthsInstallment'
 export type PaymentMethodsProps = {
   paymentMethodType: PaymentMethodType
   totalPrice: number
+  formError: string | boolean | undefined
   refetch: () => void
 }
 
-export const PaymentMethods: React.FC<PaymentMethodsProps> = ({ paymentMethodType, totalPrice, refetch }) => {
+export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
+  paymentMethodType,
+  totalPrice,
+  formError,
+  refetch,
+}) => {
   const { id: quoteId } = useParams()
 
   const [showInstallments, setShowInstallments] = useState<boolean>(false)
@@ -36,22 +41,35 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({ paymentMethodTyp
 
   return (
     <>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          marginX: -4,
+          padding: '8px 16px 12px',
+          background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
+        }}
+      >
         <FourMonthsInstallment
           selected={paymentMethodType === PaymentMethodType.ASSIST_FOUR_PAYMENT}
           totalPrice={totalPrice}
+          onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.ASSIST_FOUR_PAYMENT)}
         />
         <SixMonthsInstallment
           selected={paymentMethodType === PaymentMethodType.ASSIST_SIX_PAYMENT}
           totalPrice={totalPrice}
+          onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.ASSIST_SIX_PAYMENT)}
         />
         <FullPayment selected={paymentMethodType === PaymentMethodType.STRIPE} totalPrice={totalPrice} />
-        <CashPayment
+        {/* <CashPayment
           selected={paymentMethodType === PaymentMethodType.CASH}
           totalPrice={totalPrice}
           onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.CASH)}
-        />
+        /> */}
       </Box>
+
+      <small className='form-error'>{formError}</small>
 
       <Typography
         sx={{

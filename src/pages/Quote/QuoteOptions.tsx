@@ -3,47 +3,51 @@ import { Box, CardMedia, Link, Typography } from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
-import { boolean, object } from 'yup'
+import { number, object } from 'yup'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PaymentCards } from '@glass/components/PaymentCards'
 import { BookingTimes } from '@glass/components/quotePage/BookingTimes'
 import { OptionalOrderLines } from '@glass/components/quotePage/OptionalOrderLines'
-import { OrderLines } from '@glass/components/quotePage/OrderLines'
+import { Packages } from '@glass/components/quotePage/Packages'
 import { BeforeAfterType, InquiryStep } from '@glass/enums'
-import { Quote, RequestBooking } from '@glass/models'
+import { Quote } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
-import { sendBookingService } from '@glass/services/apis/send-booking.service'
+import { sendReserveBookingService } from '@glass/services/apis/send-reserve-booking.service'
+import { updateQuotationPackageService } from '@glass/services/apis/update-quotation-package.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
 import { Testimonials } from '../Home/Testimonials'
 
 export type QuoteOptionsForm = {
-  bookingDate: boolean
+  quotationPackageId: number
+  reserveBookingId: number
 }
 
 export enum FormFieldIds {
-  BOOKING_DATE = 'bookingDate',
+  QUOTATION_PACKAGE_ID = 'quotationPackageId',
+  RESERVE_BOOKING_ID = 'reserveBookingId',
 }
 
 export type QuoteOptionsProps = {
   quoteDetails: Quote
   refetch: () => void
-  onContinue: () => void
 }
 
-export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetch, onContinue }) => {
+export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetch }) => {
   const { id: quoteId } = useParams()
   const navigate = useNavigate()
 
   const validationSchema = object({
-    bookingDate: boolean().isTrue('Please select the date you would like to get repair done').nullable(),
+    quotationPackageId: number().min(1, 'Please select the product').nullable(),
+    reserveBookingId: number().min(1, 'Please select the date you would like to get repair done').nullable(),
   })
 
   const formik = useFormik({
     initialValues: {
-      bookingDate: false,
+      quotationPackageId: 0,
+      reserveBookingId: 0,
     },
     validationSchema: validationSchema,
     onSubmit: async () => {},
@@ -52,6 +56,18 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
   const backToEditQuote = (step: InquiryStep) => {
     const licenseReg = quoteDetails?.registration_number.replace(' ', '')
     navigate(`/customer/edit/${licenseReg}/${quoteId}/${step}`)
+  }
+
+  const handleCheckPackage = (packageId: number) => {
+    if (!quoteId) return
+    trackPromise(
+      updateQuotationPackageService(quoteId, packageId).then((res) => {
+        if (res.success) {
+          formik.setFieldValue(FormFieldIds.QUOTATION_PACKAGE_ID, packageId)
+          refetch()
+        }
+      }),
+    )
   }
 
   const handleCheckOptionalOrderLine = (orderLineId: number, optionalLineId: number, checked: boolean) => {
@@ -75,28 +91,36 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
     }
   }
 
-  const handleCheckRequestBooking = (requestBooking: RequestBooking) => {
+  const sendReserveBooking = (values: QuoteOptionsForm) => {
     if (!quoteId) return
 
     trackPromise(
-      sendBookingService(quoteId, requestBooking.request_booking_date, requestBooking.request_time_slot).then(() => {
+      sendReserveBookingService(quoteId, values.reserveBookingId).then(() => {
         refetch()
       }),
     )
   }
 
   const handleContinueClick = () => {
-    formik.setFieldTouched(FormFieldIds.BOOKING_DATE, true, true)
-    if (formik.errors.bookingDate) {
-      scrollToElementWithOffset(FormFieldIds.BOOKING_DATE, 100)
+    formik.setFieldTouched(FormFieldIds.QUOTATION_PACKAGE_ID, true, true)
+    if (formik.errors.quotationPackageId) {
+      scrollToElementWithOffset(FormFieldIds.QUOTATION_PACKAGE_ID, 100)
       return
     }
-    onContinue()
+    formik.setFieldTouched(FormFieldIds.RESERVE_BOOKING_ID, true, true)
+    if (formik.errors.reserveBookingId) {
+      scrollToElementWithOffset(FormFieldIds.RESERVE_BOOKING_ID, 100)
+      return
+    }
+    sendReserveBooking(formik.values)
   }
 
   useEffect(() => {
     if (quoteDetails) {
-      formik.setFieldValue(FormFieldIds.BOOKING_DATE, quoteDetails.booking_date)
+      const selectedPackage = Object.values(quoteDetails.quotation_packages).find(
+        (item) => item.quotation_package_details[0]?.order_line_added,
+      )
+      formik.setFieldValue(FormFieldIds.QUOTATION_PACKAGE_ID, selectedPackage?.quotation_package_id || 0)
     }
   }, [quoteDetails])
 
@@ -140,7 +164,13 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           </Box>
         </Box>
 
-        <OrderLines orderLines={quoteDetails.order_lines || []} />
+        <Box id={FormFieldIds.QUOTATION_PACKAGE_ID}>
+          <Packages
+            packages={quoteDetails.quotation_packages || []}
+            formError={formik.touched.quotationPackageId && formik.errors.quotationPackageId}
+            onCheckPackage={handleCheckPackage}
+          />
+        </Box>
 
         <Box sx={{ p: 4 }}></Box>
 
@@ -157,11 +187,11 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
 
         <Box sx={{ p: 4 }}></Box>
 
-        <Box id={FormFieldIds.BOOKING_DATE}>
+        <Box id={FormFieldIds.RESERVE_BOOKING_ID}>
           <BookingTimes
-            requestBookings={quoteDetails.request_booking || []}
-            onCheckRequestBooking={handleCheckRequestBooking}
-            formError={formik.touched.bookingDate && formik.errors.bookingDate}
+            reserveBookingId={formik.values.reserveBookingId}
+            formError={formik.touched.reserveBookingId && formik.errors.reserveBookingId}
+            onCheckReserveBooking={(value) => formik.setFieldValue(FormFieldIds.RESERVE_BOOKING_ID, value)}
           />
         </Box>
 
@@ -206,32 +236,30 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
         <Testimonials />
       </Box>
 
-      {quoteDetails.is_published && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100vw',
-            zIndex: '100',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-            background: '#fff',
-          }}
-        >
-          <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
-            Proceed to checkout
-          </button>
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100vw',
+          zIndex: '100',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+          borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+          background: '#fff',
+        }}
+      >
+        <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
+          Proceed to checkout
+        </button>
 
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <PaymentCards />
-          </Box>
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <PaymentCards />
         </Box>
-      )}
+      </Box>
     </form>
   )
 }

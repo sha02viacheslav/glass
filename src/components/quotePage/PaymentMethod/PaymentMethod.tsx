@@ -4,13 +4,7 @@ import { autocomplete } from 'getaddress-autocomplete'
 import moment from 'moment'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { Checkout } from '@glass/components/quotePage/Checkout'
-import {
-  FixglassPaymentMethodTyp,
-  PaymentMethodType,
-  PaymentOptionEnum,
-  PaymentStatus,
-  QuoteAction,
-} from '@glass/enums'
+import { PaymentMethodType, PaymentOptionEnum, PaymentStatus, QuoteAction } from '@glass/enums'
 import { REACT_APP_AUTOCOMPLETE } from '@glass/envs'
 import { Address, MonthlyPayment, PaTransaction, PaymentOptionDto, PaymentSchedule, Quote } from '@glass/models'
 import { customerLogService } from '@glass/services/apis/customer-log.service'
@@ -183,9 +177,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       // retrieve payment assist plan data
       getPaymentAssistPlanService(
         qid,
-        isFourMonths(totalPrice)
-          ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
-          : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
+        isFourMonths(totalPrice) ? PaymentMethodType.ASSIST_FOUR_PAYMENT : PaymentMethodType.ASSIST_SIX_PAYMENT,
       ).then((res) => {
         if (res.success) {
           setMonthlyPayments(res.data)

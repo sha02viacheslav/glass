@@ -4,6 +4,7 @@ import { Typography } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
 import { PHONE_NUMBER } from '@glass/constants'
+import { OrderState } from '@glass/enums'
 import { Quote } from '@glass/models'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getNotificationChecked, getQuoteId, setNotificationChecked } from '@glass/utils/session/session.util'
@@ -83,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
               </div>
             ) : (
               <>
-                {!!quoteDetails && !quoteDetails?.is_published && (
+                {!!quoteDetails && quoteDetails?.order_state === OrderState.NEW && (
                   <Typography
                     sx={{
                       color: 'var(--Gray-600, #6A6B71)',
@@ -99,11 +100,11 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
           </div>
         </div>
 
-        {!!quoteDetails?.is_published && (
+        {showMenu && !!quoteDetails?.is_published && (
           <img src={process.env.PUBLIC_URL + '/images/ellipse.svg'} className='notification-icon img-fluid' alt='' />
         )}
 
-        {!!quoteDetails?.is_published && showNotification && (
+        {showMenu && !!quoteDetails?.is_published && showNotification && (
           <div className='notification-bar' onClick={() => checkNotification()}>
             <div className='notification-title'>Track your service</div>
             <div className='notification-content'>You can access your service timeline in our website menu.</div>

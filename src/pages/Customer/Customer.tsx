@@ -2,10 +2,8 @@ import './Customer.css'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
-  CardMedia,
   FormControl,
   FormControlLabel,
-  InputLabel,
   OutlinedInput,
   Radio,
   RadioGroup,
@@ -26,6 +24,7 @@ import { Workshops } from '@glass/components/GoogleMap/Workshops'
 import { HowToTakePic } from '@glass/components/Help/HowToTakePic'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
+import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { INQUIRY_STEPS } from '@glass/constants'
@@ -960,81 +959,12 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           >
             <div className='padding-48'></div>
             <section>
-              <Box className='row'>
-                <Box sx={{ display: 'flex', gap: 2, marginBottom: 12 }}>
-                  <CardMedia
-                    component='img'
-                    sx={{ width: 20, height: 20 }}
-                    image={process.env.PUBLIC_URL + '/images/account.svg'}
-                    alt='Account'
-                  />
-                  <Box>
-                    <FormControl id={FormFieldIds.FIRST_NAME} fullWidth sx={{ marginBottom: 6 }}>
-                      <InputLabel>First name*</InputLabel>
-                      <OutlinedInput
-                        value={formik.values.firstName}
-                        label='First name*'
-                        placeholder='First name*'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.FIRST_NAME, e.target.value)}
-                        error={formik.touched.firstName && !!formik.errors.firstName}
-                      />
-                      <small className='form-error'>{formik.touched.firstName && formik.errors.firstName}</small>
-                    </FormControl>
-
-                    <FormControl id={FormFieldIds.LAST_NAME} fullWidth>
-                      <InputLabel>Last name*</InputLabel>
-                      <OutlinedInput
-                        value={formik.values.lastName}
-                        label='Last name*'
-                        placeholder='Last name*'
-                        onChange={(e) => formik.setFieldValue(FormFieldIds.LAST_NAME, e.target.value)}
-                        error={formik.touched.lastName && !!formik.errors.lastName}
-                      />
-                      <small className='form-error'>{formik.touched.lastName && formik.errors.lastName}</small>
-                    </FormControl>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                  <CardMedia
-                    component='img'
-                    sx={{ width: 20, height: 20 }}
-                    image={process.env.PUBLIC_URL + '/images/phone-blue.svg'}
-                    alt='Account'
-                  />
-                  <FormControl id={FormFieldIds.PHONE} fullWidth>
-                    <InputLabel>Phone number*</InputLabel>
-                    <OutlinedInput
-                      value={formik.values.phone}
-                      label='Phone number*'
-                      placeholder='Phone number*'
-                      onChange={(e) => formik.setFieldValue(FormFieldIds.PHONE, e.target.value)}
-                      error={formik.touched.phone && !!formik.errors.phone}
-                    />
-                    <small className='form-error'>{formik.touched.phone && formik.errors.phone}</small>
-                  </FormControl>
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                  <CardMedia
-                    component='img'
-                    sx={{ width: 20, height: 20 }}
-                    image={process.env.PUBLIC_URL + '/images/email-blue.svg'}
-                    alt='Account'
-                  />
-                  <FormControl id={FormFieldIds.EMAIL} fullWidth>
-                    <InputLabel>E-mail*</InputLabel>
-                    <OutlinedInput
-                      value={formik.values.email}
-                      label='E-mail*'
-                      placeholder='E-mail*'
-                      onChange={(e) => formik.setFieldValue(FormFieldIds.EMAIL, e.target.value)}
-                      error={formik.touched.email && !!formik.errors.email}
-                    />
-                    <small className='form-error'>{formik.touched.email && formik.errors.email}</small>
-                  </FormControl>
-                </Box>
-              </Box>
+              <PersonalInfoForm
+                values={formik.values}
+                touched={formik.touched}
+                errors={formik.errors}
+                setFieldValue={formik.setFieldValue}
+              />
             </section>
             <div className='padding-64'></div>
           </Box>

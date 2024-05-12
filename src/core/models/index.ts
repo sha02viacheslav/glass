@@ -1,6 +1,7 @@
 export * from './address.model'
 export * from './api-response.model'
 export * from './attachment.model'
+export * from './available-booking-times.model'
 export * from './before-after.model'
 export * from './booking-date.model'
 export * from './comment.model'

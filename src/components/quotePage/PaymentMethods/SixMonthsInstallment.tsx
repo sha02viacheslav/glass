@@ -4,11 +4,12 @@ import { Box, Radio, Typography } from '@mui/material'
 export type SixMonthsInstallmentProps = {
   selected: boolean
   totalPrice: number
+  onSelect: () => void
 }
 
 const MONTHS = 6
 
-export const SixMonthsInstallment: React.FC<SixMonthsInstallmentProps> = ({ selected, totalPrice }) => {
+export const SixMonthsInstallment: React.FC<SixMonthsInstallmentProps> = ({ selected, totalPrice, onSelect }) => {
   const monthlyPrice = useMemo<number>(() => {
     return +(totalPrice / MONTHS).toFixed(2)
   }, [totalPrice])
@@ -21,6 +22,9 @@ export const SixMonthsInstallment: React.FC<SixMonthsInstallmentProps> = ({ sele
         borderRadius: '4px',
         background: '#FFF',
         boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+      }}
+      onClick={() => {
+        if (!selected) onSelect()
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>

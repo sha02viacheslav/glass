@@ -3,11 +3,9 @@ import { Box, Button, CardMedia, Typography } from '@mui/material'
 import moment from 'moment'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AddPictures } from '@glass/components/AddPictures'
-import { Footer } from '@glass/components/Footer'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
-import { QuickContact } from '@glass/components/QuickContact'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { SLOT_LEGENDS } from '@glass/constants'
 import { BeforeAfterType, CarType, InquiryStep } from '@glass/enums'
@@ -15,18 +13,17 @@ import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { slotStartTime, slotTimeIndex, workingPlaceLabel } from '@glass/utils/index'
-import { CheckingQuote } from './CheckingQuote'
 import { ReadyQuote } from './ReadyQuote'
 import { InstallmentBenefits } from '../Home/InstallmentBenefits'
 import { LiveService } from '../Home/LiveService'
 import { Testimonials } from '../Home/Testimonials'
 
-export type PendingQuoteProps = {
+export type OpenQuoteProps = {
   quoteDetails: Quote
   onContinue: () => void
 }
 
-export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onContinue }) => {
+export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }) => {
   const { id: quoteId } = useParams()
   const navigate = useNavigate()
 
@@ -44,13 +41,9 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
   return (
     <>
       <Box sx={{ paddingX: 4, marginBottom: 32 }}>
-        {quoteDetails.is_published ? (
-          <Box sx={{ cursor: 'pointer' }} onClick={() => onContinue()}>
-            <ReadyQuote quoteDetails={quoteDetails} />
-          </Box>
-        ) : (
-          <CheckingQuote quoteDetails={quoteDetails} />
-        )}
+        <Box sx={{ cursor: 'pointer' }} onClick={() => onContinue()}>
+          <ReadyQuote quoteDetails={quoteDetails} />
+        </Box>
 
         <Box sx={{ padding: 3, marginTop: 8, marginBottom: 6 }}>
           <Box
@@ -461,34 +454,25 @@ export const PendingQuote: React.FC<PendingQuoteProps> = ({ quoteDetails, onCont
         <Testimonials />
       </Box>
 
-      {quoteDetails.is_published && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100vw',
-            zIndex: '100',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-            background: '#fff',
-          }}
-        >
-          <button className='btn-raised w-100' type='button' onClick={() => onContinue()}>
-            See the Quote
-          </button>
-        </Box>
-      )}
-
-      {!quoteDetails.is_published && (
-        <>
-          <QuickContact showReg={false} />
-          <Footer />
-        </>
-      )}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100vw',
+          zIndex: '100',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+          borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+          background: '#fff',
+        }}
+      >
+        <button className='btn-raised w-100' type='button' onClick={() => onContinue()}>
+          See the Quote
+        </button>
+      </Box>
     </>
   )
 }

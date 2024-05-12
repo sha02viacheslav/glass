@@ -1,17 +1,58 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, CardMedia, Radio, Typography } from '@mui/material'
 import moment from 'moment'
+import { trackPromise } from 'react-promise-tracker'
+import { useParams } from 'react-router-dom'
 import { SLOT_LEGENDS } from '@glass/constants'
-import { RequestBooking } from '@glass/models'
+import { AvailableBookingTimeView } from '@glass/models'
+import { getAvailableBookingTimeService } from '@glass/services/apis/get-available-booking-time.service'
 import { slotStartTime, slotTimeIndex } from '@glass/utils/index'
 
 export type BookingTimesProps = {
-  requestBookings: RequestBooking[]
-  onCheckRequestBooking: (value: RequestBooking) => void
+  reserveBookingId: number
   formError: string | boolean | undefined
+  onCheckReserveBooking: (value: number) => void
 }
 
-export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onCheckRequestBooking, formError }) => {
+export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, formError, onCheckReserveBooking }) => {
+  const { id: quoteId } = useParams()
+
+  const [availableBookingTimes, setAvailableBookingTimes] = useState<AvailableBookingTimeView[] | undefined>(undefined)
+
+  const getAvailableBookingTimes = () => {
+    if (quoteId) {
+      trackPromise(
+        getAvailableBookingTimeService(quoteId).then((res) => {
+          if (res.success) {
+            const availableBookingTimes = res.data
+            const bookingTimes: AvailableBookingTimeView[] = []
+
+            Object.keys(availableBookingTimes).forEach((bookingDate) => {
+              availableBookingTimes[bookingDate].forEach((availableBooking) => {
+                const times = availableBooking.time_slot_visual.split('_')
+                const timeSlot = `${times[0].slice(0, 2)}_${times[1].slice(0, 2)}`
+                bookingTimes.push({
+                  reserve_booking_id: availableBooking.reserve_booking_id,
+                  time_slot: timeSlot,
+                  timeSlotIndex: slotTimeIndex(slotStartTime(bookingDate, timeSlot)),
+                  booking_date: bookingDate,
+                  daysFromNow: moment(bookingDate).diff(moment(), 'days'),
+                })
+              })
+            })
+            setAvailableBookingTimes(bookingTimes)
+          }
+        }),
+      )
+    }
+  }
+
+  useEffect(() => {
+    if (quoteId && !availableBookingTimes) {
+      getAvailableBookingTimes()
+    }
+  }, [availableBookingTimes])
+
   return (
     <>
       <Typography
@@ -35,7 +76,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
           overflowX: 'auto',
         }}
       >
-        {requestBookings.map((element, index) => (
+        {(availableBookingTimes || []).map((element, index) => (
           <Box
             key={index}
             sx={{
@@ -47,16 +88,15 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
               cursor: 'pointer',
             }}
             onClick={() => {
-              onCheckRequestBooking(element)
+              onCheckReserveBooking(element.reserve_booking_id)
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Radio checked={false} size='small' sx={{ padding: 0 }} />
+                <Radio checked={reserveBookingId === element.reserve_booking_id} size='small' sx={{ padding: 0 }} />
                 <Box sx={{ marginLeft: 2 }}>
                   <Typography sx={{ fontWeight: '600', lineHeight: '20px', letterSpacing: '-0.16px' }}>
-                    {moment(element.request_booking_date).format('dddd')},{' '}
-                    {moment(element.request_booking_date).format('DD.MM.')}
+                    {moment(element.booking_date).format('dddd')}, {moment(element.booking_date).format('DD.MM.')}
                   </Typography>
 
                   <Typography
@@ -68,7 +108,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
                       letterSpacing: '-0.12px',
                     }}
                   >
-                    {moment(element.request_booking_date).diff(moment(), 'days')} days from now
+                    {!!element.daysFromNow ? element.daysFromNow + ' days from now' : 'Today'}
                   </Typography>
                 </Box>
               </Box>
@@ -78,12 +118,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
               <CardMedia
                 component='img'
                 sx={{ width: 24, height: 24 }}
-                image={
-                  process.env.PUBLIC_URL +
-                  '/images/' +
-                  SLOT_LEGENDS[slotTimeIndex(slotStartTime(element.request_booking_date, element.request_time_slot))]
-                    .icon
-                }
+                image={process.env.PUBLIC_URL + '/images/' + SLOT_LEGENDS[element.timeSlotIndex].icon}
               />
 
               <Box>
@@ -96,10 +131,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
                     textTransform: 'capitalize',
                   }}
                 >
-                  {
-                    SLOT_LEGENDS[slotTimeIndex(slotStartTime(element.request_booking_date, element.request_time_slot))]
-                      .title
-                  }
+                  {SLOT_LEGENDS[element.timeSlotIndex].title}
                 </Typography>
 
                 <Typography
@@ -111,10 +143,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ requestBookings, onC
                     letterSpacing: '-0.12px',
                   }}
                 >
-                  {
-                    SLOT_LEGENDS[slotTimeIndex(slotStartTime(element.request_booking_date, element.request_time_slot))]
-                      .time
-                  }
+                  {SLOT_LEGENDS[element.timeSlotIndex].time}
                 </Typography>
               </Box>
             </Box>

@@ -9,6 +9,18 @@ import { OptionalOrderLine } from './optional-order-line.model'
 import { PaTransaction } from './pa-transaction.model'
 import { Workshop } from './workshop.model'
 
+export interface QuotePackage {
+  quotation_package_id: number
+  quotation_package_price_total: number
+  quotation_package_details: QuotePackageDetail[]
+}
+
+export interface QuotePackageDetail {
+  order_line_added: boolean
+  price_total: number
+  product: string
+}
+
 export type Quote = {
   customer_id: number
   registration_number: string
@@ -50,4 +62,5 @@ export type Quote = {
   workshop_address: string
   workshop: Workshop
   images_gallery: BeforeAfter[]
+  quotation_packages: { [key: string]: QuotePackage }
 }

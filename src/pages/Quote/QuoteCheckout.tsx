@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
 import { useFormik } from 'formik'
 import moment from 'moment'
-import { boolean, object } from 'yup'
+import { object, string } from 'yup'
 import { PaymentCards } from '@glass/components/PaymentCards'
 import { PaymentMethods } from '@glass/components/quotePage/PaymentMethods'
 import { SLOT_LEGENDS } from '@glass/constants'
@@ -11,12 +11,12 @@ import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { scrollToElementWithOffset, slotStartTime, slotTimeIndex, workingPlaceLabel } from '@glass/utils/index'
 
-export type QuoteOptionsForm = {
-  bookingDate: boolean
+export type QuoteCheckoutForm = {
+  paymentMethodType: boolean
 }
 
 export enum FormFieldIds {
-  BOOKING_DATE = 'bookingDate',
+  PAYMENT_METHOD_TYPE = 'paymentMethodType',
 }
 
 export type QuoteCheckoutProps = {
@@ -28,12 +28,12 @@ export type QuoteCheckoutProps = {
 
 export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refetch, onContinue, onBack }) => {
   const validationSchema = object({
-    bookingDate: boolean().isTrue('Please select the date you would like to get repair done').nullable(),
+    paymentMethodType: string().required('Please select the payment method').nullable(),
   })
 
   const formik = useFormik({
     initialValues: {
-      bookingDate: false,
+      paymentMethodType: false,
     },
     validationSchema: validationSchema,
     onSubmit: async () => {},
@@ -42,9 +42,9 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
   const { totalPrice } = useCalcPriceSummary(quoteDetails)
 
   const handleContinueClick = () => {
-    formik.setFieldTouched(FormFieldIds.BOOKING_DATE, true, true)
-    if (formik.errors.bookingDate) {
-      scrollToElementWithOffset(FormFieldIds.BOOKING_DATE, 100)
+    formik.setFieldTouched(FormFieldIds.PAYMENT_METHOD_TYPE, true, true)
+    if (formik.errors.paymentMethodType) {
+      scrollToElementWithOffset(FormFieldIds.PAYMENT_METHOD_TYPE, 100)
       return
     }
     onContinue()
@@ -52,7 +52,7 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
 
   useEffect(() => {
     if (quoteDetails) {
-      formik.setFieldValue(FormFieldIds.BOOKING_DATE, quoteDetails.booking_date)
+      formik.setFieldValue(FormFieldIds.PAYMENT_METHOD_TYPE, quoteDetails.payment_method_type)
     }
   }, [quoteDetails])
 
@@ -132,56 +132,52 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
 
         <Box sx={{ p: 4 }}></Box>
 
-        <PaymentMethods
-          paymentMethodType={quoteDetails.payment_method_type}
-          totalPrice={totalPrice}
-          refetch={refetch}
-        />
+        <Box id={FormFieldIds.PAYMENT_METHOD_TYPE}>
+          <PaymentMethods
+            paymentMethodType={quoteDetails.payment_method_type}
+            totalPrice={totalPrice}
+            formError={formik.touched.paymentMethodType && formik.errors.paymentMethodType}
+            refetch={refetch}
+          />
+        </Box>
 
         <Box sx={{ p: 8 }}></Box>
       </Box>
 
-      {quoteDetails.is_published && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100vw',
-            zIndex: '100',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-            background: '#fff',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <button className='btn-transparent' type='button' onClick={() => onBack()}>
-              <CardMedia
-                component='img'
-                sx={{ width: 24, height: 'auto', marginLeft: -2 }}
-                image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
-              />
-              Back to quote
-            </button>
-            <button
-              className='btn-raised'
-              type='button'
-              onClick={() => handleContinueClick()}
-              disabled={!quoteDetails.payment_method_type}
-            >
-              Go to payment
-            </button>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <PaymentCards />
-          </Box>
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100vw',
+          zIndex: '100',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          padding: 3,
+          borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+          background: '#fff',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <button className='btn-transparent' type='button' onClick={() => onBack()}>
+            <CardMedia
+              component='img'
+              sx={{ width: 24, height: 'auto', marginLeft: -2 }}
+              image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
+            />
+            Back to quote
+          </button>
+          <button className='btn-raised' type='button' onClick={() => handleContinueClick()}>
+            Go to payment
+          </button>
         </Box>
-      )}
+
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <PaymentCards />
+        </Box>
+      </Box>
     </form>
   )
 }

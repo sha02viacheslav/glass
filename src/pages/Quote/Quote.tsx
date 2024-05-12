@@ -18,7 +18,6 @@ import { PaymentMethod } from '@glass/components/quotePage/PaymentMethod'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { EMPTY_OFFER, PHONE_NUMBER } from '@glass/constants'
 import {
-  FixglassPaymentMethodTyp,
   OrderState,
   PaymentMethodType,
   PaymentOptionEnum,
@@ -43,8 +42,10 @@ import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 import { setQuoteId } from '@glass/utils/session/session.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
-import { PendingQuote } from './PendingQuote'
+import { NewQuote } from './NewQuote'
+import { OpenQuote } from './OpenQuote'
 import { QuoteCheckout } from './QuoteCheckout'
+import { QuoteInstallmentPayment } from './QuoteInstallmentPayment'
 import { QuoteOptions } from './QuoteOptions'
 import { QuoteTracking } from './QuoteTracking'
 
@@ -56,7 +57,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { id } = useParams()
   const showButtons = false
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
-  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.TRACKING)
+  const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.NEW)
+  const [seeQuoteClicked, setSeeQuoteClicked] = useState<boolean>(false)
+  const [goToPaymentClicked, setGoToPaymentClicked] = useState<boolean>(false)
   const [acceptBtn, setAcceptBtn] = useState<QuoteAction>(QuoteAction.GO_TIME_SLOT)
   const [timeSlot, setTimeSlot] = useState<TimeSlot | undefined>(undefined)
   const [quoteInfoOpen, setInfoOpen] = useState<boolean>(false)
@@ -174,9 +177,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       trackPromise(
         beginPaymentAssistService(
           id,
-          isFourMonths(totalPrice)
-            ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
-            : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
+          isFourMonths(totalPrice) ? PaymentMethodType.ASSIST_FOUR_PAYMENT : PaymentMethodType.ASSIST_SIX_PAYMENT,
         ).then((res) => {
           if (res.success) {
             window.open(res.data.url, '_blank', 'noreferrer')
@@ -362,6 +363,28 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     }
   }
 
+  const initQuoteState = () => {
+    if (quoteDetails?.order_state === OrderState.NEW) {
+      setSnapValue(QuoteStep.NEW)
+    } else if (quoteDetails?.order_state === OrderState.OPEN) {
+      if (seeQuoteClicked) {
+        setSnapValue(QuoteStep.OPTIONS)
+      } else {
+        setSnapValue(QuoteStep.OPEN)
+      }
+    } else if (quoteDetails?.order_state === OrderState.PAYMENT_IN_1H) {
+      if (goToPaymentClicked) {
+        setSnapValue(QuoteStep.PAYMENT)
+      } else {
+        setSnapValue(QuoteStep.CHECKOUT)
+      }
+    } else if (quoteDetails?.order_state === OrderState.PAYMENT_IN_1H_EXPIRED) {
+      setSnapValue(QuoteStep.OPTIONS)
+    } else if (quoteDetails?.order_state === OrderState.WON) {
+      setSnapValue(QuoteStep.TRACKING)
+    }
+  }
+
   useEffect(() => {
     // Get Quote Data
     if (id && !quoteDetails) {
@@ -373,6 +396,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     // scroll to top on page load
     scrollToElementWithOffset('1')
   }, [])
+
+  useEffect(() => {
+    if (quoteDetails) {
+      initQuoteState()
+    }
+  }, [quoteDetails, seeQuoteClicked, goToPaymentClicked])
 
   useEffect(() => {
     if (quoteDetails) {
@@ -395,6 +424,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       }
       setTempLicense(formatLicenseNumber(quoteDetails.registration_number))
       initTimeSlot()
+      initQuoteState()
     }
   }, [quoteDetails])
 
@@ -438,8 +468,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     <Box sx={{ paddingTop: 22 }}>
       {!!quoteDetails && (
         <>
-          {snapValue === QuoteStep.PENDING && (
-            <PendingQuote quoteDetails={quoteDetails} onContinue={() => setSnapValue(QuoteStep.OPTIONS)} />
+          {snapValue === QuoteStep.NEW && <NewQuote quoteDetails={quoteDetails} />}
+
+          {snapValue === QuoteStep.OPEN && (
+            <OpenQuote quoteDetails={quoteDetails} onContinue={() => setSeeQuoteClicked(true)} />
           )}
 
           {snapValue === QuoteStep.OPTIONS && (
@@ -448,7 +480,6 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               refetch={() => {
                 getQuote()
               }}
-              onContinue={() => setSnapValue(QuoteStep.CHECKOUT)}
             />
           )}
 
@@ -458,19 +489,13 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               refetch={() => {
                 getQuote()
               }}
-              onContinue={() => {
-                switch (quoteDetails.payment_method_type) {
-                  case PaymentMethodType.CASH: {
-                    setSnapValue(QuoteStep.TRACKING)
-                    break
-                  }
-                  default: {
-                    setSnapValue(QuoteStep.PAYMENT)
-                  }
-                }
-              }}
+              onContinue={() => setGoToPaymentClicked(true)}
               onBack={() => setSnapValue(QuoteStep.OPTIONS)}
             />
+          )}
+
+          {snapValue === QuoteStep.PAYMENT && (
+            <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
           )}
 
           {snapValue === QuoteStep.TRACKING && (
@@ -494,7 +519,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             />
           )}
 
-          {snapValue === QuoteStep.PAYMENT && (
+          {snapValue === QuoteStep.TIME_SLOT && (
             <div className='quote-page px-3 px-md-0'>
               <section className='sec-title'>
                 <div className='container'>

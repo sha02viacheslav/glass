@@ -1,16 +1,27 @@
 import React from 'react'
 import { Box, Radio, Typography } from '@mui/material'
-import { Offer } from '@glass/models'
+import { QuotePackage } from '@glass/models'
 
-export type OrderLinesProps = {
-  orderLines: Offer[]
+export type PackagesProps = {
+  packages: { [key: string]: QuotePackage }
+  formError: string | boolean | undefined
+  onCheckPackage: (value: number) => void
 }
 
-export const OrderLines: React.FC<OrderLinesProps> = ({ orderLines }) => {
+export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheckPackage }) => {
   return (
     <>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {orderLines.map((element, index) => (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          marginX: -4,
+          padding: '8px 16px 12px',
+          background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
+        }}
+      >
+        {Object.keys(packages).map((packageKey, index) => (
           <Box
             key={index}
             sx={{
@@ -19,11 +30,19 @@ export const OrderLines: React.FC<OrderLinesProps> = ({ orderLines }) => {
               borderRadius: '4px',
               background: '#FFF',
               boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              onCheckPackage(packages[packageKey].quotation_package_id)
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Radio checked={true} size='small' sx={{ padding: 0 }} />
+                <Radio
+                  checked={packages[packageKey].quotation_package_details[0]?.order_line_added}
+                  size='small'
+                  sx={{ padding: 0 }}
+                />
                 <Typography
                   sx={{
                     fontWeight: '600',
@@ -32,7 +51,7 @@ export const OrderLines: React.FC<OrderLinesProps> = ({ orderLines }) => {
                     marginLeft: 2,
                   }}
                 >
-                  {element.product}
+                  {packageKey.split('|')[0]}
                 </Typography>
               </Box>
               <Typography
@@ -62,7 +81,7 @@ export const OrderLines: React.FC<OrderLinesProps> = ({ orderLines }) => {
                 >
                   £
                 </Typography>
-                {(element.price_subtotal / 4).toFixed(2)} Upfront
+                {+(packages[packageKey].quotation_package_price_total / 4).toFixed(2)} Upfront
               </Typography>
             </Box>
 
@@ -74,11 +93,14 @@ export const OrderLines: React.FC<OrderLinesProps> = ({ orderLines }) => {
                 marginTop: 4,
               }}
             >
-              Then pay 3x£100 a month or <strong>total £{element.price_subtotal.toFixed(2)}</strong> (inc VAT).
+              Then pay 3x£100 a month or{' '}
+              <strong>total £{+packages[packageKey].quotation_package_price_total.toFixed(2)}</strong> (inc VAT).
             </Typography>
           </Box>
         ))}
       </Box>
+
+      <small className='form-error'>{formError}</small>
     </>
   )
 }
