@@ -497,3 +497,7 @@ input.form-control.round {
 .MuiFormControlLabel-root .MuiFormControlLabel-label.Mui-disabled {
   color: var(--Gray-400, #c1c1c3) !important;
 }
+
+.flex-1 {
+  flex: 1;
+}

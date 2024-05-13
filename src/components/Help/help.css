@@ -1,0 +1,77 @@
+.ribbon-g {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  text-align: right;
+}
+
+.ribbon-g-l {
+  right: auto;
+  left: -5px;
+}
+
+.ribbon-g span {
+  font-size: 14px;
+  color: #000;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: bold;
+  line-height: 20px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg); /* Needed for Safari */
+  width: 100px;
+  display: block;
+  background: #7255db;
+  background: linear-gradient(#7255db 0%, #9f8aea 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px;
+  right: -21px;
+}
+
+.ribbon-g-l span {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg); /* Needed for Safari */
+  background: #5588db;
+  background: linear-gradient(#8aafea 0%, #5588db 100%);
+  left: -21px;
+  right: auto;
+}
+
+.ribbon-g span::before {
+  content: '';
+  position: absolute;
+  left: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid #2c1385;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #2c1385;
+}
+
+.ribbon-g-l span::before {
+  border-left: 3px solid #133f85;
+  border-top: 3px solid #133f85;
+}
+
+.ribbon-g span::after {
+  content: '';
+  position: absolute;
+  right: 0%;
+  top: 100%;
+  z-index: -1;
+  border-right: 3px solid #2c1385;
+  border-left: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #2c1385;
+}
+
+.ribbon-g-l span::after {
+  border-right: 3px solid #133f85;
+  border-top: 3px solid #133f85;
+}

@@ -4,6 +4,7 @@ import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import { number, object } from 'yup'
+import { DifferenceOEE_OEM } from '@glass/components/Help/DifferenceOEE_OEM'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { PaymentCards } from '@glass/components/PaymentCards'
@@ -172,7 +173,9 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           />
         </Box>
 
-        <Box sx={{ p: 4 }}></Box>
+        <Box sx={{ p: 4 }}>
+          <DifferenceOEE_OEM />
+        </Box>
 
         <OptionalOrderLines
           optionalOrderLines={quoteDetails.optional_order_lines || []}

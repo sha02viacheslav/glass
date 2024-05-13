@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react'
+import React, { FC, PropsWithChildren } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Typography, Modal, Box, Divider } from '@mui/material'
 
@@ -6,10 +6,19 @@ type PropComponent = PropsWithChildren<{
   open: boolean
   onClose: () => void
   title?: string
+  titleStyle?: React.CSSProperties
   bordered?: boolean
   width?: string | number
 }>
-export const CustomModal: FC<PropComponent> = ({ open, onClose, children, title, width = 1000, bordered = true }) => {
+export const CustomModal: FC<PropComponent> = ({
+  open,
+  onClose,
+  children,
+  title,
+  width = 1000,
+  bordered = true,
+  titleStyle = {},
+}) => {
   return (
     <Modal open={open} onClose={onClose} aria-labelledby='modal-modal-title' aria-describedby='modal-modal-description'>
       <Box
@@ -30,7 +39,7 @@ export const CustomModal: FC<PropComponent> = ({ open, onClose, children, title,
       >
         <Box>
           <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} sx={{ p: 4 }}>
-            <Typography variant='h6' sx={{ fontSize: 22 }}>
+            <Typography variant='h6' style={{ fontSize: 22, ...titleStyle }}>
               {title || ''}
             </Typography>
             <CloseIcon onClick={() => onClose()} />
