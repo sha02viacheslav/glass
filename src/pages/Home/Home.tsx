@@ -21,7 +21,6 @@ import { Testimonials } from './Testimonials'
 export const Home: React.FC = () => {
   const navigate = useNavigate()
   const [licenseSearchVal, setLicense] = useState('')
-  const [showReviewDialog, setShowReviewDialog] = useState<boolean>(false)
 
   const handleVehInputChange = (data: string | undefined) => {
     setLicense(formatLicenseNumber(data))
@@ -45,22 +44,7 @@ export const Home: React.FC = () => {
       <section className='sec-banner'>
         <div className='px-3 mt-auto'>
           <div>
-            <div>
-              <div
-                className='d-inline-flex align-items-center cursor-pointer'
-                onClick={() => setShowReviewDialog(true)}
-              >
-                {[1, 2, 3, 4, 5].map((index) => (
-                  <img key={index} src={process.env.PUBLIC_URL + '/images/star.svg'} className='img-fluid' alt='' />
-                ))}
-                <div className='lh-15 text-white ms-1'>5.0</div>
-                <img src={process.env.PUBLIC_URL + '/images/google.png'} className='img-fluid ms-1' alt='' />
-                <div className='lh-15 text-white ms-2'>reviews</div>
-              </div>
-            </div>
-
-            {showReviewDialog && <ReviewsDialog onClose={() => setShowReviewDialog(false)} />}
-
+            <ReviewsDialog />
             <h2 className='fnt-30 fnt-md-60 fw-n lh-12 text-white mt-3'>
               New OEM and OEE glass replacement with crash tested glue
             </h2>

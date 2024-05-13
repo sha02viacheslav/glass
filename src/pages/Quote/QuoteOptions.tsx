@@ -11,6 +11,7 @@ import { PaymentCards } from '@glass/components/PaymentCards'
 import { BookingTimes } from '@glass/components/quotePage/BookingTimes'
 import { OptionalOrderLines } from '@glass/components/quotePage/OptionalOrderLines'
 import { Packages } from '@glass/components/quotePage/Packages'
+import { ReviewsDialog } from '@glass/components/ReviewsDialog'
 import { BeforeAfterType, InquiryStep } from '@glass/enums'
 import { Quote } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
@@ -173,20 +174,22 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           />
         </Box>
 
-        <Box sx={{ p: 4 }}>
-          <DifferenceOEE_OEM />
-        </Box>
+        <Box sx={{ p: 4 }}></Box>
 
         <OptionalOrderLines
           optionalOrderLines={quoteDetails.optional_order_lines || []}
           onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
         />
 
-        <Typography sx={{ color: 'orange', p: 3 }}>TODO:F2W-45</Typography>
+        <Typography sx={{ color: 'orange', p: 3 }}>
+          <DifferenceOEE_OEM />
+        </Typography>
 
         <Box sx={{ p: 2 }}></Box>
 
-        <Typography sx={{ color: 'orange', p: 3 }}>TODO:F2W-47</Typography>
+        <Typography sx={{ color: 'orange', p: 3 }}>
+          <ReviewsDialog />
+        </Typography>
 
         <Box sx={{ p: 4 }}></Box>
 
