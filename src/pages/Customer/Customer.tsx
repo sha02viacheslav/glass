@@ -16,6 +16,7 @@ import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { EnumLoader } from 'src/core/enums/loader.enum'
 import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
@@ -383,6 +384,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
+      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -403,6 +405,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
+      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -430,6 +433,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
+      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -479,6 +483,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
+      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -543,6 +548,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
+      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -556,6 +562,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             toast(res.message)
           }
         }),
+        EnumLoader.SAVE_INQUIRY,
       )
     }
   }
@@ -620,6 +627,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             toast(res.message)
           }
         }),
+        EnumLoader.SAVE_QUOTE,
       )
     }
   }

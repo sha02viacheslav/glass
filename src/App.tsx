@@ -20,6 +20,7 @@ import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
 import { setRequestedURL } from '@glass/utils/session/session.util'
 import 'react-toastify/dist/ReactToastify.css'
+import { EnumLoader } from './core/enums/loader.enum'
 import { Comparison } from './pages/Comparison'
 import { InquiryIntro } from './pages/InquiryIntro'
 import { Installments } from './pages/Installments'
@@ -29,8 +30,16 @@ import { ServiceDetail } from './pages/ServiceDetail'
 import TermsConditions from './pages/TermsConditions'
 
 export const LoadingIndicator: React.FC = () => {
+  const { promiseInProgress: SAVE_INQUIRY } = usePromiseTracker({ area: EnumLoader.SAVE_INQUIRY })
+  const { promiseInProgress: SAVE_QUOTE } = usePromiseTracker({ area: EnumLoader.SAVE_QUOTE })
   const { promiseInProgress } = usePromiseTracker()
-  return <Loader loading={promiseInProgress} />
+  let title = undefined
+  if (SAVE_INQUIRY) {
+    title = 'Sending inquiry...'
+  } else if (SAVE_QUOTE) {
+    title = 'Saving quote...'
+  }
+  return <Loader loading={promiseInProgress || SAVE_INQUIRY || SAVE_QUOTE} title={title} />
 }
 
 const theme = createTheme({
