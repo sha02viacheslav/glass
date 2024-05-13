@@ -80,6 +80,12 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     }
   }, [carType])
 
+  const dispatchSelected = (selected: string[]) => {
+    // update tinted windows in selectedWindows array as not tinted
+    setSelectedWindows((windows) => windows.slice())
+    // setSelectedWindows(selected)
+    if (onSelectBrokenGlasses) onSelectBrokenGlasses(selected.map((item) => item.toLowerCase()))
+  }
   // handle window selection
   const selectWindow = (windowClicked: WinLoc) => {
     let index = 0
@@ -130,7 +136,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         selectedWindows.push(brokenWindows[index].name)
       }
     }
-    setSelectedWindows((windows) => windows.slice())
+    dispatchSelected(selectedWindows)
     brokenWindows[index].broken = !brokenWindows[index].broken
     setBrokenWindows((windows) => windows.slice())
     getCharacteristics()
@@ -144,15 +150,13 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       for (let i = 0; i < selectedWindows.length; i++) {
         selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy').replace('privacy', 'non-privacy')
       }
-      // update tinted windows in selectedWindows array as not tinted
-      setSelectedWindows(selectedWindows.slice())
+
+      dispatchSelected(selectedWindows)
     } else {
-      // update not tinted windows in brokenWindows array as tinted
       for (let i = 0; i < selectedWindows.length; i++) {
         selectedWindows[i] = selectedWindows[i].replace('non-privacy', 'privacy')
       }
-      // update tinted windows in selectedWindows array as tinted
-      setSelectedWindows(selectedWindows.slice())
+      dispatchSelected(selectedWindows)
     }
     setTintedConfirmed(true)
     setBrokenWindows(brokenWindows.slice())
@@ -208,7 +212,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         }
       }
     }
-    setSelectedWindows((windows) => windows.slice())
+    dispatchSelected(selectedWindows)
     getCharacteristics()
   }
 
@@ -266,10 +270,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     setActiveQuestionIndex(initialActives)
     onChangeCharacteristics(characteristicsResult)
   }, [characteristics])
-
-  useEffect(() => {
-    if (onSelectBrokenGlasses) onSelectBrokenGlasses(selectedWindows.map((item) => item.toLowerCase()))
-  }, [selectedWindows, brokenWindows])
 
   useEffect(() => {
     if (carType) {
@@ -331,7 +331,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           />
         )}
 
-        <div className={styles.imgContainer}>
+        <div className={styles.imgContainer} id='image_container'>
           {/* display either car with tinted windows or normal */}
           <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_IMAGES[carType]} alt='' />
           <img
@@ -375,7 +375,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           {/* You should create instances for all car types so that the image-map-resizer is working */}
           {CAR_TYPES.map((item, index) =>
             item == carType ? (
-              <WindowMap key={index} carType={item} selectWindow={selectWindow} />
+              <WindowMap key={index} carType={carType} selectWindow={selectWindow} value={brokenWindows} />
             ) : (
               <div key={index} className='d-none'></div>
             ),

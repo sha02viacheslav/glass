@@ -885,7 +885,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
                 />
 
-                <div className='no-glass'>No glass selected</div>
+                <div className='no-glass'>
+                  {formik.values.glassLocation.length ? formik.values.glassLocation.length : 'No'} glass selected
+                </div>
               </div>
             </section>
             <div className='padding-64'></div>
