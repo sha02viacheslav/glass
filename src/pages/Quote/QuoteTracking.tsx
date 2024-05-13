@@ -15,6 +15,7 @@ import { styled } from '@mui/material/styles'
 import { useFormik } from 'formik'
 import { useParams } from 'react-router-dom'
 import { boolean, object } from 'yup'
+import { TrackTechnician } from '@glass/components/GoogleMap/TrackTechnician'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType, TrackingStep } from '@glass/enums'
@@ -67,6 +68,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
   }
 
   const [activeStep] = useState<TrackingStep>(TrackingStep.STEP9)
+  const [modalTrackMap, setModalTrackMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
 
   useRetrieveVehData(quoteDetails?.DoorPlanLiteral, (data: CarType) => {
@@ -146,8 +148,12 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
             Hello {quoteDetails.customer_f_name}!
           </Typography>
 
-          <button className='btn-transparent primary'>TODO: F2W-55</button>
+          <button type='button' className='btn-transparent primary p-0' onClick={() => setModalTrackMap(true)}>
+            <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
+            <span style={{ fontSize: '16px', color: '#4285F4' }}>Track the technician</span>
+          </button>
         </Box>
+        {modalTrackMap && <TrackTechnician onDismiss={() => setModalTrackMap(false)} />}
 
         <Box
           sx={{
