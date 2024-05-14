@@ -21,6 +21,24 @@ export interface QuotePackageDetail {
   product: string
 }
 
+export interface FieldServiceAttachment {
+  attachment_id: number
+  attachment_url: string
+}
+
+export interface FieldServiceState {
+  sequence: number
+  name: string
+  date: string
+  attachment_ids: FieldServiceAttachment[]
+}
+export interface FieldService {
+  fs_id: number
+  fs_name: string
+  traccar_device_id: string
+  state: FieldServiceState[]
+}
+
 export type Quote = {
   customer_id: number
   registration_number: string
@@ -63,4 +81,5 @@ export type Quote = {
   workshop: Workshop
   images_gallery: BeforeAfter[]
   quotation_packages: { [key: string]: QuotePackage }
+  tracking_delivery: FieldService[]
 }

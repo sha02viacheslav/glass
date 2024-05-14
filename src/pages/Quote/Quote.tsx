@@ -498,26 +498,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
           )}
 
-          {snapValue === QuoteStep.TRACKING && (
-            <QuoteTracking
-              quoteDetails={quoteDetails}
-              refetch={() => {
-                getQuote()
-              }}
-              onContinue={() => {
-                switch (quoteDetails.payment_method_type) {
-                  case PaymentMethodType.CASH: {
-                    setSnapValue(QuoteStep.TRACKING)
-                    break
-                  }
-                  default: {
-                    setSnapValue(QuoteStep.PAYMENT)
-                  }
-                }
-              }}
-              onBack={() => setSnapValue(QuoteStep.OPTIONS)}
-            />
-          )}
+          {snapValue === QuoteStep.TRACKING && <QuoteTracking quoteDetails={quoteDetails} />}
 
           {snapValue === QuoteStep.TIME_SLOT && (
             <div className='quote-page px-3 px-md-0'>

@@ -123,6 +123,10 @@ body {
   color: var(--Light-Blue---Primary-400, #4285f4);
 }
 
+.btn-transparent.danger {
+  color: var(--Red---Semantic-500, #c22222);
+}
+
 .btn-transparent.small {
   padding: 8px 12px;
   font-size: 14px;
