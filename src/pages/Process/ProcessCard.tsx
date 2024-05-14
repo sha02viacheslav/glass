@@ -11,13 +11,12 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({ title, children }) => 
 
   return (
     <section className={'process-card' + (expanded ? ' expanded' : '')}>
-      <div className='process-card-header'>
+      <div className='process-card-header' onClick={() => setExpanded((prev) => !prev)}>
         <div className='process-card-title'>{title}</div>
         <img
           src={process.env.PUBLIC_URL + '/images/chevron-down.svg'}
           className={'process-card-expand' + (expanded ? ' rotate' : '')}
           alt=''
-          onClick={() => setExpanded((prev) => !prev)}
         />
       </div>
 
