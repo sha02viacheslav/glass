@@ -8,7 +8,7 @@ export type ConfirmDialogProps = {
   subDescription?: string | ReactNode
   confirmStr?: string
   cancelStr?: string
-  backgroundColor?: string
+  confirmButtonType?: 'primary' | 'danger'
   showIcon?: boolean
   showCancel?: boolean
   onConfirm: () => void
@@ -21,6 +21,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   subDescription,
   confirmStr = 'Yes',
   cancelStr = 'No',
+  confirmButtonType = 'primary',
   showIcon = true,
   showCancel = true,
   onConfirm,
@@ -61,13 +62,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             <Box marginTop={showIcon ? 0 : 7}></Box>
           )}
           {subDescription && <Typography>{subDescription}</Typography>}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6, gap: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6, marginLeft: -4, gap: 2 }}>
             {showCancel && (
               <button className='btn-transparent' onClick={onCancel}>
                 {cancelStr}
               </button>
             )}
-            <button className='btn-stroked transparent' onClick={onConfirm}>
+            <button
+              className={confirmButtonType === 'primary' ? 'btn-stroked transparent' : 'btn-transparent danger'}
+              onClick={onConfirm}
+            >
               {confirmStr}
             </button>
           </Box>

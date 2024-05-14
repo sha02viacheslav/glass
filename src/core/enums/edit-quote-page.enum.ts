@@ -6,4 +6,6 @@ export enum EditQuotePage {
   DATE = 'date',
   LOCATION = 'location',
   OVERVIEW = 'overview',
+  CANCEL = 'cancel',
+  BOOKING_CANCELLED = 'booking_cancelled',
 }

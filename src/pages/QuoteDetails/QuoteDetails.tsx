@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Box, FormControl, FormControlLabel, OutlinedInput, Radio, RadioGroup, Typography } from '@mui/material'
+import {
+  Box,
+  CardMedia,
+  FormControl,
+  FormControlLabel,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -8,6 +17,7 @@ import { EnumLoader } from 'src/core/enums/loader.enum'
 import { array, boolean, number, object, string } from 'yup'
 import { AddPictures } from '@glass/components/AddPictures'
 import { AddressInput } from '@glass/components/AddressInput/AddressInput'
+import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import MobileService from '@glass/components/GoogleMap/MobileService'
 import { Workshops } from '@glass/components/GoogleMap/Workshops'
 import { HowToTakePic } from '@glass/components/Help/HowToTakePic'
@@ -15,6 +25,7 @@ import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType, EditQuotePage, WorkingPlace } from '@glass/enums'
+import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import {
   Address,
@@ -30,6 +41,7 @@ import {
   UpdateQuoteDto,
   Workshop,
 } from '@glass/models'
+import { cancelBookingService } from '@glass/services/apis/cancel-booking.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
@@ -39,7 +51,9 @@ import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-s
 import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
+import { BookingCancelled } from './BookingCancelled'
 import { EditQuoteDetailsHeader } from './EditQuoteDetailsHeader'
+import { QuoteCancel } from './QuoteCancel'
 import { QuoteOverview } from './QuoteOverview'
 import { WorkshopCard } from '../Customer/WorkshopCard'
 import { LiveService } from '../Home/LiveService'
@@ -84,13 +98,15 @@ export const QuoteDetails: React.FC = ({}) => {
   const { quoteId } = useParams()
 
   const steps = {
-    [EditQuotePage.GLASS]: { index: 1, title: 'Broken glass details' },
-    [EditQuotePage.COMMENT_IMAGES]: { index: 2, title: 'Your comment and images info' },
-    [EditQuotePage.PERSONAL_INFO]: { index: 3, title: 'Personal info' },
-    [EditQuotePage.DATE_LOCATION]: { index: 4, title: 'Repair location, date and time' },
-    [EditQuotePage.DATE]: { index: 5, title: 'Service date and time' },
-    [EditQuotePage.LOCATION]: { index: 5, title: 'Edit Location' },
-    [EditQuotePage.OVERVIEW]: { index: 6, title: 'Details of your quote' },
+    [EditQuotePage.GLASS]: { title: 'Broken glass details' },
+    [EditQuotePage.COMMENT_IMAGES]: { title: 'Your comment and images info' },
+    [EditQuotePage.PERSONAL_INFO]: { title: 'Personal info' },
+    [EditQuotePage.DATE_LOCATION]: { title: 'Repair location, date and time' },
+    [EditQuotePage.DATE]: { title: 'Service date and time' },
+    [EditQuotePage.LOCATION]: { title: 'Edit Location' },
+    [EditQuotePage.OVERVIEW]: { title: 'Details of your quote' },
+    [EditQuotePage.CANCEL]: { title: 'We’re here to help' },
+    [EditQuotePage.BOOKING_CANCELLED]: { title: 'Thank you!' },
   }
 
   const validationSchema = object({
@@ -149,6 +165,10 @@ export const QuoteDetails: React.FC = ({}) => {
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [modalMap, setModalMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
+  const [showCancelBooking, setShowCancelBooking] = useState<boolean>(false)
+  const [showRefundPopup, setShowRefundPopup] = useState<boolean>(false)
+
+  const { totalPrice } = useCalcPriceSummary(quoteDetails)
 
   const getQuote = () => {
     if (quoteId) {
@@ -483,6 +503,21 @@ export const QuoteDetails: React.FC = ({}) => {
     formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, requestBookings)
   }
 
+  const cancelBooking = () => {
+    if (!quoteId) return
+
+    trackPromise(
+      cancelBookingService(quoteId).then((res) => {
+        if (res.success) {
+          setActivePage(EditQuotePage.BOOKING_CANCELLED)
+        } else {
+          toast(res.message)
+        }
+      }),
+      EnumLoader.SAVE_QUOTE,
+    )
+  }
+
   useEffect(() => {
     if (!workshops.length) {
       getWorkshop()
@@ -749,42 +784,124 @@ export const QuoteDetails: React.FC = ({}) => {
             <div className='padding-64'></div>
           </Box>
 
-          <div className='padding-64'></div>
+          <Box
+            className='tab-content'
+            sx={{ height: activePage === EditQuotePage.CANCEL ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
+          >
+            <div className='padding-32'></div>
+            <section>{!!quoteDetails && <QuoteCancel></QuoteCancel>}</section>
+            <div className='padding-64'></div>
+          </Box>
 
           <Box
-            sx={{
-              position: 'fixed',
-              bottom: '0',
-              left: '0',
-              width: '100vw',
-              zIndex: '100',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              padding: 4,
-              borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-              background: '#fff',
-            }}
+            className='tab-content'
+            sx={{ height: activePage === EditQuotePage.BOOKING_CANCELLED ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            {activePage !== EditQuotePage.OVERVIEW && (
-              <>
-                <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                  Save changes
-                </button>
-              </>
-            )}
-
-            {activePage === EditQuotePage.OVERVIEW && (
-              <>
-                <button className='btn-transparent danger w-100' type='button' onClick={handleContinueClick}>
-                  Cancel the booking
-                </button>
-              </>
-            )}
+            <div className='padding-32'></div>
+            <section>{!!quoteDetails && <BookingCancelled totalPrice={totalPrice}></BookingCancelled>}</section>
+            <div className='padding-64'></div>
           </Box>
+
+          <div className='padding-64'></div>
+
+          {activePage !== EditQuotePage.BOOKING_CANCELLED && (
+            <Box
+              sx={{
+                position: 'fixed',
+                bottom: '0',
+                left: '0',
+                width: '100vw',
+                zIndex: '100',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                padding: 4,
+                borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+                background: '#fff',
+              }}
+            >
+              {activePage !== EditQuotePage.OVERVIEW && activePage !== EditQuotePage.CANCEL && (
+                <>
+                  <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                    Save changes
+                  </button>
+                </>
+              )}
+
+              {activePage === EditQuotePage.OVERVIEW && (
+                <>
+                  <button
+                    className='btn-transparent danger w-100'
+                    type='button'
+                    onClick={() => setShowCancelBooking(true)}
+                  >
+                    Cancel the booking
+                  </button>
+                </>
+              )}
+
+              {activePage === EditQuotePage.CANCEL && (
+                <>
+                  <button
+                    className='btn-transparent px-3'
+                    type='button'
+                    onClick={() => setActivePage(EditQuotePage.OVERVIEW)}
+                  >
+                    <CardMedia
+                      component='img'
+                      sx={{ width: 24, height: 'auto', marginLeft: -2 }}
+                      image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
+                    />
+                    Back to quote
+                  </button>
+                  <button
+                    className='btn-transparent danger px-3'
+                    type='button'
+                    onClick={() => setShowRefundPopup(true)}
+                  >
+                    Refund my money
+                  </button>
+                </>
+              )}
+            </Box>
+          )}
         </form>
 
         {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
+
+        {showCancelBooking && (
+          <ConfirmDialog
+            title='Are you sure?'
+            showIcon={false}
+            description={<span className='text-left d-block'>Are you sure you want to cancel the booking?</span>}
+            confirmStr='Yes, request'
+            cancelStr='No, cancel'
+            confirmButtonType='danger'
+            onCancel={() => setShowCancelBooking(false)}
+            onConfirm={() => {
+              setShowCancelBooking(false)
+              setActivePage(EditQuotePage.CANCEL)
+            }}
+          />
+        )}
+
+        {showRefundPopup && (
+          <ConfirmDialog
+            title='Are you sure?'
+            showIcon={false}
+            description={
+              <span className='text-left d-block'>Are you sure you want to cancel the booking and receive refund?</span>
+            }
+            confirmStr='Yes, request'
+            cancelStr='Let me think'
+            confirmButtonType='danger'
+            onCancel={() => setShowRefundPopup(false)}
+            onConfirm={() => {
+              setShowRefundPopup(false)
+              cancelBooking()
+            }}
+          />
+        )}
       </Box>
     </>
   )

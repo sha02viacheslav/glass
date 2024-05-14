@@ -495,51 +495,49 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         </Box>
       </Box>
 
-      {quoteDetails.is_published && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100vw',
-            zIndex: '100',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-            background: '#fff',
-          }}
-        >
-          <Link to={'/quote-details/' + quoteId}>
-            <Button
-              sx={{
-                width: '100%',
-                paddingX: 6,
-                paddingY: 3,
-                fontSize: '18px',
-                fontWeight: '700',
-                lineHeight: '24px',
-                letterSpacing: '0.18px',
-                color: 'var(--Light-Blue---Primary-500, #225FC2)',
-                background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
-                boxShadow:
-                  '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
-                marginTop: 8,
-              }}
-            >
-              See all the service details
-              <CardMedia
-                component='img'
-                sx={{ width: 24, height: 24, marginLeft: 2 }}
-                image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
-                alt='Minus'
-              />
-            </Button>
-          </Link>
-        </Box>
-      )}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100vw',
+          zIndex: '100',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+          borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+          background: '#fff',
+        }}
+      >
+        <Link to={'/quote-details/' + quoteId}>
+          <Button
+            sx={{
+              width: '100%',
+              paddingX: 6,
+              paddingY: 3,
+              fontSize: '18px',
+              fontWeight: '700',
+              lineHeight: '24px',
+              letterSpacing: '0.18px',
+              color: 'var(--Light-Blue---Primary-500, #225FC2)',
+              background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
+              boxShadow:
+                '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
+              marginTop: 8,
+            }}
+          >
+            See all the service details
+            <CardMedia
+              component='img'
+              sx={{ width: 24, height: 24, marginLeft: 2 }}
+              image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
+              alt='Minus'
+            />
+          </Button>
+        </Link>
+      </Box>
     </form>
   )
 }

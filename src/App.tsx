@@ -33,12 +33,15 @@ import TermsConditions from './pages/TermsConditions'
 export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress: SAVE_INQUIRY } = usePromiseTracker({ area: EnumLoader.SAVE_INQUIRY })
   const { promiseInProgress: SAVE_QUOTE } = usePromiseTracker({ area: EnumLoader.SAVE_QUOTE })
+  const { promiseInProgress: CANCEL_BOOKING } = usePromiseTracker({ area: EnumLoader.CANCEL_BOOKING })
   const { promiseInProgress } = usePromiseTracker()
   let title = undefined
   if (SAVE_INQUIRY) {
     title = 'Sending inquiry...'
   } else if (SAVE_QUOTE) {
     title = 'Saving quote...'
+  } else if (CANCEL_BOOKING) {
+    title = 'Cancelling booking...'
   }
   return <Loader loading={promiseInProgress || SAVE_INQUIRY || SAVE_QUOTE} title={title} />
 }
