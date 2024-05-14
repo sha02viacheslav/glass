@@ -26,6 +26,7 @@ import { InquiryIntro } from './pages/InquiryIntro'
 import { Installments } from './pages/Installments'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import { Process } from './pages/Process'
+import { QuoteDetails } from './pages/QuoteDetails'
 import { ServiceDetail } from './pages/ServiceDetail'
 import TermsConditions from './pages/TermsConditions'
 
@@ -121,7 +122,7 @@ export const App: React.FC = () => {
   const [showFooter, setShowFooter] = useState<boolean>(true)
 
   useEffect(() => {
-    setShowHeader(!location.pathname.startsWith('/customer/edit'))
+    setShowHeader(!location.pathname.startsWith('/customer/edit') && !location.pathname.startsWith('/quote-details'))
     setShowMenu(
       !location.pathname.startsWith('/quote') &&
         !location.pathname.startsWith('/inquiry-intro') &&
@@ -174,6 +175,7 @@ export const App: React.FC = () => {
             <Route path='/quote/:id' element={<QuotePage />} />
             <Route path='/quote/in/:id' element={<QuotePage />} />
             <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
+            <Route path='/quote-details/:quoteId' element={<QuoteDetails />} />
           </Routes>
           {showQuickContact && <QuickContact showReg={showMenu} />}
           {showFooter && <Footer />}

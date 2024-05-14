@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -9,12 +9,9 @@ import {
   StepLabel,
   Stepper,
   Typography,
-  // stepConnectorClasses,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useFormik } from 'formik'
-import { useParams } from 'react-router-dom'
-import { boolean, object } from 'yup'
+import { Link, useParams } from 'react-router-dom'
 import { TrackTechnician } from '@glass/components/GoogleMap/TrackTechnician'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
@@ -22,67 +19,89 @@ import { CarType, TrackingStep } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
-import { scrollToElementWithOffset } from '@glass/utils/index'
 import { DownloadInvoice } from './DownloadInvoice'
-
-export type QuoteOptionsForm = {
-  bookingDate: boolean
-}
-
-export enum FormFieldIds {
-  BOOKING_DATE = 'bookingDate',
-}
 
 export type QuoteTrackingProps = {
   quoteDetails: Quote
-  refetch: () => void
-  onContinue: () => void
-  onBack: () => void
 }
 
-export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onContinue }) => {
+export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) => {
   const { id: quoteId } = useParams()
 
-  const validationSchema = object({
-    bookingDate: boolean().isTrue('Please select the date you would like to get repair done').nullable(),
-  })
-
-  const formik = useFormik({
-    initialValues: {
-      bookingDate: false,
-    },
-    validationSchema: validationSchema,
-    onSubmit: async () => {},
-  })
-
   const steps = {
-    [TrackingStep.STEP1]: { index: 1, title: 'Booking confirmed and paid', icon: 'calendar-check.svg', isSmall: false },
-    [TrackingStep.STEP2]: { index: 2, title: 'Waiting for the day of the service', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP3]: { index: 3, title: 'Day before reminder', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP4]: { index: 4, title: 'Repair day', icon: 'wrench-white.svg', isSmall: false },
-    [TrackingStep.STEP5]: { index: 5, title: 'Technician arrived', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP6]: { index: 6, title: 'Technician took “before” photo', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP7]: { index: 7, title: 'Technician is repairing your car', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP8]: { index: 8, title: 'Technician takes “after” photo', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP9]: { index: 9, title: 'You can drive your car!', icon: 'wheel-fill.svg', isSmall: false },
+    [TrackingStep.STEP1]: {
+      index: 1,
+      sequence: 1,
+      title: 'Booking confirmed and paid',
+      icon: 'calendar-check.svg',
+      isSmall: false,
+    },
+    [TrackingStep.STEP2]: {
+      index: 2,
+      sequence: 2,
+      title: 'Waiting for the day of the service',
+      icon: 'check.svg',
+      isSmall: true,
+    },
+    [TrackingStep.STEP3]: { index: 3, sequence: 3, title: 'Day before reminder', icon: 'check.svg', isSmall: true },
+    [TrackingStep.STEP4]: { index: 4, sequence: 4, title: 'Repair day', icon: 'wrench-white.svg', isSmall: false },
+    [TrackingStep.STEP5]: { index: 5, sequence: 5, title: 'Technician arrived', icon: 'check.svg', isSmall: true },
+    [TrackingStep.STEP6]: {
+      index: 6,
+      sequence: 5,
+      title: 'Technician took “before” photo',
+      icon: 'check.svg',
+      isSmall: true,
+    },
+    [TrackingStep.STEP7]: {
+      index: 7,
+      sequence: 6,
+      title: 'Technician is repairing your car',
+      icon: 'check.svg',
+      isSmall: true,
+    },
+    [TrackingStep.STEP8]: {
+      index: 8,
+      sequence: 7,
+      title: 'Technician takes “after” photo',
+      icon: 'check.svg',
+      isSmall: true,
+    },
+    [TrackingStep.STEP9]: {
+      index: 9,
+      sequence: 7,
+      title: 'You can drive your car!',
+      icon: 'wheel-fill.svg',
+      isSmall: false,
+    },
   }
 
-  const [activeStep] = useState<TrackingStep>(TrackingStep.STEP9)
   const [modalTrackMap, setModalTrackMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
+
+  const activeStep = useMemo<TrackingStep>(() => {
+    const sequence = quoteDetails.tracking_delivery[0]?.state.find((item) => !item.date)?.sequence || 1
+    return (
+      (Object.keys(steps).find((key) => steps[key as TrackingStep].sequence === sequence) as TrackingStep) ||
+      TrackingStep.STEP1
+    )
+  }, [quoteDetails])
+
+  const beforeAttachments = useMemo(() => {
+    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 5)?.attachment_ids || []
+  }, [quoteDetails])
+
+  const repairAttachments = useMemo(() => {
+    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 6)?.attachment_ids || []
+  }, [quoteDetails])
+
+  const afterAttachments = useMemo(() => {
+    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 7)?.attachment_ids || []
+  }, [quoteDetails])
 
   useRetrieveVehData(quoteDetails?.DoorPlanLiteral, (data: CarType) => {
     setSelectedCarType(data)
   })
-
-  const handleContinueClick = () => {
-    formik.setFieldTouched(FormFieldIds.BOOKING_DATE, true, true)
-    if (formik.errors.bookingDate) {
-      scrollToElementWithOffset(FormFieldIds.BOOKING_DATE, 100)
-      return
-    }
-    onContinue()
-  }
 
   const ColorStepIconRoot = styled('div')<{
     ownerState: { completed?: boolean; active?: boolean; isSmall?: boolean }
@@ -119,12 +138,6 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
       </ColorStepIconRoot>
     )
   }
-
-  useEffect(() => {
-    if (quoteDetails) {
-      formik.setFieldValue(FormFieldIds.BOOKING_DATE, quoteDetails.booking_date)
-    }
-  }, [quoteDetails])
 
   return (
     <form>
@@ -328,17 +341,22 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
                         {(step as TrackingStep) === TrackingStep.STEP6 && (
                           <>
                             {active || completed ? (
-                              <CardMedia
-                                component='img'
-                                sx={{
-                                  width: 'auto',
-                                  height: 80,
-                                  objectFit: 'cover',
-                                  borderRadius: '2px',
-                                }}
-                                image={quoteDetails.customer_attachments[0]?.datas}
-                                alt='Broken Image'
-                              />
+                              <>
+                                {beforeAttachments.map((item, index) => (
+                                  <CardMedia
+                                    key={index}
+                                    component='img'
+                                    sx={{
+                                      width: 'auto',
+                                      height: 80,
+                                      objectFit: 'cover',
+                                      borderRadius: '2px',
+                                    }}
+                                    image={item.attachment_url}
+                                    alt='Broken Image'
+                                  />
+                                ))}
+                              </>
                             ) : (
                               <Typography
                                 sx={{
@@ -373,18 +391,20 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
                                     >
                                       Old glass and glue removed, surface prepared for new glass
                                     </Typography>
-                                    <CardMedia
-                                      component='img'
-                                      sx={{
-                                        width: 'auto',
-                                        height: 80,
-                                        objectFit: 'cover',
-                                        borderRadius: '2px',
-                                        marginTop: 2,
-                                      }}
-                                      image={quoteDetails.customer_attachments[0]?.datas}
-                                      alt='Broken Image'
-                                    />
+                                    {repairAttachments.map((item, index) => (
+                                      <CardMedia
+                                        key={index}
+                                        component='img'
+                                        sx={{
+                                          width: 'auto',
+                                          height: 80,
+                                          objectFit: 'cover',
+                                          borderRadius: '2px',
+                                          marginTop: 2,
+                                        }}
+                                        image={item.attachment_url}
+                                      />
+                                    ))}
                                   </Box>
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
@@ -423,17 +443,22 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
                         {(step as TrackingStep) === TrackingStep.STEP8 && (
                           <>
                             {active || completed ? (
-                              <CardMedia
-                                component='img'
-                                sx={{
-                                  width: 'auto',
-                                  height: 80,
-                                  objectFit: 'cover',
-                                  borderRadius: '2px',
-                                }}
-                                image={quoteDetails.customer_attachments[0]?.datas}
-                                alt='Broken Image'
-                              />
+                              <>
+                                {afterAttachments.map((item, index) => (
+                                  <CardMedia
+                                    key={index}
+                                    component='img'
+                                    sx={{
+                                      width: 'auto',
+                                      height: 80,
+                                      objectFit: 'cover',
+                                      borderRadius: '2px',
+                                    }}
+                                    image={item.attachment_url}
+                                    alt='Broken Image'
+                                  />
+                                ))}
+                              </>
                             ) : (
                               <Typography
                                 sx={{
@@ -487,31 +512,32 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails, onCo
             background: '#fff',
           }}
         >
-          <Button
-            sx={{
-              width: '100%',
-              paddingX: 6,
-              paddingY: 3,
-              fontSize: '18px',
-              fontWeight: '700',
-              lineHeight: '24px',
-              letterSpacing: '0.18px',
-              color: 'var(--Light-Blue---Primary-500, #225FC2)',
-              background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
-              boxShadow:
-                '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
-              marginTop: 8,
-            }}
-            onClick={() => handleContinueClick()}
-          >
-            See all the service details
-            <CardMedia
-              component='img'
-              sx={{ width: 24, height: 24, marginLeft: 2 }}
-              image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
-              alt='Minus'
-            />
-          </Button>
+          <Link to={'/quote-details/' + quoteId}>
+            <Button
+              sx={{
+                width: '100%',
+                paddingX: 6,
+                paddingY: 3,
+                fontSize: '18px',
+                fontWeight: '700',
+                lineHeight: '24px',
+                letterSpacing: '0.18px',
+                color: 'var(--Light-Blue---Primary-500, #225FC2)',
+                background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
+                boxShadow:
+                  '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
+                marginTop: 8,
+              }}
+            >
+              See all the service details
+              <CardMedia
+                component='img'
+                sx={{ width: 24, height: 24, marginLeft: 2 }}
+                image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
+                alt='Minus'
+              />
+            </Button>
+          </Link>
         </Box>
       )}
     </form>
