@@ -501,3 +501,8 @@ input.form-control.round {
 .flex-1 {
   flex: 1;
 }
+
+.drawer-rounded.MuiDrawer-modal .MuiPaper-elevation {
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+}
