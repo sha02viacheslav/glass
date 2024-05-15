@@ -4,6 +4,7 @@ import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { EnumLoader } from 'src/core/enums/loader.enum'
 import { object, string } from 'yup'
 import { AddressInput } from '@glass/components/AddressInput'
 import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
@@ -127,6 +128,7 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
             toast(res.message)
           }
         }),
+        EnumLoader.UPDATE_PERSONAL_INFO_ADDRESS,
       )
     }
   }
@@ -149,6 +151,7 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
             window.open(res.data.url, '_blank', 'noreferrer')
           }
         }),
+        EnumLoader.GENERATING_PLAN_URL,
       )
     }
   }

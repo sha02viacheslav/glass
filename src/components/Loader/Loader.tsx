@@ -42,7 +42,7 @@ export const Loader: React.FC<LoaderProps> = ({ loading, title = 'Loading... Ple
         }}
       >
         <ThreeCircles visible={true} color='#9557E8' height='80' width='80' />
-        <div className='text-white mt-3'>{title}</div>
+        <div className='text-white text-center mt-3'>{title}</div>
       </div>
     </div>
   ) : (

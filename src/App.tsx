@@ -33,6 +33,10 @@ export const LoadingIndicator: React.FC = () => {
   const { promiseInProgress: SAVE_INQUIRY } = usePromiseTracker({ area: EnumLoader.SAVE_INQUIRY })
   const { promiseInProgress: SAVE_QUOTE } = usePromiseTracker({ area: EnumLoader.SAVE_QUOTE })
   const { promiseInProgress: CANCEL_BOOKING } = usePromiseTracker({ area: EnumLoader.CANCEL_BOOKING })
+  const { promiseInProgress: UPDATE_PERSONAL_INFO_ADDRESS } = usePromiseTracker({
+    area: EnumLoader.UPDATE_PERSONAL_INFO_ADDRESS,
+  })
+  const { promiseInProgress: GENERATING_PLAN_URL } = usePromiseTracker({ area: EnumLoader.GENERATING_PLAN_URL })
   const { promiseInProgress } = usePromiseTracker()
   let title = undefined
   if (SAVE_INQUIRY) {
@@ -41,8 +45,24 @@ export const LoadingIndicator: React.FC = () => {
     title = 'Saving quote...'
   } else if (CANCEL_BOOKING) {
     title = 'Cancelling booking...'
+  } else if (UPDATE_PERSONAL_INFO_ADDRESS) {
+    title = 'Updating personal info and address...'
+  } else if (GENERATING_PLAN_URL) {
+    title = 'Generating payment plan URL...'
   }
-  return <Loader loading={promiseInProgress || SAVE_INQUIRY || SAVE_QUOTE} title={title} />
+  return (
+    <Loader
+      loading={
+        promiseInProgress ||
+        SAVE_INQUIRY ||
+        SAVE_QUOTE ||
+        CANCEL_BOOKING ||
+        UPDATE_PERSONAL_INFO_ADDRESS ||
+        GENERATING_PLAN_URL
+      }
+      title={title}
+    />
+  )
 }
 
 const theme = createTheme({
