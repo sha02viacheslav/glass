@@ -19,6 +19,7 @@ import { CarType, TrackingStep } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
+import { getTrackTechnicianChecked, setTrackTechnicianChecked } from '@glass/utils/session/session.util'
 import { DownloadInvoice } from './DownloadInvoice'
 
 export type QuoteTrackingProps = {
@@ -76,6 +77,9 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
     },
   }
 
+  const [showTrackTechnicianNotification, setShowTrackTechnicianNotification] = useState(
+    !getTrackTechnicianChecked(quoteId),
+  )
   const [modalTrackMap, setModalTrackMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
 
@@ -161,10 +165,35 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
             Hello {quoteDetails.customer_f_name}!
           </Typography>
 
-          <button type='button' className='btn-transparent primary p-0' onClick={() => setModalTrackMap(true)}>
-            <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
-            <span style={{ fontSize: '16px', color: '#4285F4' }}>Track the technician</span>
-          </button>
+          <Box sx={{ position: 'relative' }}>
+            <button type='button' className='btn-transparent primary p-0' onClick={() => setModalTrackMap(true)}>
+              <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
+              <span style={{ fontSize: '16px', color: '#4285F4' }}>Track the technician</span>
+            </button>
+            {quoteId && showTrackTechnicianNotification && (
+              <Box
+                sx={{
+                  width: '133px',
+                  px: 2,
+                  py: 1,
+                  position: 'absolute',
+                  right: 0,
+                  top: '32px',
+                  borderRadius: '2px',
+                  background: '#3B3B3B',
+                  color: '#fff',
+                  fontSize: 12,
+                  lineHeight: '16px',
+                }}
+                onClick={() => {
+                  setShowTrackTechnicianNotification(false)
+                  setTrackTechnicianChecked(quoteId)
+                }}
+              >
+                Tap here to track our technician on the map.
+              </Box>
+            )}
+          </Box>
         </Box>
         {modalTrackMap && <TrackTechnician onDismiss={() => setModalTrackMap(false)} />}
 

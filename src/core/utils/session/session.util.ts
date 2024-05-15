@@ -1,9 +1,11 @@
+import moment from 'moment'
 import {
   SESSION_ASKED_TINT,
   SESSION_ASKED_VAN,
   SESSION_NOTIFICATION_CHECKED,
   SESSION_QUOTE_ID,
   SESSION_REQUESTED_URL,
+  SESSION_TRACK_TECHNICIAN_CHECKED,
   SESSION_VAN_BODY,
 } from '@glass/constants'
 import { CarType } from '@glass/enums'
@@ -67,4 +69,21 @@ export const setNotificationChecked = () => {
 
 export const clearNotificationChecked = () => {
   sessionStorage.removeItem(SESSION_NOTIFICATION_CHECKED)
+}
+
+const generateTrackTechnicianId = (quoteId: string) => {
+  return `${quoteId}_${moment().format('YYYY-MM-DD')}`
+}
+
+export const getTrackTechnicianChecked = (quoteId = ''): boolean => {
+  const savedValue = JSON.parse(sessionStorage.getItem(SESSION_TRACK_TECHNICIAN_CHECKED) || '""')
+  return generateTrackTechnicianId(quoteId) === savedValue
+}
+
+export const setTrackTechnicianChecked = (quoteId: string) => {
+  sessionStorage.setItem(SESSION_TRACK_TECHNICIAN_CHECKED, JSON.stringify(generateTrackTechnicianId(quoteId)))
+}
+
+export const clearTrackTechnicianChecked = () => {
+  sessionStorage.removeItem(SESSION_TRACK_TECHNICIAN_CHECKED)
 }
