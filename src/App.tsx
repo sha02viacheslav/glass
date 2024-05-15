@@ -15,7 +15,6 @@ import { Contact } from '@glass/pages/Contact'
 import { Customer } from '@glass/pages/Customer'
 import { Home } from '@glass/pages/Home'
 import { Paid } from '@glass/pages/Paid'
-import { Pricing } from '@glass/pages/Pricing'
 import { QuotePage } from '@glass/pages/Quote'
 import { Services } from '@glass/pages/Services'
 import { setRequestedURL } from '@glass/utils/session/session.util'
@@ -164,7 +163,6 @@ export const App: React.FC = () => {
             <Route path='/privacy-policy' element={<PrivacyPolicy />} />
             <Route path='/installments' element={<Installments />} />
             <Route path='/comparison' element={<Comparison />} />
-            <Route path='/pricing' element={<Pricing />} />
             <Route path='/process' element={<Process />} />
             <Route path='/contact' element={<Contact />} />
             <Route path='/inquiry-intro' element={<InquiryIntro />} />
