@@ -47,6 +47,7 @@ import { OpenQuote } from './OpenQuote'
 import { QuoteCheckout } from './QuoteCheckout'
 import { QuoteInstallmentPayment } from './QuoteInstallmentPayment'
 import { QuoteOptions } from './QuoteOptions'
+import { QuoteStripePayment } from './QuoteStripePayment'
 import { QuoteTracking } from './QuoteTracking'
 
 export type QuoteProps = {
@@ -495,7 +496,18 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
           )}
 
           {snapValue === QuoteStep.PAYMENT && (
-            <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
+            <>
+              {quoteDetails.payment_method_type === PaymentMethodType.STRIPE ? (
+                <QuoteStripePayment
+                  quoteDetails={quoteDetails}
+                  totalPrice={totalPrice}
+                  onBack={() => setGoToPaymentClicked(false)}
+                  onSucceed={() => getQuote()}
+                />
+              ) : (
+                <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
+              )}
+            </>
           )}
 
           {snapValue === QuoteStep.TRACKING && <QuoteTracking quoteDetails={quoteDetails} />}

@@ -61,7 +61,11 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           totalPrice={totalPrice}
           onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.ASSIST_SIX_PAYMENT)}
         />
-        <FullPayment selected={paymentMethodType === PaymentMethodType.STRIPE} totalPrice={totalPrice} />
+        <FullPayment
+          selected={paymentMethodType === PaymentMethodType.STRIPE}
+          totalPrice={totalPrice}
+          onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.STRIPE)}
+        />
         {/* <CashPayment
           selected={paymentMethodType === PaymentMethodType.CASH}
           totalPrice={totalPrice}

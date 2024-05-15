@@ -5,9 +5,10 @@ import { PaymentCards } from '@glass/components/PaymentCards'
 export type FullPaymentProps = {
   selected: boolean
   totalPrice: number
+  onSelect: () => void
 }
 
-export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice }) => {
+export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice, onSelect }) => {
   return (
     <Box
       sx={{
@@ -16,6 +17,9 @@ export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice }
         borderRadius: '4px',
         background: '#FFF',
         boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+      }}
+      onClick={() => {
+        if (!selected) onSelect()
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
