@@ -380,7 +380,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
         setSnapValue(QuoteStep.CHECKOUT)
       }
     } else if (quoteDetails?.order_state === OrderState.PAYMENT_IN_1H_EXPIRED) {
-      setSnapValue(QuoteStep.OPTIONS)
+      setSnapValue(QuoteStep.CHECKOUT)
     } else if (quoteDetails?.order_state === OrderState.WON) {
       setSnapValue(QuoteStep.TRACKING)
     }

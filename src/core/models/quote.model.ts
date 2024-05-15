@@ -82,4 +82,6 @@ export type Quote = {
   images_gallery: BeforeAfter[]
   quotation_packages: { [key: string]: QuotePackage }
   tracking_delivery: FieldService[]
+  payment_in_1h_end_date: string
+  payment_in_1h_start_date: string
 }
