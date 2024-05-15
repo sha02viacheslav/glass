@@ -5,8 +5,9 @@ import { trackPromise } from 'react-promise-tracker'
 import { useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { object, string } from 'yup'
+import { AddressInput } from '@glass/components/AddressInput'
 import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
-import { MonthlyPayment, Quote, UpdateQuoteDto } from '@glass/models'
+import { Address, MonthlyPayment, Quote, UpdateQuoteDto } from '@glass/models'
 import { beginPaymentAssistService } from '@glass/services/apis/begin-payment-assist.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
@@ -17,6 +18,7 @@ export type QuoteInstallmentPaymentForm = {
   lastName: string
   email: string
   phone: string
+  invoiceAddress: string
 }
 
 export enum FormFieldIds {
@@ -24,6 +26,7 @@ export enum FormFieldIds {
   LAST_NAME = 'lastName',
   EMAIL = 'email',
   PHONE = 'phone',
+  INVOICE_ADDRESS = 'invoiceAddress',
 }
 
 export type QuoteInstallmentPaymentProps = {
@@ -39,6 +42,7 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
     lastName: string().required('Required').nullable(),
     email: string().email('Invalid email').required('Required').nullable(),
     phone: string().required('Required').nullable(),
+    invoiceAddress: string().required('Required').nullable(),
   })
 
   const formik = useFormik({
@@ -47,18 +51,26 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
       lastName: '',
       email: '',
       phone: '',
+      invoiceAddress: '',
     },
     validationSchema: validationSchema,
     onSubmit: async () => {},
   })
 
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment | undefined>(undefined)
+  const [billingAddress, setBillingAddress] = useState<Address | undefined>(undefined)
+
+  const handleChangeBillingAddress = (address: Address | undefined) => {
+    formik.setFieldValue(FormFieldIds.INVOICE_ADDRESS, address?.postcode)
+    setBillingAddress(address)
+  }
 
   const handleContinueClick = () => {
     formik.setFieldTouched(FormFieldIds.FIRST_NAME, true, true)
     formik.setFieldTouched(FormFieldIds.LAST_NAME, true, true)
     formik.setFieldTouched(FormFieldIds.EMAIL, true, true)
     formik.setFieldTouched(FormFieldIds.PHONE, true, true)
+    formik.setFieldTouched(FormFieldIds.INVOICE_ADDRESS, true, true)
     if (formik.errors.firstName) {
       scrollToElementWithOffset(FormFieldIds.FIRST_NAME, 100)
       return
@@ -71,6 +83,9 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
     } else if (formik.errors.phone) {
       scrollToElementWithOffset(FormFieldIds.PHONE, 100)
       return
+    } else if (formik.errors.invoiceAddress) {
+      scrollToElementWithOffset(FormFieldIds.INVOICE_ADDRESS, 100)
+      return
     }
     updateQuote(formik.values)
   }
@@ -79,28 +94,29 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
     if (quoteId) {
       const postData: UpdateQuoteDto = {
         fe_token: quoteId,
-        // Step 1
-        // customer_address: {
-        //   address_id: quoteDetails.delivery_address.address_id || 0,
-        //   postcode: billingAddress?.postcode || '',
-        //   latitude: billingAddress?.latitude || '',
-        //   longitude: billingAddress?.longitude || '',
-        //   line_1: billingAddress?.line_1 || '',
-        //   line_2: billingAddress?.line_2 || '',
-        //   line_3: billingAddress?.line_3 || '',
-        //   line_4: billingAddress?.line_4 || '',
-        //   locality: billingAddress?.locality || '',
-        //   town_or_city: billingAddress?.town_or_city || '',
-        //   county: billingAddress?.county || '',
-        //   district: billingAddress?.district || '',
-        //   country: billingAddress?.country || '',
-        // },
 
         // Personal Info
         customer_f_name: (values.firstName || '').trim(),
         customer_s_name: (values.lastName || '').trim(),
         customer_phone: (values.phone || '').trim(),
         customer_email: (values.email || '').trim(),
+
+        // Address
+        customer_address: {
+          address_id: quoteDetails.delivery_address.address_id || 0,
+          postcode: billingAddress?.postcode || '',
+          latitude: billingAddress?.latitude || '',
+          longitude: billingAddress?.longitude || '',
+          line_1: billingAddress?.line_1 || '',
+          line_2: billingAddress?.line_2 || '',
+          line_3: billingAddress?.line_3 || '',
+          line_4: billingAddress?.line_4 || '',
+          locality: billingAddress?.locality || '',
+          town_or_city: billingAddress?.town_or_city || '',
+          county: billingAddress?.county || '',
+          district: billingAddress?.district || '',
+          country: billingAddress?.country || '',
+        },
       }
 
       trackPromise(
@@ -149,6 +165,8 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
       formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails.customer_s_name)
       formik.setFieldValue(FormFieldIds.PHONE, quoteDetails.customer_phone)
       formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails.customer_email)
+
+      if (quoteDetails.delivery_address?.postcode) handleChangeBillingAddress(quoteDetails.delivery_address)
     }
   }, [quoteDetails])
 
@@ -228,6 +246,28 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
               touched={formik.touched}
               errors={formik.errors}
               setFieldValue={formik.setFieldValue}
+            />
+          </Box>
+        </Box>
+
+        <Box sx={{ mt: 8 }}>
+          <Typography
+            sx={{
+              color: 'var(--Gray-600, #6A6B71)',
+              fontSize: 12,
+              fontWeight: 700,
+              lineHeight: '150%',
+              letterSpacing: '0.84px',
+            }}
+          >
+            ADDRESS WHERE YOUR DEBIT CARD IS REGISTERED
+          </Typography>
+
+          <Box id={FormFieldIds.INVOICE_ADDRESS} sx={{ mt: 6 }}>
+            <AddressInput
+              address={billingAddress}
+              formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+              onChange={handleChangeBillingAddress}
             />
           </Box>
         </Box>

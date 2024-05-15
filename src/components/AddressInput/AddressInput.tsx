@@ -1,5 +1,14 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import { Box, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent } from '@mui/material'
+import {
+  Box,
+  CardMedia,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material'
 import { debounce } from 'lodash'
 import { toast } from 'react-toastify'
 import { Address, ManualAddress, SearchAddress } from '@glass/models'
@@ -175,7 +184,11 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
             marginTop: '4px',
           }}
         >
-          <img src={process.env.PUBLIC_URL + '/images/map-marker-light.svg'} className='img-fluid' alt='' />
+          <CardMedia
+            component='img'
+            sx={{ width: 16, height: 16, mt: '2px' }}
+            image={process.env.PUBLIC_URL + '/images/map-marker-light.svg'}
+          />
           {addressText}
         </Box>
       )}
