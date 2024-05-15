@@ -446,12 +446,6 @@ input.form-control.round {
   border-radius: 4px;
   border: solid 1px var(--primary-color);
 }
-.MuiOutlinedInput-root .MuiOutlinedInput-input {
-  padding-block: 12.5px 14px;
-  width: 100%;
-  box-sizing: border-box;
-  height: unset;
-}
 .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-input {
   background: #e9ecef;
   border-radius: 4px;

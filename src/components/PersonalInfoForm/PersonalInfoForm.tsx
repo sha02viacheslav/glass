@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, CardMedia, FormControl, Grid, InputLabel, OutlinedInput } from '@mui/material'
+import { Box, CardMedia, FormControl, Grid, InputAdornment, InputLabel, OutlinedInput } from '@mui/material'
 import { FormikErrors, FormikTouched } from 'formik'
 import { FormFieldIds } from '@glass/pages/Customer/Customer'
 
@@ -75,6 +75,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ values, touc
             value={values.phone}
             label='Phone number*'
             placeholder='Phone number*'
+            startAdornment={<InputAdornment position='start'>+44</InputAdornment>}
             onChange={(e) => setFieldValue(FormFieldIds.PHONE, e.target.value)}
             error={touched.phone && !!errors.phone}
           />
