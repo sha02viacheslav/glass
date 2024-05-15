@@ -5,7 +5,7 @@ import { Divider, Drawer, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { FacebookShareButton, WhatsappShareButton, TelegramShareButton, EmailShareButton } from 'react-share'
 
-const TITLE_SHARE = 'Share Booking flix.glass'
+const TITLE_SHARE = 'Share Booking fix.glass'
 
 const ShareQuote: FC<{ url: string }> = ({ url }) => {
   const [show, setShow] = useState(false)
