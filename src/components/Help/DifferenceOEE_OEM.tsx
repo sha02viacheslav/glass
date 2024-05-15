@@ -35,7 +35,7 @@ export const DifferenceOEE_OEM = () => {
       <Typography
         sx={{
           fontSize: 14,
-          marginTop: 2,
+          marginTop: 4,
         }}
       >
         <Link sx={{ fontWeight: '700' }} onClick={() => setOpen(true)}>

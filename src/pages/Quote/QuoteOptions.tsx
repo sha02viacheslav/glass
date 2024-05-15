@@ -181,15 +181,11 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
         />
 
-        <Typography sx={{ color: 'orange', p: 3 }}>
-          <DifferenceOEE_OEM />
-        </Typography>
+        <DifferenceOEE_OEM />
 
         <Box sx={{ p: 2 }}></Box>
 
-        <Typography sx={{ color: 'orange', p: 3 }}>
-          <ReviewsDialog />
-        </Typography>
+        <ReviewsDialog textColor='var(--Gray-800, #14151F)' />
 
         <Box sx={{ p: 4 }}></Box>
 

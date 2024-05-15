@@ -1,13 +1,14 @@
 import './ReviewsDialog.css'
 import React, { useState } from 'react'
-import { Modal } from '@mui/material'
+import { Modal, Typography } from '@mui/material'
 import { GoogleReviews } from '../Footer/GoogleReviews'
 
 export type ReviewsDialogProps = {
+  textColor?: string
   onClose?: () => void
 }
 
-export const ReviewsDialog: React.FC<ReviewsDialogProps> = ({ onClose = () => undefined }) => {
+export const ReviewsDialog: React.FC<ReviewsDialogProps> = ({ textColor = '#fff', onClose = () => undefined }) => {
   const [showReviewDialog, setShowReviewDialog] = useState<boolean>(false)
   return (
     <>
@@ -15,9 +16,9 @@ export const ReviewsDialog: React.FC<ReviewsDialogProps> = ({ onClose = () => un
         {[1, 2, 3, 4, 5].map((index) => (
           <img key={index} src={'/images/star.svg'} className='img-fluid' alt='' />
         ))}
-        <div className='lh-15 text-white ms-1'>5.0</div>
+        <Typography sx={{ color: textColor, lineHeight: '24px', ml: 1 }}>5.0</Typography>
         <img src={process.env.PUBLIC_URL + '/images/google.png'} className='img-fluid ms-1' alt='' />
-        <div className='lh-15 text-white ms-2'>reviews</div>
+        <Typography sx={{ color: textColor, lineHeight: '24px', ml: 2 }}>reviews</Typography>
       </div>
       <Modal
         open={showReviewDialog}
