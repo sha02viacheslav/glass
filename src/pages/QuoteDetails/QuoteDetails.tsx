@@ -484,12 +484,48 @@ export const QuoteDetails: React.FC = ({}) => {
           >
             <div className='padding-48'></div>
             <section>
-              <PersonalInfoForm
-                values={formik.values}
-                touched={formik.touched}
-                errors={formik.errors}
-                setFieldValue={formik.setFieldValue}
-              />
+              <Box>
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-600, #6A6B71)',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    lineHeight: '150%',
+                    letterSpacing: '0.84px',
+                  }}
+                >
+                  PERSONAL INFO
+                </Typography>
+                <Box sx={{ mt: 4 }}>
+                  <PersonalInfoForm
+                    values={formik.values}
+                    touched={formik.touched}
+                    errors={formik.errors}
+                    setFieldValue={formik.setFieldValue}
+                  />
+                </Box>
+              </Box>
+
+              <Box sx={{ mt: 8 }}>
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-600, #6A6B71)',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    lineHeight: '150%',
+                    letterSpacing: '0.84px',
+                  }}
+                >
+                  YOUR LOCATION
+                </Typography>
+                <Box sx={{ mt: 4 }}>
+                  <AddressInput
+                    address={billingAddress}
+                    formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+                    onChange={handleChangeBillingAddress}
+                  />
+                </Box>
+              </Box>
             </section>
             <div className='padding-64'></div>
           </Box>
