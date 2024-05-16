@@ -126,7 +126,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
           maxLength={8}
           value={localLicenseNum}
           onChange={(e) => handleInputLicenseNum(e.target.value)}
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         />
 
         {showSearch && (

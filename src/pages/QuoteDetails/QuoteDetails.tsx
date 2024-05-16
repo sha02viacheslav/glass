@@ -27,33 +27,16 @@ import { WindowSelector } from '@glass/components/WindowSelector'
 import { CarType, EditQuotePage, WorkingPlace } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
-import {
-  Address,
-  Attachment,
-  Characteristic,
-  InquiryStep1Dto,
-  InquiryStep2Dto,
-  InquiryStep3Dto,
-  InquiryStep4Dto,
-  InquiryStep5Dto,
-  Quote,
-  RequestBooking,
-  UpdateQuoteDto,
-  Workshop,
-} from '@glass/models'
+import { Address, Attachment, Characteristic, Quote, RequestBooking, UpdateWonQuoteDto, Workshop } from '@glass/models'
 import { cancelBookingService } from '@glass/services/apis/cancel-booking.service'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
-import { updateInquiryStep1Service } from '@glass/services/apis/update-inquiry-step1.service'
-import { updateInquiryStep2Service } from '@glass/services/apis/update-inquiry-step2.service'
-import { updateInquiryStep3Service } from '@glass/services/apis/update-inquiry-step3.service'
-import { updateInquiryStep4Service } from '@glass/services/apis/update-inquiry-step4.service'
-import { updateInquiryStep5Service } from '@glass/services/apis/update-inquiry-step5.service'
-import { updateQuoteService } from '@glass/services/apis/update-quote.service'
+import { updateWonQuoteService } from '@glass/services/apis/update-won-quote.service'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
 import { BookingCancelled } from './BookingCancelled'
 import { EditQuoteDetailsHeader } from './EditQuoteDetailsHeader'
 import { QuoteCancel } from './QuoteCancel'
+import { QuoteDateLocation } from './QuoteDateLocation'
 import { QuoteOverview } from './QuoteOverview'
 import { WorkshopCard } from '../Customer/WorkshopCard'
 import { LiveService } from '../Home/LiveService'
@@ -212,11 +195,7 @@ export const QuoteDetails: React.FC = ({}) => {
           scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, 100)
           return
         }
-        if (editMode) {
-          updateQuote(formik.values)
-        } else {
-          updateInquiryStep1(formik.values)
-        }
+        updateQuote(formik.values)
         break
       }
       case EditQuotePage.COMMENT_IMAGES: {
@@ -225,19 +204,12 @@ export const QuoteDetails: React.FC = ({}) => {
           scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
           return
         }
-        if (editMode) {
-          updateQuote(formik.values)
-        } else {
-          updateInquiryStep2(formik.values)
-        }
+        updateQuote(formik.values)
+
         break
       }
       case EditQuotePage.PERSONAL_INFO: {
-        if (editMode) {
-          updateQuote(formik.values)
-        } else {
-          updateInquiryStep3(formik.values)
-        }
+        updateQuote(formik.values)
         break
       }
       case EditQuotePage.DATE: {
@@ -258,11 +230,7 @@ export const QuoteDetails: React.FC = ({}) => {
           scrollToElementWithOffset(FormFieldIds.PHONE, 100)
           return
         }
-        if (editMode) {
-          updateQuote(formik.values)
-        } else {
-          updateInquiryStep4(formik.values)
-        }
+        updateQuote(formik.values)
         break
       }
       case EditQuotePage.LOCATION: {
@@ -271,20 +239,10 @@ export const QuoteDetails: React.FC = ({}) => {
           scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, 100)
           return
         }
-        if (editMode) {
-          updateQuote(formik.values)
-        } else {
-          updateInquiryStep5(formik.values)
-        }
+        updateQuote(formik.values)
         break
       }
     }
-  }
-
-  const afterUpdateQuoteDetails = () => {
-    getQuote().then(() => {
-      handleBackToSummaryClick()
-    })
   }
 
   const handleBackToSummaryClick = () => {
@@ -299,136 +257,6 @@ export const QuoteDetails: React.FC = ({}) => {
     }
   }
 
-  const updateInquiryStep1 = (values: QuoteDetailsForm) => {
-    if (!quoteId) return
-
-    const postData: InquiryStep1Dto = {
-      fe_token: quoteId,
-      customer_address: {
-        postcode: billingAddress?.postcode || '',
-        latitude: billingAddress?.latitude || '',
-        longitude: billingAddress?.longitude || '',
-        line_1: billingAddress?.line_1 || '',
-        line_2: billingAddress?.line_2 || '',
-        line_3: billingAddress?.line_3 || '',
-        line_4: billingAddress?.line_4 || '',
-        locality: billingAddress?.locality || '',
-        town_or_city: billingAddress?.town_or_city || '',
-        county: billingAddress?.county || '',
-        district: billingAddress?.district || '',
-        country: billingAddress?.country || '',
-      },
-      working_place: values.workingPlace,
-      workshop_id: formik.values.workshopId,
-    }
-
-    trackPromise(
-      updateInquiryStep1Service(postData).then((res) => {
-        if (res.success) {
-          afterUpdateQuoteDetails()
-        } else {
-          toast(res.message)
-        }
-      }),
-    )
-  }
-
-  const updateInquiryStep2 = (values: QuoteDetailsForm) => {
-    if (!quoteId) return
-
-    const postData: InquiryStep2Dto = {
-      fe_token: quoteId,
-      glass_location: values.glassLocation,
-      inquiry_characteristics: values.characteristics,
-    }
-
-    trackPromise(
-      updateInquiryStep2Service(postData).then((res) => {
-        if (res.success) {
-          afterUpdateQuoteDetails()
-        } else {
-          toast(res.message)
-        }
-      }),
-    )
-  }
-
-  const updateInquiryStep3 = (values: QuoteDetailsForm) => {
-    if (!quoteId || !quoteDetails) return
-
-    const removeAttachmentIds = quoteDetails.customer_attachments
-      .filter(
-        (attachment) => values.attachments.findIndex((item) => item.attachment_id === attachment.attachment_id) < 0,
-      )
-      .map((attachment) => attachment.attachment_id)
-
-    const postData: InquiryStep3Dto = {
-      fe_token: quoteId,
-      customer_comment: values.comment,
-      customer_attachments: values.attachments.filter((item) => !item.attachment_id),
-      remove_attachment_ids: removeAttachmentIds,
-    }
-
-    trackPromise(
-      updateInquiryStep3Service(postData).then((res) => {
-        if (res.success) {
-          afterUpdateQuoteDetails()
-        } else {
-          toast(res.message)
-        }
-      }),
-    )
-  }
-
-  const updateInquiryStep4 = (values: QuoteDetailsForm) => {
-    if (!quoteId) return
-
-    const postData: InquiryStep4Dto = {
-      fe_token: quoteId,
-      customer_f_name: (values.firstName || '').trim(),
-      customer_s_name: (values.lastName || '').trim(),
-      customer_phone: (values.phone || '').trim(),
-      customer_email: (values.email || '').trim(),
-    }
-
-    trackPromise(
-      updateInquiryStep4Service(postData).then((res) => {
-        if (res.success) {
-          afterUpdateQuoteDetails()
-        } else {
-          toast(res.message)
-        }
-      }),
-    )
-  }
-
-  const updateInquiryStep5 = (values: QuoteDetailsForm) => {
-    if (!quoteId || !quoteDetails) return
-
-    const removeRequestBookingIds = quoteDetails.request_booking
-      .filter(
-        (booking) =>
-          values.requestBookings.findIndex((item) => item.request_booking_id === booking.request_booking_id) < 0,
-      )
-      .map((booking) => booking.request_booking_id)
-
-    const postData: InquiryStep5Dto = {
-      fe_token: quoteId,
-      request_booking: values.requestBookings.filter((item) => !item.request_booking_id),
-      remove_request_booking_ids: removeRequestBookingIds,
-    }
-
-    trackPromise(
-      updateInquiryStep5Service(postData).then((res) => {
-        if (res.success) {
-          afterUpdateQuoteDetails()
-        } else {
-          toast(res.message)
-        }
-      }),
-    )
-  }
-
   const updateQuote = (values: QuoteDetailsForm) => {
     if (editMode && quoteDetails && quoteId) {
       const removeAttachmentIds = quoteDetails.customer_attachments
@@ -437,16 +265,9 @@ export const QuoteDetails: React.FC = ({}) => {
         )
         .map((attachment) => attachment.attachment_id)
 
-      const removeRequestBookingIds = quoteDetails.request_booking
-        .filter(
-          (booking) =>
-            values.requestBookings.findIndex((item) => item.request_booking_id === booking.request_booking_id) < 0,
-        )
-        .map((booking) => booking.request_booking_id)
-
-      const postData: UpdateQuoteDto = {
+      const postData: UpdateWonQuoteDto = {
         fe_token: quoteId,
-        // Step 1
+        // Address
         customer_address: {
           address_id: quoteDetails.delivery_address.address_id || 0,
           postcode: billingAddress?.postcode || '',
@@ -462,29 +283,22 @@ export const QuoteDetails: React.FC = ({}) => {
           district: billingAddress?.district || '',
           country: billingAddress?.country || '',
         },
-        working_place: values.workingPlace,
-        workshop_id: formik.values.workshopId,
-        // Step 2
-        glass_location: values.glassLocation,
-        inquiry_characteristics: values.characteristics,
-        // Step 3
+
+        // Comment and images
         customer_comment: values.comment,
         customer_attachments: values.attachments.filter((item) => !item.attachment_id),
         remove_attachment_ids: removeAttachmentIds,
-        // Step 4
+        // Personal info
         customer_f_name: (values.firstName || '').trim(),
         customer_s_name: (values.lastName || '').trim(),
         customer_phone: (values.phone || '').trim(),
         customer_email: (values.email || '').trim(),
-        // Step 5
-        request_booking: values.requestBookings.filter((item) => !item.request_booking_id),
-        remove_request_booking_ids: removeRequestBookingIds,
       }
 
       trackPromise(
-        updateQuoteService(postData).then((res) => {
+        updateWonQuoteService(postData).then((res) => {
           if (res.success) {
-            navigate(`/quote/${quoteId}`)
+            handleBackToSummaryClick()
           } else {
             toast(res.message)
           }
@@ -530,28 +344,28 @@ export const QuoteDetails: React.FC = ({}) => {
     }
 
     if (quoteDetails) {
-      // Step 1
+      // Location
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, quoteDetails.registration_number)
       handleChangeBillingAddress(quoteDetails.delivery_address)
       formik.setFieldValue(FormFieldIds.WORKING_PLACE, quoteDetails.working_place)
       formik.setFieldValue(FormFieldIds.WORKSHOP_ID, quoteDetails.workshop.id)
 
-      // Step 2
+      // Glass
       const selectedWindows = quoteDetails.glass_location || []
       if (selectedWindows.length > 0) {
         formik.setFieldValue(FormFieldIds.GLASS_LOCATION, selectedWindows)
       }
-      // Step 3
+      // Comment and images
       formik.setFieldValue(FormFieldIds.COMMENT, quoteDetails.customer_comment)
       formik.setFieldValue(FormFieldIds.ATTACHMENTS, quoteDetails.customer_attachments)
 
-      // Step 4
+      // Personal info
       formik.setFieldValue(FormFieldIds.FIRST_NAME, quoteDetails.customer_f_name)
       formik.setFieldValue(FormFieldIds.LAST_NAME, quoteDetails.customer_s_name)
       formik.setFieldValue(FormFieldIds.PHONE, quoteDetails.customer_phone)
       formik.setFieldValue(FormFieldIds.EMAIL, quoteDetails.customer_email)
 
-      // Step 5
+      // Booking time
       formik.setFieldValue(FormFieldIds.BOOKING_ENABLED, !!quoteDetails.request_booking.length)
       formik.setFieldValue(FormFieldIds.REQUEST_BOOKINGS, quoteDetails.request_booking)
     }
@@ -682,6 +496,15 @@ export const QuoteDetails: React.FC = ({}) => {
 
           <Box
             className='tab-content'
+            sx={{ height: activePage === EditQuotePage.DATE_LOCATION ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
+          >
+            <div className='padding-48'></div>
+            <section>{!!quoteDetails && <QuoteDateLocation quoteDetails={quoteDetails} />}</section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content'
             sx={{ height: activePage === EditQuotePage.DATE ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
             <div className='padding-32'></div>
@@ -804,7 +627,7 @@ export const QuoteDetails: React.FC = ({}) => {
 
           <div className='padding-64'></div>
 
-          {activePage !== EditQuotePage.BOOKING_CANCELLED && (
+          {activePage !== EditQuotePage.BOOKING_CANCELLED && activePage !== EditQuotePage.DATE_LOCATION && (
             <Box
               sx={{
                 position: 'fixed',

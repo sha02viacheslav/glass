@@ -66,12 +66,12 @@ export const QuoteOverview: React.FC<QuoteOverviewProps> = ({ selectedCarType, q
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography sx={{ fontWeight: '600', lineHeight: '140%' }}>Broken glass details</Typography>
-          <CardMedia
+          {/* <CardMedia
             component='img'
             sx={{ width: 24, height: 24, cursor: 'pointer' }}
             image={process.env.PUBLIC_URL + '/images/chevron-right.svg'}
             onClick={() => onEdit(EditQuotePage.GLASS)}
-          />
+          /> */}
         </Box>
         <Box sx={{ marginTop: 3, height: '64px', overflow: 'hidden' }}>
           <WindowSelector
