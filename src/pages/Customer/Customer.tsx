@@ -29,7 +29,7 @@ import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
 import { INQUIRY_STEPS } from '@glass/constants'
-import { BeforeAfterType, CarType, InquiryStep, WorkingPlace } from '@glass/enums'
+import { BeforeAfterType, CarType, InquiryStep, OrderState, WorkingPlace } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import {
   Address,
@@ -239,7 +239,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         if (editMode) {
           updateQuote(formik.values)
-        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        } else if (inquiry?.order_state === OrderState.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep1(formik.values)
@@ -254,7 +254,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         if (editMode) {
           updateQuote(formik.values)
-        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        } else if (inquiry?.order_state === OrderState.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep2(formik.values)
@@ -264,7 +264,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       case InquiryStep.STEP3: {
         if (editMode) {
           updateQuote(formik.values)
-        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        } else if (inquiry?.order_state === OrderState.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep3(formik.values)
@@ -291,7 +291,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         if (editMode) {
           updateQuote(formik.values)
-        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        } else if (inquiry?.order_state === OrderState.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep4(formik.values)
@@ -306,7 +306,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         }
         if (editMode) {
           updateQuote(formik.values)
-        } else if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+        } else if (inquiry?.order_state === OrderState.FINAL_CHECK) {
           updateInquiryFinalCheck(formik.values)
         } else {
           updateInquiryStep5(formik.values)
@@ -321,7 +321,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   const afterUpdateInquiryStep = () => {
     getInquiry().then(() => {
-      if (inquiry?.order_state === InquiryStep.FINAL_CHECK) {
+      if (inquiry?.order_state === OrderState.FINAL_CHECK) {
         handleBackToSummaryClick()
       } else {
         goNext()
@@ -669,9 +669,21 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
 
   useEffect(() => {
     if (inquiry) {
+      switch (inquiry.order_state) {
+        case OrderState.NEW:
+        case OrderState.OPEN:
+        case OrderState.PAYMENT_IN_1H:
+        case OrderState.PAYMENT_IN_1H_EXPIRED:
+        case OrderState.CONFIRM:
+        case OrderState.WON:
+        case OrderState.LOST:
+          navigate(`/quote/${inquiry.fe_token}`)
+          return
+      }
+
       // Step 1
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, licenseSearchVal)
-      setActiveStep(inquiry.order_state)
+      setActiveStep(inquiry.order_state as unknown as InquiryStep)
       if (inquiry.step_1.delivery_address?.postcode) handleChangeBillingAddress(inquiry.step_1.delivery_address)
       formik.setFieldValue(FormFieldIds.WORKING_PLACE, inquiry.step_1.working_place)
       formik.setFieldValue(FormFieldIds.WORKSHOP_ID, inquiry.step_1.workshop_id)
@@ -1040,7 +1052,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             )}
 
             {/* Update final check */}
-            {inquiry?.order_state === InquiryStep.FINAL_CHECK && activeStep !== InquiryStep.FINAL_CHECK && (
+            {inquiry?.order_state === OrderState.FINAL_CHECK && activeStep !== InquiryStep.FINAL_CHECK && (
               <>
                 <button className='btn-transparent' type='button' onClick={handleBackToSummaryClick}>
                   Back to Summary
@@ -1061,7 +1073,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             )}
 
             {/* Inquiry is in progress */}
-            {!editMode && inquiry?.order_state !== InquiryStep.FINAL_CHECK && (
+            {!editMode && inquiry?.order_state !== OrderState.FINAL_CHECK && (
               <>
                 <div>
                   {activeStep === InquiryStep.STEP1 && formik.values.workingPlace === WorkingPlace.WORKSHOP && (

@@ -1,6 +1,6 @@
 import { Address } from './address.model'
 import { Attachment } from './attachment.model'
-import { InquiryStep } from '../enums/inquiry-step.enum'
+import { OrderState } from '../enums/order-state.enum'
 import { WorkingPlace } from '../enums/working-place.enum'
 
 export type Characteristic = {
@@ -24,7 +24,7 @@ export type Inquiry = {
   Range: string
   request_phone_number: string
   fe_token: string
-  order_state: InquiryStep
+  order_state: OrderState
   step_1: {
     registration_number: string
     vehicle_logo_url: string
