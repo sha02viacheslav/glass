@@ -11,6 +11,7 @@ import {
   getAskedTint,
   getAskedVan,
   getVanBodyType,
+  setAskedTint,
   setAskedVan,
   setVanBodyType,
 } from '@glass/utils/session/session.util'
@@ -41,14 +42,14 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 }) => {
   // display popup
   const [showSelectGlassGuide, setShowSelectGlassGuide] = useState<boolean>(true)
-  const [showTintedConfirm, setShowTintedConfirm] = useState<boolean>(false)
+  const [showTintedPopup, setShowTintedPopup] = useState<boolean>(false)
   // determine if back windows are tinted
   const [tinted, setTinted] = useState(false)
 
   // determine if body is tailgater or barn door for the vans
   const [bodyValue, setBodyValue] = useState(getVanBodyType())
   const [isBarnDoor, setIsBarnDoor] = useState(false)
-  const [bodyPopupConfirm, setBodyPopupConfirm] = useState(getAskedVan())
+  const [bodyConfirmed, setBodyConfirmed] = useState(getAskedVan())
   const [showBodyPopup, setShowBodyPopup] = useState(false)
 
   // toggle first time popup appears, popup should show just once
@@ -78,7 +79,27 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       case CarType.TAILGATER:
         return '44px'
     }
+    return ''
   }, [carType])
+
+  const isVan = useMemo(() => {
+    return carType == CarType.BARN || carType == CarType.TAILGATER
+  }, [carType])
+
+  const needHelp = useMemo(() => {
+    let isExistHelpKey = false
+    const keys = Object.keys(characteristics)
+    for (let ii = 0; ii < keys.length; ii++) {
+      const value = characteristics[keys[ii]][activeQuestionIndex[keys[ii]]]
+      if (value) {
+        const questionName = value.name.toLowerCase() || ''
+        isExistHelpKey = questionName.includes('laminated') || questionName.includes('tempered')
+        if (isExistHelpKey) break
+      }
+    }
+
+    return isExistHelpKey
+  }, [activeQuestionIndex, characteristics])
 
   const dispatchSelected = (selected: string[]) => {
     // update tinted windows in selectedWindows array as not tinted
@@ -95,12 +116,13 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     } else {
       index = brokenWindows.findIndex((element) => element.window === windowClicked)
     }
+    const alreadySelected = brokenWindows[index].broken
     // display popup if a window which can be tinted is clicked for the first time
     if (!tintedConfirmed && brokenWindows[index].hasTinted) {
-      setShowTintedConfirm(true)
+      setShowTintedPopup(true)
       return // don't allow back window selecting if popup is still active
     } else if (
-      !bodyPopupConfirm &&
+      !bodyConfirmed &&
       (carType == CarType.BARN || carType == CarType.TAILGATER) &&
       brokenWindows[index].window === WinLoc.REAR
     ) {
@@ -109,7 +131,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       return
     }
     // add to array which is sent to customer page
-    if (brokenWindows[index].broken) {
+    if (alreadySelected) {
       const index2 = selectedWindows.findIndex((element) => element === brokenWindows[index].name)
       const index3 = selectedWindows.findIndex(
         (element) => element === brokenWindows[index].name.concat(' non-privacy'),
@@ -143,7 +165,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   // handle tinted toggle button
-  const tintedButtonHandle = (newValue: boolean) => {
+  const handleChangeTint = (newValue: boolean) => {
     setTinted(newValue)
     if (!newValue) {
       // update tinted windows in brokenWindows array as not tinted
@@ -158,7 +180,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       }
       dispatchSelected(selectedWindows)
     }
-    setTintedConfirmed(true)
     setBrokenWindows(brokenWindows.slice())
     getCharacteristics()
   }
@@ -216,23 +237,28 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     getCharacteristics()
   }
 
-  // handle popup for bodyType
+  const handleTintPopup = (isTintValue: boolean) => {
+    setTinted(isTintValue)
+    setShowTintedPopup(false)
+    setTintedConfirmed(true)
+    setAskedTint()
+    handleChangeTint(isTintValue)
+  }
+
   const handleBodyPopup = (isBarn: boolean) => {
     setIsBarnDoor(isBarn)
     setShowBodyPopup(false)
-    setBodyPopupConfirm(true)
-    bodyChange(isBarn)
+    setBodyConfirmed(true)
     setAskedVan()
+    bodyChange(isBarn)
   }
-
-  const isVan = useMemo(() => {
-    return carType == CarType.BARN || carType == CarType.TAILGATER
-  }, [carType])
 
   const checkIfPreviouslySelected = (selection: string) => {
     // currently not working with tinted windows
     if (selection.includes(' privacy')) {
-      tintedButtonHandle(true)
+      setTinted(true)
+      setAskedTint()
+      setTintedConfirmed(true)
     }
     const index = brokenWindows.findIndex(
       (element) => element.name === selection.replace(' non-privacy', '').replace(' privacy', ''),
@@ -299,31 +325,26 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     }
   }, [selectedGlasses])
 
-  const needHelp = useMemo(() => {
-    let isExistHelpKey = false
-    const keys = Object.keys(characteristics)
-    for (let ii = 0; ii < keys.length; ii++) {
-      const value = characteristics[keys[ii]][activeQuestionIndex[keys[ii]]]
-      if (value) {
-        const questionName = value.name.toLowerCase() || ''
-        isExistHelpKey = questionName.includes('laminated') || questionName.includes('tempered')
-        if (isExistHelpKey) break
-      }
-    }
-
-    return isExistHelpKey
-  }, [activeQuestionIndex, characteristics])
-
   return (
     <div>
       <div className={styles.container}>
-        {/* display popup */}
+        {showTintedPopup && (
+          <ConfirmDialog
+            title='Tinted Back Window'
+            description='Are you sure back windows tinted?'
+            showIcon={false}
+            confirmStr='Yes'
+            cancelStr='No'
+            onConfirm={() => handleTintPopup(true)}
+            onCancel={() => handleTintPopup(false)}
+          />
+        )}
 
-        {/* body type popup for vans */}
         {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
           <ConfirmDialog
             title='Rear Windows'
             description='Do you have one or two rear windows?'
+            showIcon={false}
             confirmStr='Two'
             cancelStr='One'
             onConfirm={() => handleBodyPopup(true)}
@@ -385,7 +406,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
       {!disabled && <HowToPick />}
 
-      {showTintedConfirm && (
+      {tintedConfirmed && (
         <Box
           sx={{
             display: 'flex',
@@ -411,14 +432,14 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             PRIVACY WINDOWS?
           </Typography>
 
-          <RadioGroup row value={tinted} onChange={(_, value) => tintedButtonHandle(value === 'true')}>
+          <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
             <FormControlLabel value={true} control={<Radio />} label='Yes' />
             <FormControlLabel value={false} control={<Radio />} label='No' />
           </RadioGroup>
         </Box>
       )}
 
-      {!disabled && isVan && (
+      {!disabled && isVan && bodyConfirmed && (
         <Box
           sx={{
             display: 'flex',
