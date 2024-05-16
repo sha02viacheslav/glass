@@ -30,8 +30,7 @@ import {
 import { customerLogService } from '@glass/services/apis/customer-log.service'
 import { getInvoicePdfService } from '@glass/services/apis/get-invoice-pdf.service'
 import { getPaymentAssistPlanService } from '@glass/services/apis/get-payment-assist-plan.service'
-import { updatePaymentMethod } from '@glass/services/apis/update-payment-mothod.service'
-import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
+import { updatePaymentMethod } from '@glass/services/apis/update-payment-method.service'
 import { paymentMethodButton } from '@glass/utils/payment-method-button/payment-method-button.util'
 import { paymentStatusText } from '@glass/utils/payment-status/payment-status-text.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
@@ -89,9 +88,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [showCashConfirm, setShowCashConfirm] = useState<boolean>(false)
   const [showEmailMissingPopup, setShowEmailMissingPopup] = useState<boolean>(false)
 
-  const months = useMemo<number>(() => {
-    return isFourMonths(totalPrice) ? 4 : 6
-  }, [totalPrice])
+  const months = 12
 
   const transactions = useMemo<PaTransaction[]>(() => {
     return quoteDetails?.payment_transaction?.[quoteDetails?.payment_method_type] || []
@@ -233,12 +230,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       !monthlyPayments
     ) {
       // retrieve payment assist plan data
-      getPaymentAssistPlanService(
-        qid,
-        isFourMonths(totalPrice)
-          ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
-          : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
-      ).then((res) => {
+      getPaymentAssistPlanService(qid, FixglassPaymentMethodTyp.ASSIST_12_PAYMENT).then((res) => {
         if (res.success) {
           setMonthlyPayments(res.data)
         }
@@ -249,9 +241,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const handleChangePaymentOption = (method: PaymentOptionEnum) => {
     setSelectedMethod(method)
     if (method === PaymentOptionEnum.MONTH_INSTALLMENT) {
-      handleChangePaymentMethodType(
-        isFourMonths(totalPrice) ? PaymentMethodType.ASSIST_FOUR_PAYMENT : PaymentMethodType.ASSIST_SIX_PAYMENT,
-      )
+      handleChangePaymentMethodType(PaymentMethodType.ASSIST_TWELVE_PAYMENT)
     }
     scrollToElementWithOffset('quote-card', -16)
   }
@@ -264,8 +254,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
     if (quoteDetails?.payment_method_type) {
       setPaymentMethodType(quoteDetails.payment_method_type)
       switch (quoteDetails.payment_method_type) {
-        case PaymentMethodType.ASSIST_FOUR_PAYMENT:
-        case PaymentMethodType.ASSIST_SIX_PAYMENT: {
+        case PaymentMethodType.ASSIST_TWELVE_PAYMENT: {
           setSelectedMethod(PaymentOptionEnum.MONTH_INSTALLMENT)
           break
         }

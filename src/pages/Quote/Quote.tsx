@@ -48,7 +48,6 @@ import { updateDeliveryAddressService } from '@glass/services/apis/update-delive
 import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
-import { isFourMonths } from '@glass/utils/is-four-months/is-four-months.util'
 import { scrollToElementWithOffset } from '@glass/utils/scroll-to-element/scroll-to-element.util'
 import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 
@@ -181,12 +180,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     // create payment API call
     if (id) {
       trackPromise(
-        beginPaymentAssistService(
-          id,
-          isFourMonths(totalPrice)
-            ? FixglassPaymentMethodTyp.ASSIST_4_PAYMENT
-            : FixglassPaymentMethodTyp.ASSIST_6_PAYMENT,
-        ).then((res) => {
+        beginPaymentAssistService(id, FixglassPaymentMethodTyp.ASSIST_12_PAYMENT).then((res) => {
           if (res.success) {
             window.open(res.data.url, '_blank', 'noreferrer')
             setPAUrl(res.data.url)
