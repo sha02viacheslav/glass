@@ -61,6 +61,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   const [activeQuestionIndex, setActiveQuestionIndex] = useState<Record<string, number>>({})
 
   const [characteristics, setCharacteristics] = useState<{ [key: string]: Characteristic[] }>({})
+  const [filteredCharacteristics, setFilteredCharacteristics] = useState<{ [key: string]: Characteristic[] }>({})
 
   const frontWindscreenTop = useMemo(() => {
     switch (carType) {
@@ -161,7 +162,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     dispatchSelected(selectedWindows)
     brokenWindows[index].broken = !brokenWindows[index].broken
     setBrokenWindows((windows) => windows.slice())
-    getCharacteristics()
   }
 
   // handle tinted toggle button
@@ -181,7 +181,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       dispatchSelected(selectedWindows)
     }
     setBrokenWindows(brokenWindows.slice())
-    getCharacteristics()
   }
 
   // switch between barn door and tailgater
@@ -234,7 +233,6 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
       }
     }
     dispatchSelected(selectedWindows)
-    getCharacteristics()
   }
 
   const handleTintPopup = (isTintValue: boolean) => {
@@ -269,8 +267,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
 
   const getCharacteristics = () => {
-    if (registrationNumber && selectedWindows?.length) {
-      getCharacteristicService(registrationNumber, selectedWindows).then((res) => {
+    if (registrationNumber) {
+      getCharacteristicService(registrationNumber).then((res) => {
         if (res.success) {
           setCharacteristics(res.data)
         }
@@ -282,20 +280,30 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
     if (!characteristics?.length) {
       getCharacteristics()
     }
-  }, [characteristics])
+  }, [registrationNumber])
 
   useEffect(() => {
     const characteristicsResult: Characteristic[] = []
     const initialActives: Record<string, number> = {}
-    Object.keys(characteristics).forEach((key) => {
-      characteristics[key].forEach((characteristic) => {
+    Object.keys(filteredCharacteristics).forEach((key) => {
+      filteredCharacteristics[key].forEach((characteristic) => {
         characteristicsResult.push({ ...characteristic })
       })
       initialActives[key] = 0
     })
     setActiveQuestionIndex(initialActives)
     onChangeCharacteristics(characteristicsResult)
-  }, [characteristics])
+  }, [filteredCharacteristics])
+
+  useEffect(() => {
+    const newCharacteristics: { [key: string]: Characteristic[] } = {}
+    Object.keys(characteristics)
+      .filter((key) => selectedGlasses?.findIndex((glass) => glass.includes(key)))
+      .forEach((key) => {
+        newCharacteristics[key] = characteristics[key]
+      })
+    setFilteredCharacteristics(newCharacteristics)
+  }, [characteristics, selectedGlasses])
 
   useEffect(() => {
     if (carType) {
@@ -472,10 +480,10 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
         </Box>
       )}
 
-      {Object.keys(characteristics).map((key) => (
+      {Object.keys(filteredCharacteristics).map((key) => (
         <Box key={key} sx={{ marginTop: 4 }}>
           {!disabled && (
-            <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', marginTop: 4 }}>
+            <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', pt: 4 }}>
               <Typography
                 sx={{
                   color: 'var(--Gray-600, #6A6B71)',
