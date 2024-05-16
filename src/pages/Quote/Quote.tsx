@@ -8,6 +8,7 @@ import moment from 'moment'
 import { trackPromise } from 'react-promise-tracker'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { EnumLoader } from 'src/core/enums/loader.enum'
 import { Chat } from '@glass/components/Chat'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -112,6 +113,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
             toast(res.message)
           }
         }),
+        EnumLoader.LOAD_QUOTE,
       )
     }
   }

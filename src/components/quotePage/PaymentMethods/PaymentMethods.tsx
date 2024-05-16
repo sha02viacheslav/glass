@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Box, Typography } from '@mui/material'
 import { trackPromise } from 'react-promise-tracker'
 import { useParams } from 'react-router-dom'
+import { EnumLoader } from 'src/core/enums/loader.enum'
 import { FullScreenModal } from '@glass/components/FullScreenModal'
 import { PaymentMethodType } from '@glass/enums'
 import { Installments } from '@glass/pages/Installments'
@@ -9,6 +10,7 @@ import { updatePaymentMethod } from '@glass/services/apis/update-payment-method.
 import { FourMonthsInstallment } from './FourMonthsInstallment'
 import { FullPayment } from './FullPayment'
 import { SixMonthsInstallment } from './SixMonthsInstallment'
+import { TwelveMonthsInstallment } from './TwelveMonthsInstallment'
 
 export type PaymentMethodsProps = {
   paymentMethodType: PaymentMethodType
@@ -35,6 +37,7 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
             refetch()
           }
         }),
+        EnumLoader.PAYMENT_METHOD,
       )
     }
   }
@@ -60,6 +63,11 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           selected={paymentMethodType === PaymentMethodType.ASSIST_SIX_PAYMENT}
           totalPrice={totalPrice}
           onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.ASSIST_SIX_PAYMENT)}
+        />
+        <TwelveMonthsInstallment
+          selected={paymentMethodType === PaymentMethodType.ASSIST_TWELVE_PAYMENT}
+          totalPrice={totalPrice}
+          onSelect={() => handleConfirmChangePaymentMethodType(PaymentMethodType.ASSIST_TWELVE_PAYMENT)}
         />
         <FullPayment
           selected={paymentMethodType === PaymentMethodType.STRIPE}

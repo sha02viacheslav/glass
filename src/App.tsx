@@ -38,6 +38,8 @@ export const LoadingIndicator: React.FC = () => {
   })
   const { promiseInProgress: GENERATING_PLAN_URL } = usePromiseTracker({ area: EnumLoader.GENERATING_PLAN_URL })
   const { promiseInProgress: RESET_QUOTE } = usePromiseTracker({ area: EnumLoader.RESET_QUOTE })
+  const { promiseInProgress: PAYMENT_METHOD } = usePromiseTracker({ area: EnumLoader.PAYMENT_METHOD })
+  const { promiseInProgress: LOAD_QUOTE } = usePromiseTracker({ area: EnumLoader.LOAD_QUOTE })
   const { promiseInProgress } = usePromiseTracker()
   let title = undefined
   if (SAVE_INQUIRY) {
@@ -52,6 +54,10 @@ export const LoadingIndicator: React.FC = () => {
     title = 'Generating payment plan URL...'
   } else if (RESET_QUOTE) {
     title = 'Resetting quotation...'
+  } else if (PAYMENT_METHOD) {
+    title = 'Updating payment method...'
+  } else if (LOAD_QUOTE) {
+    title = 'Loading quotation...'
   }
   return (
     <Loader
@@ -62,7 +68,9 @@ export const LoadingIndicator: React.FC = () => {
         CANCEL_BOOKING ||
         UPDATE_PERSONAL_INFO_ADDRESS ||
         GENERATING_PLAN_URL ||
-        RESET_QUOTE
+        RESET_QUOTE ||
+        PAYMENT_METHOD ||
+        LOAD_QUOTE
       }
       title={title}
     />

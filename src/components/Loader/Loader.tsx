@@ -1,5 +1,6 @@
 import React from 'react'
-import { ThreeCircles } from 'react-loader-spinner'
+import { Box, Typography } from '@mui/material'
+import { ColorRing } from 'react-loader-spinner'
 
 type LoaderProps = {
   loading: boolean
@@ -25,25 +26,45 @@ export const Loader: React.FC<LoaderProps> = ({ loading, title = 'Loading... Ple
         justifyContent: 'center',
       }}
     >
-      <div
-        style={{
+      <Box
+        sx={{
           left: 0,
           top: 0,
           width: '100%',
-          maxWidth: '192px',
+          maxWidth: '240px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 999,
           backgroundColor: '#020E21',
-          borderRadius: 4,
-          padding: 16,
+          borderRadius: 1,
+          px: 6,
+          py: 4,
         }}
       >
-        <ThreeCircles visible={true} color='#9557E8' height='80' width='80' />
-        <div className='text-white text-center mt-3'>{title}</div>
-      </div>
+        <ColorRing
+          visible={true}
+          height='80'
+          width='80'
+          ariaLabel='color-ring-loading'
+          wrapperStyle={{}}
+          wrapperClass='color-ring-wrapper'
+          colors={['#fff', '#fff', '#fff', '#fff', '#fff']}
+        />
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: '#FFF',
+            fontSize: '18px',
+            fontWeight: '700',
+            lineHeight: 'normal',
+            mt: 2,
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
     </div>
   ) : (
     <></>

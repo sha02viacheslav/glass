@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react'
 import { Box, Radio, Typography } from '@mui/material'
 
-export type SixMonthsInstallmentProps = {
+export type TwelveMonthsInstallmentProps = {
   selected: boolean
   totalPrice: number
   onSelect: () => void
 }
 
-const MONTHS = 6
+const MONTHS = 12
 
-export const SixMonthsInstallment: React.FC<SixMonthsInstallmentProps> = ({ selected, totalPrice, onSelect }) => {
+export const TwelveMonthsInstallment: React.FC<TwelveMonthsInstallmentProps> = ({ selected, totalPrice, onSelect }) => {
   const monthlyPrice = useMemo<number>(() => {
     return +(totalPrice / MONTHS).toFixed(2)
   }, [totalPrice])

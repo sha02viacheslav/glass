@@ -111,7 +111,14 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
   return (
     <form>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>
-        {timeLeft > 0 ? (
+        {timeLeft < 0 ? (
+          <ExpiredDialog
+            quoteDetails={quoteDetails}
+            onConfirm={() => {
+              handleClickReset()
+            }}
+          ></ExpiredDialog>
+        ) : (
           <Box
             sx={{
               p: 3,
@@ -134,13 +141,6 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
               </Typography>
             </Box>
           </Box>
-        ) : (
-          <ExpiredDialog
-            quoteDetails={quoteDetails}
-            onConfirm={() => {
-              handleClickReset()
-            }}
-          ></ExpiredDialog>
         )}
         <Box sx={{ paddingX: 3, py: 4, borderRadius: '2px', background: '#fff' }}>
           <Typography
