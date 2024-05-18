@@ -63,6 +63,7 @@ import { updateQuoteService } from '@glass/services/apis/update-quote.service'
 import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index'
 import { EditQuoteHeader } from './EditQuoteHeader'
 import { FinalCheck } from './FinalCheck'
+import { QuoteActiveDialog } from './QuoteActiveDialog'
 import { WorkshopCard } from './WorkshopCard'
 import { LiveService } from '../Home/LiveService'
 
@@ -176,6 +177,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [modalMap, setModalMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
+  const [showQuoteActivePopup, setShowQuoteActivePopup] = useState<boolean>(false)
 
   const selectedWorkshop = useMemo(() => {
     const workshopId = formik.values.workshopId
@@ -677,7 +679,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         case OrderState.CONFIRM:
         case OrderState.WON:
         case OrderState.LOST:
-          navigate(`/quote/${inquiry.fe_token}`)
+          setShowQuoteActivePopup(true)
           return
       }
 
@@ -1122,6 +1124,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         )}
         {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
       </div>
+
+      {showQuoteActivePopup && !!inquiry && (
+        <QuoteActiveDialog
+          customerFirstName={inquiry.step_4.customer_f_name}
+          onConfirm={() => navigate(`/quote/${inquiry.fe_token}`)}
+        />
+      )}
     </>
   )
 }
