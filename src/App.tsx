@@ -170,7 +170,11 @@ export const App: React.FC = () => {
   const [showFooter, setShowFooter] = useState<boolean>(true)
 
   useEffect(() => {
-    setShowHeader(!location.pathname.startsWith('/customer/edit') && !location.pathname.startsWith('/quote-details'))
+    setShowHeader(
+      !location.pathname.startsWith('/customer/edit') &&
+        !location.pathname.startsWith('/quote') &&
+        !location.pathname.startsWith('/quote-details'),
+    )
     setShowMenu(
       !location.pathname.startsWith('/quote') &&
         !location.pathname.startsWith('/inquiry-intro') &&

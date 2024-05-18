@@ -46,6 +46,7 @@ import { slot2Time } from '@glass/utils/slot-to-time/slot-to-time.util'
 import { NewQuote } from './NewQuote'
 import { OpenQuote } from './OpenQuote'
 import { QuoteCheckout } from './QuoteCheckout'
+import { QuoteHeader } from './QuoteHeader'
 import { QuoteInstallmentPayment } from './QuoteInstallmentPayment'
 import { QuoteOptions } from './QuoteOptions'
 import { QuoteStripePayment } from './QuoteStripePayment'
@@ -468,369 +469,377 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   }, [snapValue, timeSlot, paymentOption, quoteDetails?.invoice_data])
 
   return (
-    <Box sx={{ paddingTop: 22 }}>
-      {!!quoteDetails && (
-        <>
-          {snapValue === QuoteStep.NEW && <NewQuote quoteDetails={quoteDetails} />}
+    <>
+      {!!id && <QuoteHeader quoteId={id} quoteStep={snapValue} quoteDetails={quoteDetails} />}
 
-          {snapValue === QuoteStep.OPEN && (
-            <OpenQuote quoteDetails={quoteDetails} onContinue={() => setSeeQuoteClicked(true)} />
-          )}
+      <Box sx={{ paddingTop: 21 }}>
+        {!!quoteDetails && (
+          <>
+            {snapValue === QuoteStep.NEW && <NewQuote quoteDetails={quoteDetails} />}
 
-          {snapValue === QuoteStep.OPTIONS && (
-            <QuoteOptions
-              quoteDetails={quoteDetails}
-              refetch={() => {
-                getQuote()
-              }}
-            />
-          )}
+            {snapValue === QuoteStep.OPEN && (
+              <OpenQuote quoteDetails={quoteDetails} onContinue={() => setSeeQuoteClicked(true)} />
+            )}
 
-          {snapValue === QuoteStep.CHECKOUT && (
-            <QuoteCheckout
-              quoteDetails={quoteDetails}
-              refetch={() => {
-                getQuote()
-              }}
-              onContinue={() => setGoToPaymentClicked(true)}
-              onBack={() => setSnapValue(QuoteStep.OPTIONS)}
-            />
-          )}
+            {snapValue === QuoteStep.OPTIONS && (
+              <QuoteOptions
+                quoteDetails={quoteDetails}
+                refetch={() => {
+                  getQuote()
+                }}
+              />
+            )}
 
-          {snapValue === QuoteStep.PAYMENT && (
-            <>
-              {quoteDetails.payment_method_type === PaymentMethodType.STRIPE ? (
-                <QuoteStripePayment
-                  quoteDetails={quoteDetails}
-                  totalPrice={totalPrice}
-                  onBack={() => setGoToPaymentClicked(false)}
-                  onSucceed={() => getQuote()}
-                />
-              ) : (
-                <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
-              )}
-            </>
-          )}
+            {snapValue === QuoteStep.CHECKOUT && (
+              <QuoteCheckout
+                quoteDetails={quoteDetails}
+                refetch={() => {
+                  getQuote()
+                }}
+                onContinue={() => setGoToPaymentClicked(true)}
+                onBack={() => setSnapValue(QuoteStep.OPTIONS)}
+              />
+            )}
 
-          {snapValue === QuoteStep.TRACKING && <QuoteTracking quoteDetails={quoteDetails} />}
-
-          {snapValue === QuoteStep.TIME_SLOT && (
-            <div className='quote-page px-3 px-md-0'>
-              <section className='sec-title'>
-                <div className='container'>
-                  <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Your Quote</h1>
-                </div>
-              </section>
-
-              <div className='center'>
-                <div className='quote-info-main'>
-                  {isBlink && (
-                    <Tooltip disableFocusListener title='Booking confirmed'>
-                      <div className='client-info-blink'>-</div>
-                    </Tooltip>
-                  )}
-                  <div id='scroll-to-top' className='d-flex flex-column'>
-                    <div className='w-100 p-3 bg-grey'>
-                      <div className='fnt-20 fnt-md-28 text-primary'>Registry</div>
-                      <div className='fnt-14 fnt-md-16 text-grey mt-2'>
-                        {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
-                        <br />
-                        {formatAddress(quoteDetails?.invoice_address)}
-                        <br />
-                        {quoteDetails?.customer_email} {quoteDetails?.customer_phone}
-                      </div>
-                    </div>
-
-                    <div className='w-100 p-3'>
-                      <LicensePlate
-                        disabled={true}
-                        placeholderVal={'ENTER REG'}
-                        licenseNumber={tempLicenseNum}
-                        showSearch={false}
-                      />
-                    </div>
-
-                    {quoteInfoOpen && (
-                      <>
-                        <div className='w-100 p-3'>
-                          <div className='fnt-20 fnt-md-28 text-primary'>Job Description</div>
-
-                          {!!quoteDetails &&
-                            quoteDetails.glass_location.map((element) => (
-                              <div key={element} className='fnt-14 fnt-md-16 text-grey mt-2'>
-                                <span className='text-primary'>
-                                  {element.charAt(0).toUpperCase() + element.slice(1)}
-                                </span>{' '}
-                                Repair • Tint
-                              </div>
-                            ))}
-                        </div>
-
-                        <div className='w-100 p-3 bg-grey'>
-                          <div className='fnt-20 fnt-md-28 text-primary'>Place of Intervention</div>
-                          <div className='fnt-14 fnt-md-16 text-grey mt-2'>
-                            {quoteDetails?.working_place === WorkingPlace.MOBILE ? (
-                              <>
-                                <span className='text-primary'>At Your Home/Work</span>{' '}
-                                {formatAddress(quoteDetails?.delivery_address)}
-                              </>
-                            ) : (
-                              <>
-                                <span className='text-primary'>At Workshop</span> {quoteDetails?.workshop?.name}{' '}
-                                {quoteDetails?.workshop?.address}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className='d-flex justify-content-between align-items-center p-3'>
-                    <div className='d-flex align-items-center gap-3'>
-                      <button className='btn-raised round position-relative' onClick={backToCustomer}>
-                        Edit
-                      </button>
-
-                      {emailMissing && <span className='email-missing-error'>Add Email here</span>}
-                    </div>
-                    <button className='btn-icon' onClick={() => setInfoOpen((prev) => !prev)}>
-                      {quoteInfoOpen ? <KeyboardArrowUp /> : <UnfoldMore />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {!quoteDetails?.is_published && (
-                <div className='center'>
-                  <h2 className='thank-you-header'>Thank you!</h2>
-                  <h1 className='extra-info'>We are preparing the quote...</h1>
-                  <img
-                    className='working-gif'
-                    src='https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif'
-                    alt=''
+            {snapValue === QuoteStep.PAYMENT && (
+              <>
+                {quoteDetails.payment_method_type === PaymentMethodType.STRIPE ? (
+                  <QuoteStripePayment
+                    quoteDetails={quoteDetails}
+                    totalPrice={totalPrice}
+                    onBack={() => setGoToPaymentClicked(false)}
+                    onSucceed={() => getQuote()}
                   />
-                </div>
-              )}
+                ) : (
+                  <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
+                )}
+              </>
+            )}
 
-              <div className='center'>
-                <div className='scroll-container'>
-                  {/* select offer / payment method */}
-                  {!!quoteDetails && (
-                    <div className='quote-card mt-5'>
-                      <OrderInformation
-                        offerDetails={quoteDetails.is_published ? offersDetails : [EMPTY_OFFER]}
-                        optionalOrderLines={quoteDetails.is_published ? optionalOrderLines : []}
-                        quoteDetails={quoteDetails}
-                        qid={id}
-                        totalPrice={quoteDetails.is_published ? totalPrice : 0}
-                        totalUnitPrice={quoteDetails.is_published ? totalUnitPrice : 0}
-                        onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
-                      />
+            {snapValue === QuoteStep.TRACKING && <QuoteTracking quoteDetails={quoteDetails} />}
 
-                      {((!quoteDetails?.booking_date && !quoteDetails.request_booking_date) || editBooking) && (
-                        <TimeSelection />
-                      )}
+            {snapValue === QuoteStep.TIME_SLOT && (
+              <div className='quote-page px-3 px-md-0'>
+                <section className='sec-title'>
+                  <div className='container'>
+                    <h1 className='fnt-48 fnt-md-60 fw-n text-primary px-md-5'>Your Quote</h1>
+                  </div>
+                </section>
 
-                      <PaymentMethod
-                        quoteDetails={{
-                          ...quoteDetails,
-                          c_address: formatAddress(quoteDetails?.delivery_address, false),
-                          c_postalcode: quoteDetails?.delivery_address?.postcode || '',
-                        }}
-                        qid={id}
-                        totalPrice={quoteDetails.is_published ? totalPrice : 0}
-                        payAssist={payAssistToParent}
-                        refetchQuote={getQuote}
-                        PADataToParent={PADataToParent}
-                        PAUrl={PAUrl}
-                        handleChangePaymentMethod={handleChangePaymentMethod}
-                        handleShowEmailMissing={() => {
-                          setEmailMissing(true)
-                          scrollToElementWithOffset('scroll-to-top')
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {!!quoteDetails && (
-                    <div className='quote-card mt-5'>
-                      {(!!quoteDetails?.booking_date || !!quoteDetails?.request_booking_date) && !editBooking ? (
-                        <div className='booking-info text-center bg-primary text-white p-4'>
-                          {!!quoteDetails?.booking_date && (
-                            <>
-                              <h1 className='fnt-20 fnt-md-28 mb-4'>You are booked in!</h1>
-                              <div className='booking-address mb-4'>
-                                Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM YYYY')} from{' '}
-                                {slot2Time(quoteDetails.time_slot.split('_')?.[0])} to{' '}
-                                {slot2Time(quoteDetails.time_slot.split('_')?.[1])}
-                              </div>
-                            </>
-                          )}
-
-                          {!quoteDetails?.booking_date && !!quoteDetails?.request_booking_date && (
-                            <>
-                              <h1 className='mb-4'>Request sent, we are now reviewing it!</h1>
-                            </>
-                          )}
-
-                          {quoteDetails.working_place === WorkingPlace.MOBILE && (
-                            <div className='booking-address'>
-                              Booked in at{' '}
-                              {quoteDetails.delivery_address?.line_1 || quoteDetails.delivery_address?.line_2 || 'N/A'},{' '}
-                              {quoteDetails.delivery_address?.town_or_city || 'N/A'}{' '}
-                              {quoteDetails.delivery_address?.county || 'N/A'}{' '}
-                              {quoteDetails.delivery_address?.postcode || 'N/A'}
-                            </div>
-                          )}
-                          {quoteDetails.working_place === WorkingPlace.WORKSHOP && (
-                            <div className='booking-address'>Booked in at {quoteDetails.workshop_address || 'N/A'}</div>
-                          )}
-                          {quoteDetails?.order_state !== OrderState.WON && (
-                            <div className='d-flex justify-content-end mt-3'>
-                              <button className='btn-stroked round' onClick={() => setEditBooing(true)}>
-                                EDIT
-                              </button>
-                            </div>
-                          )}
+                <div className='center'>
+                  <div className='quote-info-main'>
+                    {isBlink && (
+                      <Tooltip disableFocusListener title='Booking confirmed'>
+                        <div className='client-info-blink'>-</div>
+                      </Tooltip>
+                    )}
+                    <div id='scroll-to-top' className='d-flex flex-column'>
+                      <div className='w-100 p-3 bg-grey'>
+                        <div className='fnt-20 fnt-md-28 text-primary'>Registry</div>
+                        <div className='fnt-14 fnt-md-16 text-grey mt-2'>
+                          {quoteDetails?.customer_f_name} {quoteDetails?.customer_s_name}
+                          <br />
+                          {formatAddress(quoteDetails?.invoice_address)}
+                          <br />
+                          {quoteDetails?.customer_email} {quoteDetails?.customer_phone}
                         </div>
-                      ) : (
+                      </div>
+
+                      <div className='w-100 p-3'>
+                        <LicensePlate
+                          disabled={true}
+                          placeholderVal={'ENTER REG'}
+                          licenseNumber={tempLicenseNum}
+                          showSearch={false}
+                        />
+                      </div>
+
+                      {quoteInfoOpen && (
                         <>
-                          <LocationSelection
-                            qid={id}
-                            quoteInfo={quoteDetails}
-                            deliveryAddressToParent={deliveryAddressToParent}
-                          />
-                          {(editBooking || timeSlotIsChanged || deliveryAddressIsChanged) && (
-                            <div className='d-flex justify-content-center gap-4 mb-4'>
-                              <button className='btn-stroked' onClick={() => handleCancelBookingChange()}>
-                                Cancel
-                              </button>
-                              {timeSlot?.isFull ? (
-                                <button className='btn-raised' onClick={() => handleRequestAvailability()}>
-                                  Request Availability
-                                </button>
+                          <div className='w-100 p-3'>
+                            <div className='fnt-20 fnt-md-28 text-primary'>Job Description</div>
+
+                            {!!quoteDetails &&
+                              quoteDetails.glass_location.map((element) => (
+                                <div key={element} className='fnt-14 fnt-md-16 text-grey mt-2'>
+                                  <span className='text-primary'>
+                                    {element.charAt(0).toUpperCase() + element.slice(1)}
+                                  </span>{' '}
+                                  Repair • Tint
+                                </div>
+                              ))}
+                          </div>
+
+                          <div className='w-100 p-3 bg-grey'>
+                            <div className='fnt-20 fnt-md-28 text-primary'>Place of Intervention</div>
+                            <div className='fnt-14 fnt-md-16 text-grey mt-2'>
+                              {quoteDetails?.working_place === WorkingPlace.MOBILE ? (
+                                <>
+                                  <span className='text-primary'>At Your Home/Work</span>{' '}
+                                  {formatAddress(quoteDetails?.delivery_address)}
+                                </>
                               ) : (
-                                <button className='btn-raised' onClick={() => handleConfirmBookingChange()}>
-                                  Confirm Booking
-                                </button>
+                                <>
+                                  <span className='text-primary'>At Workshop</span> {quoteDetails?.workshop?.name}{' '}
+                                  {quoteDetails?.workshop?.address}
+                                </>
                               )}
                             </div>
-                          )}
+                          </div>
                         </>
                       )}
                     </div>
-                  )}
+
+                    <div className='d-flex justify-content-between align-items-center p-3'>
+                      <div className='d-flex align-items-center gap-3'>
+                        <button className='btn-raised round position-relative' onClick={backToCustomer}>
+                          Edit
+                        </button>
+
+                        {emailMissing && <span className='email-missing-error'>Add Email here</span>}
+                      </div>
+                      <button className='btn-icon' onClick={() => setInfoOpen((prev) => !prev)}>
+                        {quoteInfoOpen ? <KeyboardArrowUp /> : <UnfoldMore />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Hide for now */}
-              {showButtons && (
-                <div className='accept-btn-container' id='accept-cont'>
-                  {quoteDetails?.order_state !== OrderState.WON && !!acceptBtn && (
-                    <button
-                      className='btn btn-purple-radius mb-3 quote-btn'
-                      onClick={() => handleSnapChange(acceptBtn)}
-                      id='accept-btn'
-                    >
-                      {acceptBtn}
-                    </button>
-                  )}
+                {!quoteDetails?.is_published && (
+                  <div className='center'>
+                    <h2 className='thank-you-header'>Thank you!</h2>
+                    <h1 className='extra-info'>We are preparing the quote...</h1>
+                    <img
+                      className='working-gif'
+                      src='https://media.tenor.com/6rG_OghPUKYAAAAM/so-busy-working.gif'
+                      alt=''
+                    />
+                  </div>
+                )}
+
+                <div className='center'>
+                  <div className='scroll-container'>
+                    {/* select offer / payment method */}
+                    {!!quoteDetails && (
+                      <div className='quote-card mt-5'>
+                        <OrderInformation
+                          offerDetails={quoteDetails.is_published ? offersDetails : [EMPTY_OFFER]}
+                          optionalOrderLines={quoteDetails.is_published ? optionalOrderLines : []}
+                          quoteDetails={quoteDetails}
+                          qid={id}
+                          totalPrice={quoteDetails.is_published ? totalPrice : 0}
+                          totalUnitPrice={quoteDetails.is_published ? totalUnitPrice : 0}
+                          onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
+                        />
+
+                        {((!quoteDetails?.booking_date && !quoteDetails.request_booking_date) || editBooking) && (
+                          <TimeSelection />
+                        )}
+
+                        <PaymentMethod
+                          quoteDetails={{
+                            ...quoteDetails,
+                            c_address: formatAddress(quoteDetails?.delivery_address, false),
+                            c_postalcode: quoteDetails?.delivery_address?.postcode || '',
+                          }}
+                          qid={id}
+                          totalPrice={quoteDetails.is_published ? totalPrice : 0}
+                          payAssist={payAssistToParent}
+                          refetchQuote={getQuote}
+                          PADataToParent={PADataToParent}
+                          PAUrl={PAUrl}
+                          handleChangePaymentMethod={handleChangePaymentMethod}
+                          handleShowEmailMissing={() => {
+                            setEmailMissing(true)
+                            scrollToElementWithOffset('scroll-to-top')
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {!!quoteDetails && (
+                      <div className='quote-card mt-5'>
+                        {(!!quoteDetails?.booking_date || !!quoteDetails?.request_booking_date) && !editBooking ? (
+                          <div className='booking-info text-center bg-primary text-white p-4'>
+                            {!!quoteDetails?.booking_date && (
+                              <>
+                                <h1 className='fnt-20 fnt-md-28 mb-4'>You are booked in!</h1>
+                                <div className='booking-address mb-4'>
+                                  Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM YYYY')} from{' '}
+                                  {slot2Time(quoteDetails.time_slot.split('_')?.[0])} to{' '}
+                                  {slot2Time(quoteDetails.time_slot.split('_')?.[1])}
+                                </div>
+                              </>
+                            )}
+
+                            {!quoteDetails?.booking_date && !!quoteDetails?.request_booking_date && (
+                              <>
+                                <h1 className='mb-4'>Request sent, we are now reviewing it!</h1>
+                              </>
+                            )}
+
+                            {quoteDetails.working_place === WorkingPlace.MOBILE && (
+                              <div className='booking-address'>
+                                Booked in at{' '}
+                                {quoteDetails.delivery_address?.line_1 ||
+                                  quoteDetails.delivery_address?.line_2 ||
+                                  'N/A'}
+                                , {quoteDetails.delivery_address?.town_or_city || 'N/A'}{' '}
+                                {quoteDetails.delivery_address?.county || 'N/A'}{' '}
+                                {quoteDetails.delivery_address?.postcode || 'N/A'}
+                              </div>
+                            )}
+                            {quoteDetails.working_place === WorkingPlace.WORKSHOP && (
+                              <div className='booking-address'>
+                                Booked in at {quoteDetails.workshop_address || 'N/A'}
+                              </div>
+                            )}
+                            {quoteDetails?.order_state !== OrderState.WON && (
+                              <div className='d-flex justify-content-end mt-3'>
+                                <button className='btn-stroked round' onClick={() => setEditBooing(true)}>
+                                  EDIT
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <>
+                            <LocationSelection
+                              qid={id}
+                              quoteInfo={quoteDetails}
+                              deliveryAddressToParent={deliveryAddressToParent}
+                            />
+                            {(editBooking || timeSlotIsChanged || deliveryAddressIsChanged) && (
+                              <div className='d-flex justify-content-center gap-4 mb-4'>
+                                <button className='btn-stroked' onClick={() => handleCancelBookingChange()}>
+                                  Cancel
+                                </button>
+                                {timeSlot?.isFull ? (
+                                  <button className='btn-raised' onClick={() => handleRequestAvailability()}>
+                                    Request Availability
+                                  </button>
+                                ) : (
+                                  <button className='btn-raised' onClick={() => handleConfirmBookingChange()}>
+                                    Confirm Booking
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
 
-              <div className='mt-5'>
-                <OurMethod beforeAfterImages={quoteDetails?.images_gallery} showTitle={false} />
+                {/* Hide for now */}
+                {showButtons && (
+                  <div className='accept-btn-container' id='accept-cont'>
+                    {quoteDetails?.order_state !== OrderState.WON && !!acceptBtn && (
+                      <button
+                        className='btn btn-purple-radius mb-3 quote-btn'
+                        onClick={() => handleSnapChange(acceptBtn)}
+                        id='accept-btn'
+                      >
+                        {acceptBtn}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className='mt-5'>
+                  <OurMethod beforeAfterImages={quoteDetails?.images_gallery} showTitle={false} />
+                </div>
+
+                {!!warningMsg && (
+                  <ConfirmDialog
+                    title='Error'
+                    description={warningMsg}
+                    showCancel={false}
+                    confirmStr='Ok'
+                    onConfirm={() => setWarningMsg('')}
+                  />
+                )}
+
+                {showConfirmBooking && (
+                  <ConfirmDialog
+                    title='Confirm Booking'
+                    description={
+                      <span className='text-left d-block'>
+                        Are you certain you want to make a booking for{' '}
+                        <strong>
+                          {moment(timeSlot?.booking_date).format('dddd, MMMM Do')}, between{' '}
+                          {moment(timeSlot?.booking_date)
+                            .add(timeSlot?.time_slot.split('_')?.[0], 'hours')
+                            .format('hh:mm A')}{' '}
+                          and{' '}
+                          {moment(timeSlot?.booking_date)
+                            .add(timeSlot?.time_slot.split('_')?.[1], 'hours')
+                            .format('hh:mm A')}
+                        </strong>
+                        ?
+                      </span>
+                    }
+                    onConfirm={() => {
+                      sendBookingData()
+                      setShowConfirmBooking(false)
+                    }}
+                    onCancel={() => setShowConfirmBooking(false)}
+                  />
+                )}
+
+                {showBookingMsg && (
+                  <ConfirmDialog
+                    title='You are booked in!'
+                    showIcon={false}
+                    description={
+                      <span className='text-left d-block'>
+                        Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM')} between{' '}
+                        {timeSlot?.time_slot.split('_')?.[0]} - {timeSlot?.time_slot.split('_')?.[1]}
+                        <br />
+                        {quoteDetails?.delivery_address?.line_1}, {quoteDetails?.delivery_address?.town_or_city},{' '}
+                        {quoteDetails?.delivery_address?.postcode}
+                      </span>
+                    }
+                    subDescription={
+                      <span className='text-left d-block'>
+                        <br />
+                        Job will take 1-2 hours to complete. <br />
+                        We need to test wipers and/or door glass movement.
+                        <br />
+                        <br />
+                        How can you help our work process and quality: <br />
+                        Make sure we have enough space to fully open your vehicle doors and we can park our mid-sized
+                        van next. If not enough space we have to move to different location. If needed, remove dashcam,
+                        empty dashboard and/or door pockets. It will help us vacuum the shattered glass. <br />
+                        Then just let us do the rest and we will notify you when all is done. <br />
+                        <br />
+                        Any question, call {PHONE_NUMBER}
+                      </span>
+                    }
+                    showCancel={false}
+                    confirmStr='Ok'
+                    onConfirm={() => setShowBookingMsg(false)}
+                  />
+                )}
+
+                {showRequestAvailabilityMsg && (
+                  <ConfirmDialog
+                    title='Request sent!'
+                    showIcon={false}
+                    description={<span className='text-left d-block'>We are now reviewing it</span>}
+                    showCancel={false}
+                    confirmStr='Ok'
+                    onConfirm={() => setShowRequestAvailabilityMsg(false)}
+                  />
+                )}
+
+                {!!quoteDetails && <Chat qid={id} />}
               </div>
-
-              {!!warningMsg && (
-                <ConfirmDialog
-                  title='Error'
-                  description={warningMsg}
-                  showCancel={false}
-                  confirmStr='Ok'
-                  onConfirm={() => setWarningMsg('')}
-                />
-              )}
-
-              {showConfirmBooking && (
-                <ConfirmDialog
-                  title='Confirm Booking'
-                  description={
-                    <span className='text-left d-block'>
-                      Are you certain you want to make a booking for{' '}
-                      <strong>
-                        {moment(timeSlot?.booking_date).format('dddd, MMMM Do')}, between{' '}
-                        {moment(timeSlot?.booking_date)
-                          .add(timeSlot?.time_slot.split('_')?.[0], 'hours')
-                          .format('hh:mm A')}{' '}
-                        and{' '}
-                        {moment(timeSlot?.booking_date)
-                          .add(timeSlot?.time_slot.split('_')?.[1], 'hours')
-                          .format('hh:mm A')}
-                      </strong>
-                      ?
-                    </span>
-                  }
-                  onConfirm={() => {
-                    sendBookingData()
-                    setShowConfirmBooking(false)
-                  }}
-                  onCancel={() => setShowConfirmBooking(false)}
-                />
-              )}
-
-              {showBookingMsg && (
-                <ConfirmDialog
-                  title='You are booked in!'
-                  showIcon={false}
-                  description={
-                    <span className='text-left d-block'>
-                      Arriving {moment(quoteDetails?.booking_date).format('dddd, DD MMMM')} between{' '}
-                      {timeSlot?.time_slot.split('_')?.[0]} - {timeSlot?.time_slot.split('_')?.[1]}
-                      <br />
-                      {quoteDetails?.delivery_address?.line_1}, {quoteDetails?.delivery_address?.town_or_city},{' '}
-                      {quoteDetails?.delivery_address?.postcode}
-                    </span>
-                  }
-                  subDescription={
-                    <span className='text-left d-block'>
-                      <br />
-                      Job will take 1-2 hours to complete. <br />
-                      We need to test wipers and/or door glass movement.
-                      <br />
-                      <br />
-                      How can you help our work process and quality: <br />
-                      Make sure we have enough space to fully open your vehicle doors and we can park our mid-sized van
-                      next. If not enough space we have to move to different location. If needed, remove dashcam, empty
-                      dashboard and/or door pockets. It will help us vacuum the shattered glass. <br />
-                      Then just let us do the rest and we will notify you when all is done. <br />
-                      <br />
-                      Any question, call {PHONE_NUMBER}
-                    </span>
-                  }
-                  showCancel={false}
-                  confirmStr='Ok'
-                  onConfirm={() => setShowBookingMsg(false)}
-                />
-              )}
-
-              {showRequestAvailabilityMsg && (
-                <ConfirmDialog
-                  title='Request sent!'
-                  showIcon={false}
-                  description={<span className='text-left d-block'>We are now reviewing it</span>}
-                  showCancel={false}
-                  confirmStr='Ok'
-                  onConfirm={() => setShowRequestAvailabilityMsg(false)}
-                />
-              )}
-
-              {!!quoteDetails && <Chat qid={id} />}
-            </div>
-          )}
-        </>
-      )}
-    </Box>
+            )}
+          </>
+        )}
+      </Box>
+    </>
   )
 }

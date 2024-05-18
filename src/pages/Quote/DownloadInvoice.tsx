@@ -16,7 +16,6 @@ export const DownloadInvoice: React.FC<DownloadInvoiceProps> = ({ quoteId }) => 
 
   const retrieveInvoice = () => {
     if (!quoteId) return
-    console.warn('quoteId', quoteId)
     trackPromise(
       getInvoicePdfService(quoteId)
         .then((res) => {

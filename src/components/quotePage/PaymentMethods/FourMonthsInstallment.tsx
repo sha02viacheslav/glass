@@ -21,6 +21,7 @@ export const FourMonthsInstallment: React.FC<FourMonthsInstallmentProps> = ({ se
         paddingX: 3,
         paddingY: 4,
         borderRadius: '4px',
+        border: selected ? '2px solid #225FC2' : '',
         background: '#FFF',
         boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
       }}

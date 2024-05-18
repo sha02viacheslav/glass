@@ -377,7 +377,7 @@ export const QuoteDetails: React.FC = ({}) => {
         <EditQuoteDetailsHeader title={steps[activePage].title} onBack={() => handleBackToSummaryClick()} />
       )}
 
-      <Box sx={{ pt: '56px' }}>
+      <Box sx={{ pt: '52px' }}>
         <form onSubmit={formik.handleSubmit}>
           <Box
             className='tab-content'

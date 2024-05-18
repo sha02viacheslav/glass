@@ -18,7 +18,7 @@ export const EditQuoteDetailsHeader: React.FC<EditQuoteDetailsHeaderProps> = ({ 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '20px 16px 10px',
+        padding: '18px 16px 10px',
         borderBottom: '2px solid var(--Gray-100, #F2F2F3)',
         background: '#fff',
       }}
@@ -34,7 +34,7 @@ export const EditQuoteDetailsHeader: React.FC<EditQuoteDetailsHeaderProps> = ({ 
         sx={{
           color: 'var(--Gray-600, #6A6B71)',
           fontWeight: '700',
-          lineHeight: '140%',
+          lineHeight: '22px',
         }}
       >
         {title}

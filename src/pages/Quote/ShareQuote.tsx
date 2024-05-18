@@ -7,7 +7,7 @@ import { FacebookShareButton, WhatsappShareButton, TelegramShareButton, EmailSha
 
 const TITLE_SHARE = 'Share Booking fix.glass'
 
-const ShareQuote: FC<{ url: string }> = ({ url }) => {
+export const ShareQuote: FC<{ url: string }> = ({ url }) => {
   const [show, setShow] = useState(false)
   const copyToClipboard = (text: string) => {
     navigator.clipboard
@@ -79,4 +79,3 @@ const ShareQuote: FC<{ url: string }> = ({ url }) => {
     </>
   )
 }
-export default ShareQuote

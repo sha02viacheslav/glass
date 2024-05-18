@@ -1,14 +1,13 @@
 import './Header.css'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Typography } from '@mui/material'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { CustomLink } from '@glass/components/Header/CustomLink'
 import { PHONE_NUMBER } from '@glass/constants'
 import { OrderState } from '@glass/enums'
 import { Quote } from '@glass/models'
 import { getQuoteService } from '@glass/services/apis/get-quote.service'
 import { getNotificationChecked, getQuoteId, setNotificationChecked } from '@glass/utils/session/session.util'
-import ShareQuote from './ShareQuote'
 
 export type HeaderProps = {
   showMenu: boolean
@@ -16,7 +15,6 @@ export type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const navigate = useNavigate()
-  const location = useLocation()
   const quoteId = getQuoteId()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [showNotification, setShowNotification] = useState<boolean>(!getNotificationChecked())
@@ -57,8 +55,6 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
       getQuote()
     }
   }, [quoteId])
-
-  const isQuotePage = useMemo(() => location.pathname.startsWith('/quote'), [location])
 
   return (
     <header className={'navbar-main' + (showMenu ? ' float' : '')}>
@@ -101,7 +97,6 @@ export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
                 )}
               </>
             )}
-            {quoteId && isQuotePage && <ShareQuote url={`${process.env.PUBLIC_URL}/quote/${quoteId}`} />}
           </div>
         </div>
 
