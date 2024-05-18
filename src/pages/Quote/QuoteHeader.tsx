@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { QuickCall } from '@glass/components/QuickCall/QuickCall'
 import { PaymentMethodType, QuoteStep } from '@glass/enums'
 import { Quote } from '@glass/models'
 import { ShareQuote } from './ShareQuote'
@@ -36,19 +37,22 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({ quoteId, quoteStep, qu
         />
       </Link>
 
-      <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontWeight: '700', lineHeight: '22px' }}>
-        {quoteStep === QuoteStep.NEW && 'Waiting for quote'}
-        {(quoteStep === QuoteStep.OPEN || quoteStep === QuoteStep.OPTIONS) && 'Quote is ready!'}
-        {quoteStep === QuoteStep.CHECKOUT && 'Payment option'}
-        {quoteStep === QuoteStep.PAYMENT &&
-          quoteDetails?.payment_method_type === PaymentMethodType.STRIPE &&
-          'Card details'}
-        {quoteStep === QuoteStep.PAYMENT &&
-          (quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_FOUR_PAYMENT ||
-            quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_SIX_PAYMENT ||
-            quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_TWELVE_PAYMENT) &&
-          'Installment plan details'}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontWeight: '700', lineHeight: '22px' }}>
+          {quoteStep === QuoteStep.NEW && 'Waiting for quote'}
+          {(quoteStep === QuoteStep.OPEN || quoteStep === QuoteStep.OPTIONS) && 'Quote is ready!'}
+          {quoteStep === QuoteStep.CHECKOUT && 'Payment option'}
+          {quoteStep === QuoteStep.PAYMENT &&
+            quoteDetails?.payment_method_type === PaymentMethodType.STRIPE &&
+            'Card details'}
+          {quoteStep === QuoteStep.PAYMENT &&
+            (quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_FOUR_PAYMENT ||
+              quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_SIX_PAYMENT ||
+              quoteDetails?.payment_method_type === PaymentMethodType.ASSIST_TWELVE_PAYMENT) &&
+            'Installment plan details'}
+        </Typography>
+        <QuickCall />
+      </Box>
 
       {quoteStep === QuoteStep.TRACKING && <ShareQuote url={`${process.env.PUBLIC_URL}/quote/${quoteId}`} />}
     </Box>

@@ -15,4 +15,5 @@ export enum OrderState {
   CONFIRM = 'confirm',
   WON = 'won',
   LOST = 'lost',
+  REQUEST_TO_CANCEL = 'request_to_cancel',
 }
