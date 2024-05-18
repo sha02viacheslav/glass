@@ -110,6 +110,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }
   // handle window selection
   const selectWindow = (windowClicked: WinLoc) => {
+    if (disabled) return
     let index = 0
     if ((windowClicked === 'r_rear' || windowClicked === 'l_rear') && !isBarnDoor) {
       // Special case for vans
