@@ -129,15 +129,17 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
   return (
     <form>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>
-        <Box sx={{ padding: 3, marginBottom: 6 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+        <Box sx={{ padding: 3, marginBottom: 6, background: '#fff' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <CardMedia
                 component='img'
                 sx={{ width: 20, height: 20 }}
                 image={process.env.PUBLIC_URL + '/images/account-blue.svg'}
               />
-              {quoteDetails.customer_f_name} {quoteDetails.customer_s_name}
+              <Typography sx={{ fontSize: '14px', lineHeight: '150%', whiteSpace: 'nowrap' }}>
+                {quoteDetails.customer_f_name} {quoteDetails.customer_s_name}
+              </Typography>
             </Box>
 
             <Box>
@@ -159,7 +161,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
                     lineHeight: '150%',
                   }}
                 >
-                  {quoteDetails?.make}
+                  {quoteDetails?.make} {quoteDetails?.model}
                 </Typography>
               </Box>
             </Box>

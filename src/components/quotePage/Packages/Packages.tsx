@@ -8,6 +8,8 @@ export type PackagesProps = {
   onCheckPackage: (value: number) => void
 }
 
+const MONTHS = 4
+
 export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheckPackage }) => {
   return (
     <>
@@ -81,7 +83,7 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
                 >
                   £
                 </Typography>
-                {+(packages[packageKey].quotation_package_price_total / 4).toFixed(2)} Upfront
+                {+(packages[packageKey].quotation_package_price_total / MONTHS).toFixed(2)} Upfront
               </Typography>
             </Box>
 
@@ -93,8 +95,8 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
                 marginTop: 4,
               }}
             >
-              Then pay 3x£100 a month or{' '}
-              <strong>total £{+packages[packageKey].quotation_package_price_total.toFixed(2)}</strong> (inc VAT).
+              Then pay {MONTHS - 1}x£{+(packages[packageKey].quotation_package_price_total / MONTHS).toFixed(2)} a month
+              or <strong>total £{+packages[packageKey].quotation_package_price_total.toFixed(2)}</strong> (inc VAT).
             </Typography>
           </Box>
         ))}

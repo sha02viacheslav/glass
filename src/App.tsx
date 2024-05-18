@@ -222,8 +222,8 @@ export const App: React.FC = () => {
             <Route path='/quote/in/:id' element={<QuotePage />} />
             <Route path='/quote/be/:id' element={<QuotePage quoteCount={false} />} />
             <Route path='/quote-details/:quoteId' element={<QuoteDetails />} />
-            <Route path='/payment/assist/success/:quoteId' element={<QuotePage />} />
-            <Route path='/payment/assist/failed/:quoteId' element={<QuotePage />} />
+            <Route path='/payment/assist/success/:id' element={<QuotePage />} />
+            <Route path='/payment/assist/failed/:id' element={<QuotePage />} />
           </Routes>
           {showQuickContact && <QuickContact showReg={showMenu} />}
           {showFooter && <Footer />}
