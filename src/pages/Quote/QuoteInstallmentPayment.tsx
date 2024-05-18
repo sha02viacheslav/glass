@@ -173,6 +173,10 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
     }
   }, [quoteDetails])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <form>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>

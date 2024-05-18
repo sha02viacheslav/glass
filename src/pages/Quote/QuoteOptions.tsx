@@ -126,6 +126,10 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
     }
   }, [quoteDetails])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <form>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>

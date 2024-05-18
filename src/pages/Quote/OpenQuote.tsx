@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Button, CardMedia, Typography } from '@mui/material'
 import moment from 'moment'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -37,6 +37,10 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
     const licenseReg = quoteDetails?.registration_number.replace(' ', '')
     navigate(`/customer/edit/${licenseReg}/${quoteId}/${step}`)
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   return (
     <>

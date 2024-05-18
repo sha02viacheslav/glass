@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -132,7 +132,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
     }),
   }))
 
-  function ColorStepIcon(props: StepIconProps) {
+  const ColorStepIcon = (props: StepIconProps) => {
     const { active, completed, className } = props
     const { isSmall, icon } = steps[props.icon as TrackingStep]
 
@@ -142,6 +142,10 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
       </ColorStepIconRoot>
     )
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   return (
     <form>

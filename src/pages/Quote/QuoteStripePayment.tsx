@@ -40,6 +40,10 @@ export const QuoteStripePayment: React.FC<QuoteStripePaymentProps> = ({
     }
   }, [quoteDetails])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <Box>
       <Box sx={{ paddingX: 4, marginBottom: 40 }}>
