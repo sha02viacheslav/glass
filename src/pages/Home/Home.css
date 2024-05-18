@@ -1,10 +1,103 @@
 .home .sec-banner {
   position: relative;
-  background: url(../../../public/images/home-banner.png) no-repeat;
-  background-size: cover;
   height: 100vh;
   display: flex;
   align-items: center;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.sec-background1 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: url(../../../public/images/home-banner1.jpeg) no-repeat;
+  background-size: cover;
+  background-position: 10% center;
+  animation: animatedBackground1 10s linear infinite;
+  z-index: -1;
+}
+
+@keyframes animatedBackground1 {
+  0% {
+    background-position: 10% center;
+  }
+  100% {
+    background-position: 58% center;
+  }
+}
+
+.sec-background2 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: url(../../../public/images/home-banner2.jpeg) no-repeat;
+  background-size: cover;
+  background-position: 8% center;
+  animation: animatedBackground2 10s linear infinite;
+  z-index: -1;
+}
+
+@keyframes animatedBackground2 {
+  0% {
+    background-position: 8% center;
+  }
+  100% {
+    background-position: 58% center;
+  }
+}
+
+.sec-background3 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: url(../../../public/images/home-banner3.jpeg) no-repeat;
+  background-size: auto 100%;
+  background-position: 54% center;
+  animation: animatedBackground3 10s linear infinite;
+  z-index: -1;
+}
+
+@keyframes animatedBackground3 {
+  0% {
+    background-size: auto 100%;
+  }
+  100% {
+    background-size: auto 130%;
+  }
+}
+
+.review-animation {
+  opacity: 1;
+  animation: animatedOpacity 10s linear infinite;
+}
+
+@keyframes animatedOpacity {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.content-animation {
+  transform: translateY(0);
+  animation: animatedContent 10s linear infinite;
+}
+
+@keyframes animatedContent {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-42px);
+  }
 }
 
 .home .sec-description {

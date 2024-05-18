@@ -21,6 +21,7 @@ import { Testimonials } from './Testimonials'
 export const Home: React.FC = () => {
   const navigate = useNavigate()
   const [licenseSearchVal, setLicense] = useState('')
+  const [animationStep, setAnimationStep] = useState<number>(0)
 
   const handleVehInputChange = (data: string | undefined) => {
     setLicense(formatLicenseNumber(data))
@@ -39,39 +40,55 @@ export const Home: React.FC = () => {
     localStorage.setItem('development version', JSON.stringify('1.1.7'))
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimationStep((prev) => (prev + 1) % 3)
+    }, 9000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className='home'>
       <section className='sec-banner'>
+        {animationStep === 0 && <div className='sec-background1'></div>}
+        {animationStep === 1 && <div className='sec-background2'></div>}
+        {animationStep === 2 && <div className='sec-background3'></div>}
+
         <div className='px-3 mt-auto'>
-          <div>
+          <div className={animationStep === 2 ? 'review-animation' : ''}>
             <ReviewsDialog />
+          </div>
+
+          <div className={animationStep === 2 ? ' content-animation' : ''}>
             <h2 className='fnt-30 fnt-md-60 fw-n lh-12 text-white mt-3'>
               New OEM and OEE glass replacement with crash tested glue
             </h2>
             <div className='lh-16 text-gray-400 text-uppercase mt-25'>Done where you are</div>
+
+            <div className='d-flex flex-column align-items-center mt-5'>
+              <LicensePlate
+                placeholderVal={'ENTER REG.'}
+                licenseNumber={licenseSearchVal}
+                showSearch={false}
+                handleVehInputChange={handleVehInputChange}
+              />
+              <button onClick={directToCustomer} className='btn-raised col-12 col-md-auto mt-25'>
+                Get a Quote
+              </button>
+              <div className='d-flex gap-3 mt-2'>
+                <PaymentCards />
+              </div>
+            </div>
           </div>
 
-          <div className='d-flex flex-column align-items-center mt-5'>
-            <LicensePlate
-              placeholderVal={'ENTER REG.'}
-              licenseNumber={licenseSearchVal}
-              showSearch={false}
-              handleVehInputChange={handleVehInputChange}
+          <div className='d-flex justify-content-center mt-35'>
+            <img
+              src={process.env.PUBLIC_URL + '/images/scroll-down.svg'}
+              className='img-fluid cursor-pointer'
+              alt=''
+              onClick={scrollDown}
             />
-            <button onClick={directToCustomer} className='btn-raised col-12 col-md-auto mt-25'>
-              Get a Quote
-            </button>
-            <div className='d-flex gap-3 mt-2'>
-              <PaymentCards />
-            </div>
-            <div className='d-flex justify-content-center mt-35'>
-              <img
-                src={process.env.PUBLIC_URL + '/images/scroll-down.svg'}
-                className='img-fluid cursor-pointer'
-                alt=''
-                onClick={scrollDown}
-              />
-            </div>
           </div>
         </div>
       </section>
