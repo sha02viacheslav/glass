@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import moment from 'moment'
 import { Link, useParams } from 'react-router-dom'
 import { TrackTechnician } from '@glass/components/GoogleMap/TrackTechnician'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -134,10 +135,25 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
 
   const ColorStepIcon = (props: StepIconProps) => {
     const { active, completed, className } = props
-    const { isSmall, icon } = steps[props.icon as TrackingStep]
+    const { isSmall, icon, sequence } = steps[props.icon as TrackingStep]
+    const date = quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === sequence)?.date
 
     return (
       <ColorStepIconRoot ownerState={{ completed, active, isSmall }} className={className}>
+        {!!date && (
+          <Typography
+            sx={{
+              position: 'absolute',
+              left: 0,
+              color: 'var(--Gray-700, #474747)',
+              fontSize: 12,
+              lineHeight: '140%',
+            }}
+          >
+            {moment(date).format('MMM D')}
+          </Typography>
+        )}
+
         {isSmall && !completed ? '' : <img src={process.env.PUBLIC_URL + '/images/' + icon} />}
       </ColorStepIconRoot>
     )
@@ -228,6 +244,10 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
             activeStep={steps[activeStep].index}
             orientation='vertical'
             sx={{
+              '.MuiStepLabel-iconContainer': {
+                position: 'relative',
+                paddingLeft: '48px',
+              },
               '.MuiStepConnector-root:nth-child(14)': {
                 '.MuiStepConnector-line': { height: '200px' },
               },
@@ -235,7 +255,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
             connector={
               <StepConnector
                 sx={{
-                  marginLeft: '18px',
+                  marginLeft: '66px',
                   '.MuiStepConnector-line': { borderLeftWidth: '4px', height: '128px' },
                   '&.Mui-completed': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
                 }}
