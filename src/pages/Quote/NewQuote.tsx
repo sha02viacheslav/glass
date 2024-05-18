@@ -117,7 +117,7 @@ export const NewQuote: React.FC<NewQuoteProps> = ({ quoteDetails }) => {
                   lineHeight: '150%',
                 }}
               >
-                {quoteDetails?.make}
+                {quoteDetails?.make} {quoteDetails?.model}
               </Typography>
             </Box>
           </Box>

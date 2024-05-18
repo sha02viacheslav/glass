@@ -44,7 +44,9 @@ export const QuoteOverview: React.FC<QuoteOverviewProps> = ({ selectedCarType, q
                 sx={{ width: 24, height: 24 }}
                 image={process.env.PUBLIC_URL + '/images/car.svg'}
               />
-              <div>{quoteDetails.make}</div>
+              <div>
+                {quoteDetails.make} {quoteDetails?.model}
+              </div>
             </Box>
 
             {!!quoteDetails.vehicle_logo_url && (

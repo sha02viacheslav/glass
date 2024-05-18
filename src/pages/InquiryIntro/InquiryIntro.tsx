@@ -48,7 +48,9 @@ export const InquiryIntro: React.FC = () => {
             process.env.PUBLIC_URL + '/images/mechanics-checking-planning-workshop.png'
           }
         />
-        <div className='title'>We need to ask few details about your {inquiry?.Make || 'car'}</div>
+        <div className='title'>
+          We need to ask few details about your {inquiry?.Make + ' ' + inquiry?.Model || 'car'}
+        </div>
         <div className='description'>It&apos;ll take less than 5 minutes of your time</div>
       </div>
 

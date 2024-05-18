@@ -64,7 +64,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
               lineHeight: '150%',
             }}
           >
-            {inquiry?.Make}
+            {inquiry?.Make} {inquiry?.Model}
           </Typography>
         </Box>
       </Box>

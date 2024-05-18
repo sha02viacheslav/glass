@@ -35,7 +35,7 @@ export const ReadyQuote: React.FC<ReadyQuoteProps> = ({ quoteDetails }) => {
           marginTop: 1,
         }}
       >
-        {quoteDetails.make}
+        {quoteDetails.make} {quoteDetails?.model}
       </Typography>
       {!!quoteDetails.vehicle_logo_url && (
         <CardMedia

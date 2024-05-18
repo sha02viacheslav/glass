@@ -118,7 +118,7 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
                   lineHeight: '150%',
                 }}
               >
-                {quoteDetails?.make}
+                {quoteDetails?.make} {quoteDetails?.model}
               </Typography>
             </Box>
           </Box>

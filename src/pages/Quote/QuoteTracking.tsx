@@ -303,7 +303,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                                       lineHeight: '150%',
                                     }}
                                   >
-                                    {quoteDetails?.make}
+                                    {quoteDetails?.make} {quoteDetails?.model}
                                   </Typography>
                                 </Box>
                                 <Box sx={{ width: '94px', marginTop: 2 }}>
