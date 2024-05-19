@@ -16,10 +16,11 @@ import { Link, useParams } from 'react-router-dom'
 import { TrackTechnician } from '@glass/components/GoogleMap/TrackTechnician'
 import { LicensePlate } from '@glass/components/LicensePlate'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { CarType, TrackingStep } from '@glass/enums'
+import { CarType, FieldServiceSequence, TrackingStep } from '@glass/enums'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Quote } from '@glass/models'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
+import { bookingEndTime, bookingStartTime } from '@glass/utils/index'
 import { getTrackTechnicianChecked, setTrackTechnicianChecked } from '@glass/utils/session/session.util'
 import { DownloadInvoice } from './DownloadInvoice'
 
@@ -27,56 +28,17 @@ export type QuoteTrackingProps = {
   quoteDetails: Quote
 }
 
+export interface TrackingView {
+  title: string
+  icon: string
+  isSmall: boolean
+  isActive: boolean
+  isCompleted: boolean
+  date: string
+}
+
 export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) => {
   const { id: quoteId } = useParams()
-
-  const steps = {
-    [TrackingStep.STEP1]: {
-      index: 1,
-      sequence: 1,
-      title: 'Booking confirmed and paid',
-      icon: 'calendar-check.svg',
-      isSmall: false,
-    },
-    [TrackingStep.STEP2]: {
-      index: 2,
-      sequence: 2,
-      title: 'Waiting for the day of the service',
-      icon: 'check.svg',
-      isSmall: true,
-    },
-    [TrackingStep.STEP3]: { index: 3, sequence: 3, title: 'Day before reminder', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP4]: { index: 4, sequence: 4, title: 'Repair day', icon: 'wrench-white.svg', isSmall: false },
-    [TrackingStep.STEP5]: { index: 5, sequence: 5, title: 'Technician arrived', icon: 'check.svg', isSmall: true },
-    [TrackingStep.STEP6]: {
-      index: 6,
-      sequence: 5,
-      title: 'Technician took “before” photo',
-      icon: 'check.svg',
-      isSmall: true,
-    },
-    [TrackingStep.STEP7]: {
-      index: 7,
-      sequence: 6,
-      title: 'Technician is repairing your car',
-      icon: 'check.svg',
-      isSmall: true,
-    },
-    [TrackingStep.STEP8]: {
-      index: 8,
-      sequence: 7,
-      title: 'Technician takes “after” photo',
-      icon: 'check.svg',
-      isSmall: true,
-    },
-    [TrackingStep.STEP9]: {
-      index: 9,
-      sequence: 7,
-      title: 'You can drive your car!',
-      icon: 'wheel-fill.svg',
-      isSmall: false,
-    },
-  }
 
   const [showTrackTechnicianNotification, setShowTrackTechnicianNotification] = useState(
     !getTrackTechnicianChecked(quoteId),
@@ -84,24 +46,112 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
   const [modalTrackMap, setModalTrackMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
 
-  const activeStep = useMemo<TrackingStep>(() => {
-    const sequence = quoteDetails.tracking_delivery[0]?.state.find((item) => !item.date)?.sequence || 1
+  const beforeAttachments = useMemo(() => {
     return (
-      (Object.keys(steps).find((key) => steps[key as TrackingStep].sequence === sequence) as TrackingStep) ||
-      TrackingStep.STEP1
+      quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === FieldServiceSequence.ARRIVED)
+        ?.attachment_ids || []
     )
   }, [quoteDetails])
 
-  const beforeAttachments = useMemo(() => {
-    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 5)?.attachment_ids || []
-  }, [quoteDetails])
-
   const repairAttachments = useMemo(() => {
-    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 6)?.attachment_ids || []
+    return (
+      quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === FieldServiceSequence.VEHICLE_READY)
+        ?.attachment_ids || []
+    )
   }, [quoteDetails])
 
   const afterAttachments = useMemo(() => {
-    return quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === 7)?.attachment_ids || []
+    return (
+      quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === FieldServiceSequence.ALL_DONE)
+        ?.attachment_ids || []
+    )
+  }, [quoteDetails])
+
+  const steps = useMemo<{ [key: string]: TrackingView }>(() => {
+    const bookingStart = bookingStartTime(quoteDetails.booking_date, quoteDetails.time_slot)
+    const bookingEnd = bookingEndTime(quoteDetails.booking_date, quoteDetails.time_slot)
+    const arrivedDate = quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.ARRIVED - 1].date
+    const arrived = !!arrivedDate
+    const vehicleReady = !!quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.VEHICLE_READY - 1].date
+    const allDoneDate = quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.ALL_DONE - 1].date
+    const allDone = !!allDoneDate
+
+    return {
+      [TrackingStep.STEP1]: {
+        title: 'Booking confirmed and paid',
+        icon: 'calendar-check.svg',
+        isSmall: false,
+        isActive: false,
+        isCompleted: true,
+        date: moment(quoteDetails.date_order).format('MMM D'),
+      },
+      [TrackingStep.STEP2]: {
+        title: 'Waiting for the day of the service',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: false,
+        isCompleted: moment().isAfter(moment(bookingStart).subtract(1, 'days')) || arrived,
+        date: '',
+      },
+      [TrackingStep.STEP3]: {
+        title: 'Day before reminder',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: moment().isAfter(moment(bookingStart).subtract(1, 'days')),
+        isCompleted: moment().isAfter(moment(bookingStart)) || arrived,
+        date: moment(bookingStart).subtract(1, 'days').format('MMM D'),
+      },
+      [TrackingStep.STEP4]: {
+        title: 'Repair day',
+        icon: 'wrench-white.svg',
+        isSmall: false,
+        isActive: false,
+        isCompleted: moment().isAfter(moment(bookingStart)) || arrived,
+        date: moment(bookingStart).format('MMM D'),
+      },
+      [TrackingStep.STEP5]: {
+        title: arrived ? 'Technician arrived' : 'Technician will come to you',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: moment().isAfter(moment(bookingStart)),
+        isCompleted: arrived,
+        date: !arrived
+          ? moment(arrivedDate).format('h:mm a')
+          : 'Exp. arrival \n ' + moment(bookingStart).format('H') + ' - ' + moment(bookingEnd).format('H') + 'h',
+      },
+      [TrackingStep.STEP6]: {
+        title: 'Technician took “before” photo',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: arrived,
+        isCompleted: !!beforeAttachments.length,
+        date: arrived && !beforeAttachments.length ? 'Now' : '',
+      },
+      [TrackingStep.STEP7]: {
+        title: !!beforeAttachments.length ? 'Technician is repairing your car' : 'Technician do the repair',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: !!beforeAttachments.length,
+        isCompleted: vehicleReady,
+        date: '',
+      },
+      [TrackingStep.STEP8]: {
+        title: 'Technician takes “after” photo',
+        icon: 'check.svg',
+        isSmall: true,
+        isActive: false,
+        isCompleted: !!afterAttachments.length,
+        date: '',
+      },
+      [TrackingStep.STEP9]: {
+        title: 'You can drive your car!',
+        icon: 'wheel-fill.svg',
+        isSmall: false,
+        isActive: vehicleReady && !!afterAttachments.length,
+        isCompleted: allDone,
+        date: allDone ? moment(allDoneDate).format('MMM D') : '',
+      },
+    }
   }, [quoteDetails])
 
   useRetrieveVehData(quoteDetails?.DoorPlanLiteral, (data: CarType) => {
@@ -134,9 +184,9 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
   }))
 
   const ColorStepIcon = (props: StepIconProps) => {
+    const step = props.icon as TrackingStep
     const { active, completed, className } = props
-    const { isSmall, icon, sequence } = steps[props.icon as TrackingStep]
-    const date = quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === sequence)?.date
+    const { isSmall, icon, date } = steps[step]
 
     return (
       <ColorStepIconRoot ownerState={{ completed, active, isSmall }} className={className}>
@@ -146,11 +196,12 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
               position: 'absolute',
               left: 0,
               color: 'var(--Gray-700, #474747)',
-              fontSize: 12,
+              fontSize: step === TrackingStep.STEP5 ? 10 : 12,
               lineHeight: '140%',
+              width: '60px',
             }}
           >
-            {moment(date).format('MMM D')}
+            {date}
           </Typography>
         )}
 
@@ -240,8 +291,6 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
 
         <Box sx={{ px: 4, pt: 5, pb: 20 }}>
           <Stepper
-            // alternativeLabel
-            activeStep={steps[activeStep].index}
             orientation='vertical'
             sx={{
               '.MuiStepLabel-iconContainer': {
@@ -258,14 +307,15 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                   marginLeft: '66px',
                   '.MuiStepConnector-line': { borderLeftWidth: '4px', height: '128px' },
                   '&.Mui-completed': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
+                  '&.Mui-active': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
                 }}
               />
             }
           >
             {Object.keys(steps).map((step) => {
               const stepProps: { completed?: boolean } = {}
-              const active = step === activeStep
-              const completed: boolean = step < activeStep
+              const active = steps[step].isActive
+              const completed: boolean = steps[step].isCompleted
 
               return (
                 <Step key={step} {...stepProps} active={active} completed={completed}>
@@ -284,7 +334,18 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             }
                           />
                         )}
-                        <Typography sx={{ fontSize: 14, fontWeight: '600', lineHeight: '12px' }}>
+                        <Typography
+                          sx={{
+                            color: completed
+                              ? 'var(--Gray-800, #14151F)'
+                              : active
+                              ? 'var(--Dark-Blue---Accent-500, #4522C2)'
+                              : 'var(--Gray-600, #6A6B71)',
+                            fontSize: 14,
+                            fontWeight: '600',
+                            lineHeight: '12px',
+                          }}
+                        >
                           {steps[step as TrackingStep].title}{' '}
                         </Typography>
                       </Box>
