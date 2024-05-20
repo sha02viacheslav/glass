@@ -1,7 +1,7 @@
 import './Home.css'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Chat } from '@glass/components/Chat'
 import { LicensePlate } from '@glass/components/LicensePlate'
@@ -55,42 +55,78 @@ export const Home: React.FC = () => {
         {animationStep === 1 && <div className='sec-background2'></div>}
         {animationStep === 2 && <div className='sec-background3'></div>}
 
-        <div className='px-3 mt-auto'>
-          <div className={animationStep === 2 ? 'review-animation' : ''}>
-            <ReviewsDialog />
-          </div>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: { xs: 'flex-end' },
+            height: '100%',
+            pb: { xs: 0, lg: 6 },
+          }}
+          className='container'
+        >
+          <Box sx={{ mx: 'auto', maxWidth: 785 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: { xs: 'flex-start', lg: 'center' } }}
+              className={animationStep === 2 ? 'review-animation' : ''}
+            >
+              <ReviewsDialog />
+            </Box>
 
-          <div className={animationStep === 2 ? ' content-animation' : ''}>
-            <h2 className='fnt-30 fnt-md-60 fw-n lh-12 text-white mt-3'>
-              New OEM and OEE glass replacement with crash tested glue
-            </h2>
-            <div className='lh-16 text-gray-400 text-uppercase mt-25'>Done where you are</div>
+            <Box className={animationStep === 2 ? ' content-animation' : ''}>
+              <Typography
+                variant='h2'
+                sx={{
+                  color: '#fff',
+                  textAlign: { xs: 'left', lg: 'center' },
+                  fontSize: { xs: 30, lg: 60 },
+                  fontWeight: '700',
+                  lineHeight: '120%',
+                  mt: { xs: 4, lg: 6 },
+                }}
+              >
+                New OEM and OEE glass replacement with crash tested glue
+              </Typography>
+              <Typography
+                variant='h2'
+                sx={{
+                  color: 'var(--Gray-300, #D8D8DA)',
+                  textAlign: { xs: 'left', lg: 'center' },
+                  fontSize: { xs: 16, lg: 20 },
+                  lineHeight: '160%',
+                  textTransform: 'uppercase',
+                  mt: { xs: 3, lg: 4 },
+                }}
+              >
+                Done where you are
+              </Typography>
 
-            <div className='d-flex flex-column align-items-center mt-5'>
-              <LicensePlate
-                placeholderVal={'ENTER REG.'}
-                licenseNumber={licenseSearchVal}
-                showSearch={false}
-                handleVehInputChange={handleVehInputChange}
-              />
-              <button onClick={directToCustomer} className='btn-raised col-12 col-md-auto mt-25'>
-                Get a Quote
-              </button>
-              <div className='d-flex gap-3 mt-2'>
-                <PaymentCards />
-              </div>
-            </div>
-          </div>
+              <Box sx={{ maxWidth: 400, mx: 'auto' }} className='d-flex flex-column align-items-center mt-5'>
+                <LicensePlate
+                  placeholderVal={'ENTER REG.'}
+                  licenseNumber={licenseSearchVal}
+                  showSearch={false}
+                  handleVehInputChange={handleVehInputChange}
+                />
+                <button onClick={directToCustomer} className='btn-raised w-100 mt-25'>
+                  Get a Quote
+                </button>
+                <div className='d-flex gap-3 mt-2'>
+                  <PaymentCards />
+                </div>
+              </Box>
+            </Box>
+          </Box>
 
-          <div className='d-flex justify-content-center mt-35'>
+          <Box sx={{ mt: { xs: 5, lg: 16 } }} className='d-flex justify-content-center mt-35'>
             <img
               src={process.env.PUBLIC_URL + '/images/scroll-down.svg'}
               className='img-fluid cursor-pointer'
               alt=''
               onClick={scrollDown}
             />
-          </div>
-        </div>
+          </Box>
+        </Box>
       </section>
 
       <section className='sec-description'>

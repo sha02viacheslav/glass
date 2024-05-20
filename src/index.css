@@ -504,3 +504,8 @@ input.form-control.round {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
 }
+
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}

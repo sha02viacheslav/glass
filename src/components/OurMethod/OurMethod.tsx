@@ -159,13 +159,13 @@ export const OurMethod: React.FC<OurMethodProps> = ({
         {showVideos && (
           <div>
             <div className='padding-64'></div>
-            <div className='row sec-video'>
+            <div className='sec-video'>
               <div className='sec-video-title'>Glass replacement in action</div>
               <div className='sec-video-description'>
                 Watch as our skilled technicians expertly replace windshields with precision and care.
               </div>
               {videos.map((item, index) => (
-                <div key={index} className='col-md-6 video-card'>
+                <div key={index} className='video-card'>
                   <label className='video-card-title'>{item.title}</label>
                   <div>
                     <blockquote className='twitter-tweet' data-media-max-width='648'>
