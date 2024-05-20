@@ -1,48 +1,42 @@
 import React, { ReactNode } from 'react'
-import { Link, useMatch, useNavigate, useResolvedPath } from 'react-router-dom'
+import { CardMedia, Typography } from '@mui/material'
+import { Link, useMatch, useResolvedPath } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
-import { DropdownMenuItem } from '@glass/models'
 
 export type CustomLinkProps = {
-  to: string
+  to?: string
   children: ReactNode
-  dropdownItems?: DropdownMenuItem[]
+  hasDropdown?: boolean
   onClick?: () => void
 }
 
 export const CustomLink: React.FC<CustomLinkProps> = ({
-  to,
+  to = '',
   children,
-  dropdownItems,
+  hasDropdown = false,
   onClick = () => {},
   ...props
 }) => {
-  const navigate = useNavigate()
   const generatedUuid = uuidv4()
   const resolvedPath = useResolvedPath(to)
-  const isActive = useMatch({ path: resolvedPath.pathname, end: true })
-
-  const onClickMenuItem = (link: string) => {
-    setTimeout(() => {
-      navigate(link)
-    })
-  }
+  const isActive = to ? useMatch({ path: resolvedPath.pathname, end: true }) : false
 
   return (
-    <li className={'nav-item' + (dropdownItems?.length ? ' dropdown' : '')}>
-      {!!dropdownItems?.length ? (
-        <Link
+    <li className='nav-item'>
+      {hasDropdown ? (
+        <Typography
           id={generatedUuid}
-          to={to}
           {...props}
-          className={isActive ? 'nav-link dropdown-toggle active' : 'nav-link dropdown-toggle'}
-          role='button'
-          data-bs-toggle='dropdown'
-          aria-expanded='false'
+          className={isActive ? 'nav-link active' : 'nav-link'}
           onClick={() => onClick()}
         >
           {children}
-        </Link>
+          <CardMedia
+            component='img'
+            sx={{ width: 24, height: 24 }}
+            image={process.env.PUBLIC_URL + '/images/chevron-down.svg'}
+          />
+        </Typography>
       ) : (
         <Link
           id={generatedUuid}
@@ -53,18 +47,6 @@ export const CustomLink: React.FC<CustomLinkProps> = ({
         >
           {children}
         </Link>
-      )}
-
-      {!!dropdownItems?.length && (
-        <ul className='dropdown-menu dropdown-menu-dark' aria-labelledby={generatedUuid}>
-          {dropdownItems.map((item, index) => (
-            <li key={index} className='cursor-pointer'>
-              <a className='dropdown-item' onClick={() => onClickMenuItem(item.link)}>
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
       )}
     </li>
   )
