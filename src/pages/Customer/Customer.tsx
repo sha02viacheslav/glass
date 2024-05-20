@@ -386,7 +386,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
-      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -407,7 +406,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
-      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -435,7 +433,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
-      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -485,7 +482,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
-      EnumLoader.SAVE_INQUIRY,
     )
   }
 
@@ -550,7 +546,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           toast(res.message)
         }
       }),
-      EnumLoader.SAVE_INQUIRY,
     )
   }
 

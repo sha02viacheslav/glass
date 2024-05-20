@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom'
 import { SLOT_LEGENDS } from '@glass/constants'
 import { AvailableBookingTimeView } from '@glass/models'
 import { getAvailableBookingTimeService } from '@glass/services/apis/get-available-booking-time.service'
-import { slotStartTime, slotTimeIndex } from '@glass/utils/index'
+import { bookingEndTime, bookingStartTime, slotStartTime, slotTimeIndex } from '@glass/utils/index'
 
 export type BookingTimesProps = {
   reserveBookingId: number
@@ -144,7 +144,8 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
                     letterSpacing: '-0.12px',
                   }}
                 >
-                  {SLOT_LEGENDS[element.timeSlotIndex].time}
+                  ({moment(bookingStartTime(element.booking_date, element.time_slot)).format('h:mm a')} -{' '}
+                  {moment(bookingEndTime(element.booking_date, element.time_slot)).format('h:mm a')})
                 </Typography>
               </Box>
             </Box>

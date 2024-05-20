@@ -55,7 +55,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
 
   const repairAttachments = useMemo(() => {
     return (
-      quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === FieldServiceSequence.VEHICLE_READY)
+      quoteDetails.tracking_delivery[0]?.state.find((item) => item.sequence === FieldServiceSequence.MIDDLE_UPDATE)
         ?.attachment_ids || []
     )
   }, [quoteDetails])
@@ -73,11 +73,12 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
     const arrivedDate = quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.ARRIVED - 1].date
     const arrived = !!arrivedDate
     const vehicleReady = !!quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.VEHICLE_READY - 1].date
+    const middleUpdate = !!quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.MIDDLE_UPDATE - 1].date
     const allDoneDate = quoteDetails?.tracking_delivery[0]?.state[FieldServiceSequence.ALL_DONE - 1].date
     const allDone = !!allDoneDate
 
     return {
-      [TrackingStep.STEP1]: {
+      [TrackingStep.BOOKING_CONFIRMED]: {
         title: 'Booking confirmed and paid',
         icon: 'calendar-check.svg',
         isSmall: false,
@@ -85,7 +86,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         isCompleted: true,
         date: moment(quoteDetails.date_order).format('MMM D'),
       },
-      [TrackingStep.STEP2]: {
+      [TrackingStep.WAITING_SERVICE_DAY]: {
         title: 'Waiting for the day of the service',
         icon: 'check.svg',
         isSmall: true,
@@ -93,7 +94,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         isCompleted: moment().isAfter(moment(bookingStart).subtract(1, 'days')) || arrived,
         date: '',
       },
-      [TrackingStep.STEP3]: {
+      [TrackingStep.DAY_BEFORE_REMINDER]: {
         title: 'Day before reminder',
         icon: 'check.svg',
         isSmall: true,
@@ -101,7 +102,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         isCompleted: moment().isAfter(moment(bookingStart)) || arrived,
         date: moment(bookingStart).subtract(1, 'days').format('MMM D'),
       },
-      [TrackingStep.STEP4]: {
+      [TrackingStep.REPAIR_DAY]: {
         title: 'Repair day',
         icon: 'wrench-white.svg',
         isSmall: false,
@@ -109,7 +110,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         isCompleted: moment().isAfter(moment(bookingStart)) || arrived,
         date: moment(bookingStart).format('MMM D'),
       },
-      [TrackingStep.STEP5]: {
+      [TrackingStep.ARRIVED]: {
         title: arrived ? 'Technician arrived' : 'Technician will come to you',
         icon: 'check.svg',
         isSmall: true,
@@ -119,7 +120,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
           ? moment(arrivedDate).format('h:mm a')
           : 'Exp. arrival \n ' + moment(bookingStart).format('H') + ' - ' + moment(bookingEnd).format('H') + 'h',
       },
-      [TrackingStep.STEP6]: {
+      [TrackingStep.BEFORE_PHOTO]: {
         title: 'Technician took “before” photo',
         icon: 'check.svg',
         isSmall: true,
@@ -127,23 +128,23 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
         isCompleted: !!beforeAttachments.length,
         date: arrived && !beforeAttachments.length ? 'Now' : '',
       },
-      [TrackingStep.STEP7]: {
+      [TrackingStep.REPAIRING]: {
         title: !!beforeAttachments.length ? 'Technician is repairing your car' : 'Technician do the repair',
         icon: 'check.svg',
         isSmall: true,
         isActive: !!beforeAttachments.length,
-        isCompleted: vehicleReady,
+        isCompleted: middleUpdate && !!repairAttachments?.length,
         date: '',
       },
-      [TrackingStep.STEP8]: {
+      [TrackingStep.AFTER_PHOTO]: {
         title: 'Technician takes “after” photo',
         icon: 'check.svg',
         isSmall: true,
-        isActive: false,
+        isActive: middleUpdate && !!repairAttachments?.length,
         isCompleted: !!afterAttachments.length,
         date: '',
       },
-      [TrackingStep.STEP9]: {
+      [TrackingStep.ALL_DONE]: {
         title: 'You can drive your car!',
         icon: 'wheel-fill.svg',
         isSmall: false,
@@ -196,7 +197,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
               position: 'absolute',
               left: 0,
               color: 'var(--Gray-700, #474747)',
-              fontSize: step === TrackingStep.STEP5 ? 10 : 12,
+              fontSize: step === TrackingStep.ARRIVED ? 10 : 12,
               lineHeight: '140%',
               width: '60px',
             }}
@@ -322,8 +323,8 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                   <StepLabel StepIconComponent={ColorStepIcon} icon={step} sx={{ padding: '4px 0' }}>
                     <Box sx={{ position: 'relative' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, height: '12px' }}>
-                        {((step as TrackingStep) === TrackingStep.STEP6 ||
-                          (step as TrackingStep) === TrackingStep.STEP8) && (
+                        {((step as TrackingStep) === TrackingStep.BEFORE_PHOTO ||
+                          (step as TrackingStep) === TrackingStep.AFTER_PHOTO) && (
                           <CardMedia
                             component='img'
                             sx={{ width: 20, height: 20 }}
@@ -350,7 +351,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                         </Typography>
                       </Box>
                       <Box sx={{ position: 'absolute', marginTop: 3 }}>
-                        {(step as TrackingStep) === TrackingStep.STEP1 && (
+                        {(step as TrackingStep) === TrackingStep.BOOKING_CONFIRMED && (
                           <>
                             {!!quoteId && (
                               <Box sx={{ marginTop: -2 }}>
@@ -397,7 +398,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                           </>
                         )}
 
-                        {(step as TrackingStep) === TrackingStep.STEP2 && (
+                        {(step as TrackingStep) === TrackingStep.WAITING_SERVICE_DAY && (
                           <Typography
                             sx={{
                               color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
@@ -408,7 +409,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             You will be able to track your technician on live map
                           </Typography>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP3 && (
+                        {(step as TrackingStep) === TrackingStep.DAY_BEFORE_REMINDER && (
                           <Typography
                             sx={{
                               color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
@@ -419,7 +420,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             You will receive a reminder that we are coming a day before service.
                           </Typography>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP4 && (
+                        {(step as TrackingStep) === TrackingStep.REPAIR_DAY && (
                           <Typography
                             sx={{
                               color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
@@ -430,7 +431,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             Place your car on so there is nothing within 2m radius. Our technician needs space to work.
                           </Typography>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP5 && (
+                        {(step as TrackingStep) === TrackingStep.ARRIVED && (
                           <Box sx={{ display: 'flex', gap: 2 }}>
                             <CardMedia
                               component='img'
@@ -452,7 +453,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             </Typography>
                           </Box>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP6 && (
+                        {(step as TrackingStep) === TrackingStep.BEFORE_PHOTO && (
                           <>
                             {active || completed ? (
                               <>
@@ -484,49 +485,16 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             )}
                           </>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP7 && (
+                        {(step as TrackingStep) === TrackingStep.REPAIRING && (
                           <>
-                            {completed ? (
-                              <Box>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                  <CardMedia
-                                    component='img'
-                                    sx={{ width: 16, height: 16 }}
-                                    image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
-                                  />
-                                  <Box>
-                                    <Typography
-                                      sx={{
-                                        color: 'var(--Gray-600, #6A6B71)',
-                                        fontSize: 12,
-                                        lineHeight: '130%',
-                                        letterSpacing: '-0.12px',
-                                      }}
-                                    >
-                                      Old glass and glue removed, surface prepared for new glass
-                                    </Typography>
-                                    {repairAttachments.map((item, index) => (
-                                      <CardMedia
-                                        key={index}
-                                        component='img'
-                                        sx={{
-                                          width: 'auto',
-                                          height: 80,
-                                          objectFit: 'cover',
-                                          borderRadius: '2px',
-                                          marginTop: 2,
-                                        }}
-                                        image={item.attachment_url}
-                                      />
-                                    ))}
-                                  </Box>
-                                </Box>
-                                <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
-                                  <CardMedia
-                                    component='img'
-                                    sx={{ width: 16, height: 16 }}
-                                    image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
-                                  />
+                            {(completed || !!repairAttachments?.length) && (
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <CardMedia
+                                  component='img'
+                                  sx={{ width: 16, height: 16 }}
+                                  image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
+                                />
+                                <Box>
                                   <Typography
                                     sx={{
                                       color: 'var(--Gray-600, #6A6B71)',
@@ -535,11 +503,83 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                                       letterSpacing: '-0.12px',
                                     }}
                                   >
-                                    New glass is fitted
+                                    Old glass and glue removed, surface prepared for new glass
                                   </Typography>
+                                  {repairAttachments.map((item, index) => (
+                                    <CardMedia
+                                      key={index}
+                                      component='img'
+                                      sx={{
+                                        width: 'auto',
+                                        height: 80,
+                                        objectFit: 'cover',
+                                        borderRadius: '2px',
+                                        marginTop: 2,
+                                      }}
+                                      image={item.attachment_url}
+                                    />
+                                  ))}
                                 </Box>
                               </Box>
-                            ) : (
+                            )}
+                            {completed && (
+                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                <CardMedia
+                                  component='img'
+                                  sx={{ width: 16, height: 16 }}
+                                  image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
+                                />
+                                <Typography
+                                  sx={{
+                                    color: 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                    letterSpacing: '-0.12px',
+                                  }}
+                                >
+                                  New glass is fitted
+                                </Typography>
+                              </Box>
+                            )}
+                            {!completed && !!repairAttachments?.length && (
+                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                <CardMedia
+                                  component='img'
+                                  sx={{ width: 16, height: 16 }}
+                                  image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
+                                />
+                                <Typography
+                                  sx={{
+                                    color: 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                    letterSpacing: '-0.12px',
+                                  }}
+                                >
+                                  Placing new glass
+                                </Typography>
+                              </Box>
+                            )}
+                            {!completed && !repairAttachments?.length && (
+                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                <CardMedia
+                                  component='img'
+                                  sx={{ width: 16, height: 16 }}
+                                  image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
+                                />
+                                <Typography
+                                  sx={{
+                                    color: 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                    letterSpacing: '-0.12px',
+                                  }}
+                                >
+                                  Removing the old glass and preparing surface for fitting new glass
+                                </Typography>
+                              </Box>
+                            )}
+                            {!completed && !active && (
                               <Typography
                                 sx={{
                                   color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
@@ -547,14 +587,12 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                                   lineHeight: '130%',
                                 }}
                               >
-                                {active
-                                  ? 'Removing the old glass and preparing surface for fitting new glass'
-                                  : 'Technician will repair your broken glass.'}
+                                Technician will repair your broken glass.
                               </Typography>
                             )}
                           </>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP8 && (
+                        {(step as TrackingStep) === TrackingStep.AFTER_PHOTO && (
                           <>
                             {active || completed ? (
                               <>
@@ -586,7 +624,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                             )}
                           </>
                         )}
-                        {(step as TrackingStep) === TrackingStep.STEP9 && (
+                        {(step as TrackingStep) === TrackingStep.ALL_DONE && (
                           <Typography
                             sx={{
                               color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',

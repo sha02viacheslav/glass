@@ -299,7 +299,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   useEffect(() => {
     const newCharacteristics: { [key: string]: Characteristic[] } = {}
     Object.keys(characteristics)
-      .filter((key) => selectedGlasses?.findIndex((glass) => glass.includes(key)))
+      .filter((key) => (selectedGlasses || [])?.findIndex((glass) => glass.includes(key)) > -1)
       .forEach((key) => {
         newCharacteristics[key] = characteristics[key]
       })

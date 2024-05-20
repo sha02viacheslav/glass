@@ -1,7 +1,7 @@
 import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
 import { Attachment } from '@glass/models'
-import { isBase64PDF } from '@glass/utils/check-type-base64/check-type-base64.util'
+import { isBase64PDF, isBase64Video } from '@glass/utils/check-type-base64/check-type-base64.util'
 
 type AddPicturesProps = {
   disabled?: boolean
@@ -25,7 +25,7 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
   onChangeAttachments = () => {},
   onClickUpload = () => {},
 }) => {
-  const VALID_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf']
+  const VALID_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf', 'video/mp4']
   const inputRef = useRef<HTMLInputElement>(null)
   const [validFiles, setValidFiles] = useState<Attachment[]>([])
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -138,7 +138,18 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
     >
       {validFiles.map((file, idx) => (
         <Box key={idx} sx={{ height: '100%', position: 'relative' }} className={'broken-image-wrap'}>
-          {isBase64PDF(file.datas) ? (
+          {isBase64Video(file.datas) ? (
+            <CardMedia
+              component='video'
+              controls
+              sx={{
+                width: 'auto',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+              src={file.datas}
+            />
+          ) : isBase64PDF(file.datas) ? (
             <CardMedia
               component='img'
               sx={{

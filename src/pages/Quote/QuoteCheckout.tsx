@@ -13,7 +13,14 @@ import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { Quote } from '@glass/models'
 import { resetQuoteService } from '@glass/services/apis/reset-quote.service'
 import { formatAddress } from '@glass/utils/format-address/format-address.util'
-import { scrollToElementWithOffset, slotStartTime, slotTimeIndex, workingPlaceLabel } from '@glass/utils/index'
+import {
+  bookingEndTime,
+  bookingStartTime,
+  scrollToElementWithOffset,
+  slotStartTime,
+  slotTimeIndex,
+  workingPlaceLabel,
+} from '@glass/utils/index'
 import { ExpiredDialog } from './ExpiredDialog'
 
 export type QuoteCheckoutForm = {
@@ -197,7 +204,8 @@ export const QuoteCheckout: React.FC<QuoteCheckoutProps> = ({ quoteDetails, refe
                 <Typography component='span' sx={{ fontSize: '14px', lineHeight: '140%', textTransform: 'capitalize' }}>
                   {SLOT_LEGENDS[slotTimeIndex(slotStartTime(quoteDetails.booking_date, quoteDetails.time_slot))]?.title}
                 </Typography>{' '}
-                {SLOT_LEGENDS[slotTimeIndex(slotStartTime(quoteDetails.booking_date, quoteDetails.time_slot))]?.time}
+                ({moment(bookingStartTime(quoteDetails.booking_date, quoteDetails.time_slot)).format('h:mm a')} -{' '}
+                {moment(bookingEndTime(quoteDetails.booking_date, quoteDetails.time_slot)).format('h:mm a')})
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

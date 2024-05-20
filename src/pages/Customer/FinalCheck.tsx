@@ -220,7 +220,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
             <CardMedia
               component='img'
               sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/email-dark-blue.svg'}
+              image={process.env.PUBLIC_URL + '/images/phone-dark-blue.svg'}
             />
             {inquiry.step_4.customer_phone}
           </Box>
@@ -228,7 +228,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
             <CardMedia
               component='img'
               sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/phone-dark-blue.svg'}
+              image={process.env.PUBLIC_URL + '/images/email-dark-blue.svg'}
             />
             {inquiry.step_4.customer_email}
           </Box>

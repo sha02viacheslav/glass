@@ -125,9 +125,12 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
               />
             )}
 
-            {snapValue === QuoteStep.PAYMENT && quoteDetails.payment_method_type === PaymentMethodType.STRIPE && (
-              <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
-            )}
+            {snapValue === QuoteStep.PAYMENT &&
+              (quoteDetails.payment_method_type === PaymentMethodType.ASSIST_FOUR_PAYMENT ||
+                quoteDetails.payment_method_type === PaymentMethodType.ASSIST_SIX_PAYMENT ||
+                quoteDetails.payment_method_type === PaymentMethodType.ASSIST_TWELVE_PAYMENT) && (
+                <QuoteInstallmentPayment quoteDetails={quoteDetails} onBack={() => setGoToPaymentClicked(false)} />
+              )}
 
             {snapValue === QuoteStep.TRACKING && <QuoteTracking quoteDetails={quoteDetails} />}
           </>

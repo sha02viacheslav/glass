@@ -46,16 +46,6 @@ export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange,
           <img
             src={process.env.PUBLIC_URL + '/images/chevron-left-gray.svg'}
             onClick={() => {
-              const newValue = (currentIndex + 1) % characteristics.length
-              setCurrentIndex(newValue)
-              if (setActiveIndex) {
-                setActiveIndex(newValue)
-              }
-            }}
-          />
-          <img
-            src={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
-            onClick={() =>
               setCurrentIndex((prev) => {
                 const newValue = (characteristics.length + prev - 1) % characteristics.length
                 if (setActiveIndex) {
@@ -63,7 +53,17 @@ export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange,
                 }
                 return newValue
               })
-            }
+            }}
+          />
+          <img
+            src={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
+            onClick={() => {
+              const newValue = (currentIndex + 1) % characteristics.length
+              setCurrentIndex(newValue)
+              if (setActiveIndex) {
+                setActiveIndex(newValue)
+              }
+            }}
           />
         </Box>
       </Box>

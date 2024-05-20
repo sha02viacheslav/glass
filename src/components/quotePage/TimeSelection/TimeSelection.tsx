@@ -40,8 +40,9 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   requestBookings = [],
   formError,
 }) => {
+  const firstDay = moment().startOf('week').toDate()
   const [showCalendar, setShowCalendar] = useState<boolean>(true)
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [selectedDate, setSelectedDate] = useState<Date>(firstDay)
   const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([])
   const [timeData, setTimeData] = useState<TimeRow[]>([])
   const [slots, setSlots] = useState<TimeRow[]>([])
@@ -99,10 +100,10 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   const changePage = (navValue: string) => {
     if (navValue === 'next' && pages.includes(currentPage + 1)) {
       setCurrentPage(currentPage + 1)
-      setSelectedDate((prev) => moment(prev).add(3, 'days').toDate())
+      setSelectedDate((prev) => moment(prev).add(CALENDAR_DAYS, 'days').toDate())
     } else if (navValue === 'prev' && pages.includes(currentPage - 1)) {
       setCurrentPage(currentPage - 1)
-      setSelectedDate((prev) => moment(prev).subtract(3, 'days').toDate())
+      setSelectedDate((prev) => moment(prev).subtract(CALENDAR_DAYS, 'days').toDate())
     }
   }
 
@@ -131,7 +132,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   }
 
   useEffect(() => {
-    setCurrentPage(Math.floor(moment(selectedDate).startOf('date').diff(moment().startOf('date'), 'days') / 3 + 1))
+    setCurrentPage(Math.floor(moment(selectedDate).diff(moment(firstDay), 'days') / CALENDAR_DAYS + 1))
   }, [selectedDate])
 
   // navigating calendar pages and disable passed slots
@@ -248,7 +249,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                   padding: '10px 8px',
                 }}
               >
-                week 9{' '}
+                week {moment(selectedDate).week()}{' '}
                 <Typography sx={{ color: 'var(--Gray-600, #6A6B71)' }} component='span'>
                   ({currentMonth})
                 </Typography>
