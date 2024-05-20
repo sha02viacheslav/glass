@@ -12,6 +12,7 @@ import { PlantTree } from '@glass/components/PlantTree'
 import { ReviewsDialog } from '@glass/components/ReviewsDialog'
 import { BeforeAfterType } from '@glass/enums'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
+import { HomeDescription } from './HomeDescription'
 import { InstallmentBenefits } from './InstallmentBenefits'
 import { LifeTime } from './LifeTime'
 import { LiveService } from './LiveService'
@@ -129,17 +130,25 @@ export const Home: React.FC = () => {
         </Box>
       </section>
 
-      <section className='sec-description'>
-        <div className='title'>All Brands From Mini Cooper to Range Rover, we got you covered</div>
-        <div className='description mt-3'>
-          We offer glass replacement for passenger vehicles and vans.
-          <br />
-          All jobs are done by professionals at your home, workplace or at our workshop, wherever you please.
-        </div>
-      </section>
+      <Box sx={{ py: { xs: 6, lg: 8 } }}></Box>
 
-      <section className='sec-work'>
-        <div className='title'>How we work</div>
+      <HomeDescription />
+
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
+
+      <section className='container sec-work'>
+        <Typography
+          sx={{
+            textAlign: { lg: 'center' },
+            fontSize: { xs: 24, lg: 36 },
+            fontWeight: '600',
+            lineHeight: { xs: '120%', lg: '112%' },
+            letterSpacing: { xs: '-0.24px', lg: '-0.36px' },
+            mb: { xs: 4, lg: 6 },
+          }}
+        >
+          How we work
+        </Typography>
         <div className='d-flex flex-column gap-2'>
           <div className='work-card'>
             <div className='card-content'>
