@@ -1,7 +1,7 @@
-import './Ourmethod.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import React, { useEffect, useState } from 'react'
+import { Box, Typography } from '@mui/material'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import Slider, { CustomArrowProps } from 'react-slick'
 import { BeforeAfterType } from '@glass/enums'
@@ -42,11 +42,16 @@ export const OurMethod: React.FC<OurMethodProps> = ({
 }) => {
   const settings = {
     dots: false,
-    speed: 300,
-    slidesToShow: 1,
-    slidesToScroll: 1,
     nextArrow: <SliderNextArrow />,
     prevArrow: <SliderPrevArrow />,
+    infinite: true,
+    speed: 300,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 991, settings: { slidesToShow: 2, slidesToScroll: 1 } },
+      { breakpoint: 575, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+    ],
   }
 
   const videos = [
@@ -96,88 +101,141 @@ export const OurMethod: React.FC<OurMethodProps> = ({
   }, [])
 
   return (
-    <section className='sec-our-method'>
-      <div className='container p-0'>
-        {showTitle && <h1 className='title'>Examples of our work</h1>}
-
-        <div className='mt-2 mt-md-5'>
-          <div className='example-work-container'>
-            <Slider {...settings}>
-              {beforeAfterItems.map((item, index) => (
-                <div key={index} className='item'>
-                  <div className='row g-0 example-work-card'>
-                    <div className={'col-lg-4'}>
-                      <div className='mb-3'>
-                        <div className='d-flex align-items-center justify-content-between'>
-                          <div className='example-work-title'>BMW 1 Series mk2</div>
-                          <div className='model'>Model year 2011</div>
-                        </div>
-                        <div className='description'>{item.description}</div>
-                        <div className='d-none d-lg-flex flex-column gap-3 mt-3'>
-                          <img
-                            key='before-image'
-                            src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
-                            className='img-fluid extra-image'
-                            alt=''
-                          />
-                          <img
-                            key='after-image'
-                            src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
-                            className='img-fluid extra-image'
-                            alt=''
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className='col-lg-8'>
-                      <div className='before-after-img-wrap' onTouchStart={(e) => handleTouchStartSlider(e)}>
-                        <ReactCompareSlider
-                          itemOne={
-                            <ReactCompareSliderImage
-                              src={REACT_APP_API_DOMAIN_URL + item.before_880_url}
-                              alt='Image one'
-                            />
-                          }
-                          itemTwo={
-                            <ReactCompareSliderImage
-                              src={REACT_APP_API_DOMAIN_URL + item.after_880_url}
-                              alt='Image two'
-                            />
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </Slider>
-
-            {/* <div className='fnt-20 text-primary prev-next d-md-none'>Prev // Next</div> */}
-          </div>
-        </div>
-
-        {showVideos && (
-          <div>
-            <div className='padding-64'></div>
-            <div className='sec-video'>
-              <div className='sec-video-title'>Glass replacement in action</div>
-              <div className='sec-video-description'>
-                Watch as our skilled technicians expertly replace windshields with precision and care.
-              </div>
-              {videos.map((item, index) => (
-                <div key={index} className='video-card'>
-                  <label className='video-card-title'>{item.title}</label>
-                  <div>
-                    <blockquote className='twitter-tweet' data-media-max-width='648'>
-                      <a href={'https://twitter.com/fix_glass_/status/' + item.videoId + '?ref_src=twsrc%5Etfw'}></a>
-                    </blockquote>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+    <Box>
+      <Box className='container'>
+        {showTitle && (
+          <Typography
+            component='h2'
+            sx={{
+              color: 'var(--Gray-800, #14151f)',
+              textAlign: 'center',
+              fontSize: { xs: 30, lg: 36 },
+              fontStyle: 'normal',
+              fontWeight: 700,
+              lineHeight: '120%',
+              letterSpacing: '-0.3px',
+              marginBottom: { xs: 6, lg: 12 },
+            }}
+          >
+            Examples of our work
+          </Typography>
         )}
-      </div>
-    </section>
+
+        <Box
+          sx={{
+            mx: { xs: 0, md: -3, lg: -6 },
+            '.next-arrow': { transform: 'translate(-24px, 100%)' },
+            '.prev-arrow': { transform: 'translate(calc(-100% - 24px), 100%)' },
+          }}
+        >
+          <Slider {...settings}>
+            {beforeAfterItems.map((item, index) => (
+              <Box key={index}>
+                <Box sx={{ mx: { xs: 0, md: 3, lg: 6 } }}>
+                  <div className='mb-3'>
+                    <div className='d-flex align-items-center justify-content-between'>
+                      <Typography sx={{ fontWeight: 700, lineHeight: '140%' }}>BMW 1 Series mk2</Typography>
+                      <Typography
+                        sx={{
+                          color: 'var(--Gray-600, #6a6b71)',
+                          fontSize: '12px',
+                          fontWeight: 300,
+                          lineHeight: '140%',
+                        }}
+                      >
+                        Model year 2011
+                      </Typography>
+                    </div>
+                    <Typography
+                      sx={{
+                        marginTop: '16px',
+                        height: '54px',
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        color: 'var(--Gray-700, #474747)',
+                        fontSize: '16px',
+                        fontStyle: 'normal',
+                        fontWeight: 400,
+                        lineHeight: '170%',
+                      }}
+                    >
+                      {item.description}
+                    </Typography>
+                  </div>
+                  <Box
+                    sx={{ width: '100%', height: '100%', display: 'flex' }}
+                    onTouchStart={(e) => handleTouchStartSlider(e)}
+                  >
+                    <ReactCompareSlider
+                      itemOne={
+                        <ReactCompareSliderImage src={REACT_APP_API_DOMAIN_URL + item.before_880_url} alt='Image one' />
+                      }
+                      itemTwo={
+                        <ReactCompareSliderImage src={REACT_APP_API_DOMAIN_URL + item.after_880_url} alt='Image two' />
+                      }
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            ))}
+          </Slider>
+        </Box>
+      </Box>
+
+      <Box sx={{ p: { xs: 8, lg: 12 } }}></Box>
+
+      {showVideos && (
+        <Box sx={{ p: { xs: '32px 0 24px', lg: '64px 0 128px' }, background: '#fff' }}>
+          <Box className='container'>
+            <Typography
+              sx={{
+                fontSize: { xs: 24, lg: 36 },
+                fontStyle: 'normal',
+                fontWeight: 700,
+                lineHeight: { xs: '120%', lg: '112%' },
+                letterSpacing: '-0.24px',
+                marginBottom: 3,
+              }}
+            >
+              Glass replacement in action
+            </Typography>
+            <Typography
+              sx={{
+                color: 'var(--Gray-700, #474747)',
+                fontSize: { xs: 16, lg: 20 },
+                fontStyle: 'normal',
+                fontWeight: 400,
+                lineHeight: { xs: '170%', lg: '150%' },
+                marginBottom: { xs: 4, lg: 8 },
+              }}
+            >
+              Watch as our skilled technicians expertly replace windshields with precision and care.
+            </Typography>
+            {videos.map((item, index) => (
+              <Box key={index}>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 14, lg: 24 },
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: { xs: '16px', lg: '124%' },
+                  }}
+                >
+                  {item.title}
+                </Typography>
+                <Box>
+                  <blockquote className='twitter-tweet' data-media-max-width='1200'>
+                    <a href={'https://twitter.com/fix_glass_/status/' + item.videoId + '?ref_src=twsrc%5Etfw'}></a>
+                  </blockquote>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
+    </Box>
   )
 }
