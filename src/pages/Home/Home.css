@@ -100,19 +100,6 @@
   }
 }
 
-.home .sec-payment-options .description {
-  color: var(--Gray-200, #eaeaeb);
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 150%;
-  margin-top: 40px;
-}
-
-.home .sec-payment-options .description .phone {
-  font-weight: 800;
-}
-
 .phone-number {
   white-space: nowrap;
   text-decoration: none;
