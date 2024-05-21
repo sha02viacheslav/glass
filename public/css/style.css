@@ -202,10 +202,17 @@ button.slick-arrow {
   font-size: 24px;
 }
 .prev-arrow {
-  left: -52px;
+    top: unset !important;
+    bottom: -8px;
+    left: unset;
+    right: 0;
+    transform: translate(-100%, 100%);
 }
 .next-arrow {
-  right: -52px;
+    top: unset !important;
+    bottom: -8px;
+    right: 0;
+    transform: translateY(100%);
 }
 
 .text-justify {
@@ -938,19 +945,6 @@ Media Queries
     border-top-right-radius: 0px;
     border-bottom-right-radius: 20px;
     border-bottom-left-radius: 20px;
-  }
-  .next-arrow {
-    top: unset !important;
-    bottom: -8px;
-    right: 0;
-    transform: translateY(100%);
-  }
-  .prev-arrow {
-    top: unset !important;
-    bottom: -8px;
-    left: unset;
-    right: 0;
-    transform: translate(-100%, 100%);
   }
   section.sec-about.section {
     padding-top: 110px;

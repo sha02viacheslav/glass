@@ -75,3 +75,9 @@
 .reviews-container .slide-arrow {
   display: none;
 }
+
+@media (min-width: 992px) {
+  .reviews-container .slide-arrow {
+    display: block;
+  }
+}
