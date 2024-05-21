@@ -64,7 +64,7 @@ export const LifeTime: React.FC = () => {
           </Typography>
         </Box>
 
-        <Box sx={{ p: { xs: 4, lg: 16 } }}>
+        <Box sx={{ p: { xs: 4, lg: 16 }, background: '#fff' }}>
           <Typography
             sx={{
               display: { xs: 'none', lg: 'block' },
@@ -96,7 +96,6 @@ export const LifeTime: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'flex-start',
               gap: 8,
-              background: '#fff',
             }}
             className='sec-content'
           >
