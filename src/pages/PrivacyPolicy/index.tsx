@@ -72,44 +72,52 @@ const PrivacyPolicy: React.FC = () => {
     [],
   )
   return (
-    <Box sx={{ px: 4, py: 40, maxWidth: '1000px', margin: '0 auto' }}>
-      <Typography variant='h3' sx={{ fontSize: 24, mb: 5 }}>
-        Privacy & Cookies policy
-      </Typography>
-      <Typography variant='h5' sx={{ fontSize: 14, mb: 0 }}>
-        TABLE OF CONTENTS
-      </Typography>
-      <Box sx={{ lineHeight: '24px' }}>
-        <List sx={{ mb: 6, listStyle: 'auto', pl: 4 }} component='ol' className='text-gray-700'>
-          {items.map((item) => (
-            <ListItem key={item._id}>
-              <a href={`#${item.id}`} className='text-decoration-none text-base-700'>
-                {item.title}
-              </a>
-            </ListItem>
-          ))}
-        </List>
-        <Box className='text-base-800 mt-5'>
-          {items.map((item) => (
-            <Box key={item._id} id={item.id} className='anchor'>
-              <Typography variant='h5' sx={{ fontSize: 14, mb: 3 }}>
-                {item._id}. <span className='text-uppercase'>{item.title}</span>
-              </Typography>
-              <List sx={{ mb: 6, listStyle: 'disc', pl: 8 }}>
-                {item.content.map((el, idx) => (
-                  <ListItem key={idx} sx={{ py: 0 }}>
-                    {el}
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          ))}
-        </Box>
-        <Box>
-          Have any questions?{' '}
-          <Link to='/contact' className='text-gray-700'>
-            <b>Contact us</b>
-          </Link>
+    <Box className='container'>
+      <Box sx={{ py: { xs: 40, lg: 65 }, maxWidth: 780 }}>
+        <Typography variant='h3' sx={{ fontSize: { xs: 24, lg: 60 }, lineHeight: '130%', mb: { xs: 5, lg: 12 } }}>
+          Privacy & Cookies policy
+        </Typography>
+        <Typography variant='h5' sx={{ color: 'var(--WF-Base-800, #2D3648)', fontSize: { xs: 14, lg: 24 }, mb: 0 }}>
+          TABLE OF CONTENTS
+        </Typography>
+        <Box sx={{ lineHeight: '24px' }}>
+          <List sx={{ mb: 6, listStyle: 'auto', pl: 4 }} component='ol'>
+            {items.map((item) => (
+              <ListItem key={item._id} sx={{ color: 'var(--WF-Base-700, #4A5468)', fontSize: { xs: 16, lg: 20 } }}>
+                <a href={`#${item.id}`} className='text-decoration-none text-base-700'>
+                  {item.title}
+                </a>
+              </ListItem>
+            ))}
+          </List>
+          <Box className='text-base-800 mt-5'>
+            {items.map((item) => (
+              <Box key={item._id} id={item.id} className='anchor'>
+                <Typography
+                  variant='h5'
+                  sx={{ color: 'var(--WF-Base-800, #2D3648)', fontSize: { xs: 14, lg: 20 }, mb: 3 }}
+                >
+                  {item._id}. <span className='text-uppercase'>{item.title}</span>
+                </Typography>
+                <List sx={{ mb: 6, listStyle: 'disc', pl: 8 }}>
+                  {item.content.map((el, idx) => (
+                    <ListItem
+                      key={idx}
+                      sx={{ color: 'var(--WF-Base-700, #4A5468)', py: { xs: 0, lg: 1 }, fontSize: { xs: 16, lg: 20 } }}
+                    >
+                      {el}
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            ))}
+          </Box>
+          <Box sx={{ color: 'var(--WF-Base-700, #4A5468)', fontSize: { xs: 16, lg: 20 } }}>
+            Have any questions?{' '}
+            <Link to='/contact' className='text-gray-700'>
+              <b>Contact us</b>
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Box>
