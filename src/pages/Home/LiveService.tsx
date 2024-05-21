@@ -1,18 +1,14 @@
 import React from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
 
-export type LiveServiceProps = {
-  image?: string
-}
-
-export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-bg.png' }) => {
+export const LiveService: React.FC = () => {
   return (
     <Box
       sx={{
         display: 'flex',
         paddingRight: '16px',
         alignItems: 'stretch',
-        gap: '24px',
+        gap: { xs: 6, lg: 15 },
         borderRadius: '2px',
         background: '#fff',
         boxShadow:
@@ -21,9 +17,10 @@ export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-
     >
       <CardMedia
         component='img'
-        image={process.env.PUBLIC_URL + '/images/' + image}
+        image={process.env.PUBLIC_URL + '/images/live-service-bg1.png'}
         sx={{
-          width: '146px',
+          width: { xs: 146, lg: 276 },
+          height: { xs: 'auto', lg: 276 },
           objectFit: 'cover',
           objectPosition: 'center',
           borderRadius: '2px 0 0 2px',
@@ -32,7 +29,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-
       <Box
         sx={{
           display: 'flex',
-          padding: 'var(--16, 16px) 0px',
+          padding: { xs: 'var(--16, 16px) 0px', lg: '64px 0' },
           flexDirection: 'column',
           alignItems: 'flex-start',
           gap: 'var(--8, 8px)',
@@ -43,7 +40,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-
         <Typography
           sx={{
             color: 'var(--Gray-800, #14151f)',
-            fontSize: '16px',
+            fontSize: { xs: 16, lg: 36 },
             fontWeight: '700',
             lineHeight: '140%',
             textTransform: 'uppercase',
@@ -54,7 +51,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ image = 'live-service-
         <Typography
           sx={{
             color: 'var(--Gray-600, #6a6b71)',
-            fontSize: '16px',
+            fontSize: { xs: 16, lg: 24 },
             fontWeight: '400',
             lineHeight: '170%',
             letterSpacing: '-0.16px',

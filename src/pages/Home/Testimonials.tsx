@@ -49,7 +49,7 @@ export const Testimonials: React.FC = () => {
           satisfied customers. See what they have to say about us.
         </Typography>
       </Box>
-      <Box sx={{ pr: { xs: 2, lg: 0 } }}>
+      <Box sx={{ pr: 2 }}>
         <GoogleReviews />
       </Box>
     </Box>

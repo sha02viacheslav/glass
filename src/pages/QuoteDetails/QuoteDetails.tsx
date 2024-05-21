@@ -636,7 +636,7 @@ export const QuoteDetails: React.FC = ({}) => {
               {formik.values.workingPlace === WorkingPlace.MOBILE && (
                 <Box sx={{ marginTop: '24px' }}>
                   {!!workshops.length && <MobileService workshops={workshops} />}
-                  <LiveService image='live-service-bg1.png' />
+                  <LiveService />
                 </Box>
               )}
             </section>

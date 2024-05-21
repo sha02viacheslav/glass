@@ -71,7 +71,7 @@ export const Services: React.FC = () => {
       <div className='padding-64'></div>
 
       <Box sx={{ margin: '0 16px' }}>
-        <LiveService image='live-service-bg1.png' />
+        <LiveService />
       </Box>
 
       <div className='padding-64'></div>

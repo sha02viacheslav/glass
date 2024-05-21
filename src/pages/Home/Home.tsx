@@ -139,33 +139,33 @@ export const Home: React.FC = () => {
 
       <HowWeWork />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <OurMethod beforeAfterType={BeforeAfterType.ALL} />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <PaymentOptions />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <InstallmentBenefits />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <LifeTime />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <Partners />
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
-      <Box sx={{ margin: '0 16px' }}>
+      <Box className='container'>
         <LiveService />
       </Box>
 
-      <div className='padding-64'></div>
+      <Box sx={{ py: { xs: 8, lg: 16 } }}></Box>
 
       <Testimonials />
 
@@ -173,9 +173,7 @@ export const Home: React.FC = () => {
 
       <PlantTree />
 
-      <div className='padding-64'></div>
-      <div className='padding-64'></div>
-      <div className='padding-64'></div>
+      <Box sx={{ py: 25 }}></Box>
 
       <Chat />
     </div>

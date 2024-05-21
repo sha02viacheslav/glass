@@ -443,7 +443,7 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
 
         <Box sx={{ p: 8 }}></Box>
 
-        <LiveService image='live-service-bg1.png' />
+        <LiveService />
 
         <Box sx={{ p: 8 }}></Box>
 
