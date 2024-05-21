@@ -1,6 +1,5 @@
-import './Process.css'
 import React, { useMemo } from 'react'
-import { Box } from '@mui/system'
+import { Box, Typography } from '@mui/material'
 import { ProcessCard } from './ProcessCard'
 
 export const Process: React.FC = () => {
@@ -203,48 +202,90 @@ export const Process: React.FC = () => {
   )
 
   return (
-    <div className='process-page'>
-      <div className='padding-32'></div>
+    <Box>
+      <Box sx={{ py: { xs: 20, lg: 32 } }}></Box>
 
-      <div className='page-header'>
-        <div className='breadcrumb'>More about our process</div>
-        <div className='title'>Explore Our Glass Repair Process: Learn About How We Work!</div>
-        <div className='description'>
-          Below, we&apos;ve simplified our approach into bite-sized answers to common questions. Tap each question to
-          reveal more about how we work.
-        </div>
-      </div>
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', lg: 'center' } }}
+        className='container'
+      >
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', lg: 'center' } }}
+          className='page-header'
+        >
+          <Typography
+            sx={{
+              color: 'var(--Light-Blue---Primary-600, #133f85)',
+              fontSize: { xs: 12, lg: 16 },
+              lineHeight: { xs: '130%', lg: '125%' },
+              letterSpacing: { xs: '0.84px', lg: '1.12px' },
+              textTransform: 'uppercase',
+            }}
+          >
+            More about our process
+          </Typography>
+          <Typography
+            sx={{
+              textAlign: { xs: 'left', lg: 'center' },
+              fontSize: { xs: 24, lg: 72 },
+              fontWeight: 700,
+              lineHeight: { xs: '130%', lg: '110%' },
+              marginTop: { xs: 4, lg: 8 },
+              maxWidth: 962,
+            }}
+          >
+            Explore Our Glass Repair Process: Learn About How We Work!
+          </Typography>
+          <Typography
+            sx={{
+              textAlign: { xs: 'left', lg: 'center' },
+              color: 'var(--Gray-600, #6a6b71)',
+              fontSize: { xs: 16, lg: 30 },
+              lineHeight: { xs: '170%', lg: '160%' },
+              marginTop: { xs: 3, lg: 6 },
+              maxWidth: 704,
+            }}
+          >
+            Below, we&apos;ve simplified our approach into bite-sized answers to common questions. Tap each question to
+            reveal more about how we work.
+          </Typography>
+        </Box>
 
-      <div className='padding-48'></div>
-      {helpItems.map((help) => (
-        <Box className='process-group' key={help.id} sx={{ mb: 10 }} id={help.id}>
-          <div className='process-group-title'>{help.title}</div>
-          {help.cards.map((q, qIdx) => (
-            <ProcessCard title={q.title} key={qIdx}>
-              {q.content.map((content, cIdx) => (
-                <Box key={cIdx}>
-                  <Box sx={{ mb: content.video ? 0 : 4, fontWeight: content.video ? 'bold' : 'normal' }}>
-                    {content.text}
-                  </Box>
-                  {content.video && (
-                    <iframe
-                      width='100%'
-                      height='315'
-                      src={content.video}
-                      title='YouTube Video'
-                      frameBorder='0'
-                      allowFullScreen
-                    ></iframe>
-                  )}
-                </Box>
+        <Box sx={{ p: { xs: 6, lg: 12 } }}></Box>
+
+        <Box sx={{ maxWidth: 704 }}>
+          {helpItems.map((help) => (
+            <Box key={help.id} id={help.id} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 10 }}>
+              <Typography sx={{ fontSize: '20px', fontWeight: 700, lineHeight: '130%', marginBottom: '8px' }}>
+                {help.title}
+              </Typography>
+              {help.cards.map((q, qIdx) => (
+                <ProcessCard title={q.title} key={qIdx}>
+                  {q.content.map((content, cIdx) => (
+                    <Box key={cIdx}>
+                      <Box sx={{ mb: content.video ? 0 : 4, fontWeight: content.video ? 'bold' : 'normal' }}>
+                        {content.text}
+                      </Box>
+                      {content.video && (
+                        <iframe
+                          width='100%'
+                          height='315'
+                          src={content.video}
+                          title='YouTube Video'
+                          frameBorder='0'
+                          allowFullScreen
+                        ></iframe>
+                      )}
+                    </Box>
+                  ))}
+                </ProcessCard>
               ))}
-            </ProcessCard>
+            </Box>
           ))}
         </Box>
-      ))}
+      </Box>
 
-      <div className='padding-64'></div>
-      <div className='padding-64'></div>
-    </div>
+      <Box sx={{ p: { xs: 16, lg: 25 } }}></Box>
+    </Box>
   )
 }
