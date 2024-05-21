@@ -99,9 +99,3 @@
     transform: translateY(-42px);
   }
 }
-
-.phone-number {
-  white-space: nowrap;
-  text-decoration: none;
-  color: #9941e5 !important;
-}
