@@ -1,60 +1,18 @@
-.comparison-page {
-  padding-top: 116px;
-}
-
-.comparison-page .page-header {
-  padding: 0 16px;
-}
-
-.comparison-page .page-header .breadcrumb {
-  color: var(--Light-Blue---Primary-600, #133f85);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 130%;
-  letter-spacing: 0.84px;
-  text-transform: uppercase;
-}
-
-.comparison-page .page-header .title {
-  color: var(--Gray-800, #14151f);
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 130%;
-  margin-top: 16px;
-}
-
-.comparison-page .page-header .description {
-  color: var(--Gray-600, #6a6b71);
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 170%;
-  margin-top: 12px;
-}
-
-.comparison-page .monthly-installment {
-  padding: var(--24, 24px) var(--16, 16px);
-  background: linear-gradient(94deg, #582991 11.37%, #2c1385 123.87%);
-  color: #fff;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 150%;
-}
-
 .comparison-page .comparison-table-container {
-  max-width: calc(100vh - 32px);
+  max-width: calc(100vw - 32px);
   overflow: auto;
-  margin: 0 16px;
   padding: 8px 0 16px;
 }
 
 .comparison-page .comparison-table-container .comparison-table {
   position: relative;
   table-layout: fixed;
-  width: 460px;
+}
+
+@media (max-width: 991px) {
+  .comparison-page .comparison-table-container .comparison-table {
+    width: 460px;
+  }
 }
 
 .comparison-page .comparison-table-container .comparison-table::before {
@@ -67,6 +25,13 @@
   left: 120px;
   box-shadow: 0px 8px 16px 0px rgba(65, 65, 65, 0.04), 0px 5px 10px 0px rgba(65, 65, 65, 0.04),
     0px 2px 4px 0px rgba(65, 65, 65, 0.06);
+}
+
+@media (min-width: 992px) {
+  .comparison-page .comparison-table-container .comparison-table::before {
+    left: 360px;
+    width: 360px;
+  }
 }
 
 .comparison-page .comparison-table tr {
@@ -87,6 +52,11 @@
   padding: 16px 12px;
   text-align: center;
 }
+@media (min-width: 992px) {
+  .comparison-page .comparison-table tr th {
+    font-size: 20px;
+  }
+}
 
 .comparison-page .comparison-table tr th:nth-child(2) {
   background: #fff;
@@ -95,7 +65,6 @@
 .comparison-page .comparison-table tr td:nth-child(1) {
   color: var(--Gray-800, #14151f);
   text-align: center;
-  font-size: 12px;
   font-style: normal;
   font-weight: 300;
   line-height: 180%;
@@ -106,7 +75,6 @@
 
 .comparison-page .comparison-table tr td:nth-child(2) {
   color: var(--Gray-800, #14151f);
-  font-size: 12px;
   font-style: normal;
   font-weight: 600;
   line-height: 180%;
@@ -118,11 +86,20 @@
 
 .comparison-page .comparison-table tr td:nth-child(3) {
   color: var(--Gray-800, #14151f);
-  font-size: 12px;
   font-style: normal;
   font-weight: 300;
   line-height: 180%;
   letter-spacing: 0.24px;
   vertical-align: top;
   padding: 12px 30px;
+}
+
+.comparison-page .comparison-table tr td {
+  font-size: 12px;
+}
+
+@media (min-width: 992px) {
+  .comparison-page .comparison-table tr td {
+    font-size: 16px;
+  }
 }
