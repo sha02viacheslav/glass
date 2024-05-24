@@ -18,9 +18,7 @@ export const Contact: React.FC = () => {
 
       <Box
         sx={{
-          background: {
-            lg: 'url(/images/contact-us.jpeg) center / cover no-repeat, var(--Light-Blue---Primary-000, #E8F0FE)',
-          },
+          background: { lg: 'url(/images/contact-us.png) center / cover no-repeat' },
           py: { lg: 24 },
         }}
       >
