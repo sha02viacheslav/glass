@@ -1,83 +1,123 @@
 import './Footer.css'
 import React from 'react'
+import { Box } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { SocialLinks } from '@glass/components/Footer/SocialLinks'
 
 export const Footer: React.FC = () => {
   return (
-    <footer className='footer'>
-      <section className='footer-content'>
-        <div className='content-box'>
-          <div className='d-lg-flex justify-content-between'>
-            <div>
-              <div className='d-flex flex-column flex-lg-row align-items-lg-center'>
-                <div className='d-flex align-items-center justify-content-between mb-3'>
-                  <div>
-                    <a href='#'>
-                      <img src={process.env.PUBLIC_URL + '/images/logo.svg'} className='img-fluid' alt='' />
-                    </a>
-                  </div>
-                  <div className='d-lg-none'>
-                    <SocialLinks />
-                  </div>
+    <Box sx={{ background: 'var(--Light-Blue---Primary-800, #020e21)' }}>
+      <Box className='container'>
+        <Box
+          sx={{
+            display: { xs: 'none', lg: 'block' },
+            borderTop: '1px solid var(--Light-Blue---Primary-700, #081f44)',
+            width: '100%',
+          }}
+        ></Box>
+
+        <Box sx={{ pt: { xs: 4, lg: 16 }, pb: 12 }} className='footer-content'>
+          <Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'flex-start', lg: 'space-between' },
+                gap: { xs: 8, lg: 16 },
+                pb: 8,
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  width: { xs: '100%', lg: 'auto' },
+                  flexDirection: { xs: 'row', lg: 'column' },
+                  justifyContent: { xs: 'space-between', lg: 'flex-start' },
+                  alignItems: { xs: 'center', lg: 'flex-start' },
+                }}
+              >
+                <div>
+                  <a href='#'>
+                    <img src={process.env.PUBLIC_URL + '/images/logo.svg'} className='img-fluid' alt='' />
+                  </a>
                 </div>
+                <SocialLinks />
+              </Box>
 
-                <div className='divider'></div>
+              <Box
+                sx={{
+                  display: { lg: 'none' },
+                  borderTop: '1px solid var(--Light-Blue---Primary-700, #081f44)',
+                  width: '100%',
+                }}
+              ></Box>
 
-                <div className='footer-link-container'>
-                  <div className='footer-link-wrap'>
-                    <div className='title'>Our services</div>
-                    <Link to='/services?serviceKey=new-windscreen-replacement' className='footer-link'>
-                      Windscreen replacement
-                    </Link>
-                    <Link to='/services?serviceKey=new-door-glass-replacement' className='footer-link'>
-                      Door glass replacement
-                    </Link>
-                    <Link to='/services?serviceKey=new-heated-rear-windscreen-replacement' className='footer-link'>
-                      Rear windscreen replacement
-                    </Link>
-                  </div>
+              <Box className='footer-link-wrap'>
+                <div className='title'>Our services</div>
+                <Link to='/services?serviceKey=new-windscreen-replacement' className='footer-link'>
+                  Windscreen replacement
+                </Link>
+                <Link to='/services?serviceKey=new-door-glass-replacement' className='footer-link'>
+                  Door glass replacement
+                </Link>
+                <Link to='/services?serviceKey=new-heated-rear-windscreen-replacement' className='footer-link'>
+                  Rear windscreen replacement
+                </Link>
+              </Box>
 
-                  <div className='footer-link-wrap'>
-                    <div className='title'>Other information</div>
-                    <Link to='/about-us' className='footer-link'>
-                      About Us
-                    </Link>
-                    <Link to='/contact' className='footer-link'>
-                      Contact Us
-                    </Link>
-                    <Link to='/faq' className='footer-link'>
-                      FAQ
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <Box
+                sx={{
+                  display: { xs: 'none', lg: 'flex' },
+                }}
+                className='footer-link-wrap'
+              >
+                <div className='title'>Repair & Savings Hub</div>
+                <Link to='/comparison' className='footer-link'>
+                  FixGlass vs Cheap Providers
+                </Link>
+                <Link to='/process' className='footer-link'>
+                  Learn About How We Work!
+                </Link>
+                <Link to='/installments' className='footer-link'>
+                  Saving money with installments
+                </Link>
+              </Box>
 
-              <div className='divider'></div>
+              <Box className='footer-link-wrap'>
+                <div className='title'>Other information</div>
+                <Link to='/about-us' className='footer-link'>
+                  About Us
+                </Link>
+                <Link to='/contact' className='footer-link'>
+                  Contact Us
+                </Link>
+                <Link to='/faq' className='footer-link'>
+                  FAQ
+                </Link>
+              </Box>
+            </Box>
 
-              <div className='footer-bottom'>
-                <div className='footer-bottom-links'>
-                  <div className='footer-link'>English</div>
-                  <div className='dot'></div>
-                  <div className='footer-link'></div>
-                  <Link to='/privacy-policy' className='footer-link'>
-                    Privacy Policy
-                  </Link>
-                  <div className='dot'></div>
-                  <Link to='/terms-conditions' className='footer-link'>
-                    Terms & Conditions
-                  </Link>
-                </div>
+            <Box sx={{ borderTop: '1px solid var(--Light-Blue---Primary-700, #081f44)' }}></Box>
 
-                <div className='copy-right'>Copyright by © FixGlass Company No.11808031. All rights reserved.</div>
-              </div>
-            </div>
-            <div className='d-none d-lg-block'>
-              <SocialLinks />
-            </div>
-          </div>
-        </div>
-      </section>
-    </footer>
+            <Box className='footer-bottom'>
+              <Box className='footer-bottom-links'>
+                <Box className='footer-link'>English</Box>
+                <Box className='dot'></Box>
+                <Box className='footer-link'></Box>
+                <Link to='/privacy-policy' className='footer-link'>
+                  Privacy Policy
+                </Link>
+                <Box className='dot'></Box>
+                <Link to='/terms-conditions' className='footer-link'>
+                  Terms & Conditions
+                </Link>
+              </Box>
+
+              <Box className='copy-right'>Copyright by © FixGlass Company No.11808031. All rights reserved.</Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   )
 }

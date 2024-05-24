@@ -27,7 +27,6 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({ title, children }) => 
           gap: 'var(--24, 24px)',
           alignSelf: 'stretch',
         }}
-        onClick={() => setExpanded((prev) => !prev)}
       >
         <Typography
           sx={{
@@ -43,8 +42,15 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({ title, children }) => 
         </Typography>
         <CardMedia
           component='img'
-          sx={{ width: 24, height: 24, transition: 'all 300ms', transform: expanded ? 'rotate(180deg)' : '' }}
+          sx={{
+            width: 24,
+            height: 24,
+            transition: 'all 300ms',
+            transform: expanded ? 'rotate(180deg)' : '',
+            cursor: 'pointer',
+          }}
           image={process.env.PUBLIC_URL + '/images/chevron-down.svg'}
+          onClick={() => setExpanded((prev) => !prev)}
         />
       </Box>
 

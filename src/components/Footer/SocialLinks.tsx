@@ -4,7 +4,6 @@ import React from 'react'
 export const SocialLinks: React.FC = () => {
   return (
     <div>
-      <div className='d-none d-md-block text-white fnt-18 fnt-md-20 mb-2'>Stalk us</div>
       <div className='d-flex gap-3 gap-md-4'>
         <a
           href='https://www.facebook.com/profile.php?id=100065230862925'
