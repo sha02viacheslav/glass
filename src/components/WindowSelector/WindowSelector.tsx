@@ -335,7 +335,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [selectedGlasses])
 
   return (
-    <div>
+    <Box sx={{ display: { lg: 'flex' } }}>
       <div className={styles.container}>
         {showTintedPopup && (
           <ConfirmDialog
@@ -411,170 +411,179 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             ),
           )}
         </div>
+
+        {!disabled && <HowToPick />}
       </div>
 
-      {!disabled && <HowToPick />}
-
-      {tintedConfirmed && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderRadius: '4px',
-            padding: '12px 16px',
-            border: '1px solid var(--Gray-100, #F2F2F3)',
-            background: '#fff',
-            marginTop: '24px',
-          }}
-        >
-          <Typography
+      <Box
+        sx={{
+          p: { lg: '24px 48px 48px' },
+          borderRadius: '16px',
+          border: { lg: '2px solid var(--Gray-100, #F2F2F3)' },
+          background: { lg: '#fff' },
+        }}
+      >
+        {tintedConfirmed && (
+          <Box
             sx={{
-              color: 'var(--Gray-800, #14151F)',
-              fontSize: '12px',
-              fontWeight: '600',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: '4px',
+              padding: '12px 16px',
+              border: '1px solid var(--Gray-100, #F2F2F3)',
+              background: '#fff',
+              marginTop: '24px',
             }}
           >
-            PRIVACY WINDOWS?
-          </Typography>
+            <Typography
+              sx={{
+                color: 'var(--Gray-800, #14151F)',
+                fontSize: '12px',
+                fontWeight: '600',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              PRIVACY WINDOWS?
+            </Typography>
 
-          <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
-            <FormControlLabel value={true} control={<Radio />} label='Yes' />
-            <FormControlLabel value={false} control={<Radio />} label='No' />
-          </RadioGroup>
-        </Box>
-      )}
+            <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
+              <FormControlLabel value={true} control={<Radio />} label='Yes' />
+              <FormControlLabel value={false} control={<Radio />} label='No' />
+            </RadioGroup>
+          </Box>
+        )}
 
-      {!disabled && isVan && bodyConfirmed && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderRadius: '4px',
-            padding: '12px 16px',
-            border: '1px solid var(--Gray-100, #F2F2F3)',
-            background: '#fff',
-            marginTop: '24px',
-          }}
-        >
-          <Typography
+        {!disabled && isVan && bodyConfirmed && (
+          <Box
             sx={{
-              color: 'var(--Gray-800, #14151F)',
-              fontSize: '12px',
-              fontWeight: '600',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: '4px',
+              padding: '12px 16px',
+              border: '1px solid var(--Gray-100, #F2F2F3)',
+              background: '#fff',
+              marginTop: '24px',
             }}
           >
-            Body type?
-          </Typography>
+            <Typography
+              sx={{
+                color: 'var(--Gray-800, #14151F)',
+                fontSize: '12px',
+                fontWeight: '600',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Body type?
+            </Typography>
 
-          <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
-            <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' />
-            <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' />
-          </RadioGroup>
-        </Box>
-      )}
+            <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
+              <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' />
+              <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' />
+            </RadioGroup>
+          </Box>
+        )}
 
-      {Object.keys(filteredCharacteristics).map((key) => (
-        <Box key={key} sx={{ marginTop: 4 }}>
-          {!disabled && (
-            <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', pt: 4 }}>
-              <Typography
-                sx={{
-                  color: 'var(--Gray-600, #6A6B71)',
-                  fontSize: '12px',
-                  fontWeight: '700',
-                  lineHeight: '150%',
-                  letterSpacing: '0.84px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                QUESTIONS ABOUT {key}
-              </Typography>
-
-              <Typography
-                sx={{
-                  color: 'var(--Gray-800, #14151F)',
-                  fontSize: '16px',
-                  fontWeight: '400',
-                  lineHeight: '150%',
-                  letterSpacing: '-0.16px',
-                  marginTop: 4,
-                }}
-              >
-                We need some additional information related to your {key}{' '}
+        {Object.keys(filteredCharacteristics).map((key) => (
+          <Box key={key} sx={{ marginTop: 4 }}>
+            {!disabled && (
+              <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', pt: 4 }}>
                 <Typography
                   sx={{
-                    display: 'inline',
                     color: 'var(--Gray-600, #6A6B71)',
-                  }}
-                  component='span'
-                >
-                  (Just {characteristics[key].length} fast questions).
-                </Typography>
-              </Typography>
-
-              <Box
-                sx={{
-                  padding: '12px 16px',
-                  borderRadius: '2px',
-                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                  marginTop: '24px',
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: 'var(--Dark-Blue---Accent-800, #090221)',
-                    fontSize: '16px',
+                    fontSize: '12px',
                     fontWeight: '700',
                     lineHeight: '150%',
-                    letterSpacing: '0.8px',
-                    display: 'flex',
-                    gap: '8px',
+                    letterSpacing: '0.84px',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
-                  IMPORTANT
+                  QUESTIONS ABOUT {key}
                 </Typography>
+
                 <Typography
                   sx={{
-                    color: 'var(--Light-Blue---Primary-700, #081F44)',
+                    color: 'var(--Gray-800, #14151F)',
                     fontSize: '16px',
                     fontWeight: '400',
-                    lineHeight: '170%',
-                    marginTop: '4px',
+                    lineHeight: '150%',
+                    letterSpacing: '-0.16px',
+                    marginTop: 4,
                   }}
                 >
-                  Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                  We need some additional information related to your {key}{' '}
+                  <Typography
+                    sx={{
+                      display: 'inline',
+                      color: 'var(--Gray-600, #6A6B71)',
+                    }}
+                    component='span'
+                  >
+                    (Just {characteristics[key].length} fast questions).
+                  </Typography>
                 </Typography>
-              </Box>
-            </Box>
-          )}
 
-          <Questions
-            characteristics={characteristics[key]}
-            onChange={(value) => {
-              setCharacteristics((prev) => {
-                prev[key] = value
-                return { ...prev }
-              })
-            }}
-            setActiveIndex={(v) => setActiveQuestionIndex({ ...activeQuestionIndex, [key]: v })}
-          ></Questions>
-        </Box>
-      ))}
-      {needHelp && (
-        <Box pt={4}>
-          <WhatDifference />
-        </Box>
-      )}
-    </div>
+                <Box
+                  sx={{
+                    padding: '12px 16px',
+                    borderRadius: '2px',
+                    border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                    background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                    marginTop: '24px',
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: 'var(--Dark-Blue---Accent-800, #090221)',
+                      fontSize: '16px',
+                      fontWeight: '700',
+                      lineHeight: '150%',
+                      letterSpacing: '0.8px',
+                      display: 'flex',
+                      gap: '8px',
+                    }}
+                  >
+                    <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
+                    IMPORTANT
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'var(--Light-Blue---Primary-700, #081F44)',
+                      fontSize: '16px',
+                      fontWeight: '400',
+                      lineHeight: '170%',
+                      marginTop: '4px',
+                    }}
+                  >
+                    Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            <Questions
+              characteristics={characteristics[key]}
+              onChange={(value) => {
+                setCharacteristics((prev) => {
+                  prev[key] = value
+                  return { ...prev }
+                })
+              }}
+              setActiveIndex={(v) => setActiveQuestionIndex({ ...activeQuestionIndex, [key]: v })}
+            ></Questions>
+          </Box>
+        ))}
+        {needHelp && (
+          <Box pt={4}>
+            <WhatDifference />
+          </Box>
+        )}
+      </Box>
+    </Box>
   )
 }
