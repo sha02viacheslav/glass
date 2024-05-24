@@ -9,8 +9,11 @@ import {
   RadioGroup,
   Step,
   StepIcon,
+  StepLabel,
   Stepper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
@@ -107,6 +110,8 @@ export type CustomerProps = {
 }
 
 export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
+  const theme = useTheme()
+  const isLg = useMediaQuery(theme.breakpoints.up('md'))
   const navigate = useNavigate()
 
   const { licenseNum, quoteId, step } = useParams()
@@ -767,19 +772,38 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               >
                 <span>Step {steps[activeStep].index}</span> - {steps[activeStep].title}
               </Box>
-              <Stepper alternativeLabel={true} activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
+              <Stepper alternativeLabel={isLg} activeStep={steps[activeStep].index} sx={{ margin: '0 -4px' }}>
                 {Object.keys(steps)
                   .slice(0, 5)
                   .map((step) => {
                     const stepProps: { completed?: boolean } = {}
 
                     return (
-                      <Step key={step} {...stepProps} sx={{ paddingLeft: '4px', paddingRight: '4px' }}>
-                        <StepIcon
-                          icon={steps[step as InquiryStep].index}
-                          active={step === activeStep}
-                          completed={step < activeStep}
-                        ></StepIcon>
+                      <Step
+                        key={step}
+                        {...stepProps}
+                        sx={{ paddingLeft: '4px', paddingRight: '4px', '.MuiStepConnector-root': { top: { lg: 16 } } }}
+                      >
+                        {isLg ? (
+                          <StepLabel
+                            icon={
+                              <StepIcon
+                                icon={steps[step as InquiryStep].index}
+                                active={step === activeStep}
+                                completed={step < activeStep}
+                                sx={{ width: 32, height: 32 }}
+                              ></StepIcon>
+                            }
+                          >
+                            {steps[step as InquiryStep].title}
+                          </StepLabel>
+                        ) : (
+                          <StepIcon
+                            icon={steps[step as InquiryStep].index}
+                            active={step === activeStep}
+                            completed={step < activeStep}
+                          ></StepIcon>
+                        )}
                       </Step>
                     )
                   })}
