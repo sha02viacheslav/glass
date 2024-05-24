@@ -42,7 +42,7 @@ export const CustomModal: FC<PropComponent> = ({
             <Typography variant='h6' style={{ fontSize: 22, ...titleStyle }}>
               {title || ''}
             </Typography>
-            <CloseIcon onClick={() => onClose()} />
+            <CloseIcon sx={{ cursor: 'pointer' }} onClick={() => onClose()} />
           </Box>
           {bordered && <Divider />}
         </Box>

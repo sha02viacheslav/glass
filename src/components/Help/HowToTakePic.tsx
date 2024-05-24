@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Typography, Box, Link } from '@mui/material'
+import { Typography, Box, Link, useTheme, useMediaQuery } from '@mui/material'
 import { CustomModal } from '../Modal/CustomModal'
 
 export const HowToTakePic = () => {
+  const theme = useTheme()
+  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+
   const [open, setOpen] = useState(false)
   const helpItems = useMemo(
     () => [
@@ -48,7 +51,7 @@ export const HowToTakePic = () => {
     <>
       <Typography
         sx={{
-          fontSize: 14,
+          fontSize: { xs: 14, lg: 16 },
           marginTop: 2,
         }}
       >
@@ -57,10 +60,10 @@ export const HowToTakePic = () => {
           Tap here
         </Link>
       </Typography>
-      <CustomModal open={open} onClose={() => setOpen(false)} title='How to take pictures' width={700}>
-        <Box>
+      <CustomModal open={open} onClose={() => setOpen(false)} title='How to take pictures' width={isLg ? 1100 : 700}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 6, lg: 12 } }}>
           {helpItems.map((el1, idx1) => (
-            <Box key={idx1} flex={1} mb={6}>
+            <Box key={idx1} flex={1}>
               <Typography sx={{ fontSize: 20 }} variant='h6'>
                 {el1.title}
               </Typography>

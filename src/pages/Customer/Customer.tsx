@@ -2,6 +2,7 @@ import './Customer.css'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
+  CardMedia,
   FormControl,
   FormControlLabel,
   OutlinedInput,
@@ -1056,50 +1057,69 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activeStep === InquiryStep.STEP3 ? 'auto' : '0px', overflow: 'hidden' }}
           >
             <div className='padding-48'></div>
-            <section>
-              <Box
-                sx={{
-                  paddingX: 4,
-                  paddingY: 3,
-                  borderRadius: '2px',
-                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                }}
-              >
-                <Typography
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 12 }}>
+              <Box sx={{ flex: 1 }}>
+                <Box
                   sx={{
-                    color: 'var(--Dark-Blue---Accent-800, #090221)',
-                    fontWeight: '700',
-                    lineHeight: '150%',
-                    letterSpacing: '0.8px',
+                    paddingX: 4,
+                    paddingY: 3,
+                    borderRadius: '2px',
+                    border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                    background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
                   }}
                 >
-                  IMPORTANT
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'var(--Light-Blue---Primary-700, #081F44)',
-                    lineHeight: '170%',
-                    marginTop: 1,
-                  }}
-                >
-                  Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later as
-                  well.
-                </Typography>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <CardMedia
+                      component='img'
+                      sx={{ width: { xs: 24, lg: 32 }, height: { xs: 24, lg: 32 } }}
+                      image={process.env.PUBLIC_URL + '/images/information-dark.svg'}
+                      alt='Minus'
+                    />
+                    <Typography
+                      sx={{
+                        color: 'var(--Dark-Blue---Accent-800, #090221)',
+                        fontSize: { xs: 16, lg: 20 },
+                        fontWeight: '700',
+                        lineHeight: '150%',
+                        letterSpacing: '0.8px',
+                      }}
+                    >
+                      IMPORTANT
+                    </Typography>
+                  </Box>
+
+                  <Typography
+                    sx={{
+                      color: 'var(--Light-Blue---Primary-700, #081F44)',
+                      fontSize: { xs: 16, lg: 20 },
+                      lineHeight: '170%',
+                      marginTop: { xs: 1, lg: 4 },
+                    }}
+                  >
+                    Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later
+                    as well.
+                  </Typography>
+                </Box>
+                <Box sx={{ marginTop: 6 }}>
+                  <AddPictures
+                    attachments={formik.values.attachments}
+                    onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
+                  />
+
+                  <HowToTakePic />
+                </Box>
               </Box>
-              <Box sx={{ marginTop: 6 }}>
-                <AddPictures
-                  attachments={formik.values.attachments}
-                  onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
-                />
 
-                <HowToTakePic />
+              <Box sx={{ height: 'auto', borderLeft: 'solid 1px #f2f2f2' }}></Box>
 
-                <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
+              <Box sx={{ flex: 1 }}>
+                <Typography sx={{ fontSize: { xs: 16, lg: 20 }, lineHeight: '150%', marginBottom: 2 }}>
+                  Additional comments
+                </Typography>
                 <FormControl fullWidth>
                   <OutlinedInput
                     value={formik.values.comment}
@@ -1107,18 +1127,18 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                     multiline
                     rows={4}
                     placeholder='Any info you think that can help...'
-                    sx={{ fontSize: 14, paddingY: 0 }}
+                    sx={{ fontSize: 14, paddingY: 0, background: '#fff' }}
                     onChange={(e) => formik.setFieldValue(FormFieldIds.COMMENT, e.target.value)}
                     error={formik.touched.comment && !!formik.errors.comment}
                   />
                 </FormControl>
               </Box>
-            </section>
+            </Box>
             <div className='padding-64'></div>
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
           >
             <div className='padding-48'></div>

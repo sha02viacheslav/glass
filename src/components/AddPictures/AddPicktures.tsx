@@ -210,7 +210,9 @@ export const AddPictures: React.FC<AddPicturesProps> = ({
       {!disabled && (
         <Box sx={{ marginBottom: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography sx={{ lineHeight: '150%' }}>Broken glass pictures or videos</Typography>
+            <Typography sx={{ fontSize: { xs: 16, lg: 20 }, lineHeight: '150%' }}>
+              Broken glass pictures or videos
+            </Typography>
             <button className='btn-link' onClick={btnOnClick}>
               <label style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
                 <input
