@@ -1142,14 +1142,45 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             sx={{ height: activeStep === InquiryStep.STEP4 ? 'auto' : '0px', overflow: 'hidden' }}
           >
             <div className='padding-48'></div>
-            <section>
-              <PersonalInfoForm
-                values={formik.values}
-                touched={formik.touched}
-                errors={formik.errors}
-                setFieldValue={formik.setFieldValue}
-              />
-            </section>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+              <Box sx={{ maxWidth: 354, display: { xs: 'none', lg: 'block' } }}>
+                <Typography
+                  sx={{
+                    fontSize: 24,
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '140%',
+                  }}
+                >
+                  Your personal info
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-700, #474747)',
+                    fontSize: 20,
+                    lineHeight: '140%',
+                    mt: 4,
+                  }}
+                >
+                  Pleas enter your personal info in the fields on the right.
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  p: { lg: 12 },
+                  borderRadius: '16px',
+                  border: { lg: '2px solid var(--Gray-100, #F2F2F3)' },
+                  background: { lg: '#fff' },
+                }}
+              >
+                <PersonalInfoForm
+                  values={formik.values}
+                  touched={formik.touched}
+                  errors={formik.errors}
+                  setFieldValue={formik.setFieldValue}
+                />
+              </Box>
+            </Box>
             <div className='padding-64'></div>
           </Box>
 
