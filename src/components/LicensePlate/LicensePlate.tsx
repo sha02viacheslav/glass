@@ -1,6 +1,6 @@
 import './license-plate.css'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Box } from '@mui/material'
+import { Box, CardMedia, Typography } from '@mui/material'
 import { Inquiry } from '@glass/models'
 import { getInquiryService } from '@glass/services/apis/get-inquiry.service'
 import { formatLicenseNumber } from '@glass/utils/format-license-number/format-license-number.util'
@@ -11,6 +11,7 @@ export type LicensePlateProps = {
   placeholderVal?: string
   showSearch?: boolean
   showModel?: boolean
+  hasError?: boolean
   handleVehInputChange?: (value: string) => void
   handleVehicleDataChange?: (value: Inquiry | undefined) => void
 }
@@ -21,6 +22,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   placeholderVal = '',
   showSearch = false,
   showModel = false,
+  hasError = false,
   handleVehInputChange = () => {},
   handleVehicleDataChange = () => {},
 }) => {
@@ -81,7 +83,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
   }, [licenseNumber])
 
   return (
-    <div className={'license-plate' + (invalid ? ' invalid' : '')}>
+    <Box className='license-plate'>
       <Box
         sx={{
           display: 'flex',
@@ -91,7 +93,7 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
           borderRadius: '2px',
           textAlign: 'center',
           verticalAlign: 'middle',
-          border: invalid ? '1px solid var(--Red---Semantic-500, #c22222)' : '1px solid #000',
+          border: invalid || hasError ? '1px solid var(--Red---Semantic-500, #c22222)' : '1px solid #000',
         }}
       >
         <Box
@@ -137,38 +139,63 @@ export const LicensePlate: React.FC<LicensePlateProps> = ({
       </Box>
 
       {!!showModel && (
-        <div>
-          <div className='model'>
-            <img
-              src={process.env.PUBLIC_URL + '/images/' + (invalid ? 'car-red.svg' : 'car.svg')}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt: { xs: 2, lg: 3 } }}>
+            <CardMedia
+              component='img'
+              sx={{ width: { xs: 24, lg: 32 }, height: { xs: 24, lg: 32 } }}
+              image={process.env.PUBLIC_URL + '/images/' + (invalid || hasError ? 'car-red.svg' : 'car.svg')}
               className='img-fluid'
               alt=''
             />
-            <div>
-              {invalid
-                ? 'We did not find your car'
+            <Typography
+              sx={{
+                color: invalid || hasError ? 'var(--Red---Semantic-500, #c22222)' : 'var(--WF-Base-800, #2d3648)',
+                fontSize: { xs: 16, lg: 20 },
+                fontStyle: 'normal',
+                fontWeight: '400',
+                lineHeight: '150%',
+                letterSpacing: '-0.16px',
+              }}
+            >
+              {invalid || hasError
+                ? 'We  did not find your car'
                 : isLoading
                 ? 'Searching for your car'
                 : !!model
                 ? model
                 : 'Car make and model will be shown here '}
-            </div>
-          </div>
-          <div className='d-flex justify-content-between gap-3'>
-            <div className='search-hint'>
+            </Typography>
+          </Box>
+
+          <Box className='d-flex justify-content-between gap-3'>
+            <Typography
+              sx={{
+                color: invalid || hasError ? 'var(--Red---Semantic-500, #c22222)' : 'var(--WF-Base-600, #717d96)',
+                fontSize: { xs: 14, lg: 16 },
+                lineHeight: '150%',
+                marginTop: 1,
+              }}
+            >
               {!!model
                 ? 'We found your car model and make.'
-                : invalid
+                : invalid || hasError
                 ? 'Please make sure you entered the correct registration number.'
                 : isLoading
                 ? 'Hang tight while we find your model.'
                 : 'Needs few seconds to find your car after you type your registration number.'}
-            </div>
+            </Typography>
 
-            {!!vehicleImageUrl && <img src={vehicleImageUrl} className='car-image' alt='' />}
-          </div>
-        </div>
+            {!!vehicleImageUrl && (
+              <CardMedia
+                component='img'
+                sx={{ width: 90, height: 'auto', objectFit: 'contain' }}
+                image={vehicleImageUrl}
+              />
+            )}
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }

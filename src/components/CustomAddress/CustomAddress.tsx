@@ -1,6 +1,6 @@
 import './CustomAddress.css'
 import React from 'react'
-import { FormControl, InputLabel, Modal, OutlinedInput } from '@mui/material'
+import { Box, FormControl, InputLabel, Modal, OutlinedInput } from '@mui/material'
 import { useFormik } from 'formik'
 import { object, string } from 'yup'
 import { ManualAddress } from '@glass/models'
@@ -72,24 +72,26 @@ export const CustomAddress: React.FC<CustomAddressProps> = ({
       aria-describedby='child-modal-description'
     >
       <div className='custom-address-dialog'>
-        <div className='custom-address-modal-header'>
+        <Box className='container custom-address-modal-header'>
           <img
             src={process.env.PUBLIC_URL + '/images/close.svg'}
             className='close-btn'
             alt=''
             onClick={() => onClose()}
           />
-          <div className='title'>Random address</div>
-          <div className='description'>
-            If your address is not in the list you can enter it here manually and we will find you.
-          </div>
-          <div className='postcode'>
-            <span className='gray'>Postcode:</span> {postcode}
-          </div>
-        </div>
+          <Box sx={{ maxWidth: 390 }}>
+            <div className='title'>Random address</div>
+            <div className='description'>
+              If your address is not in the list you can enter it here manually and we will find you.
+            </div>
+            <div className='postcode'>
+              <span className='gray'>Postcode:</span> {postcode}
+            </div>
+          </Box>
+        </Box>
 
-        <form onSubmit={formik.handleSubmit}>
-          <div className='row mt-4'>
+        <form onSubmit={formik.handleSubmit} className='container '>
+          <Box sx={{ maxWidth: 390 }} className='row mt-4'>
             <div className='col-6 mb-4'>
               <FormControl fullWidth>
                 <InputLabel>Flat number</InputLabel>
@@ -173,22 +175,36 @@ export const CustomAddress: React.FC<CustomAddressProps> = ({
                 <small className='form-error'>{formik.touched.county && formik.errors.county}</small>
               </FormControl>
             </div>
-          </div>
+          </Box>
         </form>
 
-        <div className='custom-address-modal-footer'>
-          <div className='full-address'>
-            <div>{formik.values.flatNumber}</div>
-            <div>{formik.values.buildingNumber}</div>
-            <div>{formik.values.buildingName}</div>
-            <div>{formik.values.street}</div>
-            <div>{formik.values.city}</div>
-            <div>{formik.values.county}</div>
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100vw',
+            zIndex: '100',
+            pt: { xs: 4, lg: 6 },
+            pb: { xs: 10, lg: 12 },
+            borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+            background: '#fff',
+          }}
+        >
+          <div className='container custom-address-modal-footer'>
+            <div className='full-address'>
+              <div>{formik.values.flatNumber}</div>
+              <div>{formik.values.buildingNumber}</div>
+              <div>{formik.values.buildingName}</div>
+              <div>{formik.values.street}</div>
+              <div>{formik.values.city}</div>
+              <div>{formik.values.county}</div>
+            </div>
+            <button type='button' className='btn-raised' onClick={() => handleCreateAddress()}>
+              Add my address
+            </button>
           </div>
-          <button type='button' className='btn-raised' onClick={() => handleCreateAddress()}>
-            Add my address
-          </button>
-        </div>
+        </Box>
       </div>
     </Modal>
   )

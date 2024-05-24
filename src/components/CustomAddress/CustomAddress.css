@@ -5,8 +5,8 @@
   transform: translate(-50%, -50%);
   width: 100vw;
   height: 100vh;
-  background-color: #fff;
-  padding: 24px;
+  background-color: var(--Background-Background, #fcfcfc);
+  padding: 24px 0;
 }
 
 .custom-address-modal-header {
@@ -15,7 +15,7 @@
 
 .custom-address-dialog .custom-address-modal-header .close-btn {
   position: absolute;
-  right: 0;
+  right: 16px;
   cursor: pointer;
 }
 

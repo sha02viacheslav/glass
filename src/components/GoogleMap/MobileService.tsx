@@ -268,7 +268,7 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
         </Box>
       ) : (
         <Box>
-          <Typography sx={{ mb: 0 }}>
+          <Typography sx={{ mb: 0, display: { lg: 'none' } }}>
             Location on map
             <span className='text-gray-600'> (tap to expand)</span>
           </Typography>
@@ -280,39 +280,41 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
           </Box>
         </Box>
       )}
-      <GoogleMap
-        id='google_map'
-        mapContainerStyle={{ width: '100%', height: '130px' }}
-        center={selected ? { lat: selected?.lat, lng: selected.lng } : undefined}
-        zoom={ZOOM}
-        options={{
-          zoomControl: false,
-          fullscreenControl: false,
-          scaleControl: false,
-          rotateControl: false,
-          streetViewControl: false,
-        }}
-        onClick={() => setIsFullScreen(true)}
-      >
-        {selected && (
-          <Marker
-            position={{ lat: selected?.lat, lng: selected.lng }}
-            options={{
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: '#FFF',
-                fillOpacity: 1,
-                strokeWeight: 10,
-                scale: 14,
-                strokeColor: '#225FC2',
-              },
-            }}
-          />
-        )}
-        {directionsServiceOptions && (
-          <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
-        )}
-      </GoogleMap>
+      <Box sx={{ display: { lg: 'none' } }}>
+        <GoogleMap
+          id='google_map'
+          mapContainerStyle={{ width: '100%', height: '130px' }}
+          center={selected ? { lat: selected?.lat, lng: selected.lng } : undefined}
+          zoom={ZOOM}
+          options={{
+            zoomControl: false,
+            fullscreenControl: false,
+            scaleControl: false,
+            rotateControl: false,
+            streetViewControl: false,
+          }}
+          onClick={() => setIsFullScreen(true)}
+        >
+          {selected && (
+            <Marker
+              position={{ lat: selected?.lat, lng: selected.lng }}
+              options={{
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  fillColor: '#FFF',
+                  fillOpacity: 1,
+                  strokeWeight: 10,
+                  scale: 14,
+                  strokeColor: '#225FC2',
+                },
+              }}
+            />
+          )}
+          {directionsServiceOptions && (
+            <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
+          )}
+        </GoogleMap>
+      </Box>
       {isFullScreen && (
         <Modal
           open={true}

@@ -31,37 +31,3 @@
 .license-plate .search-button:disabled {
   cursor: progress;
 }
-
-.license-plate .model {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--WF-Base-800, #2d3648);
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 150%;
-  letter-spacing: -0.16px;
-  margin-top: 8px;
-}
-
-.license-plate .search-hint {
-  color: var(--WF-Base-600, #717d96);
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 150%;
-  margin-top: 4px;
-}
-
-.license-plate.invalid .model {
-  color: var(--Red---Semantic-500, #c22222);
-}
-
-.license-plate.invalid .search-hint {
-  color: var(--Red---Semantic-400, #db5555);
-}
-
-.license-plate .car-image {
-  width: 90px;
-}
