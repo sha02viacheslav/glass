@@ -124,7 +124,10 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({ amount, cl
           background: '#fff',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          className='container'
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', lg: 'flex-end' } }}
+        >
           <button className='btn-transparent' type='button' onClick={() => onBack()}>
             <CardMedia
               component='img'

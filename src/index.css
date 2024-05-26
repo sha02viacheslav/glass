@@ -509,3 +509,37 @@ input.form-control.round {
   padding-left: 1rem;
   padding-right: 1rem;
 }
+
+.container-pl {
+  padding-left: 1rem;
+}
+
+@media (min-width: 576px) {
+  .container-pl {
+    padding-left: calc((100vw - 540px) / 2 + 1rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .container-pl {
+    padding-left: calc((100vw - 720px) / 2 + 1rem);
+  }
+}
+
+@media (min-width: 992px) {
+  .container-pl {
+    padding-left: calc((100vw - 960px) / 2 + 1rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .container-pl {
+    padding-left: calc((100vw - 1140px) / 2 + 1rem);
+  }
+}
+
+@media (min-width: 1400px) {
+  .container-pl {
+    padding-left: calc((100vw - 1320px) / 2 + 1rem);
+  }
+}

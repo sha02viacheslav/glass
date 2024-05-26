@@ -9,6 +9,8 @@ import {
   StepLabel,
   Stepper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import moment from 'moment'
@@ -23,6 +25,7 @@ import { formatAddress } from '@glass/utils/format-address/format-address.util'
 import { bookingEndTime, bookingStartTime } from '@glass/utils/index'
 import { getTrackTechnicianChecked, setTrackTechnicianChecked } from '@glass/utils/session/session.util'
 import { DownloadInvoice } from './DownloadInvoice'
+import { ShareQuote } from './ShareQuote'
 
 export type QuoteTrackingProps = {
   quoteDetails: Quote
@@ -38,6 +41,8 @@ export interface TrackingView {
 }
 
 export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) => {
+  const theme = useTheme()
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
   const { id: quoteId } = useParams()
 
   const [showTrackTechnicianNotification, setShowTrackTechnicianNotification] = useState(
@@ -217,478 +222,516 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
 
   return (
     <form>
-      <Box sx={{ marginBottom: 40 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px 8px',
-            borderBottom: '1px solid var(--Gray-100, #F2F2F3)',
-            background: '#fff',
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: 700,
-              lineHeight: '140%',
-            }}
-          >
-            Hello {quoteDetails.customer_f_name}!
-          </Typography>
-
-          <Box sx={{ position: 'relative' }}>
-            <button type='button' className='btn-transparent primary p-0' onClick={() => setModalTrackMap(true)}>
-              <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
-              <span style={{ fontSize: '16px', color: '#4285F4' }}>Track the technician</span>
-            </button>
-            {quoteId && showTrackTechnicianNotification && (
+      <Box sx={{ marginBottom: { xs: 40, lg: 0 }, mt: { lg: -15 } }}>
+        <Box sx={{ display: { lg: 'flex' } }}>
+          <Box sx={{ flex: 5 }}>
+            <Box sx={{ borderBottom: '1px solid var(--Gray-100, #F2F2F3)', background: '#fff' }}>
               <Box
+                className={isLg ? 'container-pl' : 'container'}
                 sx={{
-                  width: '133px',
-                  px: 2,
-                  py: 1,
-                  position: 'absolute',
-                  right: 0,
-                  top: '32px',
-                  borderRadius: '2px',
-                  background: '#3B3B3B',
-                  color: '#fff',
-                  fontSize: 12,
-                  lineHeight: '16px',
-                }}
-                onClick={() => {
-                  setShowTrackTechnicianNotification(false)
-                  setTrackTechnicianChecked(quoteId)
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  pt: { xs: 3, lg: 6 },
+                  pb: { xs: 2, lg: 6 },
+                  pr: { xs: 4, lg: 6 },
                 }}
               >
-                Tap here to track our technician on the map.
+                <Typography
+                  sx={{
+                    fontSize: { xs: 16, lg: 30 },
+                    fontWeight: 700,
+                    lineHeight: '140%',
+                  }}
+                >
+                  Hello {quoteDetails.customer_f_name}!
+                </Typography>
+
+                <Box sx={{ position: 'relative' }}>
+                  <Box sx={{ display: { lg: 'none' } }}>
+                    <button
+                      type='button'
+                      className='btn-transparent primary p-0'
+                      onClick={() => setModalTrackMap(true)}
+                    >
+                      <img src={process.env.PUBLIC_URL + '/images/map.svg'} />
+                      <span style={{ fontSize: '16px', color: '#4285F4' }}>Track the technician</span>
+                    </button>
+                  </Box>
+                  <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+                    <ShareQuote url={`${process.env.PUBLIC_URL}/quote/${quoteId}`} />
+                  </Box>
+                  {quoteId && showTrackTechnicianNotification && (
+                    <Box
+                      sx={{
+                        width: '133px',
+                        px: 2,
+                        py: 1,
+                        position: 'absolute',
+                        right: 0,
+                        top: '32px',
+                        borderRadius: '2px',
+                        background: '#3B3B3B',
+                        color: '#fff',
+                        fontSize: 12,
+                        lineHeight: '16px',
+                      }}
+                      onClick={() => {
+                        setShowTrackTechnicianNotification(false)
+                        setTrackTechnicianChecked(quoteId)
+                      }}
+                    >
+                      Tap here to track our technician on the map.
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            )}
-          </Box>
-        </Box>
-        {modalTrackMap && <TrackTechnician onDismiss={() => setModalTrackMap(false)} />}
+            </Box>
+            {modalTrackMap && <TrackTechnician onDismiss={() => setModalTrackMap(false)} />}
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
-          }}
-        >
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              textAlign: 'center',
-              fontSize: '16px',
-              fontWeight: '600',
-              lineHeight: '140%',
-            }}
-          >
-            Service timeline
-          </Typography>
-        </Box>
-
-        <Box sx={{ px: 4, pt: 5, pb: 20 }}>
-          <Stepper
-            orientation='vertical'
-            sx={{
-              '.MuiStepLabel-iconContainer': {
-                position: 'relative',
-                paddingLeft: '48px',
-              },
-              '.MuiStepConnector-root:nth-child(14)': {
-                '.MuiStepConnector-line': { height: '200px' },
-              },
-            }}
-            connector={
-              <StepConnector
+            <Box
+              className={isLg ? 'container-pl' : 'container'}
+              sx={{ mb: 40, height: { lg: 'calc(100vh - 323px)' }, overflow: 'auto', pr: { xs: 4, lg: 6 } }}
+            >
+              <Box
                 sx={{
-                  marginLeft: '66px',
-                  '.MuiStepConnector-line': { borderLeftWidth: '4px', height: '128px' },
-                  '&.Mui-completed': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
-                  '&.Mui-active': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  py: 3,
                 }}
-              />
-            }
-          >
-            {Object.keys(steps).map((step) => {
-              const stepProps: { completed?: boolean } = {}
-              const active = steps[step].isActive
-              const completed: boolean = steps[step].isCompleted
+              >
+                <Typography
+                  sx={{
+                    color: 'var(--Gray-600, #6A6B71)',
+                    textAlign: 'center',
+                    fontSize: { xs: 16, lg: 20 },
+                    fontWeight: '600',
+                    lineHeight: '140%',
+                  }}
+                >
+                  Service timeline
+                </Typography>
+              </Box>
 
-              return (
-                <Step key={step} {...stepProps} active={active} completed={completed}>
-                  <StepLabel StepIconComponent={ColorStepIcon} icon={step} sx={{ padding: '4px 0' }}>
-                    <Box sx={{ position: 'relative' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, height: '12px' }}>
-                        {((step as TrackingStep) === TrackingStep.BEFORE_PHOTO ||
-                          (step as TrackingStep) === TrackingStep.AFTER_PHOTO) && (
-                          <CardMedia
-                            component='img'
-                            sx={{ width: 20, height: 20 }}
-                            image={
-                              process.env.PUBLIC_URL +
-                              '/images/' +
-                              (active || completed ? 'camera.svg' : 'map-marker.svg')
-                            }
-                          />
-                        )}
-                        <Typography
-                          sx={{
-                            color: completed
-                              ? 'var(--Gray-800, #14151F)'
-                              : active
-                              ? 'var(--Dark-Blue---Accent-500, #4522C2)'
-                              : 'var(--Gray-600, #6A6B71)',
-                            fontSize: 14,
-                            fontWeight: '600',
-                            lineHeight: '12px',
-                          }}
-                        >
-                          {steps[step as TrackingStep].title}{' '}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ position: 'absolute', marginTop: 3 }}>
-                        {(step as TrackingStep) === TrackingStep.BOOKING_CONFIRMED && (
-                          <>
-                            {!!quoteId && (
-                              <Box sx={{ marginTop: -2 }}>
-                                <DownloadInvoice quoteId={quoteId} />
-                              </Box>
-                            )}
-                            <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
-                              <Box sx={{ height: 75, overflow: 'hidden' }}>
-                                <WindowSelector
-                                  disabled={true}
-                                  carType={selectedCarType}
-                                  registrationNumber={quoteDetails.registration_number}
-                                  selectedGlasses={quoteDetails.glass_location}
-                                />
-                              </Box>
+              <Box sx={{ pt: 5, pb: 20 }}>
+                <Stepper
+                  orientation='vertical'
+                  sx={{
+                    '.MuiStepLabel-iconContainer': {
+                      position: 'relative',
+                      paddingLeft: '48px',
+                    },
+                    '.MuiStepConnector-root:nth-child(14)': {
+                      '.MuiStepConnector-line': { height: '200px' },
+                    },
+                  }}
+                  connector={
+                    <StepConnector
+                      sx={{
+                        marginLeft: '66px',
+                        '.MuiStepConnector-line': { borderLeftWidth: '4px', height: '128px' },
+                        '&.Mui-completed': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
+                        '&.Mui-active': { '.MuiStepConnector-line': { borderColor: '#133F85' } },
+                      }}
+                    />
+                  }
+                >
+                  {Object.keys(steps).map((step) => {
+                    const stepProps: { completed?: boolean } = {}
+                    const active = steps[step].isActive
+                    const completed: boolean = steps[step].isCompleted
 
-                              <Box>
-                                <Box sx={{ display: 'flex', gap: 2 }}>
-                                  {!!quoteDetails.vehicle_logo_url && (
-                                    <CardMedia
-                                      component='img'
-                                      sx={{ width: 'auto', height: 20 }}
-                                      image={quoteDetails.vehicle_logo_url}
-                                    />
-                                  )}
-                                  <Typography
-                                    sx={{
-                                      color: 'var(--Gray-800, #14151F)',
-                                      fontSize: '14px',
-                                      fontWeight: '400',
-                                      lineHeight: '150%',
-                                    }}
-                                  >
-                                    {quoteDetails?.make} {quoteDetails?.model}
-                                  </Typography>
-                                </Box>
-                                <Box sx={{ width: '94px', marginTop: 2 }}>
-                                  <Box sx={{ zoom: 0.3 }}>
-                                    <LicensePlate disabled={true} licenseNumber={quoteDetails.registration_number} />
-                                  </Box>
-                                </Box>
-                              </Box>
-                            </Box>
-                          </>
-                        )}
-
-                        {(step as TrackingStep) === TrackingStep.WAITING_SERVICE_DAY && (
-                          <Typography
-                            sx={{
-                              color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                              fontSize: 12,
-                              lineHeight: '130%',
-                            }}
-                          >
-                            You will be able to track your technician on live map
-                          </Typography>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.DAY_BEFORE_REMINDER && (
-                          <Typography
-                            sx={{
-                              color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                              fontSize: 12,
-                              lineHeight: '130%',
-                            }}
-                          >
-                            You will receive a reminder that we are coming a day before service.
-                          </Typography>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.REPAIR_DAY && (
-                          <Typography
-                            sx={{
-                              color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                              fontSize: 12,
-                              lineHeight: '130%',
-                            }}
-                          >
-                            Place your car on so there is nothing within 2m radius. Our technician needs space to work.
-                          </Typography>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.ARRIVED && (
-                          <Box sx={{ display: 'flex', gap: 2 }}>
-                            <CardMedia
-                              component='img'
-                              sx={{ width: 20, height: 20 }}
-                              image={
-                                process.env.PUBLIC_URL +
-                                '/images/' +
-                                (active || completed ? 'map-marker-blue.svg' : 'map-marker.svg')
-                              }
-                            />
-                            <Typography
-                              sx={{
-                                color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                                fontSize: 12,
-                                lineHeight: '130%',
-                              }}
-                            >
-                              {formatAddress(quoteDetails.delivery_address)}
-                            </Typography>
-                          </Box>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.BEFORE_PHOTO && (
-                          <>
-                            {active || completed ? (
-                              <>
-                                {beforeAttachments.map((item, index) => (
-                                  <CardMedia
-                                    key={index}
-                                    component='img'
-                                    sx={{
-                                      width: 'auto',
-                                      height: 80,
-                                      objectFit: 'cover',
-                                      borderRadius: '2px',
-                                    }}
-                                    image={item.attachment_url}
-                                    alt='Broken Image'
-                                  />
-                                ))}
-                              </>
-                            ) : (
-                              <Typography
-                                sx={{
-                                  color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                                  fontSize: 12,
-                                  lineHeight: '130%',
-                                }}
-                              >
-                                Technician will take images of your car before repair
-                              </Typography>
-                            )}
-                          </>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.REPAIRING && (
-                          <>
-                            {(completed || !!repairAttachments?.length) && (
-                              <Box sx={{ display: 'flex', gap: 1 }}>
+                    return (
+                      <Step key={step} {...stepProps} active={active} completed={completed}>
+                        <StepLabel StepIconComponent={ColorStepIcon} icon={step} sx={{ padding: '4px 0' }}>
+                          <Box sx={{ position: 'relative' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, height: '12px' }}>
+                              {((step as TrackingStep) === TrackingStep.BEFORE_PHOTO ||
+                                (step as TrackingStep) === TrackingStep.AFTER_PHOTO) && (
                                 <CardMedia
                                   component='img'
-                                  sx={{ width: 16, height: 16 }}
-                                  image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
+                                  sx={{ width: 20, height: 20 }}
+                                  image={
+                                    process.env.PUBLIC_URL +
+                                    '/images/' +
+                                    (active || completed ? 'camera.svg' : 'map-marker.svg')
+                                  }
                                 />
-                                <Box>
+                              )}
+                              <Typography
+                                sx={{
+                                  color: completed
+                                    ? 'var(--Gray-800, #14151F)'
+                                    : active
+                                    ? 'var(--Dark-Blue---Accent-500, #4522C2)'
+                                    : 'var(--Gray-600, #6A6B71)',
+                                  fontSize: 14,
+                                  fontWeight: '600',
+                                  lineHeight: '12px',
+                                }}
+                              >
+                                {steps[step as TrackingStep].title}{' '}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ position: 'absolute', marginTop: 3 }}>
+                              {(step as TrackingStep) === TrackingStep.BOOKING_CONFIRMED && (
+                                <>
+                                  {!!quoteId && (
+                                    <Box sx={{ marginTop: -2 }}>
+                                      <DownloadInvoice quoteId={quoteId} />
+                                    </Box>
+                                  )}
+                                  <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
+                                    <Box sx={{ height: 75, overflow: 'hidden' }}>
+                                      <WindowSelector
+                                        disabled={true}
+                                        carType={selectedCarType}
+                                        registrationNumber={quoteDetails.registration_number}
+                                        selectedGlasses={quoteDetails.glass_location}
+                                      />
+                                    </Box>
+
+                                    <Box>
+                                      <Box sx={{ display: 'flex', gap: 2 }}>
+                                        {!!quoteDetails.vehicle_logo_url && (
+                                          <CardMedia
+                                            component='img'
+                                            sx={{ width: 'auto', height: 20 }}
+                                            image={quoteDetails.vehicle_logo_url}
+                                          />
+                                        )}
+                                        <Typography
+                                          sx={{
+                                            color: 'var(--Gray-800, #14151F)',
+                                            fontSize: '14px',
+                                            fontWeight: '400',
+                                            lineHeight: '150%',
+                                          }}
+                                        >
+                                          {quoteDetails?.make} {quoteDetails?.model}
+                                        </Typography>
+                                      </Box>
+                                      <Box sx={{ width: '94px', marginTop: 2 }}>
+                                        <Box sx={{ zoom: 0.3 }}>
+                                          <LicensePlate
+                                            disabled={true}
+                                            licenseNumber={quoteDetails.registration_number}
+                                          />
+                                        </Box>
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                </>
+                              )}
+
+                              {(step as TrackingStep) === TrackingStep.WAITING_SERVICE_DAY && (
+                                <Typography
+                                  sx={{
+                                    color:
+                                      active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                  }}
+                                >
+                                  You will be able to track your technician on live map
+                                </Typography>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.DAY_BEFORE_REMINDER && (
+                                <Typography
+                                  sx={{
+                                    color:
+                                      active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                  }}
+                                >
+                                  You will receive a reminder that we are coming a day before service.
+                                </Typography>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.REPAIR_DAY && (
+                                <Typography
+                                  sx={{
+                                    color:
+                                      active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                    fontSize: 12,
+                                    lineHeight: '130%',
+                                  }}
+                                >
+                                  Place your car on so there is nothing within 2m radius. Our technician needs space to
+                                  work.
+                                </Typography>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.ARRIVED && (
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                  <CardMedia
+                                    component='img'
+                                    sx={{ width: 20, height: 20 }}
+                                    image={
+                                      process.env.PUBLIC_URL +
+                                      '/images/' +
+                                      (active || completed ? 'map-marker-blue.svg' : 'map-marker.svg')
+                                    }
+                                  />
                                   <Typography
                                     sx={{
-                                      color: 'var(--Gray-600, #6A6B71)',
+                                      color:
+                                        active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
                                       fontSize: 12,
                                       lineHeight: '130%',
-                                      letterSpacing: '-0.12px',
                                     }}
                                   >
-                                    Old glass and glue removed, surface prepared for new glass
+                                    {formatAddress(quoteDetails.delivery_address)}
                                   </Typography>
-                                  {repairAttachments.map((item, index) => (
-                                    <CardMedia
-                                      key={index}
-                                      component='img'
-                                      sx={{
-                                        width: 'auto',
-                                        height: 80,
-                                        objectFit: 'cover',
-                                        borderRadius: '2px',
-                                        marginTop: 2,
-                                      }}
-                                      image={item.attachment_url}
-                                    />
-                                  ))}
                                 </Box>
-                              </Box>
-                            )}
-                            {completed && (
-                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
-                                <CardMedia
-                                  component='img'
-                                  sx={{ width: 16, height: 16 }}
-                                  image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
-                                />
+                              )}
+                              {(step as TrackingStep) === TrackingStep.BEFORE_PHOTO && (
+                                <>
+                                  {active || completed ? (
+                                    <>
+                                      {beforeAttachments.map((item, index) => (
+                                        <CardMedia
+                                          key={index}
+                                          component='img'
+                                          sx={{
+                                            width: 'auto',
+                                            height: 80,
+                                            objectFit: 'cover',
+                                            borderRadius: '2px',
+                                          }}
+                                          image={item.attachment_url}
+                                          alt='Broken Image'
+                                        />
+                                      ))}
+                                    </>
+                                  ) : (
+                                    <Typography
+                                      sx={{
+                                        color:
+                                          active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                        fontSize: 12,
+                                        lineHeight: '130%',
+                                      }}
+                                    >
+                                      Technician will take images of your car before repair
+                                    </Typography>
+                                  )}
+                                </>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.REPAIRING && (
+                                <>
+                                  {(completed || !!repairAttachments?.length) && (
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                      <CardMedia
+                                        component='img'
+                                        sx={{ width: 16, height: 16 }}
+                                        image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
+                                      />
+                                      <Box>
+                                        <Typography
+                                          sx={{
+                                            color: 'var(--Gray-600, #6A6B71)',
+                                            fontSize: 12,
+                                            lineHeight: '130%',
+                                            letterSpacing: '-0.12px',
+                                          }}
+                                        >
+                                          Old glass and glue removed, surface prepared for new glass
+                                        </Typography>
+                                        {repairAttachments.map((item, index) => (
+                                          <CardMedia
+                                            key={index}
+                                            component='img'
+                                            sx={{
+                                              width: 'auto',
+                                              height: 80,
+                                              objectFit: 'cover',
+                                              borderRadius: '2px',
+                                              marginTop: 2,
+                                            }}
+                                            image={item.attachment_url}
+                                          />
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+                                  {completed && (
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                      <CardMedia
+                                        component='img'
+                                        sx={{ width: 16, height: 16 }}
+                                        image={process.env.PUBLIC_URL + '/images/check-gray.svg'}
+                                      />
+                                      <Typography
+                                        sx={{
+                                          color: 'var(--Gray-600, #6A6B71)',
+                                          fontSize: 12,
+                                          lineHeight: '130%',
+                                          letterSpacing: '-0.12px',
+                                        }}
+                                      >
+                                        New glass is fitted
+                                      </Typography>
+                                    </Box>
+                                  )}
+                                  {!completed && !!repairAttachments?.length && (
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                      <CardMedia
+                                        component='img'
+                                        sx={{ width: 16, height: 16 }}
+                                        image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
+                                      />
+                                      <Typography
+                                        sx={{
+                                          color: 'var(--Gray-600, #6A6B71)',
+                                          fontSize: 12,
+                                          lineHeight: '130%',
+                                          letterSpacing: '-0.12px',
+                                        }}
+                                      >
+                                        Placing new glass
+                                      </Typography>
+                                    </Box>
+                                  )}
+                                  {!completed && !repairAttachments?.length && (
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
+                                      <CardMedia
+                                        component='img'
+                                        sx={{ width: 16, height: 16 }}
+                                        image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
+                                      />
+                                      <Typography
+                                        sx={{
+                                          color: 'var(--Gray-600, #6A6B71)',
+                                          fontSize: 12,
+                                          lineHeight: '130%',
+                                          letterSpacing: '-0.12px',
+                                        }}
+                                      >
+                                        Removing the old glass and preparing surface for fitting new glass
+                                      </Typography>
+                                    </Box>
+                                  )}
+                                  {!completed && !active && (
+                                    <Typography
+                                      sx={{
+                                        color:
+                                          active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                        fontSize: 12,
+                                        lineHeight: '130%',
+                                      }}
+                                    >
+                                      Technician will repair your broken glass.
+                                    </Typography>
+                                  )}
+                                </>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.AFTER_PHOTO && (
+                                <>
+                                  {active || completed ? (
+                                    <>
+                                      {afterAttachments.map((item, index) => (
+                                        <CardMedia
+                                          key={index}
+                                          component='img'
+                                          sx={{
+                                            width: 'auto',
+                                            height: 80,
+                                            objectFit: 'cover',
+                                            borderRadius: '2px',
+                                          }}
+                                          image={item.attachment_url}
+                                          alt='Broken Image'
+                                        />
+                                      ))}
+                                    </>
+                                  ) : (
+                                    <Typography
+                                      sx={{
+                                        color:
+                                          active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
+                                        fontSize: 12,
+                                        lineHeight: '130%',
+                                      }}
+                                    >
+                                      Technician will take the images after he repairs your car.
+                                    </Typography>
+                                  )}
+                                </>
+                              )}
+                              {(step as TrackingStep) === TrackingStep.ALL_DONE && (
                                 <Typography
                                   sx={{
-                                    color: 'var(--Gray-600, #6A6B71)',
+                                    color:
+                                      active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
                                     fontSize: 12,
                                     lineHeight: '130%',
-                                    letterSpacing: '-0.12px',
                                   }}
                                 >
-                                  New glass is fitted
+                                  {active || completed
+                                    ? 'Everything is ready to drive! Enjoy it.'
+                                    : '60 min after the repair is complete. You can drive your car.'}
                                 </Typography>
-                              </Box>
-                            )}
-                            {!completed && !!repairAttachments?.length && (
-                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
-                                <CardMedia
-                                  component='img'
-                                  sx={{ width: 16, height: 16 }}
-                                  image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
-                                />
-                                <Typography
-                                  sx={{
-                                    color: 'var(--Gray-600, #6A6B71)',
-                                    fontSize: 12,
-                                    lineHeight: '130%',
-                                    letterSpacing: '-0.12px',
-                                  }}
-                                >
-                                  Placing new glass
-                                </Typography>
-                              </Box>
-                            )}
-                            {!completed && !repairAttachments?.length && (
-                              <Box sx={{ display: 'flex', gap: 1, mt: 4 }}>
-                                <CardMedia
-                                  component='img'
-                                  sx={{ width: 16, height: 16 }}
-                                  image={process.env.PUBLIC_URL + '/images/live-signifier.svg'}
-                                />
-                                <Typography
-                                  sx={{
-                                    color: 'var(--Gray-600, #6A6B71)',
-                                    fontSize: 12,
-                                    lineHeight: '130%',
-                                    letterSpacing: '-0.12px',
-                                  }}
-                                >
-                                  Removing the old glass and preparing surface for fitting new glass
-                                </Typography>
-                              </Box>
-                            )}
-                            {!completed && !active && (
-                              <Typography
-                                sx={{
-                                  color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                                  fontSize: 12,
-                                  lineHeight: '130%',
-                                }}
-                              >
-                                Technician will repair your broken glass.
-                              </Typography>
-                            )}
-                          </>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.AFTER_PHOTO && (
-                          <>
-                            {active || completed ? (
-                              <>
-                                {afterAttachments.map((item, index) => (
-                                  <CardMedia
-                                    key={index}
-                                    component='img'
-                                    sx={{
-                                      width: 'auto',
-                                      height: 80,
-                                      objectFit: 'cover',
-                                      borderRadius: '2px',
-                                    }}
-                                    image={item.attachment_url}
-                                    alt='Broken Image'
-                                  />
-                                ))}
-                              </>
-                            ) : (
-                              <Typography
-                                sx={{
-                                  color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                                  fontSize: 12,
-                                  lineHeight: '130%',
-                                }}
-                              >
-                                Technician will take the images after he repairs your car.
-                              </Typography>
-                            )}
-                          </>
-                        )}
-                        {(step as TrackingStep) === TrackingStep.ALL_DONE && (
-                          <Typography
-                            sx={{
-                              color: active || completed ? 'var(--Gray-800, #14151F)' : 'var(--Gray-600, #6A6B71)',
-                              fontSize: 12,
-                              lineHeight: '130%',
-                            }}
-                          >
-                            {active || completed
-                              ? 'Everything is ready to drive! Enjoy it.'
-                              : '60 min after the repair is complete. You can drive your car.'}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  </StepLabel>
-                </Step>
-              )
-            })}
-          </Stepper>
-        </Box>
-      </Box>
+                              )}
+                            </Box>
+                          </Box>
+                        </StepLabel>
+                      </Step>
+                    )
+                  })}
+                </Stepper>
+              </Box>
+            </Box>
 
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: '0',
-          left: '0',
-          width: '100vw',
-          zIndex: '100',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2,
-          padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
-          borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-          background: '#fff',
-        }}
-      >
-        <Link to={'/quote-details/' + quoteId}>
-          <Button
-            sx={{
-              width: '100%',
-              paddingX: 6,
-              paddingY: 3,
-              fontSize: '18px',
-              fontWeight: '700',
-              lineHeight: '24px',
-              letterSpacing: '0.18px',
-              color: 'var(--Light-Blue---Primary-500, #225FC2)',
-              background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
-              boxShadow:
-                '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
-              marginTop: 8,
-            }}
-          >
-            See all the service details
-            <CardMedia
-              component='img'
-              sx={{ width: 24, height: 24, marginLeft: 2 }}
-              image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
-              alt='Minus'
-            />
-          </Button>
-        </Link>
+            <Box
+              sx={{
+                position: 'fixed',
+                bottom: '0',
+                left: '0',
+                width: { xs: '100vw', lg: '41.66vw' },
+                zIndex: '100',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                padding: 'var(--16, 16px) var(--16, 16px) 40px var(--16, 16px)',
+                borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+                background: '#fff',
+              }}
+            >
+              <Link to={'/quote-details/' + quoteId}>
+                <Button
+                  sx={{
+                    width: '100%',
+                    paddingX: 6,
+                    paddingY: 3,
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    lineHeight: '24px',
+                    letterSpacing: '0.18px',
+                    color: 'var(--Light-Blue---Primary-500, #225FC2)',
+                    background: 'var(--Light-Blue---Primary-000, #E8F0FE)',
+                    boxShadow:
+                      '0px 3px 8px 0px rgba(88, 86, 94, 0.08), 0px 2px 4px 0px rgba(88, 86, 94, 0.10), 0px 1px 2px 0px rgba(88, 86, 94, 0.12)',
+                    marginTop: 8,
+                  }}
+                >
+                  See all the service details
+                  <CardMedia
+                    component='img'
+                    sx={{ width: 24, height: 24, marginLeft: 2 }}
+                    image={process.env.PUBLIC_URL + '/images/arrow-right-light-blue.svg'}
+                    alt='Minus'
+                  />
+                </Button>
+              </Link>
+            </Box>
+          </Box>
+
+          <Box sx={{ flex: 7, display: { xs: 'none', lg: 'block' } }}>
+            <TrackTechnician showOnModal={false} onDismiss={() => setModalTrackMap(false)} />
+          </Box>
+        </Box>
       </Box>
     </form>
   )

@@ -16,7 +16,7 @@ export type HeaderProps = {
 export const Header: React.FC<HeaderProps> = ({ showMenu }) => {
   const theme = useTheme()
   const isDownLg = useMediaQuery(theme.breakpoints.down('lg'))
-  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
   const navigate = useNavigate()
   const quoteId = getQuoteId()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)

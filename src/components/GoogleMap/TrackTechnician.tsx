@@ -11,6 +11,7 @@ import { getWorkshopService } from '@glass/services/apis/get-workshop.service'
 const ZOOM = 16
 
 type PropComponent = {
+  showOnModal?: boolean
   onDismiss?: () => void
 }
 
@@ -18,7 +19,7 @@ type PropComponentMap = PropComponent & {
   workshop: Workshop
 }
 
-const MapTrackTechnician: FC<PropComponentMap> = ({ workshop }) => {
+const MapTrackTechnician: FC<PropComponentMap> = ({ showOnModal, workshop }) => {
   const { lat, lng } = useMyLocation()
   const myPosition = useMemo(() => {
     if (lat && lng) {
@@ -57,7 +58,10 @@ const MapTrackTechnician: FC<PropComponentMap> = ({ workshop }) => {
     <>
       <GoogleMap
         id='my_map'
-        mapContainerStyle={{ height: '100vh', width: '100%' }}
+        mapContainerStyle={{
+          height: showOnModal ? '100vh' : 'calc(100vh - 100px)',
+          width: '100%',
+        }}
         center={center}
         zoom={ZOOM}
         options={{
@@ -95,9 +99,9 @@ const MapTrackTechnician: FC<PropComponentMap> = ({ workshop }) => {
       <Box
         sx={{
           position: 'absolute',
-          left: 10,
-          top: 55,
-          width: 'calc(100vw - 20px)',
+          left: { xs: 10, lg: 24 },
+          top: { xs: 55, lg: 24 },
+          width: { xs: 'calc(100vw - 20px)', lg: 476 },
           backgroundColor: '#ece8fe',
           borderRadius: 2,
           px: 4,
@@ -131,7 +135,7 @@ const MapTrackTechnician: FC<PropComponentMap> = ({ workshop }) => {
   )
 }
 
-export const TrackTechnician: FC<PropComponent> = ({ onDismiss = () => undefined, ...props }) => {
+export const TrackTechnician: FC<PropComponent> = ({ showOnModal = true, onDismiss = () => undefined, ...props }) => {
   if (!GOOGLE_MAP_API_KEY) return <></>
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -150,33 +154,41 @@ export const TrackTechnician: FC<PropComponent> = ({ onDismiss = () => undefined
   if (!isLoaded || !workshops.length) return <div></div>
   else
     return (
-      <Modal
-        open={true}
-        aria-labelledby='child-modal-title'
-        disableAutoFocus={true}
-        aria-describedby='child-modal-description'
-      >
-        <div className='custom-address-dialog p-0'>
-          <Button
-            variant='outlined'
-            startIcon={<ArrowBackIcon />}
-            sx={{
-              position: 'absolute',
-              top: 10,
-              left: 10,
-              zIndex: 99,
-              backgroundColor: 'white',
-              color: 'black',
-              border: 'transparent',
-            }}
-            style={{ boxShadow: '0px 2px 6px 2px #00000026' }}
-            onClick={onDismiss}
-            type='button'
+      <>
+        {showOnModal ? (
+          <Modal
+            open={true}
+            aria-labelledby='child-modal-title'
+            disableAutoFocus={true}
+            aria-describedby='child-modal-description'
           >
-            Back
-          </Button>
-          <MapTrackTechnician key={+new Date()} {...props} workshop={workshops[0]} />
-        </div>
-      </Modal>
+            <div className='custom-address-dialog p-0'>
+              <Button
+                variant='outlined'
+                startIcon={<ArrowBackIcon />}
+                sx={{
+                  position: 'absolute',
+                  top: 10,
+                  left: 10,
+                  zIndex: 99,
+                  backgroundColor: 'white',
+                  color: 'black',
+                  border: 'transparent',
+                }}
+                style={{ boxShadow: '0px 2px 6px 2px #00000026' }}
+                onClick={onDismiss}
+                type='button'
+              >
+                Back
+              </Button>
+              <MapTrackTechnician key={+new Date()} {...props} workshop={workshops[0]} />
+            </div>
+          </Modal>
+        ) : (
+          <Box sx={{ position: 'relative' }}>
+            <MapTrackTechnician key={+new Date()} {...props} workshop={workshops[0]} showOnModal={showOnModal} />
+          </Box>
+        )}
+      </>
     )
 }

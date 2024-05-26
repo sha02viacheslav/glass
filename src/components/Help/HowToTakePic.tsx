@@ -4,7 +4,7 @@ import { CustomModal } from '../Modal/CustomModal'
 
 export const HowToTakePic = () => {
   const theme = useTheme()
-  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
 
   const [open, setOpen] = useState(false)
   const helpItems = useMemo(

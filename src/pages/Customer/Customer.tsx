@@ -112,7 +112,7 @@ export type CustomerProps = {
 
 export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const theme = useTheme()
-  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
   const navigate = useNavigate()
 
   const { licenseNum, quoteId, step } = useParams()

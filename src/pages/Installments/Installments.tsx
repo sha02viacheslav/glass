@@ -5,7 +5,7 @@ import { InstallmentArticle } from './InstallmentArticle'
 
 export const Installments: React.FC = () => {
   const theme = useTheme()
-  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
 
   return (
     <Box className='installments-page container'>

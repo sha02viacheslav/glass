@@ -18,8 +18,8 @@ export const FourMonthsInstallment: React.FC<FourMonthsInstallmentProps> = ({ se
     <Box
       sx={{
         position: 'relative',
-        paddingX: 3,
-        paddingY: 4,
+        paddingX: { xs: 3, lg: 6 },
+        paddingY: { xs: 4, lg: 8 },
         borderRadius: '4px',
         border: selected ? '2px solid #225FC2' : '',
         background: '#FFF',
@@ -31,11 +31,11 @@ export const FourMonthsInstallment: React.FC<FourMonthsInstallmentProps> = ({ se
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-          <Radio checked={selected} size='small' sx={{ padding: 0 }} />
+          <Radio checked={selected} size='small' sx={{ padding: { xs: 0, lg: '2px 0' } }} />
           <Typography
             sx={{
-              fontSize: '18px',
-              lineHeight: '20px',
+              fontSize: { xs: 18, lg: 24 },
+              lineHeight: { xs: '20px', lg: '100%' },
               letterSpacing: '-0.18px',
               marginLeft: 2,
             }}
@@ -48,7 +48,7 @@ export const FourMonthsInstallment: React.FC<FourMonthsInstallmentProps> = ({ se
       <Typography
         sx={{
           color: 'var(--Gray-700, #474747)',
-          fontSize: '14px',
+          fontSize: { xs: 14, lg: 16 },
           lineHeight: '170%',
           marginTop: 3,
         }}
@@ -60,10 +60,10 @@ export const FourMonthsInstallment: React.FC<FourMonthsInstallmentProps> = ({ se
         sx={{
           textAlign: 'right',
           color: 'var(--Gray-700, #474747)',
-          fontSize: '14px',
+          fontSize: { xs: 14, lg: 20 },
           lineHeight: '150%',
           letterSpacing: '-0.14px',
-          marginTop: 4,
+          marginTop: { xs: 4, lg: 6 },
         }}
       >
         Total (inc. VAT): £{totalPrice}

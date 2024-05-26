@@ -9,7 +9,7 @@ import { Testimonials } from '../Home/Testimonials'
 
 export const Comparison: React.FC = () => {
   const theme = useTheme()
-  const isLg = useMediaQuery(theme.breakpoints.up('md'))
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
 
   return (
     <div className='comparison-page'>

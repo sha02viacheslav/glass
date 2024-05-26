@@ -46,22 +46,34 @@ export const QuoteStripePayment: React.FC<QuoteStripePaymentProps> = ({
 
   return (
     <Box>
-      <Box sx={{ paddingX: 4, marginBottom: 40 }}>
-        <Typography sx={{ fontWeight: 400, lineHeight: '170%' }}>
-          Please enter your card details so we can finish the payment.
-        </Typography>
+      <Box className='container' sx={{ marginBottom: 40 }}>
+        <Box sx={{ maxWidth: 829, mx: 'auto' }}>
+          <Typography sx={{ fontSize: { xs: 16, lg: 24 }, fontWeight: 400, lineHeight: '170%' }}>
+            Please enter your card details so we can finish the payment.
+          </Typography>
 
-        <Box sx={{ mt: 6 }}>
-          {quoteDetails?.payment_method_type === PaymentMethodType.STRIPE && clientSecret && (
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <StripePaymentForm
-                amount={totalPrice}
-                clientSecret={clientSecret}
-                onBack={onBack}
-                onSucceed={onSucceed}
-              />
-            </Elements>
-          )}
+          <Box
+            sx={{
+              mt: 6,
+              pt: { lg: 12 },
+              pb: { lg: 32 },
+              border: { lg: '1px solid var(--Grey-Border, #E0E0E0)' },
+              background: { lg: 'var(--Box, #F7FAFC)' },
+            }}
+          >
+            <Box sx={{ maxWidth: 500, mx: 'auto' }}>
+              {quoteDetails?.payment_method_type === PaymentMethodType.STRIPE && clientSecret && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <StripePaymentForm
+                    amount={totalPrice}
+                    clientSecret={clientSecret}
+                    onBack={onBack}
+                    onSucceed={onSucceed}
+                  />
+                </Elements>
+              )}
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

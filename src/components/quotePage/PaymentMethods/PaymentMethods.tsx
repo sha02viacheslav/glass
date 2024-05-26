@@ -50,6 +50,8 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           flexDirection: 'column',
           gap: 3,
           marginX: -4,
+          mt: -2,
+          mb: -3,
           padding: '8px 16px 12px',
           background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
         }}

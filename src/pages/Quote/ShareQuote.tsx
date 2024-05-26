@@ -19,8 +19,8 @@ export const ShareQuote: FC<{ url: string }> = ({ url }) => {
   }
   return (
     <>
-      <Box onClick={() => setShow(true)}>
-        Service mainpage <ShareIcon />
+      <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={() => setShow(true)}>
+        <Typography sx={{ display: { lg: 'none' } }}>Service mainpage</Typography> <ShareIcon />
       </Box>
       <Drawer anchor={'bottom'} open={show} onClose={() => setShow(false)} className='drawer-rounded'>
         <Box sx={{ padding: 5, pt: 10 }}>

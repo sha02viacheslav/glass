@@ -177,16 +177,16 @@ export const AddressInput: React.FC<ChangeAddressProps> = ({ address, formError,
             display: 'flex',
             gap: '8px',
             color: 'var(--Gray-600, #6a6b71)',
-            fontSize: '14px',
+            fontSize: { xs: 15, lg: 16 },
             fontWeight: '400',
-            lineHeight: '140%',
+            lineHeight: { xs: '140%', lg: '150%' },
             letterSpacing: '-0.14px',
             marginTop: '4px',
           }}
         >
           <CardMedia
             component='img'
-            sx={{ width: 16, height: 16, mt: '2px' }}
+            sx={{ width: { xs: 16, lg: 24 }, height: { xs: 16, lg: 24 }, mt: { xs: '2px', lg: 0 } }}
             image={process.env.PUBLIC_URL + '/images/map-marker-light.svg'}
           />
           {addressText}

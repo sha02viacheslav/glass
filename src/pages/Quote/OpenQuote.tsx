@@ -44,7 +44,7 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
 
   return (
     <>
-      <Box sx={{ paddingX: 4, marginBottom: 32 }} className='container'>
+      <Box sx={{ marginBottom: 32 }} className='container'>
         <Box sx={{ cursor: 'pointer', maxWidth: 716, mx: 'auto' }} onClick={() => onContinue()}>
           <ReadyQuote quoteDetails={quoteDetails} />
         </Box>

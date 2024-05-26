@@ -179,107 +179,154 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
 
   return (
     <form>
-      <Box sx={{ paddingX: 4, marginBottom: 40 }}>
+      <Box className='container' sx={{ marginBottom: 40 }}>
         <Box
           sx={{
-            paddingX: 3,
-            py: 4,
-            border: '1px solid var(--Yellow---Semantic-500, #FBBC05)',
-            borderRadius: '4px',
-            background: '#FFF9C6',
+            display: 'flex',
+            flexDirection: { xs: 'column', lg: 'row' },
+            alignItems: 'flex-start',
+            gap: { xs: 8, lg: 12 },
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <CardMedia sx={{ width: 24, height: 24 }} image={process.env.PUBLIC_URL + '/images/alert-rhombus.svg'} />
-            <Typography
+          <Box
+            sx={{
+              flex: 1,
+            }}
+          >
+            <Box
               sx={{
-                color: 'var(--WF-Base-800, #2D3648)',
-                fontSize: 20,
-                fontWeight: '700',
-                lineHeight: '150%',
-                letterSpacing: '-0.2px',
+                paddingX: { xs: 3, lg: 6 },
+                py: { xs: 4, lg: 6 },
+                border: '1px solid var(--Yellow---Semantic-500, #FBBC05)',
+                borderRadius: '4px',
+                background: '#FFF9C6',
               }}
             >
-              Read before continuing
-            </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <CardMedia
+                  sx={{ width: 24, height: 24 }}
+                  image={process.env.PUBLIC_URL + '/images/alert-rhombus.svg'}
+                />
+                <Typography
+                  sx={{
+                    color: 'var(--WF-Base-800, #2D3648)',
+                    fontSize: { xs: 20, lg: 24 },
+                    fontWeight: '700',
+                    lineHeight: { xs: '150%', lg: '100%' },
+                    letterSpacing: '-0.2px',
+                  }}
+                >
+                  Read before continuing
+                </Typography>
+              </Box>
+
+              <List
+                sx={{
+                  listStyle: 'auto',
+                  pl: 6,
+                  py: 0,
+                  color: 'var(--Gray-700, #474747)',
+                  fontSize: { xs: 16, lg: 20 },
+                  lineHeight: '24px',
+                  letterSpacing: '-0.16px',
+                  mt: { xs: 4, lg: 8 },
+                }}
+                component='ol'
+              >
+                <ListItem sx={{ p: 0 }}>Credit or “prepaid debit cards” aren&apos;t accepted.</ListItem>
+                <ListItem sx={{ p: 0, mt: { xs: 2, lg: 6 } }}>
+                  Name, address and all information must match with your debit card when paying upfront cost of £100. If
+                  not, payment will not go through
+                </ListItem>
+              </List>
+            </Box>
+
+            <Box sx={{ display: { xs: 'none', lg: 'block' }, mt: 12 }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 'auto', height: 36, display: 'inline' }}
+                image={process.env.PUBLIC_URL + '/images/payment-assist.png'}
+              />
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  fontSize: 20,
+                  lineHeight: '140%',
+                  letterSpacing: '-0.16px',
+                  mt: 2,
+                }}
+              >
+                is our payment provider
+              </Typography>
+            </Box>
           </Box>
 
-          <List
+          <Box
             sx={{
-              listStyle: 'auto',
-              pl: 6,
-              color: 'var(--Gray-700, #474747)',
-              lineHeight: '24px',
-              letterSpacing: '-0.16px',
-              mt: 2,
+              flex: 1,
+              p: { lg: 12 },
+              borderRadius: '16px',
+              border: { lg: '2px solid var(--Gray-100, #F2F2F3)' },
+              background: { lg: '#fff' },
             }}
-            component='ol'
           >
-            <ListItem sx={{ paddingY: '2px' }}>Credit or “prepaid debit cards” aren&apos;t accepted.</ListItem>
-            <ListItem sx={{ paddingY: '2px' }}>
-              Name, address and all information must match with your debit card when paying upfront cost of £100. If
-              not, payment will not go through
-            </ListItem>
-          </List>
-        </Box>
+            <Box>
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  fontSize: { xs: 12, lg: 16 },
+                  fontWeight: 700,
+                  lineHeight: '150%',
+                  letterSpacing: '0.84px',
+                }}
+              >
+                Personal info
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'var(--WF-Base-700, #4A5468)',
+                  fontSize: { xs: 16, lg: 20 },
+                  fontWeight: 400,
+                  lineHeight: '170%',
+                  mt: { xs: 4, lg: 6 },
+                }}
+              >
+                The details below must be the <strong>same</strong> as those registered with your debit card.
+              </Typography>
 
-        <Box sx={{ mt: 8 }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: 12,
-              fontWeight: 700,
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-            }}
-          >
-            Personal info
-          </Typography>
-          <Typography
-            sx={{
-              color: 'var(--WF-Base-700, #4A5468)',
-              fontSize: 16,
-              fontWeight: 400,
-              lineHeight: '170%',
-              mt: 4,
-            }}
-          >
-            The details below must be the <strong>same</strong> as those registered with your debit card.
-          </Typography>
+              <Box sx={{ mt: { xs: 4, lg: 6 } }}>
+                <PersonalInfoForm
+                  values={formik.values}
+                  touched={formik.touched}
+                  errors={formik.errors}
+                  setFieldValue={formik.setFieldValue}
+                />
+              </Box>
+            </Box>
 
-          <Box sx={{ mt: 4 }}>
-            <PersonalInfoForm
-              values={formik.values}
-              touched={formik.touched}
-              errors={formik.errors}
-              setFieldValue={formik.setFieldValue}
-            />
+            <Box sx={{ mt: { xs: 8, lg: 16 } }}>
+              <Typography
+                sx={{
+                  color: 'var(--Gray-600, #6A6B71)',
+                  fontSize: { xs: 12, lg: 16 },
+                  fontWeight: 700,
+                  lineHeight: '150%',
+                  letterSpacing: '0.84px',
+                }}
+              >
+                ADDRESS WHERE YOUR DEBIT CARD IS REGISTERED
+              </Typography>
+
+              <Box id={FormFieldIds.INVOICE_ADDRESS} sx={{ mt: 6 }}>
+                <AddressInput
+                  address={billingAddress}
+                  formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+                  onChange={handleChangeBillingAddress}
+                />
+              </Box>
+            </Box>
           </Box>
         </Box>
-
-        <Box sx={{ mt: 8 }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: 12,
-              fontWeight: 700,
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-            }}
-          >
-            ADDRESS WHERE YOUR DEBIT CARD IS REGISTERED
-          </Typography>
-
-          <Box id={FormFieldIds.INVOICE_ADDRESS} sx={{ mt: 6 }}>
-            <AddressInput
-              address={billingAddress}
-              formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
-              onChange={handleChangeBillingAddress}
-            />
-          </Box>
-        </Box>
-
-        <Box sx={{ p: 4 }}></Box>
 
         <Box sx={{ p: 8 }}></Box>
       </Box>
@@ -295,12 +342,12 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
           flexDirection: 'column',
           alignItems: 'center',
           gap: 3,
-          padding: 3,
+          paddingY: 3,
           borderTop: '1px solid var(--Gray-100, #f2f2f3)',
           background: '#fff',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box className='container' sx={{ display: 'flex', justifyContent: { xs: 'center', lg: 'flex-end' } }}>
           <button className='btn-transparent' type='button' onClick={() => onBack()}>
             <CardMedia
               component='img'
@@ -324,7 +371,14 @@ export const QuoteInstallmentPayment: React.FC<QuoteInstallmentPaymentProps> = (
           </button>
         </Box>
 
-        <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', lineHeight: '24px', letterSpacing: '-0.16px' }}>
+        <Typography
+          sx={{
+            display: { lg: 'none' },
+            color: 'var(--Gray-600, #6A6B71)',
+            lineHeight: '24px',
+            letterSpacing: '-0.16px',
+          }}
+        >
           We use{' '}
           <CardMedia
             component='img'

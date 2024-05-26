@@ -12,8 +12,8 @@ export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice, 
   return (
     <Box
       sx={{
-        paddingX: 3,
-        paddingY: 4,
+        paddingX: { xs: 3, lg: 6 },
+        paddingY: { xs: 4, lg: 8 },
         borderRadius: '4px',
         border: selected ? '2px solid #225FC2' : '',
         background: '#FFF',
@@ -25,11 +25,11 @@ export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice, 
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-          <Radio checked={selected} size='small' sx={{ padding: 0 }} />
+          <Radio checked={selected} size='small' sx={{ padding: { xs: 0, lg: '2px 0' } }} />
           <Typography
             sx={{
-              fontSize: '18px',
-              lineHeight: '20px',
+              fontSize: { xs: 18, lg: 24 },
+              lineHeight: { xs: '20px', lg: '100%' },
               letterSpacing: '-0.18px',
               marginLeft: 2,
             }}
@@ -42,7 +42,7 @@ export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice, 
       <Typography
         sx={{
           color: 'var(--Gray-700, #474747)',
-          fontSize: '14px',
+          fontSize: { xs: 14, lg: 16 },
           lineHeight: '170%',
           marginTop: 3,
         }}
@@ -50,7 +50,7 @@ export const FullPayment: React.FC<FullPaymentProps> = ({ selected, totalPrice, 
         Secure online credit or debit card accepted. All card accepted.
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: { xs: 4, lg: 6 } }}>
         <PaymentCards />
       </Box>
     </Box>

@@ -168,7 +168,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
 
   return (
     <form>
-      <Box sx={{ paddingX: 4, marginBottom: 40 }} className='container'>
+      <Box sx={{ marginBottom: 40 }} className='container'>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 8, lg: 24 } }}>
           <Box sx={{ flex: '1' }}>
             <Box sx={{ padding: { xs: 3, lg: 6 }, marginBottom: 6, background: '#fff' }}>
