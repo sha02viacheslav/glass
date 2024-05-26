@@ -19,249 +19,260 @@ export type FinalCheckProps = {
 
 export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry, onEdit }) => {
   return (
-    <Box>
-      <Typography
-        sx={{
-          fontWeight: '600',
-          lineHeight: '150%',
-          letterSpacing: '-0.16px',
-        }}
-      >
-        Let&apos;s check the information before sending. You will be able to edit all the info later also.
-      </Typography>
-
-      <div className='padding-32'></div>
-
-      <Box sx={{ paddingBottom: 6, borderBottom: '1px solid var(--Gray-100, #f2f2f3)' }}>
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 6, lg: 24 } }}>
+      <Box sx={{ flex: '1' }}>
         <Typography
           sx={{
-            color: 'var(--Gray-600, #6A6B71)',
-            fontSize: '12px',
-            fontWeight: '700',
+            fontSize: { xs: 16, lg: 30 },
+            fontWeight: '600',
             lineHeight: '150%',
-            letterSpacing: '0.84px',
-            textTransform: 'uppercase',
+            letterSpacing: '-0.16px',
           }}
         >
-          CAR REGISTRATION NUMBER
+          Let&apos;s check the information before sending. You will be able to edit all the info later also.
         </Typography>
 
-        <Box sx={{ width: '94px', marginTop: 3 }}>
-          <Box sx={{ zoom: 0.3 }}>
-            <LicensePlate disabled={true} licenseNumber={inquiry.step_1.registration_number} />
-          </Box>
-        </Box>
+        <div className='padding-32'></div>
 
-        <Box sx={{ display: 'flex', gap: 2, marginTop: 4 }}>
-          {!!inquiry.step_1.vehicle_logo_url && (
-            <CardMedia component='img' sx={{ width: 'auto', height: 20 }} image={inquiry.step_1.vehicle_logo_url} />
-          )}
-          <Typography
-            sx={{
-              color: 'var(--Gray-800, #14151F)',
-              fontSize: '14px',
-              fontWeight: '400',
-              lineHeight: '150%',
-            }}
-          >
-            {inquiry?.Make} {inquiry?.Model}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ paddingBottom: 6, borderBottom: '1px solid var(--Gray-100, #f2f2f3)' }}>
           <Typography
             sx={{
               color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
+              fontSize: { xs: 12, lg: 16 },
               fontWeight: '700',
               lineHeight: '150%',
               letterSpacing: '0.84px',
               textTransform: 'uppercase',
             }}
           >
-            Service type and location
+            CAR REGISTRATION NUMBER
           </Typography>
-          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP1)}>
-            EDIT
-          </button>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 3 }}>
-          <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
-            <CardMedia
-              component='img'
-              sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/wrench.svg'}
-            />
-            {workingPlaceLabel(inquiry.step_1.working_place)}
+
+          <Box sx={{ width: '94px', marginTop: 3 }}>
+            <Box sx={{ zoom: { xs: 0.3, lg: 0.75 } }}>
+              <LicensePlate disabled={true} licenseNumber={inquiry.step_1.registration_number} />
+            </Box>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
-            <CardMedia
-              component='img'
-              sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/map-marker-blue.svg'}
-            />
-            {formatAddress(inquiry.step_1.delivery_address)}
-          </Box>
-        </Box>
-      </Box>
 
-      <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
-              fontWeight: '700',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-            }}
-          >
-            Broken glass
-          </Typography>
-          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP2)}>
-            EDIT
-          </button>
-        </Box>
-        <Box
-          sx={{
-            padding: 3,
-            border: '1px solid var(--Gray-200, #EAEAEB)',
-            borderRadius: 2,
-            marginTop: 3,
-          }}
-        >
-          <WindowSelector
-            disabled={true}
-            carType={selectedCarType}
-            registrationNumber={inquiry.step_1.registration_number}
-            selectedGlasses={inquiry.step_2.glass_location}
-          />
-        </Box>
-      </Box>
-
-      <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
-              fontWeight: '700',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-            }}
-          >
-            Your images and comment
-          </Typography>
-          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP3)}>
-            EDIT
-          </button>
-        </Box>
-
-        <Typography
-          sx={{
-            fontSize: '14px',
-            lineHeight: '150%',
-            marginTop: 3,
-          }}
-        >
-          Broken glass pictures or videos
-        </Typography>
-        <AddPictures attachments={inquiry.step_3.customer_attachments} disabled={true} />
-
-        <Box sx={{ marginTop: 3 }}>
-          <Typography sx={{ fontSize: '14px', fontWeight: '600', lineHeight: '150%' }}>Additional comments</Typography>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '14px',
-              fontWeight: '600',
-              lineHeight: '150%',
-              marginTop: 1,
-            }}
-          >
-            {inquiry.step_3.customer_comment}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
-              fontWeight: '700',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-            }}
-          >
-            Your personal info
-          </Typography>
-          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP4)}>
-            EDIT
-          </button>
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 3 }}>
-          <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
-            <CardMedia
-              component='img'
-              sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/account-blue.svg'}
-            />
-            {inquiry.step_4.customer_f_name} {inquiry.step_4.customer_s_name}
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
-            <CardMedia
-              component='img'
-              sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/phone-dark-blue.svg'}
-            />
-            {inquiry.step_4.customer_phone}
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
-            <CardMedia
-              component='img'
-              sx={{ width: 20, height: 20 }}
-              image={process.env.PUBLIC_URL + '/images/email-dark-blue.svg'}
-            />
-            {inquiry.step_4.customer_email}
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography
-            sx={{
-              color: 'var(--Gray-600, #6A6B71)',
-              fontSize: '12px',
-              fontWeight: '700',
-              lineHeight: '150%',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-            }}
-          >
-            Preferred repair dates
-          </Typography>
-          <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP5)}>
-            EDIT
-          </button>
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 3 }}>
-          {inquiry.step_5.request_booking.map((item, index) => (
-            <Typography key={index} sx={{ fontSize: 14, lineHeight: '20px', letterSpacing: '0.7px' }}>
-              {moment(item.request_booking_date).format('dddd')}{' '}
-              {SLOT_LEGENDS[slotTimeIndex(slotStartTime(item.request_booking_date, item.request_time_slot))].title},{' '}
-              {moment(item.request_booking_date).format('Do MMMM')}
+          <Box sx={{ display: 'flex', gap: 2, marginTop: 4 }}>
+            {!!inquiry.step_1.vehicle_logo_url && (
+              <CardMedia
+                component='img'
+                sx={{ width: 'auto', height: { xs: 20, lg: 45 } }}
+                image={inquiry.step_1.vehicle_logo_url}
+              />
+            )}
+            <Typography
+              sx={{
+                color: 'var(--Gray-800, #14151F)',
+                fontSize: { xs: 14, lg: 30 },
+                fontWeight: '400',
+                lineHeight: '150%',
+              }}
+            >
+              {inquiry?.Make} {inquiry?.Model}
             </Typography>
-          ))}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ flex: '1' }}>
+        <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Service type and location
+            </Typography>
+            <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP1)}>
+              EDIT
+            </button>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/wrench.svg'}
+              />
+              {workingPlaceLabel(inquiry.step_1.working_place)}
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/map-marker-blue.svg'}
+              />
+              {formatAddress(inquiry.step_1.delivery_address)}
+            </Box>
+          </Box>
+        </Box>
+
+        <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Broken glass
+            </Typography>
+            <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP2)}>
+              EDIT
+            </button>
+          </Box>
+          <Box
+            sx={{
+              padding: 3,
+              border: '1px solid var(--Gray-200, #EAEAEB)',
+              borderRadius: 2,
+              marginTop: 3,
+            }}
+          >
+            <WindowSelector
+              disabled={true}
+              carType={selectedCarType}
+              registrationNumber={inquiry.step_1.registration_number}
+              selectedGlasses={inquiry.step_2.glass_location}
+            />
+          </Box>
+        </Box>
+
+        <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Your images and comment
+            </Typography>
+            <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP3)}>
+              EDIT
+            </button>
+          </Box>
+
+          <Typography
+            sx={{
+              fontSize: '14px',
+              lineHeight: '150%',
+              marginTop: 3,
+            }}
+          >
+            Broken glass pictures or videos
+          </Typography>
+          <AddPictures attachments={inquiry.step_3.customer_attachments} disabled={true} />
+
+          <Box sx={{ marginTop: 3 }}>
+            <Typography sx={{ fontSize: '14px', fontWeight: '600', lineHeight: '150%' }}>
+              Additional comments
+            </Typography>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '14px',
+                fontWeight: '600',
+                lineHeight: '150%',
+                marginTop: 1,
+              }}
+            >
+              {inquiry.step_3.customer_comment}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Your personal info
+            </Typography>
+            <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP4)}>
+              EDIT
+            </button>
+          </Box>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/account-blue.svg'}
+              />
+              {inquiry.step_4.customer_f_name} {inquiry.step_4.customer_s_name}
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/phone-dark-blue.svg'}
+              />
+              {inquiry.step_4.customer_phone}
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, fontSize: '14px', lineHeight: '150%' }}>
+              <CardMedia
+                component='img'
+                sx={{ width: 20, height: 20 }}
+                image={process.env.PUBLIC_URL + '/images/email-dark-blue.svg'}
+              />
+              {inquiry.step_4.customer_email}
+            </Box>
+          </Box>
+        </Box>
+
+        <Box sx={{ borderBottom: '1px solid var(--Gray-100, #f2f2f3)', paddingBottom: 6, marginTop: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              sx={{
+                color: 'var(--Gray-600, #6A6B71)',
+                fontSize: '12px',
+                fontWeight: '700',
+                lineHeight: '150%',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Preferred repair dates
+            </Typography>
+            <button type='button' className='btn-link xs' onClick={() => onEdit(InquiryStep.STEP5)}>
+              EDIT
+            </button>
+          </Box>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 3 }}>
+            {inquiry.step_5.request_booking.map((item, index) => (
+              <Typography key={index} sx={{ fontSize: 14, lineHeight: '20px', letterSpacing: '0.7px' }}>
+                {moment(item.request_booking_date).format('dddd')}{' '}
+                {SLOT_LEGENDS[slotTimeIndex(slotStartTime(item.request_booking_date, item.request_time_slot))].title},{' '}
+                {moment(item.request_booking_date).format('Do MMMM')}
+              </Typography>
+            ))}
+          </Box>
         </Box>
       </Box>
     </Box>

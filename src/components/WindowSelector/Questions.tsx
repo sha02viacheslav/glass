@@ -5,11 +5,17 @@ import { QuestionCard } from './QuestionCard'
 
 export type QuestionsProps = {
   characteristics: Characteristic[]
+  disabled?: boolean
   onChange: (value: Characteristic[]) => void
   setActiveIndex?: (v: number) => void
 }
 
-export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange, setActiveIndex }) => {
+export const Questions: React.FC<QuestionsProps> = ({
+  characteristics,
+  disabled = false,
+  onChange,
+  setActiveIndex,
+}) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
 
   const handleChangeCharacteristic = (value: Characteristic) => {
@@ -70,6 +76,7 @@ export const Questions: React.FC<QuestionsProps> = ({ characteristics, onChange,
 
       <QuestionCard
         characteristic={characteristics[currentIndex]}
+        disabled={disabled}
         onChange={(value) => handleChangeCharacteristic(value)}
       ></QuestionCard>
     </>

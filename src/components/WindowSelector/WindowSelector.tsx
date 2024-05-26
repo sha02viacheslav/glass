@@ -22,6 +22,7 @@ import { HowToPick } from '../Help/HowToPick'
 import { WhatDifference } from '../Help/WhatDifference'
 
 export type WindowSelectorProps = {
+  showInRow?: boolean
   disabled?: boolean
   carType: CarType
   registrationNumber: string
@@ -32,6 +33,7 @@ export type WindowSelectorProps = {
 }
 
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
+  showInRow = false,
   disabled = false,
   carType,
   registrationNumber,
@@ -335,7 +337,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [selectedGlasses])
 
   return (
-    <Box sx={{ display: { lg: 'flex' } }}>
+    <Box sx={{ display: { lg: showInRow ? 'flex' : 'block' } }}>
       <div className={styles.container}>
         {showTintedPopup && (
           <ConfirmDialog
@@ -417,13 +419,13 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
       <Box
         sx={{
-          p: { lg: '24px 48px 48px' },
+          p: { lg: showInRow ? '24px 48px 48px' : '' },
           borderRadius: '16px',
-          border: { lg: '2px solid var(--Gray-100, #F2F2F3)' },
-          background: { lg: '#fff' },
+          border: { lg: showInRow ? '2px solid var(--Gray-100, #F2F2F3)' : '' },
+          background: { lg: showInRow ? '#fff' : '' },
         }}
       >
-        {tintedConfirmed && (
+        {!disabled && tintedConfirmed && (
           <Box
             sx={{
               display: 'flex',
@@ -450,8 +452,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             </Typography>
 
             <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
-              <FormControlLabel value={true} control={<Radio />} label='Yes' />
-              <FormControlLabel value={false} control={<Radio />} label='No' />
+              <FormControlLabel value={true} control={<Radio />} label='Yes' disabled={disabled} />
+              <FormControlLabel value={false} control={<Radio />} label='No' disabled={disabled} />
             </RadioGroup>
           </Box>
         )}
@@ -483,8 +485,8 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
             </Typography>
 
             <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
-              <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' />
-              <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' />
+              <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' disabled={disabled} />
+              <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' disabled={disabled} />
             </RadioGroup>
           </Box>
         )}
@@ -568,6 +570,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
 
             <Questions
               characteristics={characteristics[key]}
+              disabled={disabled}
               onChange={(value) => {
                 setCharacteristics((prev) => {
                   prev[key] = value

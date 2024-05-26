@@ -5,10 +5,11 @@ import { Characteristic } from '@glass/models'
 
 export type QuestionCardProps = {
   characteristic: Characteristic
+  disabled?: boolean
   onChange: (value: Characteristic) => void
 }
 
-export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, onChange }) => {
+export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, disabled = false, onChange }) => {
   const answer = useMemo(() => {
     if (characteristic[CharacteristicAnswer.YES]) {
       return CharacteristicAnswer.YES
@@ -25,7 +26,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, onCh
     <>
       <Box
         sx={{
-          padding: '12px',
+          padding: { xs: '12px', lg: '16px' },
           borderRadius: '2px',
           boxShadow:
             '0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07), 0px 1px 7px 0px rgba(147, 147, 147, 0.09)',
@@ -58,9 +59,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, onCh
           }
           sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}
         >
-          <FormControlLabel value={CharacteristicAnswer.YES} control={<Radio />} label='Yes' />
-          <FormControlLabel value={CharacteristicAnswer.NO} control={<Radio />} label='No' />
-          <FormControlLabel value={CharacteristicAnswer.NOT_KNOW} control={<Radio />} label="I don't know" />
+          <FormControlLabel value={CharacteristicAnswer.YES} control={<Radio />} label='Yes' disabled={disabled} />
+          <FormControlLabel value={CharacteristicAnswer.NO} control={<Radio />} label='No' disabled={disabled} />
+          <FormControlLabel
+            value={CharacteristicAnswer.NOT_KNOW}
+            control={<Radio />}
+            label="I don't know"
+            disabled={disabled}
+          />
         </RadioGroup>
       </Box>
     </>

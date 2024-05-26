@@ -812,8 +812,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             </Box>
           )}
 
-          <Box sx={{ py: { xs: 6, lg: 8 } }}></Box>
-
           <Box
             className='tab-content container'
             sx={{ height: activeStep === InquiryStep.STEP1 ? 'auto' : '0px', overflowY: 'hidden' }}
@@ -1040,6 +1038,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             <section>
               <div id={FormFieldIds.GLASS_LOCATION}>
                 <WindowSelector
+                  showInRow={true}
                   carType={selectedCarType}
                   registrationNumber={formik.values.registrationNumber}
                   selectedGlasses={formik.values.glassLocation}
@@ -1202,7 +1201,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activeStep === InquiryStep.FINAL_CHECK ? 'auto' : '0px', overflow: 'hidden' }}
           >
             <div className='padding-32'></div>
