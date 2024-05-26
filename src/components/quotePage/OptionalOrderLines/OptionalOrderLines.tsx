@@ -13,7 +13,13 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
 }) => {
   return (
     <>
-      <Typography sx={{ fontWeight: '600', lineHeight: '140%' }}>
+      <Typography
+        sx={{
+          fontSize: { xs: 16, lg: 20 },
+          fontWeight: '600',
+          lineHeight: '140%',
+        }}
+      >
         Would you like new wipers?{' '}
         <Typography component='span' sx={{ color: 'var(--Gray-600, #6A6B71)', fontWeight: '600', lineHeight: '140%' }}>
           (Optional)
@@ -28,7 +34,7 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
           <Grid key={index} item xs={6}>
             <Box
               sx={{
-                padding: 4,
+                padding: { xs: 4, lg: 8 },
                 borderRadius: '4px',
                 border: element.order_line_added ? '2px solid #225FC2' : '',
                 background: '#FFF',
@@ -44,7 +50,7 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
                   <Radio checked={element.order_line_added} size='small' sx={{ padding: 0 }} />
                   <Typography
                     sx={{
-                      fontSize: '14px',
+                      fontSize: { xs: 14, lg: 20 },
                       fontWeight: '600',
                       lineHeight: '20px',
                       marginLeft: 2,
@@ -67,7 +73,7 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
                 <Typography
                   sx={{
                     color: 'var(--Red---Semantic-500, #C22222)',
-                    fontSize: '14px',
+                    fontSize: { xs: 14, lg: 16 },
                     lineHeight: '24px',
                     textDecoration: 'line-through',
                   }}
@@ -77,6 +83,7 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
                 {element.discount === 100 ? (
                   <Typography
                     sx={{
+                      fontSize: { xs: 16, lg: 20 },
                       color: 'var(--Gray-700, #474747)',
                       fontWeight: '700',
                       lineHeight: '24px',
@@ -87,6 +94,8 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
                 ) : (
                   <Typography
                     sx={{
+                      fontSize: { xs: 16, lg: 20 },
+                      fontWeight: '700',
                       color: 'var(--Gray-700, #474747)',
                       lineHeight: '24px',
                     }}

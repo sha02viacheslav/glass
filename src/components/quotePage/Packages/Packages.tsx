@@ -19,6 +19,8 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
           flexDirection: 'column',
           gap: 3,
           marginX: -4,
+          mt: -2,
+          mb: -3,
           padding: '8px 16px 12px',
           background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
         }}
@@ -27,8 +29,8 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
           <Box
             key={index}
             sx={{
-              paddingX: 3,
-              paddingY: 4,
+              paddingX: { xs: 3, lg: 6 },
+              paddingY: { xs: 4, lg: 8 },
               borderRadius: '4px',
               border: packages[packageKey].quotation_package_details[0]?.order_line_added ? '2px solid #225FC2' : '',
               background: '#FFF',
@@ -48,8 +50,9 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
                 />
                 <Typography
                   sx={{
+                    fontSize: { xs: 16, lg: 20 },
                     fontWeight: '600',
-                    lineHeight: '20px',
+                    lineHeight: { xs: '20px', lg: '120%' },
                     letterSpacing: '-0.32px',
                     marginLeft: 2,
                   }}
@@ -74,9 +77,9 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
                   sx={{
                     textShadow: '0px 1px 2px rgba(0, 0, 0, 0.12)',
                     fontFamily: 'Inter',
-                    fontSize: '18px',
+                    fontSize: { xs: 18, lg: 24 },
                     fontWeight: '700',
-                    lineHeight: '20px',
+                    lineHeight: { xs: '20px', lg: '100%' },
                     background: 'linear-gradient(90deg, #4522C2 0%, #8F00FF 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -91,7 +94,7 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
             <Typography
               sx={{
                 color: 'var(--Gray-700, #474747)',
-                fontSize: '14px',
+                fontSize: { xs: 14, lg: 18 },
                 lineHeight: '140%',
                 marginTop: 4,
               }}

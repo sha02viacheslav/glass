@@ -58,6 +58,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
       <Typography
         sx={{
           color: !!formError ? 'var(--Red---Semantic-500, #C22222)' : 'var(--Gray-800, #14151F)',
+          fontSize: { xs: 16, lg: 20 },
           fontWeight: '600',
           lineHeight: '140%',
           marginBottom: 4,
@@ -70,6 +71,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
         sx={{
           background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
           display: 'flex',
+          flexWrap: { xs: 'nowrap', lg: 'wrap' },
           gap: 3,
           marginX: -4,
           padding: '8px 16px 12px',
@@ -80,8 +82,8 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
           <Box
             key={index}
             sx={{
-              minWidth: 180,
-              padding: 4,
+              minWidth: { xs: 180, lg: 'calc(50% - 6px)' },
+              padding: { xs: 4, lg: 8 },
               borderRadius: '4px',
               border: reserveBookingId === element.reserve_booking_id ? '2px solid #225FC2' : '',
               background: '#FFF',
@@ -96,14 +98,21 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
               <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
                 <Radio checked={reserveBookingId === element.reserve_booking_id} size='small' sx={{ padding: 0 }} />
                 <Box sx={{ marginLeft: 2 }}>
-                  <Typography sx={{ fontWeight: '600', lineHeight: '20px', letterSpacing: '-0.16px' }}>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: 16, lg: 20 },
+                      fontWeight: '600',
+                      lineHeight: { xs: '20px', lg: '120%' },
+                      letterSpacing: '-0.16px',
+                    }}
+                  >
                     {moment(element.booking_date).format('dddd')}, {moment(element.booking_date).format('DD.MM.')}
                   </Typography>
 
                   <Typography
                     sx={{
                       color: 'var(--Gray-700, #474747)',
-                      fontSize: '12px',
+                      fontSize: { xs: 12, lg: 16 },
                       fontWeight: '400',
                       lineHeight: '150%',
                       letterSpacing: '-0.12px',
@@ -115,7 +124,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
               </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1, marginTop: { xs: 2, lg: 4 } }}>
               <CardMedia
                 component='img'
                 sx={{ width: 24, height: 24 }}
@@ -126,7 +135,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
                 <Typography
                   sx={{
                     color: 'var(--Gray-700, #474747)',
-                    fontSize: '12px',
+                    fontSize: { xs: 12, lg: 20 },
                     lineHeight: 'normal',
                     letterSpacing: '-0.12px',
                     textTransform: 'capitalize',
@@ -138,7 +147,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
                 <Typography
                   sx={{
                     color: 'var(--Gray-700, #474747)',
-                    fontSize: '12px',
+                    fontSize: { xs: 12, lg: 16 },
                     fontWeight: '300',
                     lineHeight: '150%',
                     letterSpacing: '-0.12px',
