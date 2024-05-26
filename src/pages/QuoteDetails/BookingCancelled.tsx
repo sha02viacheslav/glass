@@ -9,8 +9,10 @@ export type BookingCancelledProps = {
 
 export const BookingCancelled: React.FC<BookingCancelledProps> = ({ totalPrice }) => {
   return (
-    <Box>
-      <Typography sx={{ textAlign: 'center', fontSize: 24, lineHeight: '120%', letterSpacing: '-0.24px', mb: 4 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography
+        sx={{ textAlign: 'center', fontSize: { xs: 24, lg: 36 }, lineHeight: '120%', letterSpacing: '-0.24px', mb: 4 }}
+      >
         Thank you for considering our service!
       </Typography>
 
@@ -23,6 +25,7 @@ export const BookingCancelled: React.FC<BookingCancelledProps> = ({ totalPrice }
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          maxWidth: 416,
         }}
       >
         <Typography
@@ -80,7 +83,7 @@ export const BookingCancelled: React.FC<BookingCancelledProps> = ({ totalPrice }
         </Typography>
       </Box>
 
-      <Box sx={{ mt: 16 }}>
+      <Box sx={{ mt: 16, width: { xs: '100%', lg: 358 } }}>
         <Link to='/'>
           <button type='button' className='btn-raised w-100'>
             Go to homepage

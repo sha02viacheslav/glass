@@ -333,6 +333,10 @@ export const QuoteDetails: React.FC = ({}) => {
   }
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [activePage])
+
+  useEffect(() => {
     if (!workshops.length) {
       getWorkshop()
     }
@@ -377,13 +381,15 @@ export const QuoteDetails: React.FC = ({}) => {
         <EditQuoteDetailsHeader title={steps[activePage].title} onBack={() => handleBackToSummaryClick()} />
       )}
 
-      <Box sx={{ pt: '52px' }}>
+      <Box>
+        <Box sx={{ pt: { xs: 10, lg: 25 } }}></Box>
+
         <form onSubmit={formik.handleSubmit}>
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.OVERVIEW ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-32'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>
               {!!quoteDetails && (
                 <QuoteOverview
@@ -397,10 +403,10 @@ export const QuoteDetails: React.FC = ({}) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.GLASS ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-48'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>
               <div id={FormFieldIds.GLASS_LOCATION}>
                 <WindowSelector
@@ -417,50 +423,67 @@ export const QuoteDetails: React.FC = ({}) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.COMMENT_IMAGES ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-48'></div>
-            <section>
-              <Box
-                sx={{
-                  paddingX: 4,
-                  paddingY: 3,
-                  borderRadius: '2px',
-                  border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                  background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                }}
-              >
-                <Typography
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 6, lg: 24 } }}>
+              <Box sx={{ flex: 1 }}>
+                <Box
                   sx={{
-                    color: 'var(--Dark-Blue---Accent-800, #090221)',
-                    fontWeight: '700',
-                    lineHeight: '150%',
-                    letterSpacing: '0.8px',
+                    paddingX: 4,
+                    paddingY: 3,
+                    borderRadius: '2px',
+                    border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                    background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
                   }}
                 >
-                  IMPORTANT
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'var(--Light-Blue---Primary-700, #081F44)',
-                    lineHeight: '170%',
-                    marginTop: 1,
-                  }}
-                >
-                  Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later as
-                  well.
-                </Typography>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <CardMedia
+                      component='img'
+                      sx={{ width: { xs: 24, lg: 32 }, height: { xs: 24, lg: 32 } }}
+                      image={process.env.PUBLIC_URL + '/images/information-dark.svg'}
+                      alt='Minus'
+                    />
+                    <Typography
+                      sx={{
+                        color: 'var(--Dark-Blue---Accent-800, #090221)',
+                        fontSize: { xs: 16, lg: 20 },
+                        fontWeight: '700',
+                        lineHeight: { xs: '150%', lg: '160%' },
+                        letterSpacing: '0.8px',
+                      }}
+                    >
+                      IMPORTANT
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      color: 'var(--Light-Blue---Primary-700, #081F44)',
+                      fontSize: { xs: 16, lg: 20 },
+                      lineHeight: '170%',
+                      marginTop: { xs: 1, lg: 4 },
+                    }}
+                  >
+                    Adding images is optional, but it helps to reduce possible mistakes. You can upload pictures later
+                    as well.
+                  </Typography>
+                </Box>
+
+                <Box sx={{ marginTop: 6 }}>
+                  <AddPictures
+                    attachments={formik.values.attachments}
+                    onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
+                  />
+
+                  <HowToTakePic />
+                </Box>
               </Box>
-              <Box sx={{ marginTop: 6 }}>
-                <AddPictures
-                  attachments={formik.values.attachments}
-                  onChangeAttachments={(value) => formik.setFieldValue(FormFieldIds.ATTACHMENTS, value)}
-                />
 
-                <HowToTakePic />
-
-                <Typography sx={{ lineHeight: '150%', marginTop: 6, marginBottom: 2 }}>Additional comments</Typography>
+              <Box sx={{ flex: 1 }}>
+                <Typography sx={{ fontSize: { xs: 16, lg: 20 }, lineHeight: '150%', marginBottom: 2 }}>
+                  Additional comments
+                </Typography>
                 <FormControl fullWidth>
                   <OutlinedInput
                     value={formik.values.comment}
@@ -468,62 +491,94 @@ export const QuoteDetails: React.FC = ({}) => {
                     multiline
                     rows={4}
                     placeholder='Any info you think that can help...'
-                    sx={{ fontSize: 14, paddingY: 0 }}
+                    sx={{ fontSize: 14, paddingY: 0, background: '#fff' }}
                     onChange={(e) => formik.setFieldValue(FormFieldIds.COMMENT, e.target.value)}
                     error={formik.touched.comment && !!formik.errors.comment}
                   />
                 </FormControl>
               </Box>
-            </section>
+            </Box>
             <div className='padding-64'></div>
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.PERSONAL_INFO ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-48'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>
-              <Box>
-                <Typography
-                  sx={{
-                    color: 'var(--Gray-600, #6A6B71)',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    lineHeight: '150%',
-                    letterSpacing: '0.84px',
-                  }}
-                >
-                  PERSONAL INFO
-                </Typography>
-                <Box sx={{ mt: 4 }}>
-                  <PersonalInfoForm
-                    values={formik.values}
-                    touched={formik.touched}
-                    errors={formik.errors}
-                    setFieldValue={formik.setFieldValue}
-                  />
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+                <Box sx={{ maxWidth: 354, display: { xs: 'none', lg: 'block' } }}>
+                  <Typography
+                    sx={{
+                      fontSize: 24,
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '140%',
+                    }}
+                  >
+                    Your personal info
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'var(--Gray-700, #474747)',
+                      fontSize: 20,
+                      lineHeight: '140%',
+                      mt: 4,
+                    }}
+                  >
+                    Here you can edit your personal info.
+                  </Typography>
                 </Box>
-              </Box>
 
-              <Box sx={{ mt: 8 }}>
-                <Typography
+                <Box
                   sx={{
-                    color: 'var(--Gray-600, #6A6B71)',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    lineHeight: '150%',
-                    letterSpacing: '0.84px',
+                    p: { lg: 12 },
+                    borderRadius: '16px',
+                    border: { lg: '2px solid var(--Gray-100, #F2F2F3)' },
+                    background: { lg: '#fff' },
                   }}
                 >
-                  YOUR LOCATION
-                </Typography>
-                <Box sx={{ mt: 4 }}>
-                  <AddressInput
-                    address={billingAddress}
-                    formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
-                    onChange={handleChangeBillingAddress}
-                  />
+                  <Typography
+                    sx={{
+                      color: 'var(--Gray-600, #6A6B71)',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      lineHeight: '150%',
+                      letterSpacing: '0.84px',
+                    }}
+                  >
+                    PERSONAL INFO
+                  </Typography>
+                  <Box sx={{ mt: 4 }}>
+                    <PersonalInfoForm
+                      values={formik.values}
+                      touched={formik.touched}
+                      errors={formik.errors}
+                      setFieldValue={formik.setFieldValue}
+                    />
+                  </Box>
+
+                  <Box sx={{ mt: 8 }}>
+                    <Typography
+                      sx={{
+                        color: 'var(--Gray-600, #6A6B71)',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        lineHeight: '150%',
+                        letterSpacing: '0.84px',
+                      }}
+                    >
+                      YOUR LOCATION
+                    </Typography>
+                    <Box sx={{ mt: 4 }}>
+                      <AddressInput
+                        address={billingAddress}
+                        formError={formik.touched.invoiceAddress && formik.errors.invoiceAddress}
+                        onChange={handleChangeBillingAddress}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </section>
@@ -531,7 +586,7 @@ export const QuoteDetails: React.FC = ({}) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.DATE_LOCATION ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
             <div className='padding-48'></div>
@@ -543,7 +598,7 @@ export const QuoteDetails: React.FC = ({}) => {
             className='tab-content'
             sx={{ height: activePage === EditQuotePage.DATE ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-32'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>
               <TimeSelection
                 bookingEnabled={formik.values.bookingEnabled}
@@ -557,7 +612,7 @@ export const QuoteDetails: React.FC = ({}) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.LOCATION ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
             <div className='padding-48'></div>
@@ -645,18 +700,21 @@ export const QuoteDetails: React.FC = ({}) => {
 
           <Box
             className='tab-content'
-            sx={{ height: activePage === EditQuotePage.CANCEL ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
+            sx={{
+              height: activePage === EditQuotePage.CANCEL ? 'auto' : '0px',
+              overflow: 'hidden',
+            }}
           >
-            <div className='padding-32'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>{!!quoteDetails && <QuoteCancel></QuoteCancel>}</section>
             <div className='padding-64'></div>
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.BOOKING_CANCELLED ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
-            <div className='padding-32'></div>
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
             <section>{!!quoteDetails && <BookingCancelled totalPrice={totalPrice}></BookingCancelled>}</section>
             <div className='padding-64'></div>
           </Box>
@@ -674,54 +732,64 @@ export const QuoteDetails: React.FC = ({}) => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
-                padding: 4,
+                py: 4,
                 borderTop: '1px solid var(--Gray-100, #f2f2f3)',
                 background: '#fff',
               }}
             >
-              {activePage !== EditQuotePage.OVERVIEW && activePage !== EditQuotePage.CANCEL && (
-                <>
-                  <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                    Save changes
-                  </button>
-                </>
-              )}
+              <Box
+                className='container'
+                sx={{
+                  display: 'flex',
+                  justifyContent: { xs: 'center', lg: 'flex-end' },
+                  alignItems: 'flex-start',
+                  gap: { lg: 6 },
+                }}
+              >
+                {activePage !== EditQuotePage.OVERVIEW && activePage !== EditQuotePage.CANCEL && (
+                  <Box sx={{ width: { xs: '100%', lg: 246 } }}>
+                    <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                      Save changes
+                    </button>
+                  </Box>
+                )}
 
-              {activePage === EditQuotePage.OVERVIEW && (
-                <>
-                  <button
-                    className='btn-transparent danger w-100'
-                    type='button'
-                    onClick={() => setShowCancelBooking(true)}
-                  >
-                    Cancel the booking
-                  </button>
-                </>
-              )}
+                {activePage === EditQuotePage.OVERVIEW && (
+                  <>
+                    <button
+                      className='btn-transparent danger w-100'
+                      type='button'
+                      onClick={() => setShowCancelBooking(true)}
+                    >
+                      Cancel the booking
+                    </button>
+                  </>
+                )}
 
-              {activePage === EditQuotePage.CANCEL && (
-                <>
-                  <button
-                    className='btn-transparent px-3'
-                    type='button'
-                    onClick={() => setActivePage(EditQuotePage.OVERVIEW)}
-                  >
-                    <CardMedia
-                      component='img'
-                      sx={{ width: 24, height: 'auto', marginLeft: -2 }}
-                      image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
-                    />
-                    Back to quote
-                  </button>
-                  <button
-                    className='btn-transparent danger px-3'
-                    type='button'
-                    onClick={() => setShowRefundPopup(true)}
-                  >
-                    Refund my money
-                  </button>
-                </>
-              )}
+                {activePage === EditQuotePage.CANCEL && (
+                  <>
+                    <button
+                      className='btn-transparent px-3'
+                      type='button'
+                      onClick={() => setActivePage(EditQuotePage.OVERVIEW)}
+                    >
+                      <CardMedia
+                        component='img'
+                        sx={{ width: 24, height: 'auto', marginLeft: -2 }}
+                        image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
+                      />
+                      Back to quote
+                    </button>
+                    <button
+                      className='btn-transparent danger px-3'
+                      type='button'
+                      onClick={() => setShowRefundPopup(true)}
+                    >
+                      Refund my money
+                    </button>
+                  </>
+                )}
+              </Box>
             </Box>
           )}
         </form>

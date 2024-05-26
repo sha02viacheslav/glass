@@ -124,8 +124,8 @@ export const OurMethod: React.FC<OurMethodProps> = ({
         <Box
           sx={{
             mx: { xs: 0, md: -3, lg: -6 },
-            '.next-arrow': { transform: 'translate(-24px, 100%)' },
-            '.prev-arrow': { transform: 'translate(calc(-100% - 24px), 100%)' },
+            '.next-arrow': { lg: { transform: 'translate(-24px, 100%)' } },
+            '.prev-arrow': { lg: { transform: 'translate(calc(-100% - 24px), 100%)' } },
           }}
         >
           <Slider {...settings}>

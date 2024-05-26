@@ -1084,7 +1084,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                         color: 'var(--Dark-Blue---Accent-800, #090221)',
                         fontSize: { xs: 16, lg: 20 },
                         fontWeight: '700',
-                        lineHeight: '150%',
+                        lineHeight: { xs: '150%', lg: '160%' },
                         letterSpacing: '0.8px',
                       }}
                     >
