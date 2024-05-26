@@ -816,6 +816,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             className='tab-content container'
             sx={{ height: activeStep === InquiryStep.STEP1 ? 'auto' : '0px', overflowY: 'hidden' }}
           >
+            <div className='padding-48'></div>
             <Box
               sx={{
                 display: 'flex',
@@ -1217,8 +1218,6 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
             <div className='padding-64'></div>
           </Box>
 
-          <Box sx={{ py: { xs: 8, lg: 12 } }}></Box>
-
           <Box
             sx={{
               position: 'fixed',
@@ -1265,7 +1264,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
               {/* Final check */}
               {activeStep === InquiryStep.FINAL_CHECK && (
                 <>
-                  <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                  <button className={'btn-raised' + (isLg ? '' : ' w-100')} type='button' onClick={handleContinueClick}>
                     Submit
                   </button>
                 </>
@@ -1321,6 +1320,8 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           <OurMethod beforeAfterImages={beforeAfterItems} showTitle={false} showVideos={false} />
         )}
         {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
+
+        <Box sx={{ py: { xs: 8, lg: 12 } }}></Box>
       </Box>
 
       {showQuoteActivePopup && !!inquiry && (

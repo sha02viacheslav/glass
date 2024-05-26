@@ -87,7 +87,9 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
     <>
       {!!id && <QuoteHeader quoteId={id} quoteStep={snapValue} quoteDetails={quoteDetails} />}
 
-      <Box sx={{ paddingTop: 21 }}>
+      <Box>
+        <Box sx={{ py: { xs: 10, lg: 20 } }}></Box>
+
         {!!quoteDetails && (
           <>
             {snapValue === QuoteStep.NEW && <NewQuote quoteDetails={quoteDetails} />}

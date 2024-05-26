@@ -19,7 +19,7 @@ export const CheckingQuote: React.FC<CheckingQuoteProps> = ({ quoteDetails }) =>
 
   return (
     <Box sx={{ paddingX: 3 }}>
-      <Typography sx={{ textAlign: 'center', fontSize: '20px', fontWeight: '700', lineHeight: '130%' }}>
+      <Typography sx={{ textAlign: 'center', fontSize: { xs: 20, lg: 36 }, fontWeight: '700', lineHeight: '130%' }}>
         {quoteDetails.customer_f_name}, our team is analyzing your inquiry for {quoteDetails.make} {quoteDetails.model}
       </Typography>
       <Box
@@ -37,13 +37,22 @@ export const CheckingQuote: React.FC<CheckingQuoteProps> = ({ quoteDetails }) =>
           selectedGlasses={quoteDetails.glass_location}
         />
       </Box>
-      <Typography sx={{ textAlign: 'center', fontWeight: '700', lineHeight: '170%', letterSpacing: '-0.16px' }}>
+      <Typography
+        sx={{
+          textAlign: 'center',
+          fontSize: { xs: 16, lg: 20 },
+          fontWeight: '700',
+          lineHeight: '170%',
+          letterSpacing: '-0.16px',
+        }}
+      >
         You will get your quote soon. Thank you for your patience.
       </Typography>
       <Typography
         sx={{
           color: 'var(--Gray-700, #474747)',
           textAlign: 'center',
+          fontSize: { xs: 16, lg: 20 },
           fontWeight: '400',
           lineHeight: '150%',
           letterSpacing: '-0.16px',
