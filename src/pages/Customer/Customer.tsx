@@ -1185,7 +1185,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
           </Box>
 
           <Box
-            className='tab-content'
+            className='tab-content container'
             sx={{ height: activeStep === InquiryStep.STEP5 ? 'auto' : '0px', overflow: 'hidden' }}
           >
             <div className='padding-32'></div>
