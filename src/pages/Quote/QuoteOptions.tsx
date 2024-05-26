@@ -15,6 +15,7 @@ import { ReviewsDialog } from '@glass/components/ReviewsDialog'
 import { BeforeAfterType, InquiryStep } from '@glass/enums'
 import { Quote } from '@glass/models'
 import { addOptionalProductService } from '@glass/services/apis/add-optional-product.service'
+import { confirmRebookService } from '@glass/services/apis/confirm-rebook.service'
 import { removeOptionalProductService } from '@glass/services/apis/remove-optional-product.service'
 import { sendReserveBookingService } from '@glass/services/apis/send-reserve-booking.service'
 import { updateQuotationPackageService } from '@glass/services/apis/update-quotation-package.service'
@@ -34,10 +35,11 @@ export enum FormFieldIds {
 
 export type QuoteOptionsProps = {
   quoteDetails: Quote
+  rebook?: boolean
   refetch: () => void
 }
 
-export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetch }) => {
+export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, rebook = false, refetch }) => {
   const { id: quoteId } = useParams()
   const navigate = useNavigate()
 
@@ -103,6 +105,16 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
     )
   }
 
+  const confirmRebook = (values: QuoteOptionsForm) => {
+    if (!quoteId) return
+
+    trackPromise(
+      confirmRebookService(quoteId, values.reserveBookingId).then(() => {
+        refetch()
+      }),
+    )
+  }
+
   const handleContinueClick = () => {
     formik.setFieldTouched(FormFieldIds.QUOTATION_PACKAGE_ID, true, true)
     if (formik.errors.quotationPackageId) {
@@ -114,7 +126,12 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
       scrollToElementWithOffset(FormFieldIds.RESERVE_BOOKING_ID, 100)
       return
     }
-    sendReserveBooking(formik.values)
+
+    if (rebook) {
+      confirmRebook(formik.values)
+    } else {
+      sendReserveBooking(formik.values)
+    }
   }
 
   const renderSelectedDate = () => {
@@ -229,6 +246,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           <Box sx={{ flex: '1' }}>
             <Box id={FormFieldIds.QUOTATION_PACKAGE_ID}>
               <Packages
+                disabled={rebook}
                 packages={quoteDetails.quotation_packages || []}
                 formError={formik.touched.quotationPackageId && formik.errors.quotationPackageId}
                 onCheckPackage={handleCheckPackage}
@@ -238,6 +256,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
             <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
 
             <OptionalOrderLines
+              disabled={rebook}
               optionalOrderLines={quoteDetails.optional_order_lines || []}
               onCheckOptionalOrderLine={handleCheckOptionalOrderLine}
             />
@@ -287,15 +306,29 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, refetc
           background: '#fff',
         }}
       >
-        <Box sx={{ width: { xs: '100%', lg: 317 } }}>
-          <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
-            Proceed to checkout
-          </button>
-        </Box>
+        {!rebook && (
+          <>
+            <Box sx={{ width: { xs: '100%', lg: 317 } }}>
+              <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
+                Proceed to checkout
+              </button>
+            </Box>
 
-        <Box sx={{ display: 'flex', gap: 3 }}>
-          <PaymentCards />
-        </Box>
+            <Box sx={{ display: 'flex', gap: 3 }}>
+              <PaymentCards />
+            </Box>
+          </>
+        )}
+
+        {rebook && (
+          <>
+            <Box sx={{ width: { xs: '100%', lg: 317 } }}>
+              <button className='btn-raised w-100' type='button' onClick={() => handleContinueClick()}>
+                Rebook
+              </button>
+            </Box>
+          </>
+        )}
       </Box>
     </form>
   )

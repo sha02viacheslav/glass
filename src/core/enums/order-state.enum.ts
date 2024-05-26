@@ -16,4 +16,5 @@ export enum OrderState {
   WON = 'won',
   LOST = 'lost',
   REQUEST_TO_CANCEL = 'request_to_cancel',
+  TO_REBOOK = 'to_rebook',
 }

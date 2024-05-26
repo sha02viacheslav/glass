@@ -8,4 +8,5 @@ export enum EditQuotePage {
   OVERVIEW = 'overview',
   CANCEL = 'cancel',
   BOOKING_CANCELLED = 'booking_cancelled',
+  REQUEST_TO_CANCEL = 'request_to_cancel',
 }

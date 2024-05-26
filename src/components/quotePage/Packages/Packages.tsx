@@ -3,6 +3,7 @@ import { Box, Radio, Typography } from '@mui/material'
 import { QuotePackage } from '@glass/models'
 
 export type PackagesProps = {
+  disabled?: boolean
   packages: { [key: string]: QuotePackage }
   formError: string | boolean | undefined
   onCheckPackage: (value: number) => void
@@ -10,7 +11,7 @@ export type PackagesProps = {
 
 const MONTHS = 4
 
-export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheckPackage }) => {
+export const Packages: React.FC<PackagesProps> = ({ disabled = false, packages, formError, onCheckPackage }) => {
   return (
     <>
       <Box
@@ -23,6 +24,7 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
           mb: -3,
           padding: '8px 16px 12px',
           background: !!formError ? 'var(--Red---Semantic-000, #FEE8E8)' : 'transparent',
+          opacity: disabled ? 0.3 : 1,
         }}
       >
         {Object.keys(packages).map((packageKey, index) => (
@@ -35,10 +37,12 @@ export const Packages: React.FC<PackagesProps> = ({ packages, formError, onCheck
               border: packages[packageKey].quotation_package_details[0]?.order_line_added ? '2px solid #225FC2' : '',
               background: '#FFF',
               boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
             }}
             onClick={() => {
-              onCheckPackage(packages[packageKey].quotation_package_id)
+              if (!disabled) {
+                onCheckPackage(packages[packageKey].quotation_package_id)
+              }
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>

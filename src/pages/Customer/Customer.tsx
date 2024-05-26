@@ -682,6 +682,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         case OrderState.WON:
         case OrderState.LOST:
         case OrderState.REQUEST_TO_CANCEL:
+        case OrderState.TO_REBOOK:
           setShowQuoteActivePopup(true)
           return
       }

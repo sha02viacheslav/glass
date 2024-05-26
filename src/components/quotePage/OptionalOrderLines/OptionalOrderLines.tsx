@@ -3,16 +3,18 @@ import { Box, CardMedia, Grid, Radio, Typography } from '@mui/material'
 import { OptionalOrderLine } from '@glass/models'
 
 export type OptionalOrderLinesProps = {
+  disabled?: boolean
   optionalOrderLines: OptionalOrderLine[]
   onCheckOptionalOrderLine: (orderLineId: number, optionalLineId: number, checked: boolean) => void
 }
 
 export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
+  disabled = false,
   optionalOrderLines,
   onCheckOptionalOrderLine,
 }) => {
   return (
-    <>
+    <Box sx={{ opacity: disabled ? 0.3 : 1 }}>
       <Typography
         sx={{
           fontSize: { xs: 16, lg: 20 },
@@ -39,10 +41,12 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
                 border: element.order_line_added ? '2px solid #225FC2' : '',
                 background: '#FFF',
                 boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
-                cursor: 'pointer',
+                cursor: disabled ? 'not-allowed' : 'pointer',
               }}
               onClick={() => {
-                onCheckOptionalOrderLine(element.order_line_id, element.optional_line_id, !element.order_line_added)
+                if (!disabled) {
+                  onCheckOptionalOrderLine(element.order_line_id, element.optional_line_id, !element.order_line_added)
+                }
               }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -108,6 +112,6 @@ export const OptionalOrderLines: React.FC<OptionalOrderLinesProps> = ({
           </Grid>
         ))}
       </Grid>
-    </>
+    </Box>
   )
 }

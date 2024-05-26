@@ -18,13 +18,14 @@ import { QuoteInstallmentPayment } from './QuoteInstallmentPayment'
 import { QuoteOptions } from './QuoteOptions'
 import { QuoteStripePayment } from './QuoteStripePayment'
 import { QuoteTracking } from './QuoteTracking'
+import { QuoteCancelling } from '../QuoteDetails/QuoteCancelling'
 
 export type QuoteProps = {
   quoteCount?: boolean
 }
 
 export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
-  const { id } = useParams()
+  const { id: quoteId } = useParams()
   const [quoteDetails, setQuoteDetails] = useState<Quote | undefined>(undefined)
   const [snapValue, setSnapValue] = useState<QuoteStep>(QuoteStep.NEW)
   const [seeQuoteClicked, setSeeQuoteClicked] = useState<boolean>(false)
@@ -33,10 +34,10 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
   const { totalPrice } = useCalcPriceSummary(quoteDetails)
 
   const getQuote = () => {
-    if (id) {
-      setQuoteId(id)
+    if (quoteId) {
+      setQuoteId(quoteId)
       trackPromise(
-        getQuoteService(id, quoteCount).then((res) => {
+        getQuoteService(quoteId, quoteCount).then((res) => {
           if (res.success) {
             setQuoteDetails(res.data)
           } else {
@@ -67,12 +68,16 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
       setSnapValue(QuoteStep.CHECKOUT)
     } else if (quoteDetails?.order_state === OrderState.WON) {
       setSnapValue(QuoteStep.TRACKING)
+    } else if (quoteDetails?.order_state === OrderState.TO_REBOOK) {
+      setSnapValue(QuoteStep.REBOOK)
+    } else if (quoteDetails?.order_state === OrderState.REQUEST_TO_CANCEL) {
+      setSnapValue(QuoteStep.REQUEST_TO_CANCEL)
     }
   }
 
   useEffect(() => {
     // Get Quote Data
-    if (id && !quoteDetails) {
+    if (quoteId && !quoteDetails) {
       getQuote()
     }
   }, [quoteDetails])
@@ -85,7 +90,7 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
 
   return (
     <>
-      {!!id && <QuoteHeader quoteId={id} quoteStep={snapValue} quoteDetails={quoteDetails} />}
+      {!!quoteId && <QuoteHeader quoteId={quoteId} quoteStep={snapValue} quoteDetails={quoteDetails} />}
 
       <Box>
         <Box sx={{ py: { xs: 10, lg: 20 } }}></Box>
@@ -105,6 +110,20 @@ export const QuotePage: React.FC<QuoteProps> = ({ quoteCount = true }) => {
                   getQuote()
                 }}
               />
+            )}
+
+            {snapValue === QuoteStep.REBOOK && (
+              <QuoteOptions
+                rebook={true}
+                quoteDetails={quoteDetails}
+                refetch={() => {
+                  getQuote()
+                }}
+              />
+            )}
+
+            {snapValue === QuoteStep.REQUEST_TO_CANCEL && !!quoteId && (
+              <QuoteCancelling quoteId={quoteId} onStopCancelBooking={() => getQuote()}></QuoteCancelling>
             )}
 
             {snapValue === QuoteStep.CHECKOUT && (

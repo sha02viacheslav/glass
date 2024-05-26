@@ -24,7 +24,7 @@ import { HowToTakePic } from '@glass/components/Help/HowToTakePic'
 import { PersonalInfoForm } from '@glass/components/PersonalInfoForm'
 import { TimeSelection } from '@glass/components/quotePage/TimeSelection'
 import { WindowSelector } from '@glass/components/WindowSelector'
-import { CarType, EditQuotePage, WorkingPlace } from '@glass/enums'
+import { CarType, EditQuotePage, OrderState, WorkingPlace } from '@glass/enums'
 import { useCalcPriceSummary } from '@glass/hooks/useCalcPriceSummary'
 import { useRetrieveVehData } from '@glass/hooks/useRetrieveVehData'
 import { Address, Attachment, Characteristic, Quote, RequestBooking, UpdateWonQuoteDto, Workshop } from '@glass/models'
@@ -36,6 +36,7 @@ import { scrollToElementWithOffset, workingPlaceLabel } from '@glass/utils/index
 import { BookingCancelled } from './BookingCancelled'
 import { EditQuoteDetailsHeader } from './EditQuoteDetailsHeader'
 import { QuoteCancel } from './QuoteCancel'
+import { QuoteCancelling } from './QuoteCancelling'
 import { QuoteDateLocation } from './QuoteDateLocation'
 import { QuoteOverview } from './QuoteOverview'
 import { WorkshopCard } from '../Customer/WorkshopCard'
@@ -90,6 +91,7 @@ export const QuoteDetails: React.FC = ({}) => {
     [EditQuotePage.OVERVIEW]: { title: 'Details of your quote' },
     [EditQuotePage.CANCEL]: { title: 'We’re here to help' },
     [EditQuotePage.BOOKING_CANCELLED]: { title: 'Thank you!' },
+    [EditQuotePage.REQUEST_TO_CANCEL]: { title: 'Thank you!' },
   }
 
   const validationSchema = object({
@@ -324,6 +326,7 @@ export const QuoteDetails: React.FC = ({}) => {
       cancelBookingService(quoteId).then((res) => {
         if (res.success) {
           setActivePage(EditQuotePage.BOOKING_CANCELLED)
+          getQuote()
         } else {
           toast(res.message)
         }
@@ -348,6 +351,10 @@ export const QuoteDetails: React.FC = ({}) => {
     }
 
     if (quoteDetails) {
+      if (quoteDetails.order_state === OrderState.TO_REBOOK) {
+        navigate('/quote/' + quoteId)
+      }
+
       // Location
       formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, quoteDetails.registration_number)
       handleChangeBillingAddress(quoteDetails.delivery_address)
@@ -712,6 +719,22 @@ export const QuoteDetails: React.FC = ({}) => {
 
           <Box
             className='tab-content container'
+            sx={{ height: activePage === EditQuotePage.REQUEST_TO_CANCEL ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
+          >
+            <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
+            <section>
+              {!!quoteId && (
+                <QuoteCancelling
+                  quoteId={quoteId}
+                  onStopCancelBooking={() => navigate('/quote/' + quoteId)}
+                ></QuoteCancelling>
+              )}
+            </section>
+            <div className='padding-64'></div>
+          </Box>
+
+          <Box
+            className='tab-content container'
             sx={{ height: activePage === EditQuotePage.BOOKING_CANCELLED ? 'auto' : '0px', overflow: 'hidden', px: 4 }}
           >
             <Box sx={{ pt: { xs: 8, lg: 16 } }}></Box>
@@ -721,77 +744,79 @@ export const QuoteDetails: React.FC = ({}) => {
 
           <div className='padding-64'></div>
 
-          {activePage !== EditQuotePage.BOOKING_CANCELLED && activePage !== EditQuotePage.DATE_LOCATION && (
-            <Box
-              sx={{
-                position: 'fixed',
-                bottom: '0',
-                left: '0',
-                width: '100vw',
-                zIndex: '100',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                py: 4,
-                borderTop: '1px solid var(--Gray-100, #f2f2f3)',
-                background: '#fff',
-              }}
-            >
+          {activePage !== EditQuotePage.BOOKING_CANCELLED &&
+            activePage !== EditQuotePage.REQUEST_TO_CANCEL &&
+            activePage !== EditQuotePage.DATE_LOCATION && (
               <Box
-                className='container'
                 sx={{
+                  position: 'fixed',
+                  bottom: '0',
+                  left: '0',
+                  width: '100vw',
+                  zIndex: '100',
                   display: 'flex',
-                  justifyContent: { xs: 'center', lg: 'flex-end' },
+                  justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  gap: { lg: 6 },
+                  py: 4,
+                  borderTop: '1px solid var(--Gray-100, #f2f2f3)',
+                  background: '#fff',
                 }}
               >
-                {activePage !== EditQuotePage.OVERVIEW && activePage !== EditQuotePage.CANCEL && (
-                  <Box sx={{ width: { xs: '100%', lg: 246 } }}>
-                    <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
-                      Save changes
-                    </button>
-                  </Box>
-                )}
+                <Box
+                  className='container'
+                  sx={{
+                    display: 'flex',
+                    justifyContent: { xs: 'center', lg: 'flex-end' },
+                    alignItems: 'flex-start',
+                    gap: { lg: 6 },
+                  }}
+                >
+                  {activePage !== EditQuotePage.OVERVIEW && activePage !== EditQuotePage.CANCEL && (
+                    <Box sx={{ width: { xs: '100%', lg: 246 } }}>
+                      <button className='btn-raised w-100' type='button' onClick={handleContinueClick}>
+                        Save changes
+                      </button>
+                    </Box>
+                  )}
 
-                {activePage === EditQuotePage.OVERVIEW && (
-                  <>
-                    <button
-                      className='btn-transparent danger w-100'
-                      type='button'
-                      onClick={() => setShowCancelBooking(true)}
-                    >
-                      Cancel the booking
-                    </button>
-                  </>
-                )}
+                  {activePage === EditQuotePage.OVERVIEW && (
+                    <>
+                      <button
+                        className='btn-transparent danger w-100'
+                        type='button'
+                        onClick={() => setShowCancelBooking(true)}
+                      >
+                        Cancel the booking
+                      </button>
+                    </>
+                  )}
 
-                {activePage === EditQuotePage.CANCEL && (
-                  <>
-                    <button
-                      className='btn-transparent px-3'
-                      type='button'
-                      onClick={() => setActivePage(EditQuotePage.OVERVIEW)}
-                    >
-                      <CardMedia
-                        component='img'
-                        sx={{ width: 24, height: 'auto', marginLeft: -2 }}
-                        image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
-                      />
-                      Back to quote
-                    </button>
-                    <button
-                      className='btn-transparent danger px-3'
-                      type='button'
-                      onClick={() => setShowRefundPopup(true)}
-                    >
-                      Refund my money
-                    </button>
-                  </>
-                )}
+                  {activePage === EditQuotePage.CANCEL && (
+                    <>
+                      <button
+                        className='btn-transparent px-3'
+                        type='button'
+                        onClick={() => setActivePage(EditQuotePage.OVERVIEW)}
+                      >
+                        <CardMedia
+                          component='img'
+                          sx={{ width: 24, height: 'auto', marginLeft: -2 }}
+                          image={process.env.PUBLIC_URL + '/images/chevron-left.svg'}
+                        />
+                        Back to quote
+                      </button>
+                      <button
+                        className='btn-transparent danger px-3'
+                        type='button'
+                        onClick={() => setShowRefundPopup(true)}
+                      >
+                        Refund my money
+                      </button>
+                    </>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
         </form>
 
         {modalMap && workshops.length && <Workshops onDismiss={() => setModalMap(false)} workshops={workshops} />}
