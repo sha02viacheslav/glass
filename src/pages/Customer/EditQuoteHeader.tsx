@@ -16,6 +16,7 @@ export const EditQuoteHeader: React.FC<EditQuoteHeaderProps> = ({ quoteId, title
         top: '0',
         left: '0',
         width: '100vw',
+        height: { xs: 52, lg: 100 },
         zIndex: '1001',
         display: 'flex',
         alignItems: 'center',

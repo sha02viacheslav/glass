@@ -20,7 +20,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({ quoteId, quoteStep, qu
         top: '0',
         left: '0',
         width: '100vw',
-        height: { lg: '100px' },
+        height: { xs: 52, lg: 100 },
         zIndex: '1001',
         display: 'flex',
         alignItems: { xs: 'center', lg: 'flex-end' },

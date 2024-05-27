@@ -237,13 +237,13 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         formik.setFieldTouched(FormFieldIds.INVOICE_ADDRESS, true, true)
         formik.setFieldTouched(FormFieldIds.WORKING_PLACE, true, true)
         if (formik.errors.registrationNumber) {
-          scrollToElementWithOffset(FormFieldIds.REGISTRATION_NUMBER, 100)
+          scrollToElementWithOffset(FormFieldIds.REGISTRATION_NUMBER, isLg ? 220 : 140)
           return
         } else if (formik.errors.invoiceAddress) {
-          scrollToElementWithOffset(FormFieldIds.INVOICE_ADDRESS, 100)
+          scrollToElementWithOffset(FormFieldIds.INVOICE_ADDRESS, isLg ? 220 : 140)
           return
         } else if (formik.errors.workingPlace) {
-          scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, 100)
+          scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, isLg ? 220 : 140)
           return
         }
         if (editMode) {
@@ -258,7 +258,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       case InquiryStep.STEP2: {
         formik.setFieldTouched(FormFieldIds.GLASS_LOCATION, true, true)
         if (formik.errors.glassLocation) {
-          scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, 100)
+          scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, isLg ? 220 : 140)
           return
         }
         if (editMode) {
@@ -286,16 +286,16 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
         formik.setFieldTouched(FormFieldIds.EMAIL, true, true)
         formik.setFieldTouched(FormFieldIds.PHONE, true, true)
         if (formik.errors.firstName) {
-          scrollToElementWithOffset(FormFieldIds.FIRST_NAME, 100)
+          scrollToElementWithOffset(FormFieldIds.FIRST_NAME, isLg ? 220 : 140)
           return
         } else if (formik.errors.lastName) {
-          scrollToElementWithOffset(FormFieldIds.LAST_NAME, 100)
+          scrollToElementWithOffset(FormFieldIds.LAST_NAME, isLg ? 220 : 140)
           return
         } else if (formik.errors.email) {
-          scrollToElementWithOffset(FormFieldIds.EMAIL, 100)
+          scrollToElementWithOffset(FormFieldIds.EMAIL, isLg ? 220 : 140)
           return
         } else if (formik.errors.phone) {
-          scrollToElementWithOffset(FormFieldIds.PHONE, 100)
+          scrollToElementWithOffset(FormFieldIds.PHONE, isLg ? 220 : 140)
           return
         }
         if (editMode) {
@@ -310,7 +310,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       case InquiryStep.STEP5: {
         formik.setFieldTouched(FormFieldIds.REQUEST_BOOKINGS, true, true)
         if (formik.errors.requestBookings) {
-          scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, 100)
+          scrollToElementWithOffset(FormFieldIds.REQUEST_BOOKINGS, isLg ? 220 : 140)
           return
         }
         if (editMode) {
@@ -970,7 +970,10 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   <RadioGroup
                     row
                     value={formik.values.workingPlace}
-                    onChange={(_, value) => formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)}
+                    onChange={(_, value) => {
+                      scrollToElementWithOffset(FormFieldIds.WORKING_PLACE, isLg ? 220 : 140)
+                      formik.setFieldValue(FormFieldIds.WORKING_PLACE, value as WorkingPlace)
+                    }}
                   >
                     <FormControlLabel
                       value={WorkingPlace.WORKSHOP}

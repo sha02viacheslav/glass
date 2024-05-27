@@ -189,7 +189,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     setShowHeader(
-      !location.pathname.startsWith('/customer') &&
+      !location.pathname.startsWith('/inquiry-intro') &&
+        !location.pathname.startsWith('/customer') &&
         !location.pathname.startsWith('/quote') &&
         !location.pathname.startsWith('/quote-details'),
     )

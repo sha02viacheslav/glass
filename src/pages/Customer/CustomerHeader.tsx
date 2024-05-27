@@ -14,8 +14,9 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({ title }) => {
         top: '0',
         left: '0',
         width: '100vw',
+        height: { xs: 52, lg: 100 },
         zIndex: '1001',
-        padding: { xs: '18px 16px 10px', lg: '32px 0 24px' },
+        padding: { xs: '18px 0 10px', lg: '32px 0 24px' },
         borderBottom: '2px solid var(--Gray-100, #F2F2F3)',
         background: '#fff',
       }}
