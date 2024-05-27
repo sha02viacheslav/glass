@@ -178,7 +178,46 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
           >
             Broken glass pictures or videos
           </Typography>
-          <AddPictures attachments={inquiry.step_3.customer_attachments} disabled={true} />
+          {!!inquiry.step_3.customer_attachments.length ? (
+            <AddPictures attachments={inquiry.step_3.customer_attachments} disabled={true} />
+          ) : (
+            <Box
+              sx={{
+                px: 4,
+                py: 3,
+                borderRadius: '4px',
+                border: '1px solid var(--Yellow---Semantic-500, #FBBC05)',
+                background: '#FFF9C6',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <CardMedia
+                  sx={{ width: 24, height: 24 }}
+                  image={process.env.PUBLIC_URL + '/images/alert-rhombus.svg'}
+                />
+                <Typography
+                  sx={{
+                    color: 'var(--WF-Base-800, #2D3648)',
+                    fontWeight: '500',
+                    lineHeight: '150%',
+                    letterSpacing: '-0.16px',
+                  }}
+                >
+                  You didn&apos;t added any image
+                </Typography>
+              </Box>{' '}
+              <Typography
+                sx={{
+                  color: 'var(--Gray-700, #474747)',
+                  lineHeight: '150%',
+                  letterSpacing: '-0.16px',
+                  mt: 1,
+                }}
+              >
+                It will take longer for us to make the quote. You can add images here.
+              </Typography>
+            </Box>
+          )}
 
           <Box sx={{ marginTop: 3 }}>
             <Typography sx={{ fontSize: '14px', fontWeight: '600', lineHeight: '150%' }}>
@@ -193,7 +232,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
                 marginTop: 1,
               }}
             >
-              {inquiry.step_3.customer_comment}
+              {inquiry.step_3.customer_comment || 'No Comment'}
             </Typography>
           </Box>
         </Box>
