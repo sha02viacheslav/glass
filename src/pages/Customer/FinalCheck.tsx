@@ -146,6 +146,7 @@ export const FinalCheck: React.FC<FinalCheckProps> = ({ selectedCarType, inquiry
               carType={selectedCarType}
               registrationNumber={inquiry.step_1.registration_number}
               selectedGlasses={inquiry.step_2.glass_location}
+              id='map_win_final_check'
             />
           </Box>
         </Box>

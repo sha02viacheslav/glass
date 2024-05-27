@@ -30,6 +30,7 @@ export type WindowSelectorProps = {
   setCarType?: (value: CarType) => void
   onSelectBrokenGlasses?: (value: string[]) => void
   onChangeCharacteristics?: (value: Characteristic[]) => void
+  id?: string
 }
 
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
@@ -41,6 +42,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   setCarType = () => {},
   onSelectBrokenGlasses = () => {},
   onChangeCharacteristics = () => {},
+  id = 'map_workplace',
 }) => {
   // display popup
   const [showSelectGlassGuide, setShowSelectGlassGuide] = useState<boolean>(true)
@@ -407,7 +409,7 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
           {/* You should create instances for all car types so that the image-map-resizer is working */}
           {CAR_TYPES.map((item, index) =>
             item == carType ? (
-              <WindowMap key={index} carType={carType} selectWindow={selectWindow} value={brokenWindows} />
+              <WindowMap key={index} carType={carType} selectWindow={selectWindow} value={brokenWindows} id={id} />
             ) : (
               <div key={index} className='d-none'></div>
             ),

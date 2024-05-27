@@ -254,6 +254,7 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
                 carType={selectedCarType}
                 registrationNumber={quoteDetails.registration_number}
                 selectedGlasses={quoteDetails.glass_location}
+                id='map_win_open_quote'
               />
             </Box>
           </Box>

@@ -1050,6 +1050,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   setCarType={setSelectedCarType}
                   onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
                   onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
+                  id='map_win_customer'
                 />
 
                 <div className='no-glass'>

@@ -99,6 +99,7 @@ export const QuoteOverview: React.FC<QuoteOverviewProps> = ({ selectedCarType, q
               carType={selectedCarType}
               registrationNumber={quoteDetails.registration_number}
               selectedGlasses={quoteDetails.glass_location}
+              id='map_win_overview'
             />
           </Box>
           <Typography sx={{ color: 'var(--Gray-600, #6A6B71)', fontSize: 14, lineHeight: '140%', marginTop: 3 }}>

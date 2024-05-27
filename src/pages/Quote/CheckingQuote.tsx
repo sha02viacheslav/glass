@@ -35,6 +35,7 @@ export const CheckingQuote: React.FC<CheckingQuoteProps> = ({ quoteDetails }) =>
           carType={selectedCarType}
           registrationNumber={quoteDetails.registration_number}
           selectedGlasses={quoteDetails.glass_location}
+          id='map_win_check_quote'
         />
       </Box>
       <Typography

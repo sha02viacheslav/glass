@@ -10,12 +10,13 @@ export type WindowMapProps = {
   carType: CarType
   selectWindow: (value: WinLoc) => void
   value: WindowSelection[]
+  id?: string
 }
 const R_DOT = 4
 const D_DOT = R_DOT * 2
 const COLOR_DOT = '#133F85' // '133F85'
 
-export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, value }) => {
+export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, value, id = 'map_workplace' }) => {
   const [scale, setScale] = useState(1)
   const [poCenter, setPoCenter] = useState(1)
   const [offset, setOffset] = useState(1)
@@ -70,8 +71,10 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
   }, [windows, poCenter])
 
   const getOffsetWithWrapper = () => {
-    const wrapper = document.getElementById('glassLocation')
-    const dom = document.getElementById('image_container')
+    const dom = document.querySelector(`#${id} > img`)
+    const wrapper = dom?.parentNode?.parentNode?.parentNode as HTMLElement
+    console.warn(wrapper, 'wrapper')
+
     if (dom && wrapper) {
       const widthW = wrapper.clientWidth
       const widthD = dom.clientWidth
@@ -82,7 +85,7 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
   }
   useEffect(() => {
     imageMapResize()
-    const dom = document.getElementById('map_workplace')
+    const dom = document.querySelector(`#${id} > img`)
 
     if (dom) {
       dom.addEventListener('load', () => {
@@ -101,7 +104,7 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
   }, [])
 
   const rendered = () => {
-    document.querySelectorAll('[data-label-id]').forEach((e) => {
+    document.querySelectorAll(`#${id} [data-label-id]`).forEach((e) => {
       const dom = e as HTMLElement
       if (dom) {
         const data_p = dom.getAttribute('data-p')
@@ -112,7 +115,7 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
           const rect = dom.getBoundingClientRect()
           const wTop = dom.offsetTop
           const wHeight = rect.height
-          const divLine = document.querySelector<HTMLElement>(`svg[data-line-id='${data_id}']`)
+          const divLine = document.querySelector<HTMLElement>(`#${id} svg[data-line-id='${data_id}']`)
           if (divLine) {
             const lTop = parseInt(divLine.style.top)
             const lLeft = parseInt(divLine.style.left)
@@ -162,14 +165,8 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
   }, [helps, offset, poCenter, widthImage])
 
   return (
-    <>
-      <img
-        className={styles.selectionLayer}
-        src={CAR_IMAGES[carType]}
-        alt=''
-        useMap='#window-image-map'
-        id='map_workplace'
-      />
+    <div id={id}>
+      <img className={styles.selectionLayer} src={CAR_IMAGES[carType]} alt='' useMap='#window-image-map' />
 
       <map name='window-image-map'>
         {windows.map((el) => (
@@ -297,6 +294,6 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
           </Box>
         ))}
       </Box>
-    </>
+    </div>
   )
 }

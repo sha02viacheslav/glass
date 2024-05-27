@@ -389,6 +389,7 @@ export const QuoteTracking: React.FC<QuoteTrackingProps> = ({ quoteDetails }) =>
                                         carType={selectedCarType}
                                         registrationNumber={quoteDetails.registration_number}
                                         selectedGlasses={quoteDetails.glass_location}
+                                        id='map_win_quote_tracking'
                                       />
                                     </Box>
 

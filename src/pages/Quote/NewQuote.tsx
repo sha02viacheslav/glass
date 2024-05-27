@@ -285,6 +285,7 @@ export const NewQuote: React.FC<NewQuoteProps> = ({ quoteDetails }) => {
                   carType={selectedCarType}
                   registrationNumber={quoteDetails.registration_number}
                   selectedGlasses={quoteDetails.glass_location}
+                  id='map_win_new_quote'
                 />
               </Box>
             </Box>

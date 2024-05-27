@@ -423,6 +423,7 @@ export const QuoteDetails: React.FC = ({}) => {
                   setCarType={setSelectedCarType}
                   onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
                   onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}
+                  id='map_win_quote_detail'
                 />
               </div>
             </section>
