@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import moment from 'moment'
 import {
   CALENDAR_LENGTH,
+  CALENDAR_START_DATE,
   CALENDAR_START_TIME,
   CALENDAR_TIME_INTERVAL,
   CALENDAR_TIME_SLOTS,
@@ -24,7 +25,7 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
     return schedules
   }
   const createTimetable = () => {
-    const firstDay = moment().startOf('week').toDate()
+    const firstDay = moment().startOf(CALENDAR_START_DATE).toDate()
     // initialize with today's entry
     const newTimetable: TimeRow[] = [
       {
@@ -46,7 +47,7 @@ export const useCreateTimetable = (timetableToClient: (value: TimeRow[]) => void
 
   const retrieveBookings = (nextDate: Date, timetable: TimeRow[]) => {
     // get past bookings
-    getCalendarService(moment().startOf('week').toDate(), nextDate).then((res) => {
+    getCalendarService(moment().startOf(CALENDAR_START_DATE).toDate(), nextDate).then((res) => {
       if (res.success && res.data) {
         fillTimeSlots(timetable, res.data)
       }

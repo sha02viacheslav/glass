@@ -2,7 +2,14 @@ import './time-select-new.css'
 import React, { useEffect, useState } from 'react'
 import { Box, CardMedia, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import moment from 'moment'
-import { BOOKING_DATE_FORMAT, CALENDAR_DAYS, CALENDAR_TIME_INTERVAL, SLOT_LABELS, SLOT_LEGENDS } from '@glass/constants'
+import {
+  BOOKING_DATE_FORMAT,
+  CALENDAR_DAYS,
+  CALENDAR_START_DATE,
+  CALENDAR_TIME_INTERVAL,
+  SLOT_LABELS,
+  SLOT_LEGENDS,
+} from '@glass/constants'
 import { BookingOccupy } from '@glass/enums'
 import { useCreateTimetable } from '@glass/hooks/useCreateTimetable'
 import { RequestBooking, TimeRow, TimeSlot } from '@glass/models'
@@ -40,7 +47,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   requestBookings = [],
   formError,
 }) => {
-  const firstDay = moment().startOf('week').toDate()
+  const firstDay = moment().startOf(CALENDAR_START_DATE).toDate()
   const [showCalendar, setShowCalendar] = useState<boolean>(true)
   const [selectedDate, setSelectedDate] = useState<Date>(firstDay)
   const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([])
@@ -394,7 +401,7 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
                                 moment(element.date).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
                                   ? 'var(--Dark-Blue---Accent-400, #7255DB)'
                                   : moment(element.date).format('YYYY-MM-DD') ===
-                                    moment().startOf('week').format('YYYY-MM-DD')
+                                    moment(element.date).startOf('week').format('YYYY-MM-DD')
                                   ? 'var(--Gray-800, #14151F)'
                                   : 'var(--Gray-600, #6A6B71)',
                               textAlign: 'center',
