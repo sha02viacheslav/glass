@@ -21,6 +21,7 @@ const ZOOM = 16
 
 const FullMapWorkshop: FC<PropComponentMap> = ({ workshops: markerWorkshops, can }) => {
   const [directions, setResponse] = useState<google.maps.DirectionsResult | null>(null)
+  const [loaded, setLoaded] = useState(false)
 
   const [selected, setSelected] = useState(markerWorkshops[0])
   const { lat, lng } = useMyLocation()
@@ -71,12 +72,18 @@ const FullMapWorkshop: FC<PropComponentMap> = ({ workshops: markerWorkshops, can
     } else return undefined
   }, [directions])
 
+  const onLoaded = useCallback(() => {
+    setTimeout(() => {
+      setLoaded(true)
+    }, 100)
+  }, [])
+
   return (
     <>
       <GoogleMap
         id='my_map'
         mapContainerStyle={{ height: '100vh', width: '100%' }}
-        center={myPosition}
+        center={myPosition || selected}
         zoom={ZOOM}
         options={{
           zoomControl: false,
@@ -85,24 +92,27 @@ const FullMapWorkshop: FC<PropComponentMap> = ({ workshops: markerWorkshops, can
           rotateControl: false,
           streetViewControl: false,
         }}
+        onLoad={onLoaded}
       >
-        {!!myPosition && (
+        {loaded && (
           <>
-            <Marker
-              key='my'
-              position={myPosition}
-              options={{
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  fillColor: '#225FC2',
-                  fillOpacity: 1,
-                  strokeWeight: 10,
-                  scale: 14,
-                  strokeColor: '#133F85',
-                  strokeOpacity: 0.3,
-                },
-              }}
-            />
+            {!!myPosition && (
+              <Marker
+                key='my'
+                position={myPosition}
+                options={{
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#225FC2',
+                    fillOpacity: 1,
+                    strokeWeight: 10,
+                    scale: 14,
+                    strokeColor: '#133F85',
+                    strokeOpacity: 0.3,
+                  },
+                }}
+              />
+            )}
             {markerWorkshops.map((pos, idx) => (
               <Marker
                 key={idx}
@@ -116,23 +126,23 @@ const FullMapWorkshop: FC<PropComponentMap> = ({ workshops: markerWorkshops, can
                 onClick={() => handleMarkerClick(pos)}
               />
             ))}
+            {directionsServiceOptions && (
+              <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
+            )}
+            {directions && (
+              <DirectionsRenderer
+                directions={directions}
+                options={{
+                  polylineOptions: {
+                    strokeColor: can ? '#4285F4' : '#FF0000', // Change the path color to red
+                  },
+                  markerOptions: {
+                    opacity: 0,
+                  },
+                }}
+              />
+            )}
           </>
-        )}
-        {directionsServiceOptions && (
-          <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
-        )}
-        {directions && (
-          <DirectionsRenderer
-            directions={directions}
-            options={{
-              polylineOptions: {
-                strokeColor: can ? '#4285F4' : '#FF0000', // Change the path color to red
-              },
-              markerOptions: {
-                opacity: 0,
-              },
-            }}
-          />
         )}
       </GoogleMap>
       {infoDistanceAndDuration && (
@@ -207,6 +217,7 @@ const FullMapWorkshop: FC<PropComponentMap> = ({ workshops: markerWorkshops, can
 const MobileService: FC<PropComponent> = ({ workshops }) => {
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [error, setError] = useState<boolean>()
+  const [loaded, setLoaded] = useState(false)
 
   const markerWorkshops = useMemo<WorkshopMap[]>(
     () =>
@@ -215,7 +226,7 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
   )
   const { lat, lng } = useMyLocation()
   const selected = useMemo(() => {
-    if (markerWorkshops.length && lat !== undefined && lng !== undefined) return markerWorkshops[0]
+    if (markerWorkshops.length) return markerWorkshops[0]
     return undefined
   }, [markerWorkshops, lat, lng])
 
@@ -252,6 +263,16 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
     } else return undefined
   }, [selected, myPosition])
 
+  const markerPos = useMemo(() => ({ lat: selected?.lat || 0, lng: selected?.lng || 0 }), [selected])
+
+  const onLoaded = useCallback(() => {
+    setTimeout(() => {
+      setLoaded(true)
+    }, 100)
+  }, [])
+
+  if (!selected) return <></>
+
   return (
     <Box sx={{ mb: 2 }}>
       {error === true ? (
@@ -284,7 +305,7 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
         <GoogleMap
           id='google_map'
           mapContainerStyle={{ width: '100%', height: '130px' }}
-          center={selected ? { lat: selected?.lat, lng: selected.lng } : undefined}
+          center={markerPos}
           zoom={ZOOM}
           options={{
             zoomControl: false,
@@ -293,25 +314,28 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
             rotateControl: false,
             streetViewControl: false,
           }}
+          onLoad={onLoaded}
           onClick={() => setIsFullScreen(true)}
         >
-          {selected && (
-            <Marker
-              position={{ lat: selected?.lat, lng: selected.lng }}
-              options={{
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  fillColor: '#FFF',
-                  fillOpacity: 1,
-                  strokeWeight: 10,
-                  scale: 14,
-                  strokeColor: '#225FC2',
-                },
-              }}
-            />
-          )}
-          {directionsServiceOptions && (
-            <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
+          {loaded && (
+            <>
+              <Marker
+                position={markerPos}
+                options={{
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#FFF',
+                    fillOpacity: 1,
+                    strokeWeight: 10,
+                    scale: 14,
+                    strokeColor: '#225FC2',
+                  },
+                }}
+              />
+              {directionsServiceOptions && (
+                <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
+              )}
+            </>
           )}
         </GoogleMap>
       </Box>
@@ -350,10 +374,13 @@ const MobileService: FC<PropComponent> = ({ workshops }) => {
 }
 
 const MainMapMobileService: FC<PropComponent> = (props) => {
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   })
+  if (loadError) {
+    return <div>Map cannot be loaded right now, sorry.</div>
+  }
   if (!isLoaded) return <div></div>
   else return <MobileService {...props} />
 }

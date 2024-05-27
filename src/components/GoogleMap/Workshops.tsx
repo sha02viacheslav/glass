@@ -20,6 +20,7 @@ type PropComponent = {
 
 const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () => undefined }) => {
   const [directions, setResponse] = useState<google.maps.DirectionsResult | null>(null)
+  const [loaded, setLoaded] = useState(false)
 
   const markerWorkshops = useMemo<WorkshopMap[]>(
     () =>
@@ -77,6 +78,12 @@ const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () =
     } else return undefined
   }, [directions])
 
+  const onLoaded = useCallback(() => {
+    setTimeout(() => {
+      setLoaded(true)
+    }, 100)
+  }, [])
+
   return (
     <>
       <GoogleMap
@@ -86,7 +93,7 @@ const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () =
           width: '100%',
           minHeight: showOnModal ? 'unset' : '765px',
         }}
-        center={myPosition}
+        center={myPosition || selected}
         zoom={ZOOM}
         options={{
           zoomControl: false,
@@ -95,24 +102,27 @@ const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () =
           rotateControl: false,
           streetViewControl: false,
         }}
+        onLoad={onLoaded}
       >
-        {!!myPosition && (
+        {loaded && (
           <>
-            <Marker
-              key='my'
-              position={myPosition}
-              options={{
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  fillColor: '#225FC2',
-                  fillOpacity: 1,
-                  strokeWeight: 10,
-                  scale: 14,
-                  strokeColor: '#133F85',
-                  strokeOpacity: 0.3,
-                },
-              }}
-            />
+            {!!myPosition && (
+              <Marker
+                key='my'
+                position={myPosition}
+                options={{
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#225FC2',
+                    fillOpacity: 1,
+                    strokeWeight: 10,
+                    scale: 14,
+                    strokeColor: '#133F85',
+                    strokeOpacity: 0.3,
+                  },
+                }}
+              />
+            )}
             {markerWorkshops.map((pos, idx) => (
               <Marker
                 key={idx}
@@ -126,23 +136,23 @@ const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () =
                 onClick={() => handleMarkerClick(pos)}
               />
             ))}
+            {directionsServiceOptions && (
+              <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
+            )}
+            {directions && (
+              <DirectionsRenderer
+                directions={directions}
+                options={{
+                  polylineOptions: {
+                    strokeColor: infoDistanceAndDuration?.can ? '#4285F4' : '#FF0000', // Change the path color to red
+                  },
+                  markerOptions: {
+                    opacity: 0,
+                  },
+                }}
+              />
+            )}
           </>
-        )}
-        {directionsServiceOptions && (
-          <DirectionsService options={directionsServiceOptions} callback={directionsCallback} />
-        )}
-        {directions && (
-          <DirectionsRenderer
-            directions={directions}
-            options={{
-              polylineOptions: {
-                strokeColor: infoDistanceAndDuration?.can ? '#4285F4' : '#FF0000', // Change the path color to red
-              },
-              markerOptions: {
-                opacity: 0,
-              },
-            }}
-          />
         )}
       </GoogleMap>
       {infoDistanceAndDuration && (
@@ -199,10 +209,13 @@ const MapWorkshop: FC<PropComponent> = ({ showOnModal, workshops, onError = () =
 
 export const Workshops: FC<PropComponent> = ({ showOnModal = true, onDismiss = () => undefined, ...props }) => {
   if (!GOOGLE_MAP_API_KEY) return <></>
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   })
+  if (loadError) {
+    return <div>Map cannot be loaded right now, sorry.</div>
+  }
   if (!isLoaded) return <div></div>
   else
     return (

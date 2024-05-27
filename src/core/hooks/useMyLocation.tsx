@@ -11,9 +11,7 @@ export const useMyLocation = () => {
           setLat(position.coords.latitude)
           setLng(position.coords.longitude)
         },
-        (error) => {
-          console.error('useMyLocation: ', error)
-        },
+        () => {},
       )
     } else {
       alert('Geolocation is not supported by this browser.')
