@@ -885,9 +885,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                       showSearch={true}
                       showModel={true}
                       hasError={formik.touched.registrationNumber && !!formik.errors.registrationNumber}
-                      handleVehInputChange={(val) => {
-                        setLicense(val)
-                      }}
+                      handleVehInputChange={(val) => setLicense(val)}
                       handleVehicleDataChange={(data) => setInquiry(data)}
                     />
                   </Box>

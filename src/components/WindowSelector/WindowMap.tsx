@@ -73,7 +73,6 @@ export const WindowMap: React.FC<WindowMapProps> = ({ carType, selectWindow, val
   const getOffsetWithWrapper = () => {
     const dom = document.querySelector(`#${id} > img`)
     const wrapper = dom?.parentNode?.parentNode?.parentNode as HTMLElement
-    console.warn(wrapper, 'wrapper')
 
     if (dom && wrapper) {
       const widthW = wrapper.clientWidth

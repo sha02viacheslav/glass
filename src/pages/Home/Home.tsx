@@ -105,7 +105,7 @@ export const Home: React.FC = () => {
 
               <Box sx={{ maxWidth: 400, mx: 'auto' }} className='d-flex flex-column align-items-center mt-5'>
                 <LicensePlate
-                  placeholderVal={'ENTER REG.'}
+                  placeholderVal='Enter reg'
                   licenseNumber={licenseSearchVal}
                   showSearch={false}
                   handleVehInputChange={handleVehInputChange}

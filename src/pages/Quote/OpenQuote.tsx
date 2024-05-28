@@ -34,7 +34,6 @@ export const OpenQuote: React.FC<OpenQuoteProps> = ({ quoteDetails, onContinue }
   })
 
   const backToEditQuote = (step: InquiryStep) => {
-    console.warn(step)
     const licenseReg = quoteDetails?.registration_number.replace(' ', '')
     navigate(`/customer/edit/${licenseReg}/${quoteId}/${step}`)
   }

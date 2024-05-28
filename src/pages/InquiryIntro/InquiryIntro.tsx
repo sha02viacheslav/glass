@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
+import { useFormik } from 'formik'
 import { trackPromise } from 'react-promise-tracker'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { object, string } from 'yup'
+import { LicensePlate } from '@glass/components/LicensePlate'
 import { OurMethod } from '@glass/components/OurMethod'
 import { Partners } from '@glass/components/Partners/Partners'
 import { BeforeAfterType } from '@glass/enums'
@@ -11,10 +14,35 @@ import { CustomerHeader } from '../Customer/CustomerHeader'
 import { InstallmentBenefits } from '../Home/InstallmentBenefits'
 import { Testimonials } from '../Home/Testimonials'
 
+type IntroForm = {
+  registrationNumber: string
+}
+
+enum FormFieldIds {
+  REGISTRATION_NUMBER = 'registrationNumber',
+}
+
 export const InquiryIntro: React.FC = () => {
   const navigate = useNavigate()
   const { licenseNum } = useParams()
 
+  const validationSchema = object({
+    registrationNumber: string()
+      .required('Invalid vehicle registration number. Please review and correct it.')
+      .nullable(),
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      registrationNumber: licenseNum || '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: async () => {
+      handleClickStart()
+    },
+  })
+
+  const [licenseSearchVal, setLicense] = useState(licenseNum || '')
   const [inquiry, setInquiry] = useState<Inquiry | undefined>()
 
   const fetchVehData = (license: string | undefined) => {
@@ -32,9 +60,26 @@ export const InquiryIntro: React.FC = () => {
     }
   }
 
-  const directToCustomer = () => {
-    navigate('/customer/' + (licenseNum || ''))
+  const directToCustomer = (values: IntroForm) => {
+    navigate('/customer/' + values.registrationNumber)
   }
+
+  const handleClickStart = () => {
+    formik.setFieldTouched(FormFieldIds.REGISTRATION_NUMBER, true, true)
+    if (formik.errors.registrationNumber) {
+      return
+    }
+
+    directToCustomer(formik.values)
+  }
+
+  useEffect(() => {
+    if (inquiry) {
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, inquiry.step_1.registration_number)
+    } else {
+      formik.setFieldValue(FormFieldIds.REGISTRATION_NUMBER, '')
+    }
+  }, [inquiry])
 
   useEffect(() => {
     fetchVehData(licenseNum)
@@ -95,9 +140,24 @@ export const InquiryIntro: React.FC = () => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className='container'>
           <Box sx={{ width: { xs: '100%', lg: 400 } }} className='lets-start'>
-            <button className='btn-raised w-100' onClick={() => directToCustomer()}>
-              Let&apos;s start
-            </button>
+            <form onSubmit={formik.handleSubmit}>
+              <Box id={FormFieldIds.REGISTRATION_NUMBER} sx={{ mb: 2 }}>
+                <LicensePlate
+                  placeholderVal='Enter reg'
+                  licenseNumber={licenseSearchVal}
+                  showSearch={true}
+                  hasError={formik.touched.registrationNumber && !!formik.errors.registrationNumber}
+                  handleVehInputChange={(val) => setLicense(val)}
+                  handleVehicleDataChange={(data) => setInquiry(data)}
+                />
+                <small className='form-error'>
+                  {formik.touched.registrationNumber && formik.errors.registrationNumber}
+                </small>
+              </Box>
+              <button type='button' className='btn-raised w-100' onClick={() => handleClickStart()}>
+                Let&apos;s start
+              </button>
+            </form>
             <Box
               sx={{
                 color: 'var(--Gray-700, #474747)',
