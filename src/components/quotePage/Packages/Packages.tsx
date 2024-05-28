@@ -61,7 +61,7 @@ export const Packages: React.FC<PackagesProps> = ({ disabled = false, packages, 
                     marginLeft: 2,
                   }}
                 >
-                  {packageKey.split('|')[0]}
+                  {packages[packageKey].quotation_package_description}
                 </Typography>
               </Box>
               <Typography

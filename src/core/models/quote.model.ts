@@ -12,6 +12,7 @@ import { Workshop } from './workshop.model'
 export interface QuotePackage {
   quotation_package_id: number
   quotation_package_price_total: number
+  quotation_package_description: string
   quotation_package_details: QuotePackageDetail[]
 }
 
