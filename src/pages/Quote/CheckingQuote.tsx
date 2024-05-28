@@ -26,12 +26,11 @@ export const CheckingQuote: React.FC<CheckingQuoteProps> = ({ quoteDetails }) =>
         sx={{
           marginTop: 14,
           marginBottom: 6,
-          height: 192,
-          overflow: 'hidden',
         }}
       >
         <WindowSelector
           disabled={true}
+          hideQuestions={true}
           carType={selectedCarType}
           registrationNumber={quoteDetails.registration_number}
           selectedGlasses={quoteDetails.glass_location}

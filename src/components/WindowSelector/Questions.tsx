@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, CardMedia, Typography } from '@mui/material'
+import Slider from 'react-slick'
 import { Characteristic } from '@glass/models'
 import { QuestionCard } from './QuestionCard'
 
@@ -16,7 +17,23 @@ export const Questions: React.FC<QuestionsProps> = ({
   onChange,
   setActiveIndex,
 }) => {
+  let sliderRef: Slider | null = null
   const [currentIndex, setCurrentIndex] = useState<number>(0)
+
+  const sliderSettings = {
+    dots: false,
+    infinite: true,
+    speed: 300,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    afterChange: (index: number) => {
+      if (setActiveIndex) {
+        setActiveIndex(index)
+      }
+      setCurrentIndex(index)
+    },
+  }
 
   const handleChangeCharacteristic = (value: Characteristic) => {
     onChange(
@@ -49,36 +66,52 @@ export const Questions: React.FC<QuestionsProps> = ({
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 5 }}>
-          <img
-            src={process.env.PUBLIC_URL + '/images/chevron-left-gray.svg'}
+          <CardMedia
+            component='img'
+            sx={{ width: 24, height: 24, cursor: 'pointer' }}
+            image={process.env.PUBLIC_URL + '/images/chevron-left-gray.svg'}
             onClick={() => {
-              setCurrentIndex((prev) => {
-                const newValue = (characteristics.length + prev - 1) % characteristics.length
-                if (setActiveIndex) {
-                  setActiveIndex(newValue)
-                }
-                return newValue
-              })
+              sliderRef?.slickPrev()
             }}
           />
-          <img
-            src={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
+          <CardMedia
+            component='img'
+            sx={{ width: 24, height: 24, cursor: 'pointer' }}
+            image={process.env.PUBLIC_URL + '/images/chevron-right-gray.svg'}
             onClick={() => {
-              const newValue = (currentIndex + 1) % characteristics.length
-              setCurrentIndex(newValue)
-              if (setActiveIndex) {
-                setActiveIndex(newValue)
-              }
+              sliderRef?.slickNext()
             }}
           />
         </Box>
       </Box>
 
-      <QuestionCard
-        characteristic={characteristics[currentIndex]}
-        disabled={disabled}
-        onChange={(value) => handleChangeCharacteristic(value)}
-      ></QuestionCard>
+      <Box sx={{ mt: 2 }}>
+        <Box
+          sx={{
+            position: 'relative',
+            m: -2,
+          }}
+        >
+          <Slider
+            ref={(slider) => {
+              sliderRef = slider
+            }}
+            {...sliderSettings}
+          >
+            {characteristics.map((item, index) => (
+              <Box key={index}>
+                <Box sx={{ m: 2 }}>
+                  <QuestionCard
+                    characteristic={item}
+                    disabled={disabled}
+                    onChange={(value) => handleChangeCharacteristic(value)}
+                  ></QuestionCard>
+                </Box>
+              </Box>
+            ))}
+          </Slider>
+        </Box>
+      </Box>
     </>
   )
 }

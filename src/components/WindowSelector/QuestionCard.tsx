@@ -31,7 +31,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, disa
           boxShadow:
             '0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07), 0px 1px 7px 0px rgba(147, 147, 147, 0.09)',
           background: '#fff',
-          marginTop: '8px',
         }}
       >
         <Typography

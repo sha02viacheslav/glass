@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import { Box, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material'
 import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
@@ -24,6 +24,7 @@ import { WhatDifference } from '../Help/WhatDifference'
 export type WindowSelectorProps = {
   showInRow?: boolean
   disabled?: boolean
+  hideQuestions?: boolean
   carType: CarType
   registrationNumber: string
   selectedGlasses?: string[]
@@ -36,6 +37,7 @@ export type WindowSelectorProps = {
 export const WindowSelector: React.FC<WindowSelectorProps> = ({
   showInRow = false,
   disabled = false,
+  hideQuestions = false,
   carType,
   registrationNumber,
   selectedGlasses,
@@ -339,256 +341,270 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   }, [selectedGlasses])
 
   return (
-    <Box sx={{ display: { lg: showInRow ? 'flex' : 'block' } }}>
-      <div className={styles.container}>
-        {showTintedPopup && (
-          <ConfirmDialog
-            title='Tinted Back Window'
-            description='Are you sure back windows tinted?'
-            showIcon={false}
-            confirmStr='Yes'
-            cancelStr='No'
-            onConfirm={() => handleTintPopup(true)}
-            onCancel={() => handleTintPopup(false)}
-          />
-        )}
-
-        {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
-          <ConfirmDialog
-            title='Rear Windows'
-            description='Do you have one or two rear windows?'
-            showIcon={false}
-            confirmStr='Two'
-            cancelStr='One'
-            onConfirm={() => handleBodyPopup(true)}
-            onCancel={() => handleBodyPopup(false)}
-          />
-        )}
-
-        <div className={styles.imgContainer} id='image_container'>
-          {/* display either car with tinted windows or normal */}
-          <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_IMAGES[carType]} alt='' />
-          <img
-            className={tinted ? styles.baseImage : styles.baseImageInactive}
-            src={CAR_TINTED_IMAGES[carType]}
-            alt=''
-          />
-
-          {!disabled && showSelectGlassGuide && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: frontWindscreenTop,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: '100',
-              }}
-            >
-              <img src={process.env.PUBLIC_URL + '/images/hand.svg'} />
-              <PickGlassDialog
-                title='Picking glass'
-                description='You can select multiple glasses.'
-                onConfirm={() => setShowSelectGlassGuide(false)}
-              />
-            </Box>
+    <Grid container spacing={{ xs: 8, lg: 12 }}>
+      <Grid item xs={12} lg={showInRow ? 6 : 12}>
+        <div className={styles.container}>
+          {showTintedPopup && (
+            <ConfirmDialog
+              title='Tinted Back Window'
+              description='Are you sure back windows tinted?'
+              showIcon={false}
+              confirmStr='Yes'
+              cancelStr='No'
+              onConfirm={() => handleTintPopup(true)}
+              onCancel={() => handleTintPopup(false)}
+            />
           )}
 
-          {/* broken glass displays */}
-          {brokenWindows
-            .filter((element) => element.broken)
-            .map((element) => (
-              <img
-                key={element.window}
-                className={carType == CarType.COUPE ? styles.brokenGlassAlt : styles.brokenGlass}
-                src={tinted && element.hasTinted ? element.tintedSource : element.source}
-                alt=''
-              />
-            ))}
-
-          {/* transparent layer on top of all car-related images to maintain image map */}
-          {/* You should create instances for all car types so that the image-map-resizer is working */}
-          {CAR_TYPES.map((item, index) =>
-            item == carType ? (
-              <WindowMap key={index} carType={carType} selectWindow={selectWindow} value={brokenWindows} id={id} />
-            ) : (
-              <div key={index} className='d-none'></div>
-            ),
+          {(carType == CarType.BARN || carType == CarType.TAILGATER) && showBodyPopup && (
+            <ConfirmDialog
+              title='Rear Windows'
+              description='Do you have one or two rear windows?'
+              showIcon={false}
+              confirmStr='Two'
+              cancelStr='One'
+              onConfirm={() => handleBodyPopup(true)}
+              onCancel={() => handleBodyPopup(false)}
+            />
           )}
-        </div>
 
-        {!disabled && <HowToPick />}
-      </div>
+          <div className={styles.imgContainer} id='image_container'>
+            {/* display either car with tinted windows or normal */}
+            <img className={!tinted ? styles.baseImage : styles.baseImageInactive} src={CAR_IMAGES[carType]} alt='' />
+            <img
+              className={tinted ? styles.baseImage : styles.baseImageInactive}
+              src={CAR_TINTED_IMAGES[carType]}
+              alt=''
+            />
 
-      <Box
-        sx={{
-          p: { lg: showInRow ? '24px 48px 48px' : '' },
-          borderRadius: '16px',
-          border: { lg: showInRow ? '2px solid var(--Gray-100, #F2F2F3)' : '' },
-          background: { lg: showInRow ? '#fff' : '' },
-        }}
-      >
-        {!disabled && tintedConfirmed && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderRadius: '4px',
-              padding: '12px 16px',
-              border: '1px solid var(--Gray-100, #F2F2F3)',
-              background: '#fff',
-              marginTop: '24px',
-            }}
-          >
-            <Typography
-              sx={{
-                color: 'var(--Gray-800, #14151F)',
-                fontSize: '12px',
-                fontWeight: '600',
-                lineHeight: '150%',
-                letterSpacing: '0.84px',
-                textTransform: 'uppercase',
-              }}
-            >
-              PRIVACY WINDOWS?
-            </Typography>
-
-            <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
-              <FormControlLabel value={true} control={<Radio />} label='Yes' disabled={disabled} />
-              <FormControlLabel value={false} control={<Radio />} label='No' disabled={disabled} />
-            </RadioGroup>
-          </Box>
-        )}
-
-        {!disabled && isVan && bodyConfirmed && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderRadius: '4px',
-              padding: '12px 16px',
-              border: '1px solid var(--Gray-100, #F2F2F3)',
-              background: '#fff',
-              marginTop: '24px',
-            }}
-          >
-            <Typography
-              sx={{
-                color: 'var(--Gray-800, #14151F)',
-                fontSize: '12px',
-                fontWeight: '600',
-                lineHeight: '150%',
-                letterSpacing: '0.84px',
-                textTransform: 'uppercase',
-              }}
-            >
-              Body type?
-            </Typography>
-
-            <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
-              <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' disabled={disabled} />
-              <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' disabled={disabled} />
-            </RadioGroup>
-          </Box>
-        )}
-
-        {Object.keys(filteredCharacteristics).map((key) => (
-          <Box key={key} sx={{ marginTop: 4 }}>
-            {!disabled && (
-              <Box sx={{ borderTop: '1px solid var(--Gray-100, #f2f2f3)', pt: 4 }}>
-                <Typography
-                  sx={{
-                    color: 'var(--Gray-600, #6A6B71)',
-                    fontSize: '12px',
-                    fontWeight: '700',
-                    lineHeight: '150%',
-                    letterSpacing: '0.84px',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  QUESTIONS ABOUT {key}
-                </Typography>
-
-                <Typography
-                  sx={{
-                    color: 'var(--Gray-800, #14151F)',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    lineHeight: '150%',
-                    letterSpacing: '-0.16px',
-                    marginTop: 4,
-                  }}
-                >
-                  We need some additional information related to your {key}{' '}
-                  <Typography
-                    sx={{
-                      display: 'inline',
-                      color: 'var(--Gray-600, #6A6B71)',
-                    }}
-                    component='span'
-                  >
-                    (Just {characteristics[key].length} fast questions).
-                  </Typography>
-                </Typography>
-
-                <Box
-                  sx={{
-                    padding: '12px 16px',
-                    borderRadius: '2px',
-                    border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
-                    background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
-                    marginTop: '24px',
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: 'var(--Dark-Blue---Accent-800, #090221)',
-                      fontSize: '16px',
-                      fontWeight: '700',
-                      lineHeight: '150%',
-                      letterSpacing: '0.8px',
-                      display: 'flex',
-                      gap: '8px',
-                    }}
-                  >
-                    <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
-                    IMPORTANT
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: 'var(--Light-Blue---Primary-700, #081F44)',
-                      fontSize: '16px',
-                      fontWeight: '400',
-                      lineHeight: '170%',
-                      marginTop: '4px',
-                    }}
-                  >
-                    Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
-                  </Typography>
-                </Box>
+            {!disabled && showSelectGlassGuide && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: frontWindscreenTop,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: '100',
+                }}
+              >
+                <img src={process.env.PUBLIC_URL + '/images/hand.svg'} />
+                <PickGlassDialog
+                  title='Picking glass'
+                  description='You can select multiple glasses.'
+                  onConfirm={() => setShowSelectGlassGuide(false)}
+                />
               </Box>
             )}
 
-            <Questions
-              characteristics={characteristics[key]}
-              disabled={disabled}
-              onChange={(value) => {
-                setCharacteristics((prev) => {
-                  prev[key] = value
-                  return { ...prev }
-                })
+            {/* broken glass displays */}
+            {brokenWindows
+              .filter((element) => element.broken)
+              .map((element) => (
+                <img
+                  key={element.window}
+                  className={carType == CarType.COUPE ? styles.brokenGlassAlt : styles.brokenGlass}
+                  src={tinted && element.hasTinted ? element.tintedSource : element.source}
+                  alt=''
+                />
+              ))}
+
+            {/* transparent layer on top of all car-related images to maintain image map */}
+            {/* You should create instances for all car types so that the image-map-resizer is working */}
+            {CAR_TYPES.map((item, index) =>
+              item == carType ? (
+                <WindowMap key={index} carType={carType} selectWindow={selectWindow} value={brokenWindows} id={id} />
+              ) : (
+                <div key={index} className='d-none'></div>
+              ),
+            )}
+          </div>
+
+          {!disabled && <HowToPick />}
+        </div>
+      </Grid>
+
+      <Grid item xs={12} lg={showInRow ? 6 : 12}>
+        <Box
+          sx={{
+            p: { lg: showInRow ? '24px 48px 48px' : '' },
+            borderRadius: '16px',
+            border: { lg: showInRow ? '2px solid var(--Gray-100, #F2F2F3)' : '' },
+            background: { lg: showInRow ? '#fff' : '' },
+          }}
+        >
+          {!disabled && tintedConfirmed && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderRadius: '4px',
+                padding: '12px 16px',
+                border: '1px solid var(--Gray-100, #F2F2F3)',
+                background: '#fff',
+                marginTop: '24px',
               }}
-              setActiveIndex={(v) => setActiveQuestionIndex({ ...activeQuestionIndex, [key]: v })}
-            ></Questions>
-          </Box>
-        ))}
-        {needHelp && (
-          <Box pt={4}>
-            <WhatDifference />
-          </Box>
-        )}
-      </Box>
-    </Box>
+            >
+              <Typography
+                sx={{
+                  color: 'var(--Gray-800, #14151F)',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  lineHeight: '150%',
+                  letterSpacing: '0.84px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                PRIVACY WINDOWS?
+              </Typography>
+
+              <RadioGroup row value={tinted} onChange={(_, value) => handleChangeTint(value === 'true')}>
+                <FormControlLabel value={true} control={<Radio />} label='Yes' disabled={disabled} />
+                <FormControlLabel value={false} control={<Radio />} label='No' disabled={disabled} />
+              </RadioGroup>
+            </Box>
+          )}
+
+          {!disabled && isVan && bodyConfirmed && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderRadius: '4px',
+                padding: '12px 16px',
+                border: '1px solid var(--Gray-100, #F2F2F3)',
+                background: '#fff',
+                marginTop: '24px',
+              }}
+            >
+              <Typography
+                sx={{
+                  color: 'var(--Gray-800, #14151F)',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  lineHeight: '150%',
+                  letterSpacing: '0.84px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Body type?
+              </Typography>
+
+              <RadioGroup row value={bodyValue} onChange={(_, value) => bodyChange(value === CarType.BARN)}>
+                <FormControlLabel value={CarType.BARN} control={<Radio />} label='Barn door' disabled={disabled} />
+                <FormControlLabel value={CarType.TAILGATER} control={<Radio />} label='Tailgater' disabled={disabled} />
+              </RadioGroup>
+            </Box>
+          )}
+
+          {!hideQuestions && (
+            <>
+              {Object.keys(filteredCharacteristics).map((key) => (
+                <Box key={key} sx={{ marginTop: 4 }}>
+                  {!disabled && (
+                    <Box
+                      sx={{
+                        borderTop:
+                          tintedConfirmed || (isVan && bodyConfirmed) ? '1px solid var(--Gray-100, #f2f2f3)' : 'none',
+                        pt: tintedConfirmed || (isVan && bodyConfirmed) ? 4 : 0,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color: 'var(--Gray-600, #6A6B71)',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          lineHeight: '150%',
+                          letterSpacing: '0.84px',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        QUESTIONS ABOUT {key}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          color: 'var(--Gray-800, #14151F)',
+                          fontSize: '16px',
+                          fontWeight: '400',
+                          lineHeight: '150%',
+                          letterSpacing: '-0.16px',
+                          marginTop: 4,
+                        }}
+                      >
+                        We need some additional information related to your {key}{' '}
+                        <Typography
+                          sx={{
+                            display: 'inline',
+                            color: 'var(--Gray-600, #6A6B71)',
+                          }}
+                          component='span'
+                        >
+                          (Just {characteristics[key].length} fast questions).
+                        </Typography>
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          padding: '12px 16px',
+                          borderRadius: '2px',
+                          border: '1px solid var(--Dark-Blue---Accent-500, #4522C2)',
+                          background: 'var(--Dark-Blue---Accent-00, #ECE8FE)',
+                          marginTop: '24px',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            color: 'var(--Dark-Blue---Accent-800, #090221)',
+                            fontSize: '16px',
+                            fontWeight: '700',
+                            lineHeight: '150%',
+                            letterSpacing: '0.8px',
+                            display: 'flex',
+                            gap: '8px',
+                          }}
+                        >
+                          <img src={process.env.PUBLIC_URL + '/images/information-dark.svg'} />
+                          IMPORTANT
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: 'var(--Light-Blue---Primary-700, #081F44)',
+                            fontSize: '16px',
+                            fontWeight: '400',
+                            lineHeight: '170%',
+                            marginTop: '4px',
+                          }}
+                        >
+                          Pick &quot;I don&apos;t know&quot; if not sure and we&apos;ll check it later.
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  <Questions
+                    characteristics={characteristics[key]}
+                    disabled={disabled}
+                    onChange={(value) => {
+                      setCharacteristics((prev) => {
+                        prev[key] = value
+                        return { ...prev }
+                      })
+                    }}
+                    setActiveIndex={(v) => setActiveQuestionIndex({ ...activeQuestionIndex, [key]: v })}
+                  ></Questions>
+                </Box>
+              ))}
+              {needHelp && (
+                <Box pt={4}>
+                  <WhatDifference />
+                </Box>
+              )}
+            </>
+          )}
+        </Box>
+      </Grid>
+    </Grid>
   )
 }
