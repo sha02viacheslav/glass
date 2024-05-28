@@ -26,11 +26,13 @@ import { Testimonials } from '../Home/Testimonials'
 export type QuoteOptionsForm = {
   quotationPackageId: number
   reserveBookingId: number
+  systemSuggestion: boolean
 }
 
 export enum FormFieldIds {
   QUOTATION_PACKAGE_ID = 'quotationPackageId',
   RESERVE_BOOKING_ID = 'reserveBookingId',
+  SYSTEM_SUGGESTION = 'systemSuggestion',
 }
 
 export type QuoteOptionsProps = {
@@ -52,6 +54,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, rebook
     initialValues: {
       quotationPackageId: 0,
       reserveBookingId: 0,
+      systemSuggestion: false,
     },
     validationSchema: validationSchema,
     onSubmit: async () => {},
@@ -99,7 +102,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, rebook
     if (!quoteId) return
 
     trackPromise(
-      sendReserveBookingService(quoteId, values.reserveBookingId).then(() => {
+      sendReserveBookingService(quoteId, values.reserveBookingId, values.systemSuggestion).then(() => {
         refetch()
       }),
     )
@@ -109,7 +112,7 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, rebook
     if (!quoteId) return
 
     trackPromise(
-      confirmRebookService(quoteId, values.reserveBookingId).then(() => {
+      confirmRebookService(quoteId, values.reserveBookingId, values.systemSuggestion).then(() => {
         refetch()
       }),
     )
@@ -273,7 +276,10 @@ export const QuoteOptions: React.FC<QuoteOptionsProps> = ({ quoteDetails, rebook
               <BookingTimes
                 reserveBookingId={formik.values.reserveBookingId}
                 formError={formik.touched.reserveBookingId && formik.errors.reserveBookingId}
-                onCheckReserveBooking={(value) => formik.setFieldValue(FormFieldIds.RESERVE_BOOKING_ID, value)}
+                onCheckReserveBooking={(value) => {
+                  formik.setFieldValue(FormFieldIds.RESERVE_BOOKING_ID, value.reserve_booking_id)
+                  formik.setFieldValue(FormFieldIds.SYSTEM_SUGGESTION, value.system_suggestion)
+                }}
               />
             </Box>
           </Box>

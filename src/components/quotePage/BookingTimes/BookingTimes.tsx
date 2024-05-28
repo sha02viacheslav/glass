@@ -11,7 +11,7 @@ import { bookingEndTime, bookingStartTime, slotStartTime, slotTimeIndex } from '
 export type BookingTimesProps = {
   reserveBookingId: number
   formError: string | boolean | undefined
-  onCheckReserveBooking: (value: number) => void
+  onCheckReserveBooking: (value: AvailableBookingTimeView) => void
 }
 
 export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, formError, onCheckReserveBooking }) => {
@@ -33,6 +33,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
                 const timeSlot = `${times[0].slice(0, 2)}_${times[1].slice(0, 2)}`
                 bookingTimes.push({
                   reserve_booking_id: availableBooking.reserve_booking_id,
+                  system_suggestion: availableBooking.system_suggestion,
                   time_slot: timeSlot,
                   timeSlotIndex: slotTimeIndex(slotStartTime(bookingDate, timeSlot)),
                   booking_date: bookingDate,
@@ -91,7 +92,7 @@ export const BookingTimes: React.FC<BookingTimesProps> = ({ reserveBookingId, fo
               cursor: 'pointer',
             }}
             onClick={() => {
-              onCheckReserveBooking(element.reserve_booking_id)
+              onCheckReserveBooking(element)
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -4,9 +4,11 @@ import { postApi } from '@glass/services/apis/api.service'
 export const sendReserveBookingService = async (
   qid: string,
   reserveBookingId: number,
+  systemSuggestion: boolean,
 ): Promise<ApiResponse<boolean>> => {
   return await postApi('order/reserve_booking', {
     fe_token: qid,
     reserve_booking_id: reserveBookingId,
+    system_suggestion: systemSuggestion,
   })
 }
