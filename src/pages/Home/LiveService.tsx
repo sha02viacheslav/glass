@@ -12,7 +12,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ isSmall = false }) => 
         display: 'flex',
         paddingRight: '16px',
         alignItems: 'stretch',
-        gap: isSmall ? 6 : { xs: 6, lg: 15 },
+        gap: { xs: 6, lg: isSmall ? 6 : 15 },
         borderRadius: '2px',
         background: '#fff',
         boxShadow:
@@ -23,8 +23,8 @@ export const LiveService: React.FC<LiveServiceProps> = ({ isSmall = false }) => 
         component='img'
         image={process.env.PUBLIC_URL + '/images/live-service-bg1.png'}
         sx={{
-          width: isSmall ? 182 : { xs: 146, lg: 276 },
-          height: isSmall ? 'auto' : { xs: 'auto', lg: 276 },
+          width: { xs: 146, lg: isSmall ? 182 : 276 },
+          height: { xs: 'auto', lg: isSmall ? 'auto' : 276 },
           objectFit: 'cover',
           objectPosition: 'center',
           borderRadius: '2px 0 0 2px',
@@ -33,7 +33,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ isSmall = false }) => 
       <Box
         sx={{
           display: 'flex',
-          padding: isSmall ? '24px 0' : { xs: 'var(--16, 16px) 0px', lg: '64px 0' },
+          padding: { xs: 'var(--16, 16px) 0px', lg: isSmall ? '24px 0' : '64px 0' },
           flexDirection: 'column',
           alignItems: 'flex-start',
           gap: 'var(--8, 8px)',
@@ -44,7 +44,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ isSmall = false }) => 
         <Typography
           sx={{
             color: 'var(--Gray-800, #14151f)',
-            fontSize: isSmall ? 24 : { xs: 16, lg: 36 },
+            fontSize: { xs: 16, lg: isSmall ? 24 : 36 },
             fontWeight: '700',
             lineHeight: '140%',
             textTransform: 'uppercase',
@@ -55,7 +55,7 @@ export const LiveService: React.FC<LiveServiceProps> = ({ isSmall = false }) => 
         <Typography
           sx={{
             color: 'var(--Gray-600, #6a6b71)',
-            fontSize: isSmall ? 20 : { xs: 16, lg: 24 },
+            fontSize: { xs: 16, lg: isSmall ? 20 : 24 },
             fontWeight: '400',
             lineHeight: '170%',
             letterSpacing: '-0.16px',
