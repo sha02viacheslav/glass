@@ -133,6 +133,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
     invoiceAddress: string().required('Required').nullable(),
     workingPlace: string().required('Required').nullable(),
     glassLocation: array().of(string()).required().min(1, 'Select windows that need replacing'),
+    characteristics: array().of(object({ answer_not_know: boolean().isFalse() })),
     firstName: string().required('Required').nullable(),
     lastName: string().required('Required').nullable(),
     email: string().email('Invalid email').required('Required').nullable(),
@@ -185,6 +186,7 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
   const [modalMap, setModalMap] = useState(false)
   const [selectedCarType, setSelectedCarType] = useState<CarType>(CarType.THREE_DOOR)
   const [showQuoteActivePopup, setShowQuoteActivePopup] = useState<boolean>(false)
+  const [questionFirstErrorIndex, setQuestionFirstErrorIndex] = useState<number>(0)
 
   const selectedWorkshop = useMemo(() => {
     const workshopId = formik.values.workshopId
@@ -257,8 +259,17 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
       }
       case InquiryStep.STEP2: {
         formik.setFieldTouched(FormFieldIds.GLASS_LOCATION, true, true)
+        formik.setFieldTouched(FormFieldIds.CHARACTERISTICS, true, true)
         if (formik.errors.glassLocation) {
           scrollToElementWithOffset(FormFieldIds.GLASS_LOCATION, isLg ? 220 : 140)
+          return
+        } else if (formik.errors.characteristics) {
+          scrollToElementWithOffset(FormFieldIds.CHARACTERISTICS, isLg ? 220 : 140)
+          const characteristicsErrors = formik.errors.characteristics
+          if (typeof characteristicsErrors !== 'string') {
+            const firstErrorIndex = characteristicsErrors.findIndex((item) => !!item)
+            setQuestionFirstErrorIndex(firstErrorIndex)
+          }
           return
         }
         if (editMode) {
@@ -1045,6 +1056,9 @@ export const Customer: React.FC<CustomerProps> = ({ editMode = false }) => {
                   carType={selectedCarType}
                   registrationNumber={formik.values.registrationNumber}
                   selectedGlasses={formik.values.glassLocation}
+                  touched={formik.touched}
+                  errors={formik.errors}
+                  questionFirstErrorIndex={questionFirstErrorIndex}
                   setCarType={setSelectedCarType}
                   onSelectBrokenGlasses={(value) => formik.setFieldValue(FormFieldIds.GLASS_LOCATION, value)}
                   onChangeCharacteristics={(values) => formik.setFieldValue(FormFieldIds.CHARACTERISTICS, values)}

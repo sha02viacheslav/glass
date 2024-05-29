@@ -1,12 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, CardMedia, Typography } from '@mui/material'
+import { FormikErrors, FormikTouched } from 'formik'
 import Slider from 'react-slick'
 import { Characteristic } from '@glass/models'
+import { CustomerForm, FormFieldIds } from '@glass/pages/Customer/Customer'
 import { QuestionCard } from './QuestionCard'
 
 export type QuestionsProps = {
   characteristics: Characteristic[]
   disabled?: boolean
+  touched?: FormikTouched<CustomerForm>
+  errors?: FormikErrors<CustomerForm>
+  firstErrorIndex?: number
   onChange: (value: Characteristic[]) => void
   setActiveIndex?: (v: number) => void
 }
@@ -14,11 +19,19 @@ export type QuestionsProps = {
 export const Questions: React.FC<QuestionsProps> = ({
   characteristics,
   disabled = false,
+  touched,
+  errors,
+  firstErrorIndex = 0,
   onChange,
-  setActiveIndex,
+  setActiveIndex = () => {},
 }) => {
   let sliderRef: Slider | null = null
   const [currentIndex, setCurrentIndex] = useState<number>(0)
+
+  const handleChangeIndex = (index: number) => {
+    setActiveIndex(index)
+    setCurrentIndex(index)
+  }
 
   const sliderSettings = {
     dots: false,
@@ -28,10 +41,7 @@ export const Questions: React.FC<QuestionsProps> = ({
     slidesToScroll: 1,
     arrows: false,
     afterChange: (index: number) => {
-      if (setActiveIndex) {
-        setActiveIndex(index)
-      }
-      setCurrentIndex(index)
+      handleChangeIndex(index)
     },
   }
 
@@ -46,9 +56,14 @@ export const Questions: React.FC<QuestionsProps> = ({
     )
   }
 
+  useEffect(() => {
+    handleChangeIndex(firstErrorIndex)
+    sliderRef?.slickGoTo(firstErrorIndex)
+  }, [firstErrorIndex])
+
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginTop: 4 }}>
+      <Box id={FormFieldIds.CHARACTERISTICS} sx={{ display: 'flex', alignItems: 'center', gap: 1, marginTop: 4 }}>
         <Typography
           sx={{
             color: 'var(--Gray-600, #6A6B71)',
@@ -104,8 +119,12 @@ export const Questions: React.FC<QuestionsProps> = ({
                   <QuestionCard
                     characteristic={item}
                     disabled={disabled}
+                    hasError={touched?.characteristics && !!errors?.characteristics?.[index]}
                     onChange={(value) => handleChangeCharacteristic(value)}
                   ></QuestionCard>
+                  {touched?.characteristics && !!errors?.characteristics?.[index] && (
+                    <small className='form-error'>Please answer this question</small>
+                  )}
                 </Box>
               </Box>
             ))}

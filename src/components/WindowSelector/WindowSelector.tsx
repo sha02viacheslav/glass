@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Box, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material'
+import { FormikErrors, FormikTouched } from 'formik'
 import { cloneDeep } from 'lodash'
 import { ConfirmDialog } from '@glass/components/ConfirmDialog'
 import { WindowMap } from '@glass/components/WindowSelector/WindowMap'
 import { CAR_IMAGES, CAR_TINTED_IMAGES, CAR_TYPES, WINDOWS } from '@glass/constants'
 import { CarType, WinLoc } from '@glass/enums'
 import { Characteristic, WindowSelection } from '@glass/models'
+import { CustomerForm } from '@glass/pages/Customer/Customer'
 import { getCharacteristicService } from '@glass/services/apis/get-characteristic.service'
 import {
   getAskedTint,
@@ -28,6 +30,9 @@ export type WindowSelectorProps = {
   carType: CarType
   registrationNumber: string
   selectedGlasses?: string[]
+  touched?: FormikTouched<CustomerForm>
+  errors?: FormikErrors<CustomerForm>
+  questionFirstErrorIndex?: number
   setCarType?: (value: CarType) => void
   onSelectBrokenGlasses?: (value: string[]) => void
   onChangeCharacteristics?: (value: Characteristic[]) => void
@@ -41,6 +46,9 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
   carType,
   registrationNumber,
   selectedGlasses,
+  touched,
+  errors,
+  questionFirstErrorIndex = 0,
   setCarType = () => {},
   onSelectBrokenGlasses = () => {},
   onChangeCharacteristics = () => {},
@@ -586,6 +594,9 @@ export const WindowSelector: React.FC<WindowSelectorProps> = ({
                   <Questions
                     characteristics={characteristics[key]}
                     disabled={disabled}
+                    touched={touched}
+                    errors={errors}
+                    firstErrorIndex={questionFirstErrorIndex}
                     onChange={(value) => {
                       setCharacteristics((prev) => {
                         prev[key] = value

@@ -6,10 +6,16 @@ import { Characteristic } from '@glass/models'
 export type QuestionCardProps = {
   characteristic: Characteristic
   disabled?: boolean
+  hasError?: boolean
   onChange: (value: Characteristic) => void
 }
 
-export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, disabled = false, onChange }) => {
+export const QuestionCard: React.FC<QuestionCardProps> = ({
+  characteristic,
+  disabled = false,
+  hasError = false,
+  onChange,
+}) => {
   const answer = useMemo(() => {
     if (characteristic[CharacteristicAnswer.YES]) {
       return CharacteristicAnswer.YES
@@ -30,6 +36,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, disa
           borderRadius: '2px',
           boxShadow:
             '0px 4px 17px 0px rgba(147, 147, 147, 0.04), 0px 2px 12px 0px rgba(147, 147, 147, 0.07), 0px 1px 7px 0px rgba(147, 147, 147, 0.09)',
+          border: hasError ? '1px solid var(--Red---Semantic-500, #C22222)' : 'none',
           background: '#fff',
         }}
       >
@@ -64,7 +71,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ characteristic, disa
             value={CharacteristicAnswer.NOT_KNOW}
             control={<Radio />}
             label="I don't know"
-            disabled={disabled}
+            disabled={true}
           />
         </RadioGroup>
       </Box>
